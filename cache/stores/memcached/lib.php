@@ -203,10 +203,10 @@ class cachestore_memcached extends cache_store implements cache_is_configurable 
 
         $this->connection = new Memcached(crc32($this->name));
         $servers = $this->connection->getServerList();
+        foreach ($this->options as $key => $value) {
+            $this->connection->setOption($key, $value);
+        }
         if (empty($servers)) {
-            foreach ($this->options as $key => $value) {
-                $this->connection->setOption($key, $value);
-            }
             $this->connection->addServers($this->servers);
         }
 
@@ -214,10 +214,14 @@ class cachestore_memcached extends cache_store implements cache_is_configurable 
             foreach ($this->setservers as $setserver) {
                 // Since we will have a number of them with the same name, append server and port.
                 $connection = new Memcached(crc32($this->name.$setserver[0].$setserver[1]));
+                $servers = $connection->getServerList();
                 foreach ($this->options as $key => $value) {
                     $connection->setOption($key, $value);
                 }
-                $connection->addServer($setserver[0], $setserver[1]);
+                // Check if servers are already added (MDL-51816).
+                if (empty($servers)) {
+                    $connection->addServer($setserver[0], $setserver[1]);
+                }
                 $this->setconnections[] = $connection;
             }
         }
