@@ -40,4 +40,5 @@ $string['skipnavigation'] = 'Skip navigation';
 $string['skipto'] = 'Skip to {$a}';
 $string['tocontent'] = 'Skip to main content';
 $string['tonavigation'] = 'Go to navigation';
+$string['totop'] = 'Go to top';
 $string['youarehere'] = 'You are here';
