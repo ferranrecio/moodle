@@ -196,6 +196,19 @@ define(['jquery', 'core/pending'], function($, Pending) {
                     pendingPromise.resolve();
                 }, 300, new Pending('core/aria:delayed-focus'));
             });
+
+            // Add shrink class to body when scroll down for floating elements.
+            $(function(){
+                var shrinkHeader = 50;
+                $(window).scroll(function() {
+                    var scroll = window.pageYOffset || document.documentElement.scrollTop;
+                    if ( scroll >= shrinkHeader ) {
+                        $('body').addClass('shrink');
+                    } else {
+                        $('body').removeClass('shrink');
+                    }
+                });
+            });
         }
     };
 });
