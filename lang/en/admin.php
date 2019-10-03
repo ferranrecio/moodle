@@ -1237,6 +1237,7 @@ $string['taskcheckforupdates'] = 'Check for updates';
 $string['taskcompletionregular'] = 'Calculate regular completion data';
 $string['taskcompletiondaily'] = 'Completion mark as started';
 $string['taskcontextcleanup'] = 'Cleanup contexts';
+$string['taskcoursedatereached'] = 'Courses start and end date reached processing';
 $string['tasklogging'] = 'Task log configuration';
 $string['taskcreatecontexts'] = 'Create missing contexts';
 $string['taskdeletecachetext'] = 'Delete old text cache records';
