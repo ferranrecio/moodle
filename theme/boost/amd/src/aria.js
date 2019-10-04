@@ -200,13 +200,19 @@ define(['jquery', 'core/pending'], function($, Pending) {
 
             // Add shrink class to body when scroll down for floating elements.
             $(function() {
-                var shrinkHeader = 50;
+                // position for a possible shrinking
+                var shrinkHeader = 350;
                 $(window).scroll(function() {
                     var scroll = window.pageYOffset || document.documentElement.scrollTop;
                     if (scroll >= shrinkHeader) {
                         $('body').addClass('shrink');
                     } else {
                         $('body').removeClass('shrink');
+                    }
+                    if (scroll >= $(window).height()*2) {
+                        $('body').addClass('scrolled');
+                    } else {
+                        $('body').removeClass('scrolled');
                     }
                 });
             });
