@@ -25,6 +25,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+
 define('AJAX_SCRIPT', true);
 
 // if (!empty($_GET['nosessionupdate'])) {
@@ -79,6 +80,7 @@ $component = clean_param($component, PARAM_COMPONENT);
 if (empty($component)) {
     xapi_restful_error (403, "Wrong component name $component");
 }
+
 $pluginman = core_plugin_manager::instance();
 $plugin = $pluginman->get_plugin_info($component);
 if (!$plugin || !$plugin->is_enabled()) {

@@ -111,6 +111,7 @@ class external extends external_api {
             }
         }
 
+        xapi_restful_success($statements);
         return $result;
     }
 
@@ -165,17 +166,137 @@ class external extends external_api {
     }
 
     /**
-     * Basic xAPI statement structure validation.
-     * @param mixed $statement json decoded statement structure
+     * Basic xAPI statement structure validation. This will ensure that mandatory
+     * fields are created so rest of the logic could avoid tons of calls to isset and empty.
+     *
+     * NOTE: For now this validator only check for supported statements. In the future this kind
+     * of validation should be done with a more complex json schema validator
+     * if more scenarios are supported.
+     *
+     * @param \stdClass $statement json decoded statement structure
      * @return bool
      */
-    private static function validate_statement ($statement): bool {
-        $mandatory_fields = ['actor', 'verb', 'object'];
-        foreach ($mandatory_fields as $field) {
-            if (!isset($statement->$field)) {
+    private static function validate_statement (\stdClass $statement): bool {
+        $requiredfields = ['actor', 'verb', 'object'];
+        foreach ($requiredfields as $required) {
+            if (empty($statement->$required)) {
+                return false;
+            }
+            $validatefunction = 'validate_'.$required;
+            if (!self::$validatefunction($statement->$required)) {
                 return false;
             }
         }
         return true;
     }
+
+    /**
+     * check Agent minimal atributes (note: only Agent and Group supported).
+     *
+     * @param \stdClass $field the specific statement atribute to check
+     * @return bool
+     */
+    private static function validate_actor (\stdClass $field): bool {
+        if (empty($field->objectType)) {
+            $field->objectType = 'Agent';
+        }
+        switch ($field->objectType) {
+            case 'Agent':
+                return self::validate_agent($field);
+            case 'Group':
+                return self::validate_group($field);
+        }
+        return false;
+    }
+
+    /**
+     * check Verb minimal atributes.
+     *
+     * @param \stdClass $field the specific statement atribute to check
+     * @return bool
+     */
+    private static function validate_verb (\stdClass $field): bool {
+        if (empty($field->id)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * check Object minimal atributes (Note: for now only Activity supported).
+     *
+     * @param \stdClass $field the specific statement atribute to check
+     * @return bool
+     */
+    private static function validate_object (\stdClass $field): bool {
+        if (empty($field->objectType)) {
+            $field->objectType = 'Activity';
+        }
+        if (empty($field->id)) {
+            return false;
+        }
+        if (!empty($field->definition)) {
+            return self::validate_definition($field->definition);
+        }
+        return true;
+    }
+
+    /**
+     * check Agent minimal atributes (note: mbox_sha1sum and openid not suported).
+     *
+     * @param \stdClass $field the specific statement atribute to check
+     * @return bool
+     */
+    private static function validate_agent (\stdClass $field): bool {
+        $requiredfields = ['mbox' => [],'account' => ['homePage', 'name']];
+        $found = 0;
+        foreach ($requiredfields as $required => $atributes) {
+            if (!empty($field->$required)) {
+                $found++;
+            }
+            foreach ($atributes as $atribute) {
+                if (!empty($field->$required->$atribute)) {
+                    return false;
+                }
+            }
+        }
+        if ($found != 1) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * check Group minimal atributes, validating also group members as Agents.
+     *
+     * @param \stdClass $field the specific statement atribute to check
+     * @return bool
+     */
+    private static function validate_group (\stdClass $field): bool {
+        if (empty($field->member) || !is_array($field->member)) {
+            return false;
+        }
+        foreach ($field->member as $member) {
+            if (!self::validate_agent($member)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+        /**
+     * check Object Defintion minimal atributes.
+     *
+     * Note: validate specific interactionType delegated to plugins.
+     *
+     * @param \stdClass $field the specific statement atribute to check
+     * @return bool
+     */
+    private static function validate_definition (\stdClass $field): bool {
+        if (empty($field->interactionType)) {
+            return false;
+        }
+        return true;
+    }
+
 }
