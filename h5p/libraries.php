@@ -93,26 +93,10 @@ $form->display();
 // Load installed Libraries.
 $framework = $h5pfactory->get_framework();
 $libraries = $framework->loadLibraries();
-$installed = [];
-foreach ($libraries as $libraryname => $versions) {
-    foreach ($versions as $version) {
-        $actionmenu = new action_menu();
-        $actionmenu->set_menu_trigger(get_string('actions', 'core_h5p'));
-        $actionmenu->set_alignment(action_menu::TL, action_menu::BL);
-        $actionmenu->prioritise = true;
-        $actionmenu->add(new action_menu_link(
-            new moodle_url('/h5p/libraries.php', ['deletelibrary' => $version->id]),
-            null,
-            get_string('deletelibraryversion', 'core_h5p'),
-            false
-        ));
-        $version->actionmenu = $actionmenu->export_for_template($OUTPUT);
-        $installed[] = $version;
-    }
-}
 
-if (count($installed)) {
-    echo $OUTPUT->render_from_template('core_h5p/h5plibraries', (object)['contenttypes' => $installed]);
+if (!empty($libraries)) {
+    $libs = new core_h5p\output\libraries($libraries);
+    echo $OUTPUT->render_from_template('core_h5p/h5plibraries', $libs->export_for_template($OUTPUT));
 }
 
 echo $OUTPUT->footer();

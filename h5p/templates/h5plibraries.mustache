@@ -67,7 +67,7 @@
                     <tr>
                         <th>{{#str}}description, core{{/str}}</th>
                         <th>{{#str}}version, core{{/str}}</th>
-                        <th></th>
+                        <th>{{#str}}actions, core{{/str}}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -80,7 +80,7 @@
                             <td>{{{ major_version }}}.{{{ minor_version }}}.{{{ patch_version }}}</td>
                             <td>
                                 {{#actionmenu}}
-                                {{>core/action_menu}}
+                                    {{>core/action_menu}}
                                 {{/actionmenu}}
                             </td>
                         </tr>
@@ -110,7 +110,7 @@
                             <td>{{{ major_version }}}.{{{ minor_version }}}.{{{ patch_version }}}</td>
                             <td>
                                 {{#actionmenu}}
-                                {{>core/action_menu}}
+                                    {{>core/action_menu}}
                                 {{/actionmenu}}
                             </td>
                         </tr>

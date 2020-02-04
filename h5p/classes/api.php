@@ -35,8 +35,10 @@ defined('MOODLE_INTERNAL') || die();
 class api {
 
     /**
-     * Delete a library and also all the libraries depending on it and the H5P contents using it. For the H5P content, only the
-     * database entries in {h5p} are removed (the .h5p files are not removed in order to let users to deploy them again).
+     * Delete a library, all the libraries depending on it and the H5P contents using it.
+     *
+     * For the H5P content, only the database entries in {h5p} are removed
+     * The .h5p course files are not removed in order to let users to deploy them again.
      *
      * @param  factory   $factory The H5P factory.
      * @param  \stdClass $library The library to delete.
@@ -44,11 +46,12 @@ class api {
     public static function delete_library(factory $factory, \stdClass $library): void {
         global $DB;
 
-        // Get the H5P contents using this library, to remove them from DB. The .h5p files won't be removed
-        // so they will be displayed by the player next time a user with the proper permissions accesses it.
+        // Get the H5P contents using this library, to remove them from DB.
+        // The .h5p files won't be removed so they will be displayed by the player
+        // next time a user with the proper permissions accesses it.
         $sql = 'SELECT DISTINCT hcl.h5pid
-                FROM {h5p_contents_libraries} hcl
-                WHERE hcl.libraryid = :libraryid';
+                  FROM {h5p_contents_libraries} hcl
+                 WHERE hcl.libraryid = :libraryid';
         $params = ['libraryid' => $library->id];
         $h5pcontents = $DB->get_records_sql($sql, $params);
         foreach ($h5pcontents as $h5pcontent) {
@@ -59,7 +62,7 @@ class api {
         $factory->get_framework()->deleteLibrary($library);
 
         // Remove the libraries using this library.
-        $requiredlibraries = self::get_required_libraries($library->id);
+        $requiredlibraries = self::get_dependent_libraries($library->id);
         foreach ($requiredlibraries as $requiredlibrary) {
             self::delete_library($factory, $requiredlibrary);
         }
@@ -71,13 +74,13 @@ class api {
      * @param  int    $libraryid The library to get its dependencies.
      * @return array  List of libraryid with all the libraries required by a defined library.
      */
-    public static function get_required_libraries(int $libraryid): array {
+    public static function get_dependent_libraries(int $libraryid): array {
         global $DB;
 
         $sql = 'SELECT DISTINCT hl.*
-                FROM {h5p_library_dependencies} hld
-                JOIN {h5p_libraries} hl ON hl.id = hld.libraryid
-                WHERE hld.requiredlibraryid = :libraryid';
+                  FROM {h5p_library_dependencies} hld
+                  JOIN {h5p_libraries} hl ON hl.id = hld.libraryid
+                 WHERE hld.requiredlibraryid = :libraryid';
         $params = ['libraryid' => $libraryid];
 
         return $DB->get_records_sql($sql, $params);

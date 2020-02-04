@@ -159,11 +159,11 @@ class api_testcase extends \advanced_testcase {
     /**
      * Test the behaviour of delete_library().
      *
-     * @dataProvider  get_required_libraries_provider
+     * @dataProvider  get_dependent_libraries_provider
      * @param  string $libraryname     Machine name of the library to delete.
      * @param  int    $expectedvalue   Total of H5P required libraries expected.
      */
-    public function test_get_required_libraries(string $libraryname, int $expectedvalue): void {
+    public function test_get_dependent_libraries(string $libraryname, int $expectedvalue): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -176,7 +176,7 @@ class api_testcase extends \advanced_testcase {
         // Get required libraries.
         $library = $DB->get_record('h5p_libraries', ['machinename' => $libraryname], 'id');
         if ($library) {
-            $libraries = \core_h5p\api::get_required_libraries((int)$library->id);
+            $libraries = \core_h5p\api::get_dependent _libraries((int)$library->id);
         } else {
             $libraries = [];
         }
@@ -185,11 +185,11 @@ class api_testcase extends \advanced_testcase {
     }
 
     /**
-     * Data provider for test_get_required_libraries().
+     * Data provider for test_get_dependent_libraries().
      *
      * @return array
      */
-    public function get_required_libraries_provider(): array {
+    public function get_dependent_libraries_provider(): array {
         return [
             'Main library of a content' => [
                 'MainLibrary',
