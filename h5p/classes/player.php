@@ -711,7 +711,7 @@ class player {
      *
      * @return string The HTML code with the resize script.
      */
-    private function get_resize_code(): string {
+    public function get_resize_code(): string {
         global $OUTPUT;
 
         $template = new \stdClass();
@@ -728,7 +728,7 @@ class player {
      *
      * @return string The HTML code to reuse this H5P content in a different place.
      */
-    private function get_embed_code(string $url, bool $embedenabled): string {
+    public function get_embed_code(string $url, bool $embedenabled): string {
         global $OUTPUT;
 
         if ( ! $embedenabled) {
