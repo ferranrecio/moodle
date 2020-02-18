@@ -43,7 +43,6 @@ class contentbank_files_form extends moodleform {
 
         $data = $this->_customdata['data'];
         $options = $this->_customdata['options'];
-
         $mform->addElement('filepicker', 'file', get_string('file', 'core_contentbank'), null, $options);
         $mform->addHelpButton('file', 'file', 'core_contentbank');
         $mform->addRule('file', null, 'required');
@@ -66,7 +65,6 @@ class contentbank_files_form extends moodleform {
         if (file_is_draft_area_limit_reached($draftitemid, $this->_customdata['options']['areamaxbytes'])) {
             $errors['file'] = get_string('userquotalimit', 'error');
         }
-
         return $errors;
     }
 }

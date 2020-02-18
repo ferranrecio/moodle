@@ -27,4 +27,5 @@ $string['file'] = 'Upload content';
 $string['file_help'] = 'You can import new content into the content bank uploading files. Only extensions supported by enabled Content bank type plugins will be allowed.';
 $string['name'] = 'Content';
 $string['timecreated'] = 'Time created';
+$string['unsupported'] = 'This content type is not supported';
 $string['upload'] = 'Upload';

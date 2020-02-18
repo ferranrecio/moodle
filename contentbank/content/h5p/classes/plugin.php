@@ -25,6 +25,7 @@
 namespace contentbank_h5p;
 
 use core_contentbank\base;
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -44,15 +45,15 @@ class plugin extends base {
     /**
      * Fills content_bank table with appropiate information.
      *
-     * @param string $name  Name of the element to be created.
-     * @return int          Id of the element created or false if the element has not been created.
+     * @param stdClass $content  an optional content record compatible object (default null)
+     * @return int|null          Id of the element created or false if the element has not been created.
      */
-    public function create_content(string $name) {
-
-        $this->itemtype = self::COMPONENT;
-        $this->content->itemtype = self::COMPONENT;
-
-        return parent::create_content($name);
+    public function create_content(stdClass $content = null): ?int {
+        if (empty($content)) {
+            $content = new stdClass();
+        }
+        $content->itemtype = self::COMPONENT;
+        return parent::create_content($content);
     }
 
     /**
@@ -61,7 +62,7 @@ class plugin extends base {
      * @return array
      */
     public function get_manageable_extensions(): array {
-        return array('h5p');
+        return array('.h5p');
     }
 
     /**
@@ -69,38 +70,37 @@ class plugin extends base {
      *
      * @return bool     True if content could be uploaded. False otherwise.
      */
-    public function can_upload(): bool {
-        $hascapability = has_capability('contentbank/h5p:additem', \context_system::instance());
-        return ($hascapability && parent::can_upload());
+    public function can_upload(\context $context = null): bool {
+        $context = $context ?? $this->context;
+        $hascapability = has_capability('contentbank/h5p:additem', $context);
+        return ($hascapability && parent::can_upload($context));
     }
 
     /**
      * Returns the HTML content to add to view.php visualizer.
      *
-     * @param int $contentid    Id of the content to be rendered.
-     * @return string           HTML code to include in view.php.
+     * @return string            HTML code to include in view.php.
+     * @throws \coding_exception if content is not loaded previously.
      */
-    public function get_view_content(int $contentid): string {
-        $this->get_content($contentid);
-
-        $fileurl = $this->get_file_url($contentid);
+    public function get_view_content(): string {
+        $this->require_loaded();
+        $fileurl = $this->get_file_url($this->get_id());
         $player = new \core_h5p\player($fileurl, new \stdClass());
         $html = \html_writer::tag('h2', $this->get_name());
         $html .= $player->get_embed_code($fileurl, true);
         $html .= $player->get_resize_code();
-
         return $html;
     }
 
     /**
      * Returns the HTML code to render the icon for H5P content types.
      *
-     * @param int $contentid    Id of the content to be rendered.
-     * @return string           HTML code to render the icon
+     * @return string            HTML code to render the icon
+     * @throws \coding_exception if not loaded.
      */
-    public function get_icon(int $contentid): string {
+    public function get_icon(): string {
         global $OUTPUT;
-
+        $this->require_loaded();
         return $OUTPUT->pix_icon('f/h5p-64', $this->get_name(), 'moodle', ['class' => 'iconsize-big']);
     }
 

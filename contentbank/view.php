@@ -30,7 +30,13 @@ $context = context_system::instance();
 require_capability('moodle/contentbank:view', $context);
 
 $id = required_param('id', PARAM_INT);
-$content = $DB->get_record('contentbank_content', ['id' => $id]);
+$content = $DB->get_record('contentbank_content', ['id' => $id], '*', MUST_EXIST);
+
+$returnurl = new \moodle_url('/contentbank/index.php');
+$plugin = core_plugin_manager::instance()->get_plugin_info($content->itemtype);
+if (!$plugin || !$plugin->is_enabled()) {
+    print_error('unsupported', 'core_contentbank', $returnurl);
+}
 
 $PAGE->set_url(new \moodle_url('/contentbank/view.php', ['id' => $id]));
 $PAGE->set_context($context);
@@ -52,8 +58,9 @@ echo $OUTPUT->box_start('generalbox');
 
 $managerclass = "\\$content->itemtype\\plugin";
 if (class_exists($managerclass)) {
-    $manager = new $managerclass;
-    echo $manager->get_view_content($id);
+    $manager = new $managerclass();
+    $manager->load_content($content);
+    echo $manager->get_view_content();
 }
 
 echo $OUTPUT->box_end();

@@ -79,17 +79,15 @@ final class extensions {
      * @return core_contentbank_content[] Array of core_contentbank_content objects
      */
     private function get_types() {
-        // Save time by only building the list once.
-        if (!$this->types) {
-
-            $types = \core\plugininfo\contentbank::get_enabled_plugins();
-            $this->types = [];
-
-            foreach ($types as $name) {
-                $classname = "\\contentbank_$name\\plugin";
-                if (class_exists($classname)) {
-                    $this->types[] = new $classname($name);
-                }
+        if ($this->types) {
+            return $this->types;
+        }
+        $types = \core\plugininfo\contentbank::get_enabled_plugins();
+        $this->types = [];
+        foreach ($types as $name) {
+            $classname = "\\contentbank_$name\\plugin";
+            if (class_exists($classname)) {
+                $this->types[] = new $classname($name);
             }
         }
         return $this->types;
@@ -101,19 +99,20 @@ final class extensions {
      * @return array The array with all the extensions supported.
      */
     public function get_supported_extensions() {
-        if (empty($this->supportedextensions)) {
-            $extensions = array();
-            foreach ($this->get_types() as $type) {
-                if ($type->can_upload()) {
-                    foreach ($type->get_manageable_extensions() as $extension) {
-                        if (!empty($extension) && !in_array($extension, $extensions)) {
-                            $extensions[] = $extension;
-                        }
+        if ($this->supportedextensions) {
+            return $this->supportedextensions;
+        }
+        $extensions = array();
+        foreach ($this->get_types() as $type) {
+            if ($type->can_upload()) {
+                foreach ($type->get_manageable_extensions() as $extension) {
+                    if (!empty($extension) && !in_array($extension, $extensions)) {
+                        $extensions[] = $extension;
                     }
                 }
             }
-            $this->supportedextensions = $extensions;
         }
+        $this->supportedextensions = $extensions;
         return $this->supportedextensions;
     }
 
@@ -137,9 +136,8 @@ final class extensions {
         $dot = strrpos($filename, '.');
         if ($dot === false) {
             return '';
-        } else {
-            return strtolower(substr($filename, $dot + 1));
         }
+        return strtolower(substr($filename, $dot));
     }
 
     /**

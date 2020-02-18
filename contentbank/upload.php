@@ -82,8 +82,10 @@ if ($mform->is_cancelled()) {
         $file = reset($files);
         $filename = $file->get_filename();
         $plugin = $extensionmanager->get_extension_supporter($extensionmanager->get_extension($filename));
-        $contentid = $plugin->create_content($filename);
-        file_save_draft_area_files($formdata->file, $context->id, 'contentbank', 'public', $contentid);
+        $content = new stdClass();
+        $content->name = $filename;
+        $content->id = $plugin->create_content($content);
+        file_save_draft_area_files($formdata->file, $context->id, 'contentbank', 'public', $content->id);
     }
     redirect($returnurl);
 }

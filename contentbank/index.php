@@ -38,7 +38,7 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_pagetype('contentbank');
 
 // Get all contents managed by active plugins to render.
-$contentdata = array();
+$foldercontents = array();
 $contents = $DB->get_records('contentbank_content');
 foreach ($contents as $content) {
     $plugin = core_plugin_manager::instance()->get_plugin_info($content->itemtype);
@@ -47,14 +47,9 @@ foreach ($contents as $content) {
     }
     $managerclass = "\\$content->itemtype\\plugin";
     if (class_exists($managerclass)) {
-        $manager = new $managerclass;
-        $link = $manager->get_view_url($content->id);
-        $icon = $manager->get_icon($content->id);
-        $contentdata[] = array(
-            'name' => $content->name,
-            'link' => $link,
-            'icon' => $icon
-        );
+        $manager = new $managerclass();
+        $manager->load_content($content);
+        $foldercontents[] = $manager;
     }
 }
 
@@ -73,8 +68,8 @@ if (has_capability('moodle/contentbank:upload', $context)) {
 echo $OUTPUT->header();
 echo $OUTPUT->box_start('generalbox');
 
-echo $OUTPUT->render_from_template('core_contentbank/toolbar', array('tools' => $toolbar));
-echo $OUTPUT->render_from_template('core_contentbank/list', array('contents' => $contentdata));
+$folder = new \core_contentbank\output\folder($foldercontents, $toolbar);
+echo $OUTPUT->render($folder);
 
 echo $OUTPUT->box_end();
 echo $OUTPUT->footer();
