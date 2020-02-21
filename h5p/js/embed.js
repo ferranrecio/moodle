@@ -71,6 +71,33 @@ H5PEmbedCommunicator = (function() {
             // Parent origin can be anything.
             window.parent.postMessage(data, '*');
         };
+
+        /**
+         * Send a xAPI statement to LMS.
+         *
+         * @param {Object} [data] statement
+         * @param {string} component name
+         */
+        self.post = function(component, statements) {
+            require(['core/ajax'], function(ajax) {
+                var data = {
+                    component: component,
+                    requestjson: JSON.stringify(statements)
+                };
+                var promises = ajax.call([
+                   {
+                       methodname: 'core_xapi_statement_post',
+                       args: data
+                   }
+                ]);
+                promises[0].done(function(response) {
+                   console.log('some ok');
+                }).fail(function(ex) {
+                   console.log('all fail');
+                   console.log(ex);
+                });
+            });
+        };
     }
 
     return (window.postMessage && window.addEventListener ? new Communicator() : undefined);
@@ -148,6 +175,41 @@ document.onreadystatechange = function() {
                 H5PEmbedCommunicator.send('hello');
             }
         }, 0);
+    });
+
+    // Get emitted xAPI data.
+    H5P.externalDispatcher.on('xAPI', function(event) {
+        if (!H5PIntegration.moodleComponent) {
+            return;
+        }
+        // Skip malformed events.
+        var hasStatement = event && event.data && event.data.statement;
+        if (!hasStatement) {
+            return;
+        }
+
+        var statement = event.data.statement;
+        var validVerb = statement.verb && statement.verb.id;
+        if (!validVerb) {
+            return;
+        }
+
+
+        var isCompleted = statement.verb.id === 'http://adlnet.gov/expapi/verbs/answered'
+                    || statement.verb.id === 'http://adlnet.gov/expapi/verbs/completed';
+
+        var isChild = statement.context && statement.context.contextActivities &&
+        statement.context.contextActivities.parent &&
+        statement.context.contextActivities.parent[0] &&
+        statement.context.contextActivities.parent[0].id;
+
+        if (isCompleted && !isChild) {
+            var statements = H5P.getXAPIStatements(this.contentId);
+            console.log(statements);
+            H5PEmbedCommunicator.post(H5PIntegration.moodleComponent, statements);
+            // Get xAPI data with children if possible.
+            // storeXAPIData(this.contentId, event);
+        }
     });
 
     // Trigger initial resize for instance.

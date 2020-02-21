@@ -66,6 +66,11 @@ class player {
     private $content;
 
     /**
+     * @var string optional component name to send xAPI statements.
+     */
+    private $component;
+
+    /**
      * @var string Type of embed object, div or iframe.
      */
     private $embedtype;
@@ -96,8 +101,9 @@ class player {
      * @param string $url Local URL of the H5P file to display.
      * @param stdClass $config Configuration for H5P buttons.
      * @param bool $preventredirect Set to true in scripts that can not redirect (CLI, RSS feeds, etc.), throws exceptions
+     * @param string $component optional moodle component to sent xAPI tracking
      */
-    public function __construct(string $url, \stdClass $config, bool $preventredirect = true) {
+    public function __construct(string $url, \stdClass $config, bool $preventredirect = true, string $component = '') {
         if (empty($url)) {
             throw new \moodle_exception('h5pinvalidurl', 'core_h5p');
         }
@@ -107,6 +113,8 @@ class player {
         $this->factory = new \core_h5p\factory();
 
         $this->messages = new \stdClass();
+
+        $this->component = $component;
 
         // Create \core_h5p\core instance.
         $this->core = $this->factory->get_core();
@@ -119,6 +127,41 @@ class player {
             // Get the embedtype to use for displaying the H5P content.
             $this->embedtype = core::determineEmbedType($this->content['embedType'], $this->content['library']['embedTypes']);
         }
+    }
+
+    /**
+     * Get the encoded URL for embeding this H5P content.
+     * @param  string $url The URL of the .h5p file.
+     *
+     * @param string $url Local URL of the H5P file to display.
+     * @param stdClass $config Configuration for H5P buttons.
+     * @param bool $preventredirect Set to true in scripts that can not redirect (CLI, RSS feeds, etc.), throws exceptions
+     * @param string $component optional moodle component to sent xAPI tracking
+     * @return string The embedable code to display a H5P file.
+     */
+    public static function display(string $url, \stdClass $config, bool $preventredirect = true,
+            string $component = ''): string {
+        global $OUTPUT;
+        $params = [
+                'url' => $url,
+                'preventredirect' => $preventredirect,
+                'component' => $component,
+            ];
+
+        $optparams = ['frame', 'export', 'embed', 'copyright'];
+        foreach ($optparams as $optparam) {
+            if (!empty($config->$optparam)) {
+                $params[$optparam] = $config->$optparam;
+            }
+        }
+        $fileurl = new \moodle_url('/h5p/embed.php', $params);
+
+        $template = new \stdClass();
+        $template->embedurl = $fileurl->out(false);
+
+        $result = $OUTPUT->render_from_template('core_h5p/h5pembed', $template);
+        $result.= self::get_resize_code();
+        return $result;
     }
 
     /**
@@ -159,19 +202,20 @@ class player {
         $contenturl = \moodle_url::make_pluginfile_url($systemcontext->id, \core_h5p\file_storage::COMPONENT,
             \core_h5p\file_storage::CONTENT_FILEAREA, $this->h5pid, null, null);
         $exporturl = $this->get_export_settings($displayoptions[ core::DISPLAY_OPTION_DOWNLOAD ]);
+        $xapiobject = \core_xapi\xapi_helper::xapi_object($this->context->id);
         $contentsettings = [
             'library'         => core::libraryToString($this->content['library']),
             'fullScreen'      => $this->content['library']['fullscreen'],
             'exportUrl'       => ($exporturl instanceof \moodle_url) ? $exporturl->out(false) : '',
             'embedCode'       => $this->get_embed_code($this->url->out(),
                 $displayoptions[ core::DISPLAY_OPTION_EMBED ]),
-            'resizeCode'      => $this->get_resize_code(),
+            'resizeCode'      => self::get_resize_code(),
             'title'           => $this->content['slug'],
             'displayOptions'  => $displayoptions,
-            'url'             => self::get_embed_url($this->url->out())->out(),
+            'url'             => $xapiobject->id,//self::get_embed_url($this->url->out())->out(),
             'contentUrl'      => $contenturl->out(),
             'metadata'        => $this->content['metadata'],
-            'contentUserData' => [0 => ['state' => '{}']]
+            'contentUserData' => [0 => ['state' => '{}']],
         ];
         // Get the core H5P assets, needed by the H5P classes to render the H5P content.
         $settings = $this->get_assets();
@@ -662,7 +706,7 @@ class player {
      * @return array The settings.
      */
     private function get_core_settings(): array {
-        global $CFG;
+        global $CFG, $USER;
 
         $basepath = $CFG->wwwroot . '/';
         $systemcontext = \context_system::instance();
@@ -681,7 +725,7 @@ class player {
             'saveFreq' => false,
             'siteUrl' => $CFG->wwwroot,
             'l10n' => array('H5P' => $this->core->getLocalization()),
-            'user' => [],
+            'user' => ['name' => $USER->username, 'mail' => $USER->email],
             'hubIsEnabled' => false,
             'reportingIsEnabled' => false,
             'crossorigin' => null,
@@ -689,6 +733,7 @@ class player {
             'pluginCacheBuster' => $this->get_cache_buster(),
             'libraryUrl' => $basepath . 'lib/h5p/js',
             'moodleLibraryPaths' => $this->core->get_dependency_roots($this->h5pid),
+            'moodleComponent' => $this->component,
         );
 
         return $settings;
@@ -711,7 +756,7 @@ class player {
      *
      * @return string The HTML code with the resize script.
      */
-    public function get_resize_code(): string {
+    public static function get_resize_code(): string {
         global $OUTPUT;
 
         $template = new \stdClass();
@@ -728,7 +773,7 @@ class player {
      *
      * @return string The HTML code to reuse this H5P content in a different place.
      */
-    public function get_embed_code(string $url, bool $embedenabled): string {
+    public function get_embed_code(string $url, bool $embedenabled = true): string {
         global $OUTPUT;
 
         if ( ! $embedenabled) {
