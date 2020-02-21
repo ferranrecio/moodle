@@ -44,4 +44,5 @@ $string['package_help'] = 'The package file is a h5pfile containing H5P dynamic 
 $string['pluginadministration'] = 'H5P administration';
 $string['pluginname'] = 'H5P activity';
 $string['privacy:metadata'] = 'The File resource plugin does not store any personal data.';
+$string['statement_recieved'] = 'xAPI statement received';
 $string['view'] = 'View';

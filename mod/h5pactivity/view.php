@@ -63,7 +63,6 @@ $fileurl = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_co
                     $file->get_filearea(), $file->get_itemid(), $file->get_filepath(),
                     $file->get_filename(), false);
 $config = new stdClass();
-$player = new \core_h5p\player($fileurl, $config);
 
 $PAGE->set_url('/mod/h5pactivity/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($moduleinstance->name));
@@ -72,7 +71,6 @@ $PAGE->set_context($modulecontext);
 
 echo $OUTPUT->header();
 
-echo $player->get_embed_code($fileurl, true);
-echo $player->get_resize_code();
+echo \core_h5p\player::display($fileurl, $config, true, 'mod_h5pactivity');
 
 echo $OUTPUT->footer();
