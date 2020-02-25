@@ -308,7 +308,7 @@ function h5pactivity_get_file_areas(stdClass $course, stdClass $cm, stdClass $co
  * @return file_info_stored file_info_stored instance or null if not found
  */
 function h5pactivity_get_file_info(file_browser $browser, array $areas, stdClass $course,
-            cm_info $cm, context $context, string $filearea, int $itemid,
+            stdClass $cm, context $context, string $filearea, int $itemid,
             string $filepath, string $filename): ?file_info_stored {
     global $CFG;
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/h5pactivity/db" VERSION="20200210" COMMENT="XMLDB file for Moodle mod_h5pactivity"
+<XMLDB PATH="mod/h5pactivity/db" VERSION="20200227" COMMENT="XMLDB file for Moodle mod_h5pactivity"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -14,11 +14,55 @@
         <FIELD NAME="intro" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Activity description."/>
         <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The format of the intro field."/>
         <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="displayoptions" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="H5P Button display options"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="fk_course" TYPE="foreign" FIELDS="course" REFTABLE="course" REFFIELDS="id"/>
       </KEYS>
+    </TABLE>
+    <TABLE NAME="h5pactivity_attempts" COMMENT="Users attempts inside H5P activities">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="h5pacivityid" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="H5P activity ID"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="Attempt user ID"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="attempt" TYPE="int" LENGTH="6" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Attempt number"/>
+        <FIELD NAME="rawscore" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="maxscore" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_h5pacivityid" TYPE="foreign" FIELDS="h5pacivityid" REFTABLE="h5pacivity" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="timecreated" UNIQUE="false" FIELDS="timecreated"/>
+        <INDEX NAME="h5pacivityid-timecreated" UNIQUE="false" FIELDS="h5pacivityid, timecreated"/>
+        <INDEX NAME="h5pacivityid-userid" UNIQUE="false" FIELDS="h5pacivityid, userid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="h5pactivity_attempts_results" COMMENT="H5Pactivities_attempts tracking info">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="attemptid" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="h5pactivity_attempts ID"/>
+        <FIELD NAME="subcontent" TYPE="char" LENGTH="128" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="interactiontype" TYPE="char" LENGTH="128" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="correctpattern" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Correct Pattern in xAPI format"/>
+        <FIELD NAME="response" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="User response data in xAPI format"/>
+        <FIELD NAME="additionals" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Extra subcontent information in JSON format"/>
+        <FIELD NAME="rawscore" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="maxscore" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="fk_attemptid" TYPE="foreign" FIELDS="attemptid" REFTABLE="h5pacivity_attempts" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="attemptid-timecreated" UNIQUE="false" FIELDS="attemptid, timecreated"/>
+      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>

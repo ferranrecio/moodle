@@ -55,6 +55,11 @@ $event->add_record_snapshot('course', $course);
 $event->add_record_snapshot('h5pactivity', $moduleinstance);
 $event->trigger();
 
+// Convert display options to a valid object
+$factory = new \core_h5p\factory();
+$core = $factory->get_core();
+$config = \core_h5p\helper::decode_display_options($core, $moduleinstance->displayoptions);
+
 // Instantiate player.
 $fs = get_file_storage();
 $files = $fs->get_area_files($modulecontext->id, 'mod_h5pactivity', 'package', 0, 'id', false);
@@ -62,7 +67,6 @@ $file = reset($files);
 $fileurl = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(),
                     $file->get_filearea(), $file->get_itemid(), $file->get_filepath(),
                     $file->get_filename(), false);
-$config = new stdClass();
 
 $PAGE->set_url('/mod/h5pactivity/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($moduleinstance->name));
@@ -71,6 +75,7 @@ $PAGE->set_context($modulecontext);
 
 echo $OUTPUT->header();
 
+// TODO: we only need tracking if we are a student like user.
 echo \core_h5p\player::display($fileurl, $config, true, 'mod_h5pactivity');
 
 echo $OUTPUT->footer();

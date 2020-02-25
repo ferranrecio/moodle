@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The core_xapi test class for xAPI statements.
+ * The xapi_handler for xAPI statements.
  *
- * @package    core_xapi
+ * @package    mod_h5pactivity
  * @since      Moodle 3.9
- * @copyright  2020 Ferran Recio
+ * @copyright  2020 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,11 +30,11 @@ use context_module;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Class xapi_handler testing dummie class.
+ * Class xapi_handler for H5P statements.
  *
- * @package core_xapi
+ * @package mod_h5pactivity
  * @since      Moodle 3.9
- * @copyright  2020 Ferran Recio
+ * @copyright  2020 Ferran Recio <ferran@moodle.com>
  */
 class xapi_handler extends \core_xapi\xapi_handler_base {
 
@@ -49,15 +49,19 @@ class xapi_handler extends \core_xapi\xapi_handler_base {
     public function statement_to_event(\stdClass $statement): ?\core\event\base {
         // Validate verb.
         $validvalues = [
-                'http://adlnet.gov/expapi/verbs/answered'
+                'http://adlnet.gov/expapi/verbs/answered',
+                'http://adlnet.gov/expapi/verbs/completed',
             ];
-        if (!$this->check_valid_verb($statement, $validvalues)) {
+        $xapiverb = $this->check_valid_verb($statement, $validvalues);
+        if (!$xapiverb) {
             return null;
         }
+
         // Validate object.
         $xapiobject = $this->get_object($statement);
+
         // H5P add some extra params to ID to define subcontents
-        $parts = explode('?', $xapiobject);
+        $parts = explode('?', $xapiobject, 2);
         $contextid = array_shift($parts);
         $subcontent = str_replace('subContentId=', '', array_shift($parts));
         if (empty($contextid) || !is_numeric($contextid)) {
@@ -71,8 +75,28 @@ class xapi_handler extends \core_xapi\xapi_handler_base {
         if (!$cm) {
             return null;
         }
-        // Validate user
+
+        // Validate user.
         $user = $this->get_user_from_agent($statement->actor);
+        if (!has_capability('mod/h5pactivity:view', $context)){
+            return null;
+        }
+
+        // Save result.
+        if (isset($statement->result)) {
+            if (empty($subcontent)) {
+                $attempt = \mod_h5pactivity\attempt::new_attempt($user, $cm);
+            } else {
+                $attempt = \mod_h5pactivity\attempt::last_attempt($user, $cm);
+            }
+            if (!$attempt) {
+                return null;
+            }
+            $attempt->save_statement($statement, $subcontent);
+
+            // TODO: update grading if necessary.
+        }
+
         // Convert into a Moodle event.
         $minstatement = $this->minify_statement($statement);
         $params = array(

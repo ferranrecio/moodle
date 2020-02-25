@@ -71,6 +71,18 @@ class mod_h5pactivity_mod_form extends moodleform_mod {
         $mform->addElement('filemanager', 'packagefile', get_string('package', 'mod_h5pactivity'), null, $options);
         $mform->addHelpButton('packagefile', 'package', 'mod_h5pactivity');
 
+        // H5P displaying options
+        $factory = new \core_h5p\factory();
+        $core = $factory->get_core();
+        $displayoptions = (array) \core_h5p\helper::decode_display_options($core);
+        $mform->addElement('header', 'h5pdisplay', get_string('h5pdisplay', 'mod_h5pactivity'));
+        foreach ($displayoptions as $key => $value) {
+            $name = get_string('display'.$key, 'mod_h5pactivity');
+            $fieldname = "displayopt[$key]";
+            $mform->addElement('checkbox', $fieldname, $name);
+            $mform->setType($fieldname, PARAM_BOOL);
+        }
+
         // Add standard grading elements.
         $this->standard_grading_coursemodule_elements();
 
@@ -128,9 +140,37 @@ class mod_h5pactivity_mod_form extends moodleform_mod {
      * @return void
      **/
     public function data_preprocessing(&$defaultvalues) {
+        // H5P file.
         $draftitemid = file_get_submitted_draft_itemid('packagefile');
         file_prepare_draft_area($draftitemid, $this->context->id, 'mod_h5pactivity',
                 'package', 0, array('subdirs' => 0, 'maxfiles' => 1));
         $defaultvalues['packagefile'] = $draftitemid;
+
+        // H5P display options.
+        $factory = new \core_h5p\factory();
+        $core = $factory->get_core();
+        $currentdisplay = $defaultvalues['displayoptions'] ?? 0;
+        $displayoptions = (array) \core_h5p\helper::decode_display_options($core, $currentdisplay);
+        foreach ($displayoptions as $key => $value) {
+            $fieldname = "displayopt[$key]";
+            $defaultvalues[$fieldname] = $value;
+        }
+    }
+
+    /**
+     * Allows modules to modify the data returned by form get_data().
+     * This method is also called in the bulk activity completion form.
+     *
+     * Only available on moodleform_mod.
+     *
+     * @param stdClass $data passed by reference
+     */
+    public function data_postprocessing($data) {
+        if (isset($data->displayopt)) {
+            $factory = new \core_h5p\factory();
+            $core = $factory->get_core();
+            $config = (object) $data->displayopt;
+            $data->displayoptions = \core_h5p\helper::get_display_options($core, $config);
+        }
     }
 }
