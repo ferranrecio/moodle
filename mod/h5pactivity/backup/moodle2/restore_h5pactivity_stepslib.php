@@ -38,6 +38,10 @@ class restore_h5pactivity_activity_structure_step extends restore_activity_struc
         $paths = array();
         $userinfo = $this->get_setting_value('userinfo');
         $paths[] = new restore_path_element('h5pactivity', '/activity/h5pactivity');
+        if ($userinfo) {
+            $paths[] = new restore_path_element('h5pactivity_attempt', '/activity/h5pactivity/attempts/attempt');
+            $paths[] = new restore_path_element('h5pactivity_attempt_result', '/activity/h5pactivity/attempts/attempt/results/result');
+        }
         return $this->prepare_activity_structure($paths);
     }
 
@@ -54,6 +58,39 @@ class restore_h5pactivity_activity_structure_step extends restore_activity_struc
         $newitemid = $DB->insert_record('h5pactivity', $data);
         // Immediately after inserting "activity" record, call this.
         $this->apply_activity_instance($newitemid);
+    }
+
+    /**
+     * Processes the elt restore data.
+     *
+     * @param array $data Parsed element data.
+     */
+    protected function process_h5pactivity_attempt(array $data): void {
+        global $DB;
+        $data = (object)$data;
+
+        $oldid = $data->id;
+        $data->h5pacivityid = $this->get_new_parentid('h5pactivity');
+        $data->userid = $this->get_mappingid('user', $data->userid);
+
+        $newitemid = $DB->insert_record('h5pactivity_attempts', $data);
+        $this->set_mapping('h5pactivity_attempt', $oldid, $newitemid);
+    }
+
+    /**
+     * Processes the elt restore data.
+     *
+     * @param array $data Parsed element data.
+     */
+    protected function process_h5pactivity_attempt_result(array $data): void {
+        global $DB;
+        $data = (object)$data;
+
+        $oldid = $data->id;
+        $data->attemptid = $this->get_new_parentid('h5pactivity_attempt');
+
+        $newitemid = $DB->insert_record('h5pactivity_attempts_results', $data);
+        $this->set_mapping('h5pactivity_attempt_result', $oldid, $newitemid);
     }
 
     /**
