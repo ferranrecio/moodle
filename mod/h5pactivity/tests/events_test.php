@@ -22,6 +22,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_h5pactivity\event;
+
+use advanced_testcase;
+use context_course;
+use context_module;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -54,7 +60,7 @@ class mod_h5pactivity_events_testcase extends advanced_testcase {
         $params = [
             'context' => context_course::instance($course->id)
         ];
-        $event = \mod_h5pactivity\event\course_module_instance_list_viewed::create($params);
+        $event = course_module_instance_list_viewed::create($params);
 
         // Triggering and capturing the event.
         $sink = $this->redirectEvents();
@@ -87,7 +93,7 @@ class mod_h5pactivity_events_testcase extends advanced_testcase {
             'context' => context_module::instance($activity->cmid),
             'objectid' => $activity->id
         ];
-        $event = \mod_h5pactivity\event\course_module_viewed::create($params);
+        $event = course_module_viewed::create($params);
 
         // Triggering and capturing the event.
         $sink = $this->redirectEvents();
@@ -101,6 +107,46 @@ class mod_h5pactivity_events_testcase extends advanced_testcase {
         $this->assertEquals(context_module::instance($activity->cmid), $event->get_context());
         $this->assertEquals($activity->id, $event->objectid);
         $expected = [$course->id, 'h5pactivity', 'view', 'view.php?id=' . $activity->cmid, $activity->id, $activity->cmid];
+        $this->assertEventLegacyLogData($expected, $event);
+        $this->assertEventContextNotUsed($event);
+    }
+
+    /**
+     * Test course_module_viewed event.
+     */
+    public function test_statement_received() {
+        global $USER;
+
+        $this->resetAfterTest();
+
+        // Must be a non-guest user to create h5pactivities.
+        $this->setAdminUser();
+
+        // There is no proper API to call to trigger this event, so what we are
+        // doing here is simply making sure that the events returns the right information.
+
+        $course = $this->getDataGenerator()->create_course();
+        $activity = $this->getDataGenerator()->create_module('h5pactivity', array('course' => $course->id));
+
+        $params = array(
+            'context' => context_module::instance($activity->cmid),
+            'objectid' => $activity->id
+        );
+        $event = statement_received::create($params);
+
+        // Triggering and capturing the event.
+        $sink = $this->redirectEvents();
+        $event->trigger();
+        $events = $sink->get_events();
+        $this->assertCount(1, $events);
+        $event = reset($events);
+
+        // Checking that the event contains the expected values.
+        $this->assertInstanceOf('\mod_h5pactivity\event\statement_received', $event);
+        $this->assertEquals(context_module::instance($activity->cmid), $event->get_context());
+        $this->assertEquals($activity->id, $event->objectid);
+        $expected = array($course->id, 'h5pactivity', 'statement recieved',
+            'grade.php?user=' . $USER->id, 0, $activity->cmid);
         $this->assertEventLegacyLogData($expected, $event);
         $this->assertEventContextNotUsed($event);
     }
