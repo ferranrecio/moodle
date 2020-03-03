@@ -75,7 +75,7 @@ $PAGE->set_context($modulecontext);
 
 echo $OUTPUT->header();
 
-// TODO: add component to enable xAPI traking.
-echo \core_h5p\player::display($fileurl, $config, true);
+// TODO: we only need tracking if we have a student like role.
+echo \core_h5p\player::display($fileurl, $config, true, 'mod_h5pactivity');
 
 echo $OUTPUT->footer();

@@ -26,6 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['areapackage'] = 'Package file';
+$string['attempt'] = 'Attempt';
 $string['displayexport'] = 'Allow H5P package download';
 $string['displayembed'] = 'Show embed button';
 $string['displaycopyright'] = 'Show copyright button (if defined in package)';
@@ -40,10 +41,15 @@ $string['modulename'] = 'H5P activity';
 $string['modulename_help'] = 'Use this module to use a H5P compatible content as a course activity.';
 $string['modulename_link'] = 'mod/h5pactivity/view';
 $string['modulenameplural'] = 'H5P activities';
+$string['myattempts'] = 'My attempts';
 $string['nonewmodules'] = 'No H5P';
 $string['package'] = 'Package file';
 $string['package_help'] = 'The package file is a h5pfile containing H5P dynamic content.';
 $string['pluginadministration'] = 'H5P administration';
 $string['pluginname'] = 'H5P activity';
-$string['privacy:metadata'] = 'The File resource plugin does not store any personal data.';
+$string['privacy:metadata:attempt'] = 'The attempt number';
+$string['privacy:metadata:timecreated'] = 'The time when the tracked element was created';
+$string['privacy:metadata:timemodified'] = 'The last time element was tracked';
+$string['privacy:metadata:userid'] = 'The ID of the user who accessed the H5P activity';
+$string['statement_received'] = 'xAPI statement received';
 $string['view'] = 'View';

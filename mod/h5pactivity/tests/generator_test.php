@@ -35,6 +35,9 @@ defined('MOODLE_INTERNAL') || die();
  */
 class mod_h5pactivity_generator_testcase extends advanced_testcase {
 
+    /**
+     * Test for create_instance method.
+     */
     public function test_create_instance() {
         global $DB, $CFG, $USER;
         $this->resetAfterTest();
