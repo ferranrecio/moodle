@@ -63,7 +63,6 @@ class core_xapi_request_testcase extends externallib_advanced_testcase {
 
         // We enable group actors on the xapi_handler to test the single Agent scenarios.
         $CFG->xapitestforcegroupactors = true;
-        handler::wipe_static_cache();
     }
 
     /**

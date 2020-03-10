@@ -54,8 +54,6 @@ class core_xapi_handler_testcase extends advanced_testcase {
 
         $this->testhelper = new core_xapi_test_helper();
         $this->testhelper->init();
-
-        handler::wipe_static_cache();
     }
 
     /**

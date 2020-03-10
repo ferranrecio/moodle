@@ -38,9 +38,6 @@ defined('MOODLE_INTERNAL') || die();
  */
 class handler {
 
-    /** @var array Array of calculated Agents, Contexts that could not change between statements. */
-    protected static $entitiescache = array();
-
     /** @var string last check error. */
     protected $lasterror;
 
@@ -256,32 +253,22 @@ class handler {
             if ($agent->account->homePage != $CFG->wwwroot) {
                 return null;
             }
-            $key = 'account_'.$agent->account->name;
-            if (isset(self::$entitiescache[$key])) {
-                return self::$entitiescache[$key];
-            }
             if (!is_numeric($agent->account->name)) {
                 return null;
             }
-            self::$entitiescache[$key] = \core_user::get_user($agent->account->name);
-            if (empty(self::$entitiescache[$key])) {
-                self::$entitiescache[$key] = null;
+            $result = \core_user::get_user($agent->account->name);
+            if (empty($result)) {
+                return null;
             }
-            return self::$entitiescache[$key];
         }
         if (!empty($agent->mbox)) {
             $mbox = str_replace('mailto:', '', $agent->mbox);
-            $key = 'mbox_'.$mbox;
-            if (isset(self::$entitiescache[$key])) {
-                return self::$entitiescache[$key];
+            $result = \core_user::get_user_by_email($mbox);
+            if (empty($result)) {
+                return null;
             }
-            self::$entitiescache[$key] = \core_user::get_user_by_email($mbox);
-            if (empty(self::$entitiescache[$key])) {
-                self::$entitiescache[$key] = null;
-            }
-            return self::$entitiescache[$key];
         }
-        return null;
+        return $result;
     }
 
     /**
@@ -297,15 +284,11 @@ class handler {
         if (!$grouprecord) {
             return null;
         }
-        $key = 'groupmembers_'.$group->account->name;
-        if (isset(self::$entitiescache[$key])) {
-            return self::$entitiescache[$key];
+        $result = groups_get_members($grouprecord->id);
+        if (empty($result)) {
+            return null;
         }
-        self::$entitiescache[$key] = groups_get_members($grouprecord->id);
-        if (empty(self::$entitiescache[$key])) {
-            self::$entitiescache[$key] = null;
-        }
-        return self::$entitiescache[$key];
+        return $result;
     }
 
     /**
@@ -325,12 +308,8 @@ class handler {
         if ($group->account->homePage != $CFG->wwwroot) {
             return null;
         }
-        $key = 'group_'.$group->account->name;
-        if (!isset(self::$entitiescache[$key])) {
-            self::$entitiescache[$key] = groups_get_group($group->account->name);
-        }
-        $group = self::$entitiescache[$key];
-        if (!$group) {
+        $group = groups_get_group($group->account->name);
+        if (empty($group)) {
             return null;
         }
         return $group;
@@ -389,12 +368,4 @@ class handler {
         }
         return json_decode(json_encode($result), true);
     }
-
-    /**
-     * Wipes the static cache of actors used (for unit testing).
-     */
-    public static function wipe_static_cache() {
-        self::$entitiescache = array();
-    }
-
 }
