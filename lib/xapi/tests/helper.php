@@ -23,8 +23,14 @@
  * @copyright  2020 Ferran Recio
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace core_xapi;
+
+use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
+
+require_once(__DIR__ . '/fixtures/xapi_handler.php');
+require_once(__DIR__ . '/fixtures/xapi_test_statement_post.php');
 
 /**
  * Contains helper functions for xAPI PHPUnit Tests.
@@ -62,9 +68,9 @@ class core_xapi_test_helper {
     public function generate_statement(): stdClass {
         global $USER;
         $result = new stdClass();
-        $result->actor = \core_xapi\xapi_helper::xapi_agent($USER);
-        $result->verb = \core_xapi\xapi_helper::xapi_verb('cook');
-        $result->object = \core_xapi\xapi_helper::xapi_object('cake');
+        $result->actor = helper::xapi_agent($USER);
+        $result->verb = helper::xapi_verb('cook');
+        $result->object = helper::xapi_object('cake');
         return $result;
     }
 

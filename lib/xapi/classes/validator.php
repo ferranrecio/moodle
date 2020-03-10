@@ -33,25 +33,25 @@ defined('MOODLE_INTERNAL') || die();
  * @since      Moodle 3.9
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class xapi_validator {
+class validator {
 
     /** @var string last check error. */
-    private $lastrerror;
+    private $lasterror;
 
     /** @var int index of the last statement checked. */
     private $lastcheck;
 
-    /** @var \core_xapi\xapi_handler_base to check users and groups. */
+    /** @var handler to check users and groups. */
     private $xapihandler;
 
     /**
-     * Initialize a xapi_validator instance.
+     * Initialize a validator instance.
      *
      */
     public function __construct() {
-        $this->lastrerror = '';
+        $this->lasterror = '';
         $this->lastcheck = 0;
-        $this->xapihandler = new \core_xapi\xapi_handler_base('core_xapi');
+        $this->xapihandler = new handler('core_xapi');
     }
 
     /**
@@ -59,13 +59,13 @@ class xapi_validator {
      * @param string $requestjson json encoded statements structure
      * @return array(statements) | null
      */
-    public function get_statements_form_json($requestjson): ?array {
+    public function get_statements_from_json($requestjson): ?array {
         $request = json_decode($requestjson);
         if ($request === null) {
-            $this->lastrerror = 'JSON parse, '.json_last_error_msg();
+            $this->lasterror = 'JSON parse, '.json_last_error_msg();
             return null;
         }
-        $statements = $this->get_statements_form_request($request);
+        $statements = $this->get_statements_from_request($request);
         if (empty($statements)) {
             return null;
         }
@@ -77,12 +77,12 @@ class xapi_validator {
      * @param mixed $request json decoded statements structure
      * @return array(statements) | null
      */
-    public function get_statements_form_request($request): ?array {
+    public function get_statements_from_request($request): ?array {
         $result = array();
         if (is_array($request)) {
             $this->lastcheck = 0;
             foreach ($request as $key => $value) {
-                $statement = $this->get_statements_form_request ($value);
+                $statement = $this->get_statements_from_request($value);
                 if (empty($statement)) {
                     return null;
                 }
@@ -91,7 +91,7 @@ class xapi_validator {
             }
         } else {
             // Check if it's real statement or we need to go deeper in the structure.
-            if (!$this->validate_statement ($request)) {
+            if (!$this->validate_statement($request)) {
                 return null;
             }
             $result[] = $request;
@@ -108,7 +108,7 @@ class xapi_validator {
      * @return string the last error message.
      */
     public function get_last_error_msg(): string {
-        return $this->lastrerror;
+        return $this->lasterror;
     }
 
     /**
@@ -135,7 +135,7 @@ class xapi_validator {
         $requiredfields = ['actor', 'verb', 'object'];
         foreach ($requiredfields as $required) {
             if (empty($statement->$required)) {
-                $this->lastrerror = "missing $required";
+                $this->lasterror = "missing $required";
                 return false;
             }
             $validatefunction = 'validate_'.$required;
@@ -162,7 +162,7 @@ class xapi_validator {
             case 'Group':
                 return $this->validate_group($field);
         }
-        $this->lastrerror = "unsupported actor $field->objectType";
+        $this->lasterror = "unsupported actor $field->objectType";
         return false;
     }
 
@@ -174,11 +174,11 @@ class xapi_validator {
      */
     private function validate_verb(\stdClass $field): bool {
         if (empty($field->id)) {
-            $this->lastrerror = "missing verb id";
+            $this->lasterror = "missing verb id";
             return false;
         }
-        if (!\core_xapi\xapi_helper::check_iri_value($field->id)) {
-            $this->lastrerror = "verb id $field->id is not a valid IRI";
+        if (!helper::check_iri_value($field->id)) {
+            $this->lasterror = "verb id $field->id is not a valid IRI";
             return false;
         }
         return true;
@@ -201,11 +201,11 @@ class xapi_validator {
                 return $this->validate_group($field);
             case 'Activity':
                 if (empty($field->id)) {
-                    $this->lastrerror = "missing Activity id";
+                    $this->lasterror = "missing Activity id";
                     return false;
                 }
-                if (!\core_xapi\xapi_helper::check_iri_value($field->id)) {
-                    $this->lastrerror = "Activity id $field->id is not a valid IRI";
+                if (!helper::check_iri_value($field->id)) {
+                    $this->lasterror = "Activity id $field->id is not a valid IRI";
                     return false;
                 }
                 if (!empty($field->definition)) {
@@ -213,7 +213,7 @@ class xapi_validator {
                 }
                 return true;
         }
-        $this->lastrerror = "unsupported object type $field->objectType";
+        $this->lasterror = "unsupported object type $field->objectType";
         return false;
     }
 
@@ -227,7 +227,7 @@ class xapi_validator {
         $unsupported = ['mbox_sha1sum', 'openid'];
         foreach ($unsupported as $attribute) {
             if (isset($field->$attribute)) {
-                $this->lastrerror = "unsupported Actor $attribute";
+                $this->lasterror = "unsupported Actor $attribute";
                 return false;
             }
         }
@@ -238,19 +238,19 @@ class xapi_validator {
                 $found++;
                 foreach ($atributes as $atribute) {
                     if (empty($field->$required->$atribute)) {
-                        $this->lastrerror = "missing $required $atribute";
+                        $this->lasterror = "missing $required $atribute";
                         return false;
                     }
                 }
             }
         }
         if ($found != 1) {
-            $this->lastrerror = "more than one Agent identifier found";
+            $this->lasterror = "more than one Agent identifier found";
             return false;
         }
         $user = $this->xapihandler->get_user($field);
         if (empty($user)) {
-            $this->lastrerror = "Agent user not found";
+            $this->lasterror = "Agent user not found";
             return false;
         }
         return true;
@@ -266,20 +266,20 @@ class xapi_validator {
      */
     private function validate_group(\stdClass $field): bool {
         if (isset($field->member)) {
-            $this->lastrerror = "anonynous groups are not supported";
+            $this->lasterror = "anonynous groups are not supported";
             return false;
         }
         if (!isset($field->account)) {
-            $this->lastrerror = "missing Group account";
+            $this->lasterror = "missing Group account";
             return false;
         }
         if (empty($field->account->homePage) || empty($field->name)) {
-            $this->lastrerror = "invalid group account attribute";
+            $this->lasterror = "invalid group account attribute";
             return false;
         }
         $group = $this->xapihandler->get_group($field);
         if (empty($group)) {
-            $this->lastrerror = "Group not found";
+            $this->lasterror = "Group not found";
             return false;
         }
         return true;
@@ -311,7 +311,7 @@ class xapi_validator {
             'compound' => true,
         ];
         if (!isset($posiblevalues[$field->interactionType])) {
-            $this->lastrerror = "definition unsupported $field->interactionType";
+            $this->lasterror = "definition unsupported $field->interactionType";
             return false;
         }
         return true;

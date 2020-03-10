@@ -23,9 +23,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace core_xapi;
+namespace core_xapi\xapi;
 
+use core_xapi\event\xapi_test_statement_post;
 use context_system;
+use core_xapi\handler as handler_base;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -36,7 +38,7 @@ defined('MOODLE_INTERNAL') || die();
  * @since      Moodle 3.9
  * @copyright  2020 Ferran Recio
  */
-class xapi_handler extends xapi_handler_base {
+class handler extends handler_base {
 
     /**
      * Convert a statmenet object into a Moodle xAPI Event. If a statement is accepted
@@ -44,7 +46,7 @@ class xapi_handler extends xapi_handler_base {
      * otherwise the statement will be rejected
      *
      * @param \stdClass $statement
-     * @return ?\core\event\base a Moodle event to trigger
+     * @return \core\event\base|null a Moodle event to trigger
      */
     public function statement_to_event(\stdClass $statement): ?\core\event\base {
         // Validate verb.
@@ -70,7 +72,7 @@ class xapi_handler extends xapi_handler_base {
             'other' => $minstatement,
             'context' => context_system::instance()
         );
-        return event\xapi_test_statement_post::create($params);
+        return xapi_test_statement_post::create($params);
     }
 
     /**
@@ -84,7 +86,7 @@ class xapi_handler extends xapi_handler_base {
      *
      * @return bool
      */
-    public function is_group_actor_enabled(): bool {
+    public function supports_group_actors(): bool {
         global $CFG;
         if (isset($CFG->xapitestforcegroupactors)) {
             return $CFG->xapitestforcegroupactors;
@@ -99,6 +101,6 @@ class xapi_handler extends xapi_handler_base {
      * @return array the minimal statement needed to be stored a part from logstore data
      */
     public function testing_minify_statement(\stdClass $statement) {
-        return $this->minify_statement ($statement);
+        return $this->minify_statement($statement);
     }
 }

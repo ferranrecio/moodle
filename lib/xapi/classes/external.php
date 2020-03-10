@@ -70,6 +70,8 @@ class external extends external_api {
             'component' => $component,
             'requestjson' => $requestjson,
         ));
+        $component = $params['component'];
+        $requestjson = $params['requestjson'];
 
         // Check that $component is a real component name.
         $dir = core_component::get_component_directory($component);
@@ -78,17 +80,17 @@ class external extends external_api {
         }
 
         // Process request statements, statements could be send in several ways.
-        $validator = new \core_xapi\xapi_validator();
-        $statements = $validator->get_statements_form_json($requestjson);
+        $validator = new validator();
+        $statements = $validator->get_statements_from_json($requestjson);
         if (empty($statements)) {
-            $lastrerror = $validator->get_last_error_msg();
+            $lasterror = $validator->get_last_error_msg();
             $lastcheck = $validator->get_last_check_index();
-            $msg = "Statement #$lastcheck error: $lastrerror.";
+            $msg = "Statement #$lastcheck error: $lasterror.";
             throw new invalid_xapi_request_exception($msg);
         }
 
         // Get component xAPI statement handler class.
-        $xapihandler = \core_xapi\xapi_helper::get_xapi_handler($component);
+        $xapihandler = handler::create($component);
         if (!$xapihandler) {
             throw new invalid_xapi_request_exception('Component not compatible.');
         }
@@ -112,7 +114,8 @@ class external extends external_api {
      */
     public static function post_statement_returns() {
         return new external_multiple_structure(
-            new external_value(PARAM_ALPHANUMEXT, 'Statements IDs')
+            new external_value(PARAM_BOOL, 'If the statement is accepted'),
+            'List of statements storing acceptance results'
         );
     }
 }

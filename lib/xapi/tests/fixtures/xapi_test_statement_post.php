@@ -25,6 +25,7 @@
 namespace core_xapi\event;
 
 use context_system;
+use \core_xapi\xapi\handler;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -74,7 +75,7 @@ class xapi_test_statement_post extends \core\event\base {
      * @return bool True if the $statement represents this event.
      */
     public function compare_statement(\stdClass $statement): bool {
-        $xapihandler = new \core_xapi\xapi_handler('core_xapi');
+        $handler = new handler('core_xapi');
         // Check minified version.
         $calculatedfields = ['actor', 'id', 'timestamp', 'stored', 'version'];
         foreach ($calculatedfields as $field) {
@@ -87,7 +88,7 @@ class xapi_test_statement_post extends \core\event\base {
             return false;
         }
         // Check user.
-        $users = $xapihandler->get_all_users($statement);
+        $users = $handler->get_all_users($statement);
         if (empty($users) || !isset($users[$this->data['userid']])) {
             return false;
         }
