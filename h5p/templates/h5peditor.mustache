@@ -79,36 +79,19 @@
         "actionurl": "https://domain.example/h5p/editor.php"
     }
 }}
-<div class="core_h5p-editor-wrapper">
-    <form id="h5peditor-form" method="post" action="{{actionurl}}">
-        <input type="hidden" name="contentid" value="{{id}}">
-        <input type="hidden" name="name">
-        <input type="hidden" name="h5paction">
-        <input type="hidden" name="h5plibrary" value="{{h5plibrary}}">
-        <input type="hidden" name="h5pparams" value="{{h5pparams}}">
-        <div class="float-right mb-3">
-            <input type="submit" class="btn btn-primary" name="save" value="{{#str}} save, core {{/str}}">
-            <input type="submit" class="btn btn-secondary" name="cancel" value="{{#str}} cancel, core {{/str}}">
-        </div>
-        <div class="h5p-editor-wrapper">
-            <div class="h5p-editor">
-                {{#str}} javascriptloading, core_h5p {{/str}}
-            </div>
-        </div>
-        <div class="h5p-editor-upload"></div>
-        <div class="float-right mt-3">
-            <input type="submit" class="btn btn-primary" name="save" value="{{#str}} save, core {{/str}}">
-            <input type="submit" class="btn btn-secondary" name="cancel" value="{{#str}} cancel, core {{/str}}">
-        </div>
-    </form>
+<div class="h5p-editor-wrapper">
+    <div class="h5p-editor">
+        {{> core/loading }}
+    </div>
 </div>
+<div class="h5p-editor-upload"></div>
 {{#js}}
     require(['jquery'], function($) {
         var $editor = $('.h5p-editor');
-        var mformId = H5PIntegration.editor.formId;
+        var mformId = $editor.closest("form").attr('id');
 
         // Cancel validation and submission of form if clicking cancel button
-        var cancelSubmitCallback = function ($button) {
+        var cancelSubmitCallback = function($button) {
             return $button.is('[name="cancel"]');
         };
 

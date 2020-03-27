@@ -106,7 +106,7 @@ class editor_framework implements H5peditorStorage {
 
         if ($libraries !== null) {
             // Get details for the specified libraries only.
-            $librarieswithdetails = array();
+            $librarieswithdetails = [];
             foreach ($libraries as $library) {
                 $sql = 'SELECT title, runnable
                           FROM {h5p_libraries}
@@ -130,19 +130,20 @@ class editor_framework implements H5peditorStorage {
         }
 
         // Load all libraries.
-        $libraries = array();
+        $libraries = [];
         $librariesresult = $DB->get_records_sql(
             "SELECT id,
-                        machinename AS name,
-                        title,
-                        majorversion,
-                        minorversion
-                   FROM {h5p_libraries}
-                  WHERE runnable = 1
-                    AND semantics IS NOT NULL
-               ORDER BY title"
+                    machinename AS name,
+                    title,
+                    majorversion,
+                    minorversion
+               FROM {h5p_libraries}
+              WHERE runnable = 1
+                AND semantics IS NOT NULL
+           ORDER BY title, majorversion DESC, minorversion DESC"
         );
 
+        $added = [];
         foreach ($librariesresult as $library) {
             // Remove unique index.
             unset($library->id);
@@ -153,20 +154,11 @@ class editor_framework implements H5peditorStorage {
             $library->minorVersion = (int) $library->minorversion;
             unset($library->minorversion);
 
-            // Make sure we only display the newest version of a library.
-            foreach ($libraries as $key => $existinglibrary) {
-                if ($library->name === $existinglibrary->name) {
-                    // Found library with same name, check versions.
-                    if ( ( $library->majorversion === $existinglibrary->majorVersion &&
-                            $library->minorversion > $existinglibrary->minorVersion ) ||
-                        ( $library->majorversion > $existinglibrary->majorVersion ) ) {
-                        // This is a newer version.
-                        $existinglibrary->isOld = true;
-                    } else {
-                        // This is an older version.
-                        $library->isOld = true;
-                    }
-                }
+            // If we already add this library means that it is an old version.
+            if (isset($added[$library->name])) {
+                $library->isOld = true;
+            } else {
+                $added[$library->name] = true;
             }
 
             // Add new library.

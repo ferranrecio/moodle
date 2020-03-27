@@ -59,7 +59,7 @@ class editor_ajax_testcase extends \advanced_testcase {
     /**
      * Test that getLatestLibraryVersions method retrieves the latest installed library versions.
      */
-    public function test_getLatestLibraryVersions() {
+    public function test_getLatest_library_versions() {
         $this->resetAfterTest();
 
         $generator = \testing_util::get_data_generator();
@@ -85,7 +85,7 @@ class editor_ajax_testcase extends \advanced_testcase {
     /**
      * Test that the method validateEditorToken validates an existing token.
      */
-    public function test_validateEditorToken() {
+    public function test_validate_editor_token() {
         $factory = new factory();
         $core = $factory->get_core();
 

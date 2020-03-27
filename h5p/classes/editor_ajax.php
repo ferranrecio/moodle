@@ -51,23 +51,20 @@ class editor_ajax implements H5PEditorAjaxInterface {
     public function getLatestLibraryVersions() {
         global $DB;
 
-        $maxmajorversionsql = "SELECT hl.machinename, MAX(hl.majorversion) AS majorversion
-                                 FROM {h5p_libraries} hl
-                                WHERE hl.runnable = 1
-                             GROUP BY hl.machinename";
-
-        $maxminorversionsql = "SELECT hl2.machinename, hl2.majorversion, MAX(hl2.minorversion) AS minorversion
-                                 FROM ({$maxmajorversionsql}) hl1
-                                 JOIN {h5p_libraries} hl2 ON hl1.machinename = hl2.machinename
-                                      AND hl1.majorversion = hl2.majorversion
-                             GROUP BY hl2.machinename, hl2.majorversion";
-
-        $sql = " SELECT hl4.id, hl4.machinename as machine_name, hl4.title, hl4.majorversion as major_version,
-                        hl4.minorversion as minor_version, hl4.patchversion as patch_version, '' as has_icon, 0 as restricted
-                   FROM {h5p_libraries} hl4
-                   JOIN ({$maxminorversionsql}) hl3 ON hl4.machinename = hl3.machinename
-                        AND hl4.majorversion = hl3.majorversion
-                        AND hl4.minorversion = hl3.minorversion";
+        // This query gets the entry with max(majorversion) and max(minorversion) of every H5P library.
+        $sql = "SELECT hl2.id, hl2.machinename as machine_name, hl2.title, hl2.majorversion as major_version,
+                       hl2.minorversion AS minor_version, hl2.patchversion as patch_version,
+                       '' as has_icon, 0 as restricted
+                  FROM {h5p_libraries} hl2
+                       LEFT JOIN {h5p_libraries} hl1
+                            ON hl1.machinename = hl2.machinename
+                               AND (hl2.majorversion < hl1.majorversion
+                                   OR (hl2.majorversion = hl1.majorversion
+                                      AND hl2.minorversion < hl1.minorversion)
+                                   )
+                 WHERE hl2.runnable = 1
+                       AND hl1.majorversion is null
+                 ORDER BY hl2.machinename";
 
         return $DB->get_records_sql($sql);
     }

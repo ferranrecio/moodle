@@ -41,15 +41,12 @@ class autoloader {
      */
     public static function get_all_handlers(): array {
         $handlers = [];
-        foreach (\core_component::get_plugin_types() as $ptype => $unused) {
-            $plugins = \core_component::get_plugin_list_with_class($ptype, 'local\library\handler') +
-                \core_component::get_plugin_list_with_class($ptype, 'local_library_handler');
-            // Allow plugins to have the class either with namespace or without (useful for unittest).
-            foreach ($plugins as $pname => $class) {
-                $handlers[$pname] = $class;
-            }
+        $plugins = \core_component::get_plugin_list_with_class('h5plib', 'local\library\handler') +
+            \core_component::get_plugin_list_with_class('h5plib', 'local_library_handler');
+        // Allow plugins to have the class either with namespace or without (useful for unittest).
+        foreach ($plugins as $pname => $class) {
+            $handlers[$pname] = $class;
         }
-
         return $handlers;
     }
 
@@ -132,7 +129,7 @@ class autoloader {
      * @param string $filepath The path within the h5p root
      * @return null|string
      */
-    public static function get_h5p_editor_library_base(?string $filepath = null): ?string {
+    public static function get_h5p_editor_library_base(string $filepath = null): ?string {
         return component_class_callback(self::get_handler_classname(), 'get_h5p_editor_library_base', [$filepath]);
     }
 

@@ -59,7 +59,7 @@ class editor_framework_testcase extends \advanced_testcase {
     /**
      * Test that the method saveFileTemporarily saves a file in a temporary location.
      */
-    public function test_saveFileTemporarily() {
+    public function test_save_file_temporarily() {
         // Create temp folder.
         $tempfolder = make_request_directory(false);
 
@@ -80,7 +80,7 @@ class editor_framework_testcase extends \advanced_testcase {
     /**
      * Test that the method getLibraries get the specified libraries or all the content types (runnable = 1).
      */
-    public function test_getLibraries() {
+    public function test_get_libraries() {
         $generator = \testing_util::get_data_generator();
         $h5pgenerator = $generator->get_plugin_generator('core_h5p');
 
@@ -122,7 +122,7 @@ class editor_framework_testcase extends \advanced_testcase {
     /**
      * Test that the method removeTemporarilySavedFiles deletes files in a temporary location.
      */
-    public function test_removeTemporarilySavedFiles() {
+    public function test_remove_temporarily_saved_files() {
         // Create temp folder.
         $tempfolder = make_request_directory(false);
 
