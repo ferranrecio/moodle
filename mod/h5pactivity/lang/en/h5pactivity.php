@@ -27,16 +27,33 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['areapackage'] = 'Package file';
 $string['attempt'] = 'Attempt';
+$string['attempts'] = 'Attempts';
 $string['deleteallattempts'] = 'Delete all H5P attempts';
 $string['displayexport'] = 'Allow download';
 $string['displayembed'] = 'Embed button';
 $string['displaycopyright'] = 'Copyright button';
+$string['enabletracking'] = 'Enable attempt tracking';
+$string['enabletracking_help'] = 'If tracking is desabled, H5P content will not send user tracking information and only manual will be available.';
+$string['grade_grademethod'] = 'Attempt grading method';
+$string['grade_grademethod_help'] = 'When using point grading, the following methods are available for calculating the final grade:
+
+* Highest grade of all attempts
+* Average (mean) grade of all attempts
+* First attempt (all other attempts are ignored)
+* Last attempt (all other attempts are ignored)
+* Don\'t use attempts for grading (disable grading calculation)';
+$string['grade_manual'] = 'Don\'t use attempt tracking for grading';
+$string['grade_highest_attempt'] = 'Use highest attempt result for grading';
+$string['grade_average_attempt'] = 'Use average attempt result for grading';
+$string['grade_last_attempt'] = 'Use last attempt result for grading';
+$string['grade_first_attempt'] = 'Use first attempt result for grading';
 $string['h5pactivity:addinstance'] = 'Add a new H5P';
 $string['h5pactivity:submit'] = 'Submit H5P attempts';
 $string['h5pactivity:view'] = 'View H5P';
 $string['h5pactivityfieldset'] = 'H5P settings';
 $string['h5pactivityname'] = 'H5P';
 $string['h5pactivitysettings'] = 'Settings';
+$string['h5pattempts'] = 'Attempts options';
 $string['h5pdisplay'] = 'H5P options';
 $string['modulename'] = 'H5P';
 $string['modulename_help'] = 'H5P is an abbreviation for HTML5 Package - interactive content such as presentations, videos and other multimedia, questions, quizzes, games and more. The H5P activity enables H5P to be uploaded and added to a course.
@@ -59,4 +76,6 @@ $string['privacy:metadata:userid'] = 'The ID of the user who accessed the H5P ac
 $string['privacy:metadata:xapi_track'] = 'Attempt tracking information';
 $string['privacy:metadata:xapi_track_results'] = 'Attempt results tracking information';
 $string['statement_received'] = 'xAPI statement received';
+$string['tracking_messages'] = 'Some H5P contents can send back tracking information to provide advanced reporting and authomatic grading.
+    In this section it is possible to configure the way the activity will handle this tracking information in case the content send it.';
 $string['view'] = 'View';

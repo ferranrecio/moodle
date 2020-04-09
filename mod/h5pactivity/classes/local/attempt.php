@@ -36,18 +36,22 @@ defined('MOODLE_INTERNAL') || die();
  * @package    mod_h5pactivity
  * @since      Moodle 3.9
  * @copyright  2020 Ferran Recio <ferran@moodle.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class attempt {
 
     /** @var stdClass the h5pactivity_attempts record. */
     private $record;
 
+    /** @var boolean if the DB statement has been updated. */
+    private $scoreupdated = false;
+
     /**
      * Create a new attempt object.
      *
      * @param stdClass $record the h5pactivity_attempts record
      */
-    protected function __construct(stdClass $record) {
+    public function __construct(stdClass $record) {
         $this->record = $record;
         $this->results = null;
     }
@@ -205,6 +209,7 @@ class attempt {
             $this->record->duration = $record->duration;
             $this->record->completion = $record->completion ?? null;
             $this->record->success = $record->success ?? null;
+            $this->scoreupdated = true;
         }
         // Refresh current attempt.
         return $this->save();
@@ -218,6 +223,14 @@ class attempt {
     public function save(): bool {
         global $DB;
         $this->record->timemodified = time();
+        // Calculate scaled score.
+        if ($this->scoreupdated) {
+            if (empty($this->record->maxscore)) {
+                $this->record->scaled = 0;
+            } else {
+                $this->record->scaled = $this->record->rawscore / $this->record->maxscore;
+            }
+        }
         return $DB->update_record('h5pactivity_attempts', $this->record);
     }
 
@@ -404,5 +417,17 @@ class attempt {
      */
     public function get_success(): ?int {
         return $this->record->success;
+    }
+
+    /**
+     * Return if the attempt has been modified.
+     *
+     * Note: adding a result only add track information unless the statement does
+     * not specify subcontent. In this case this will update also the statement.
+     *
+     * @return bool if the attempt score have been modified
+     */
+    public function get_scoreupdated(): bool {
+        return $this->scoreupdated;
     }
 }
