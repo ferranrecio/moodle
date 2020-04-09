@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * mod_h5pactivity generator tests
+ * mod_h5pactivity attempt tests
  *
  * @package    mod_h5pactivity
  * @category   test
@@ -138,6 +138,7 @@ class attempt_testcase extends \advanced_testcase {
         $this->assertEquals(0, $attempt->get_duration());
         $this->assertNull($attempt->get_completion());
         $this->assertNull($attempt->get_success());
+        $this->assertFalse($attempt->get_scoreupdated());
 
         $statement = $this->generate_statement($hasdefinition, $hasresult);
         $result = $attempt->save_statement($statement, $subcontent);
@@ -148,6 +149,11 @@ class attempt_testcase extends \advanced_testcase {
         $this->assertEquals($results[4], $attempt->get_duration());
         $this->assertEquals($results[5], $attempt->get_completion());
         $this->assertEquals($results[6], $attempt->get_success());
+        if ($results[5]) {
+            $this->assertTrue($attempt->get_scoreupdated());
+        } else {
+            $this->assertFalse($attempt->get_scoreupdated());
+        }
     }
 
     /**
