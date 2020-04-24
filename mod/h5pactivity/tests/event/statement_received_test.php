@@ -25,7 +25,6 @@
 namespace mod_h5pactivity\event;
 
 use advanced_testcase;
-use context_course;
 use context_module;
 
 defined('MOODLE_INTERNAL') || die();
@@ -40,7 +39,7 @@ defined('MOODLE_INTERNAL') || die();
 class statement_received_testcase extends advanced_testcase {
 
     /**
-     * Test course_module_viewed event.
+     * Test statement_recieved event.
      */
     public function test_statement_received() {
         global $USER;
