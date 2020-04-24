@@ -255,6 +255,17 @@ class attempt {
     }
 
     /**
+     * Return all results stored in this attempt.
+     *
+     * @return stdClass[] results records.
+     */
+    public function get_results(): array {
+        global $DB;
+        $conditions = ['attemptid' => $this->record->id];
+        return $DB->get_records('h5pactivity_attempts_results', $conditions, 'id ASC');
+    }
+
+    /**
      * Get additional data for some interaction types.
      *
      * @param stdClass $definition the statement object definition data
@@ -366,6 +377,24 @@ class attempt {
     }
 
     /**
+     * Return the attempt H5P timecreated.
+     *
+     * @return int the attempt timecreated
+     */
+    public function get_timecreated(): int {
+        return $this->record->timecreated;
+    }
+
+    /**
+     * Return the attempt H5P timemodified.
+     *
+     * @return int the attempt timemodified
+     */
+    public function get_timemodified(): int {
+        return $this->record->timemodified;
+    }
+
+    /**
      * Return the attempt H5P activity ID.
      *
      * @return int the attempt userid
@@ -389,7 +418,7 @@ class attempt {
      * @return int the rawscore value
      */
     public function get_rawscore(): int {
-        return $this->record->maxscore;
+        return $this->record->rawscore;
     }
 
     /**
@@ -397,7 +426,7 @@ class attempt {
      *
      * @return int the duration value
      */
-    public function get_duration(): int {
+    public function get_duration(): ?int {
         return $this->record->duration;
     }
 
@@ -420,6 +449,15 @@ class attempt {
     }
 
     /**
+     * Return the attempt scaled.
+     *
+     * @return int|null the scaled value
+     */
+    public function get_scaled(): ?int {
+        return $this->record->scaled;
+    }
+
+    /**
      * Return if the attempt has been modified.
      *
      * Note: adding a result only add track information unless the statement does
@@ -429,5 +467,32 @@ class attempt {
      */
     public function get_scoreupdated(): bool {
         return $this->scoreupdated;
+    }
+
+    /**
+     * Magic get method.
+     *
+     * @param string $prop property to get.
+     *
+     * @return mixed
+     * @throws \coding_exception
+     */
+    public function __get($prop) {
+        $method = 'get_'.$prop;
+        if (method_exists($this, $method)) {
+            return $this->$method();
+        }
+        throw new \coding_exception('Property "' . $prop . '" doesn\'t exist');
+    }
+
+    /**
+     * Magic isset method.
+     *
+     * @param string $prop the property to get.
+     * @return bool true if the property is set, false otherwise.
+     */
+    public function __isset($prop) {
+        $method = 'get_'.$prop;
+        return method_exists($this, $method);
     }
 }
