@@ -42,7 +42,7 @@ class mod_h5pactivity_mod_form extends moodleform_mod {
      * Defines forms elements
      */
     public function definition(): void {
-        global $CFG;
+        global $CFG, $OUTPUT;
 
         $mform = $this->_form;
 
@@ -72,6 +72,18 @@ class mod_h5pactivity_mod_form extends moodleform_mod {
 
         $mform->addElement('filemanager', 'packagefile', get_string('package', 'mod_h5pactivity'), null, $options);
         $mform->addHelpButton('packagefile', 'package', 'mod_h5pactivity');
+
+        // Add a link to the Content Bank if the H5P content type plugin is enabled and the user can access.
+        $plugin = core_plugin_manager::instance()->get_plugin_info('contenttype_h5p');
+        if ($plugin && $plugin->is_enabled() && class_exists("contenttype_h5p\contenttype")) {
+            $contenttype = new contenttype_h5p\contenttype($this->context);
+            if ($contenttype->can_access()) {
+                $url = new moodle_url('/contentbank/index.php', ['contextid' => $this->context->id]);
+                $msg = get_string('usecontentbank', 'mod_h5pactivity', $url->out());
+                $msg .= ' '.$OUTPUT->help_icon('contentbank', 'mod_h5pactivity');
+                $mform->addElement('static', 'contentbank', '', $msg);
+            }
+        }
 
         // H5P displaying options.
         $factory = new \core_h5p\factory();
