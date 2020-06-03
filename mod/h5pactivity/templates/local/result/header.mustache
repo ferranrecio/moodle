@@ -30,6 +30,7 @@
     {
         "timecreated": "1587655101",
         "interactiontype": "choice",
+        "title": "True-false\n",
         "description": "Example of some results\n",
         "rawscore": "4",
         "maxscore": "4",
@@ -40,5 +41,10 @@
 
 }}
 <h3 class="w-100">
-    {{description}}
+    {{title}}
 </h3>
+{{#description}}
+<div class="w-100">
+    {{{description}}}
+</div>
+{{/description}}

@@ -83,7 +83,13 @@ class reportresults implements renderable, templatable {
         foreach ($results as $key => $result) {
             $outputresult = output_result::create_from_record($result);
             if ($outputresult) {
-                $data->results[] = $outputresult->export_for_template($output);
+                $resultdata = $outputresult->export_for_template($output);
+                $resultdata->number = count($data->results) + 1;
+                // The current title is to represent a single result not a full report,
+                // we need to enumerate the interactions.
+                $resultdata->title = strtolower($resultdata->title);
+                $resultdata->title = get_string('result_interaction', 'mod_h5pactivity', $resultdata);
+                $data->results[] = $resultdata;
             }
         }
 

@@ -38,17 +38,4 @@ use stdClass;
  */
 class other extends result {
 
-    /**
-     * Export this data so it can be used as the context for a mustache template.
-     *
-     * @param renderer_base $output
-     * @return stdClass
-     */
-    public function export_for_template(renderer_base $output): stdClass {
-        $data = parent::export_for_template($output);
-        if (empty($data->description)) {
-            $data->description = get_string('result_other', 'mod_h5pactivity');
-        }
-        return $data;
-    }
 }

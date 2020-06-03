@@ -131,6 +131,7 @@ class get_results_testcase extends externallib_advanced_testcase {
             $this->assertArrayHasKey('rawscore', $value);
             $this->assertArrayHasKey('maxscore', $value);
             $this->assertArrayHasKey('duration', $value);
+            $this->assertArrayHasKey('title', $value);
             $this->assertArrayHasKey('track', $value);
             if (isset($value['options'])) {
                 foreach ($value['options'] as $option) {
