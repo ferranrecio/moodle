@@ -45,8 +45,18 @@ class longfillin extends result {
      * @return stdClass
      */
     public function export_for_template(renderer_base $output): stdClass {
+        $result = $this->result;
         $data = parent::export_for_template($output);
         $data->content = reset($this->response);
+        // Check if description have HTML tags on it.
+        if (strlen($result->description) != strlen(strip_tags($result->description))) {
+            $data->description = get_string('result_longfillin', 'mod_h5pactivity');
+            $longcontent = (object)[
+                'description' => format_text($result->description),
+                'response' => $data->content,
+            ];
+            $data->content = $output->render_from_template('mod_h5pactivity/result/longfillincontent', $longcontent);
+        }
         $data->track = true;
         return $data;
     }
