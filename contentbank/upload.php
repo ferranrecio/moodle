@@ -54,7 +54,7 @@ if (has_capability('moodle/user:ignoreuserquota', $context)) {
 }
 
 $cb = new \core_contentbank\contentbank();
-$accepted = $cb->get_supported_extensions_as_string($context);
+$accepted = $cb->get_supported_extensions($context);
 
 $data = new stdClass();
 $options = array(
