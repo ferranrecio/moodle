@@ -82,7 +82,7 @@ if (has_capability('moodle/contentbank:useeditor', $context)) {
 // Place the Upload button in the toolbar.
 if (has_capability('moodle/contentbank:upload', $context)) {
     // Don' show upload button if there's no plugin to support any file extension.
-    $accepted = $cb->get_supported_extensions_as_string($context);
+    $accepted = $cb->get_supported_extensions($context);
     if (!empty($accepted)) {
         $importurl = new moodle_url('/contentbank/upload.php', ['contextid' => $contextid]);
         $toolbar[] = [

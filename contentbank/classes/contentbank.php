@@ -128,10 +128,10 @@ class contentbank {
      * @param context $context   Optional context to check (default null)
      * @return string A string with all the extensions supported.
      */
-    public function get_supported_extensions_as_string(context $context = null) {
+    public function get_supported_extensions(context $context = null) {
         $supported = $this->load_context_supported_extensions($context);
         $extensions = array_keys($supported);
-        return implode(',', $extensions);
+        return $extensions;
     }
 
     /**
