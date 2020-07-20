@@ -211,11 +211,11 @@ function($, Ajax, Notification, Str, Templates, Url, ModalFactory, ModalEvents) 
         };
         var requestType = 'success';
         Ajax.call([request])[0].then(function(data) {
-            if (data) {
+            if (data.result) {
                 return 'contentrenamed';
             }
             requestType = 'error';
-            return 'contentnotrenamed';
+            return data.warnings[0].message;
 
         }).then(function(message) {
             var params = null;
