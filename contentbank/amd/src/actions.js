@@ -139,10 +139,14 @@ function($, Ajax, Notification, Str, Templates, Url, ModalFactory, ModalEvents) 
                 });
             }).then(function(modal) {
                 modal.setSaveButtonText(saveButtonText);
-                modal.getRoot().on(ModalEvents.save, function() {
+                modal.getRoot().on(ModalEvents.save, function(e) {
                     // The action is now confirmed, sending an action for it.
                     var newname = $("#newname").val();
-                    return renameContent(contentid, newname);
+                    if (newname) {
+                        return renameContent(contentid, newname);
+                    } else {
+                        e.preventDefault();
+                    }
                 });
 
                 // Handle hidden event.
