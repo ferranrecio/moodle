@@ -160,6 +160,23 @@ M.mod_scorm.init = function(Y, nav_display, navposition_left, navposition_top, h
             obj.setAttribute('webkitallowfullscreen', 'webkitallowfullscreen');
             obj.setAttribute('mozallowfullscreen', 'mozallowfullscreen');
             if (!window_name && node.title != null) {
+                // Due to Chrome 80+ changes, synchronous XHR is not allowed on unloading events anymore.
+                // This is quite reasonable because having synchronous connections on unload will
+                // add some lag to the next page. To avoid losing data, the SCORM library needs to know
+                // if the page is closing (using window.mod_scorm_is_window_closing variable)
+                // and use "navigator.sendBeacon" instead (which is asynchronous).
+                var onloadIframe = function () {
+                    window.mod_scorm_is_window_closing = false;
+                    var setWindowClosing = function() {
+                        window.mod_scorm_is_window_closing = true;
+                    };
+                    // Add listener to the four events known to represent an unload operation.
+                    obj.contentWindow.addEventListener('beforeunload', setWindowClosing);
+                    obj.contentWindow.addEventListener('unload', setWindowClosing);
+                    obj.contentWindow.addEventListener('pagehide', setWindowClosing);
+                    obj.contentWindow.addEventListener('visibilitychange', setWindowClosing);
+                };
+                obj.addEventListener('load', onloadIframe);
                 obj.setAttribute('src', url_prefix + node.title);
             }
             if (window_name) {

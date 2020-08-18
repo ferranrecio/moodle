@@ -44,25 +44,7 @@ function DoRequest(httpReq,url,param) {
         //  - https://developer.mozilla.org/en-US/docs/Web/API/FormData/FormData
         //  - https://developer.mozilla.org/en-US/docs/Web/API/FormData/append
 
-        var vars = param.split('&'),
-            i = 0,
-            pair,
-            key,
-            value,
-            formData = new FormData();
-        for (i = 0; i < vars.length; i++) {
-            pair = vars[i].split('=');
-            key = decodeURIComponent(pair[0]);
-            value = decodeURIComponent(pair[1]);
-            formData.append(key, value);
-        }
-        // We'll also inform it that we are unloading, potentially useful in the future.
-        formData.append('unloading', '1');
-
-        // The results is true or false, we don't get the response from the server. Make it look like it was a success.
-        navigator.sendBeacon(url, formData);
-        // This is what a success looks like when it comes back from the server.
-        return "true\n0";
+        return SendUnloadingBeacon(url, param);
     }
 
     // httpReq.open (Method("get","post"), URL(string), Asyncronous(true,false))
@@ -72,6 +54,15 @@ function DoRequest(httpReq,url,param) {
     try {
         httpReq.send(param);
     } catch (e) {
+        // Under some situations, Chrome version > 80 can dismiss the Sync XHR request. To avoid losing
+        // data, we detect if this is the case and send a beacon intead of a regular XHR.
+        var ChromeInfo = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./);
+        if (ChromeInfo) {
+            var ChromeVersion = parseInt(ChromeInfo[2], 10);
+            if (ChromeVersion > 80 && FormData) {
+                return SendUnloadingBeacon(url, param);
+            }
+        }
         return false;
     }
     if (httpReq.status == 200) {
@@ -80,6 +71,42 @@ function DoRequest(httpReq,url,param) {
     } else {
         return httpReq.status;
     }
+}
+
+/**
+ * Sends an asynchronous unloading XHR.
+ *
+ * This method is necessary because on unloading situations like "unload", "pagehide",
+ * "beforeunload" and "visibilitychange" events it is not possible to send Synchronous
+ * XHR requests. We will lose the real response status but it is the last resource to
+ * avoid losing data.
+ *
+ * @param {String} url to URL to send the beacon.
+ * @param {String} param the URL params.
+ */
+function SendUnloadingBeacon (url,param) {
+    var vars = param.split('&'),
+        i = 0,
+        pair,
+        key,
+        value,
+        formData = new FormData();
+
+    for (i = 0; i < vars.length; i++) {
+        pair = vars[i].split('=');
+        key = decodeURIComponent(pair[0]);
+        value = decodeURIComponent(pair[1]);
+        formData.append(key, value);
+    }
+
+    // We'll also inform it that we are unloading, potentially useful in the future.
+    formData.append('unloading', '1');
+
+    // The results is true or false, we don't get the response from the server. Make it look like it was a success.
+    navigator.sendBeacon(url, formData);
+
+    // This is what a success looks like when it comes back from the server.
+    return "true\n0";
 }
 
 function popupwin(content) {
