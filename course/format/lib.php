@@ -70,6 +70,10 @@ abstract class format_base {
     protected $course = false;
     /** @var array caches format options, please use {@link format_base::get_format_options()} */
     protected $formatoptions = array();
+    /** @var int the section number in single section format, zero for multiple section formats. */
+    protected $singlesection = 0;
+    /** @var course_modinfo the current course modinfo, please use {@link format_base::get_modinfo()} */
+    private $modinfo = null;
     /** @var array cached instances */
     private static $instances = array();
     /** @var array plugin name => class name. */
@@ -266,6 +270,21 @@ abstract class format_base {
     }
 
     /**
+     * Return the current course modinfo.
+     *
+     * This method is used mainly by the output components to avoid unnecesary get_fast_modinfo calls.
+     *
+     * @return course_modinfo
+     */
+    public function get_modinfo() {
+        global $USER;
+        if ($this->modinfo === null) {
+            $this->modinfo = course_modinfo::instance($this->courseid, $USER->id);
+        }
+        return $this->modinfo;
+    }
+
+    /**
      * Method used in the rendered and during backup instead of legacy 'numsections'
      *
      * Default renderer will treat sections with sectionnumber greater that the value returned by this
@@ -404,6 +423,31 @@ abstract class format_base {
      */
     public function get_default_section_name($section) {
         return self::get_section_name($section);
+    }
+
+    /**
+     * Set if the current format instance will show multiple sections or an individual one.
+     *
+     * Some formats has the hability to swith from one section to multiple sections per page,
+     * this method replaces the old print_multiple_section_page and print_single_section_page.
+     *
+     * @param int $singlesection zero for all sections or a section number
+     */
+    public function set_single_section(int $singlesection): void {
+        $this->singlesection = $singlesection;
+    }
+
+    /**
+     * Set if the current format instance will show multiple sections or an individual one.
+     *
+     * Some formats has the hability to swith from one section to multiple sections per page,
+     * output components will use this method to know if the current display is a single or
+     * multiple sections.
+     *
+     * @return int zero for all sections or the sectin number
+     */
+    public function get_single_section(): int {
+        return $this->singlesection;
     }
 
     /**
@@ -998,6 +1042,21 @@ abstract class format_base {
      */
     public function get_renderer(moodle_page $page) {
         return $page->get_renderer('format_'. $this->get_format());
+    }
+
+    /**
+     * Returns instance of output compornent used by this plugin
+     *
+     * @param string $outputname the element to render (section, activity...)
+     * @return string the output component classname
+     */
+    public function get_output_classname(?string $outputname): string {
+        $component = 'format_'. $this->get_format();
+        $outputclass = "$component\\output\\$outputname";
+        if (class_exists($outputclass)) {
+            return $outputclass;
+        }
+        return "core_course\\output\\$outputname";
     }
 
     /**
