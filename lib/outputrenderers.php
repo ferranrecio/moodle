@@ -234,7 +234,11 @@ class renderer_base {
             if (!$component) {
                 $component = 'core';
             }
-            $template = $component . '/' . $classname;
+            if ($widget instanceof core\output\customtemplate) {
+                $template = $widget->get_template();
+            } else {
+                $template = $component . '/' . $classname;
+            }
             $context = $widget->export_for_template($this);
             return $this->render_from_template($template, $context);
         }
