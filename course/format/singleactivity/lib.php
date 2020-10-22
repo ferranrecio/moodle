@@ -28,11 +28,13 @@ require_once($CFG->dirroot. '/course/format/lib.php');
 /**
  * Main class for the singleactivity course format
  *
+ * TODO: move this class to classes folder.
+ *
  * @package    format_singleactivity
  * @copyright  2012 Marina Glancy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class format_singleactivity extends format_base {
+class format_singleactivity extends core_course\course_format {
     /** @var cm_info the current activity. Use get_activity() to retrieve it. */
     private $activity = false;
 
