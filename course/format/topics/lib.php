@@ -31,11 +31,13 @@ use core\output\inplace_editable;
 /**
  * Main class for the Topics course format.
  *
+ * TODO: move this class to classes folder.
+ *
  * @package    format_topics
  * @copyright  2012 Marina Glancy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class format_topics extends format_base {
+class format_topics extends core_course\course_format {
 
     /**
      * Returns true if this course format uses sections.
@@ -68,7 +70,7 @@ class format_topics extends format_base {
      * Returns the default section name for the topics course format.
      *
      * If the section number is 0, it will use the string with key = section0name from the course format's lang file.
-     * If the section number is not 0, the base implementation of format_base::get_default_section_name which uses
+     * If the section number is not 0, the base implementation of course_format::get_default_section_name which uses
      * the string with the key = 'sectionname' from the course format's lang file + the section number will be used.
      *
      * @param stdClass $section Section object from database or just field course_sections section
@@ -79,10 +81,19 @@ class format_topics extends format_base {
             // Return the general section.
             return get_string('section0name', 'format_topics');
         } else {
-            // Use format_base::get_default_section_name implementation which
+            // Use course_format::get_default_section_name implementation which
             // will display the section name in "Topic n" format.
             return parent::get_default_section_name($section);
         }
+    }
+
+    /**
+     * Generate the title for this section page.
+     *
+     * @return string the page title
+     */
+    public function page_title(): string {
+        return get_string('topicoutline');
     }
 
     /**
