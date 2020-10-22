@@ -1092,6 +1092,18 @@ abstract class course_format {
     }
 
     /**
+     * return true if the course editor must be displayed.
+     *
+     * @return bool true if edit controls must be displayed
+     */
+    public function show_editor(): bool {
+        global $PAGE;
+        $course = $this->get_course();
+        $coursecontext = context_course::instance($course->id);
+        return $PAGE->user_is_editing() && has_capability('moodle/course:update', $coursecontext);
+    }
+
+    /**
      * Allows to specify for modinfo that section is not available even when it is visible and conditionally available.
      *
      * Note: affected user can be retrieved as: $section->modinfo->userid
@@ -1387,16 +1399,13 @@ abstract class course_format {
         }
 
         // Load the cmlist output.
-        $cmitemclass = $this->get_output_classname('section_format\\cmitem');
         $renderer = $this->get_renderer($PAGE);
 
         $coursesections = $modinfo->sections;
         if (array_key_exists($section->section, $coursesections)) {
-            $completioninfo = new completion_info($course);
             foreach ($coursesections[$section->section] as $cmid) {
                 $cm = $modinfo->get_cm($cmid);
-                $cmitem = new $cmitemclass($this, $section, $cm);
-                $modules[] = $renderer->render($cmitem);
+                $modules[] = $renderer->course_section_updated_cm_item($this, $section, $cm);
             }
         }
 
