@@ -46,6 +46,14 @@ class format_weeks extends core_course\course_format {
     }
 
     /**
+     * Generate the title for this section page
+     * @return string the page title
+     */
+    public function page_title(): string {
+        return get_string('weeklyoutline');
+    }
+
+    /**
      * Returns the display name of the given section that the course prefers.
      *
      * @param int|stdClass $section Section object from database or just field section.section

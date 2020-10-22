@@ -68,15 +68,6 @@ class format_topics_renderer extends format_section_renderer_base {
     }
 
     /**
-     * Generate the title for this section page.
-     *
-     * @return string the page title
-     */
-    protected function page_title() {
-        return get_string('topicoutline');
-    }
-
-    /**
      * Generate the section title, wraps it in a link to the section page if page is to be displayed on a separate page.
      *
      * @param section_info|stdClass $section The course_section entry from DB
