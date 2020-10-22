@@ -264,6 +264,8 @@ class core_course_renderer extends plugin_renderer_base {
     /**
      * Renders HTML for the menus to add activities and resources to the current course
      *
+     * Note: this Method will be deprecated when output components are created.
+     *
      * @param stdClass $course
      * @param int $section relative section number (field course_sections.section)
      * @param int $sectionreturn The section to link back to
@@ -815,6 +817,8 @@ class core_course_renderer extends plugin_renderer_base {
     /**
      * Renders HTML to display one course module for display within a section.
      *
+     * Note: this Method will be deprecated when output components are created.
+     *
      * This function calls:
      * {@link core_course_renderer::course_section_cm()}
      *
@@ -839,6 +843,8 @@ class core_course_renderer extends plugin_renderer_base {
      *
      * This includes link, content, availability, completion info and additional information
      * that module type wants to display (i.e. number of unread forum posts)
+     *
+     * Note: this Method will be deprecated when output components are created.
      *
      * This function calls:
      * {@link core_course_renderer::course_section_cm_name()}
@@ -979,7 +985,9 @@ class core_course_renderer extends plugin_renderer_base {
 
     /**
      * Renders HTML to display a list of course modules in a course section
-     * Also displays "move here" controls in Javascript-disabled mode
+     * Also displays "move here" controls in Javascript-disabled mode.
+     *
+     * Note: this Method will be deprecated when output components are created.
      *
      * This function calls {@link core_course_renderer::course_section_cm()}
      *
@@ -990,6 +998,9 @@ class core_course_renderer extends plugin_renderer_base {
      * @return void
      */
     public function course_section_cm_list($course, $section, $sectionreturn = null, $displayoptions = array()) {
+
+        // TODO: use the new output here and add a deprecation message!
+
         global $USER;
 
         $output = '';
