@@ -51,7 +51,7 @@ class controlmenu extends \core_course\output\section_format\controlmenu {
         $format = $this->format;
         $section = $this->section;
         $course = $format->get_course();
-        $sectionreturn = $format->get_single_section();
+        $sectionreturn = $format->get_section_number();
 
         $coursecontext = context_course::instance($course->id);
 

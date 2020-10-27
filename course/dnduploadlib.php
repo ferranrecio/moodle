@@ -652,13 +652,15 @@ class dndupload_ajax_processor {
         $resp->error = self::ERROR_OK;
         $resp->elementid = 'module-' . $mod->id;
 
-        $courserenderer = $PAGE->get_renderer('core', 'course');
-        $completioninfo = new completion_info($this->course);
-        $info = get_fast_modinfo($this->course);
-        $sr = null;
-        $modulehtml = $courserenderer->course_section_cm($this->course, $completioninfo,
-                $mod, null, array());
-        $resp->fullcontent = $courserenderer->course_section_cm_list_item($this->course, $completioninfo, $mod, $sr);
+        $format = course_get_format($this->course);
+        $renderer = $format->get_renderer($PAGE);
+        $modinfo = $format->get_modinfo();
+        $section = $modinfo->get_section_info($mod->sectionnum);
+
+        // Get the new element html content.
+        $cmitemclass = $format->get_output_classname('section_format\\cmitem');
+        $cmitem = new $cmitemclass($format, $section, $mod);
+        $resp->fullcontent = $renderer->render($cmitem);
 
         echo $OUTPUT->header();
         echo json_encode($resp);

@@ -108,4 +108,27 @@ class format_site extends course_format {
     public function allow_stealth_module_visibility($cm, $section) {
         return true;
     }
+
+    /**
+     * Returns instance of page renderer used by the site page
+     *
+     * @param moodle_page $page the current page
+     * @return renderer_base
+     */
+    public function get_renderer(moodle_page $page) {
+        global $CFG;
+        if (!class_exists('format_site_renderer')) {
+            require_once($CFG->dirroot.'/course/format/renderer.php');
+        }
+        return new format_site_renderer($page, null);
+    }
+
+    /**
+     * Site format uses only section 1.
+     *
+     * @return int
+     */
+    public function get_section_number(): int {
+        return 1;
+    }
 }
