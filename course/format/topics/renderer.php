@@ -50,24 +50,6 @@ class format_topics_renderer extends format_section_renderer_base {
     }
 
     /**
-     * Generate the starting container html for a list of sections.
-     *
-     * @return string HTML to output.
-     */
-    protected function start_section_list() {
-        return html_writer::start_tag('ul', ['class' => 'topics']);
-    }
-
-    /**
-     * Generate the closing container html for a list of sections.
-     *
-     * @return string HTML to output.
-     */
-    protected function end_section_list() {
-        return html_writer::end_tag('ul');
-    }
-
-    /**
      * Generate the section title, wraps it in a link to the section page if page is to be displayed on a separate page.
      *
      * @param section_info|stdClass $section The course_section entry from DB

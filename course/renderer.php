@@ -264,8 +264,6 @@ class core_course_renderer extends plugin_renderer_base {
     /**
      * Renders HTML for the menus to add activities and resources to the current course
      *
-     * Note: this Method will be deprecated when output components are created.
-     *
      * @param stdClass $course
      * @param int $section relative section number (field course_sections.section)
      * @param int $sectionreturn The section to link back to
@@ -817,25 +815,36 @@ class core_course_renderer extends plugin_renderer_base {
     /**
      * Renders HTML to display one course module for display within a section.
      *
-     * Note: this Method will be deprecated when output components are created.
+     * @deprecated since 4.0 - use core_course output components instead.
      *
      * This function calls:
      * {@link core_course_renderer::course_section_cm()}
      *
      * @param stdClass $course
-     * @param completion_info $completioninfo
+     * @param completion_info $completioninfo (not used anymore)
      * @param cm_info $mod
      * @param int|null $sectionreturn
      * @param array $displayoptions
      * @return String
      */
-    public function course_section_cm_list_item($course, &$completioninfo, cm_info $mod, $sectionreturn, $displayoptions = array()) {
-        $output = '';
-        if ($modulehtml = $this->course_section_cm($course, $completioninfo, $mod, $sectionreturn, $displayoptions)) {
-            $modclasses = 'activity ' . $mod->modname . ' modtype_' . $mod->modname . ' ' . $mod->extraclasses;
-            $output .= html_writer::tag('li', $modulehtml, array('class' => $modclasses, 'id' => 'module-' . $mod->id));
+    public function course_section_cm_list_item($course, &$completioninfo, cm_info $mod, $sectionreturn, $displayoptions = []) {
+
+        debugging('course_section_cm_list_item is deprecated. Use core_course output classes instead.', DEBUG_DEVELOPER);
+
+        $format = course_get_format($course);
+        $modinfo = $format->get_modinfo();
+
+        // Output renderers works only with real section_info objects.
+        if ($sectionreturn) {
+            $format->set_section_number($sectionreturn);
         }
-        return $output;
+        $section = $modinfo->get_section_info($format->get_section_number());
+
+        $cmitemclass = $format->get_output_classname('section_format\\cmitem');
+        $cmitem = new $cmitemclass($format, $section, $mod);
+        // The course outputs works with format renderers, not with course renderers.
+        $renderer = $format->get_renderer($this->page);
+        return $renderer->render($cmitem);
     }
 
     /**
@@ -844,7 +853,7 @@ class core_course_renderer extends plugin_renderer_base {
      * This includes link, content, availability, completion info and additional information
      * that module type wants to display (i.e. number of unread forum posts)
      *
-     * Note: this Method will be deprecated when output components are created.
+     * @deprecated since 4.0 - use core_course output components instead.
      *
      * This function calls:
      * {@link core_course_renderer::course_section_cm_name()}
@@ -861,98 +870,27 @@ class core_course_renderer extends plugin_renderer_base {
      * @param array $displayoptions
      * @return string
      */
-    public function course_section_cm($course, &$completioninfo, cm_info $mod, $sectionreturn, $displayoptions = array()) {
-        $output = '';
-        // We return empty string (because course module will not be displayed at all)
-        // if:
-        // 1) The activity is not visible to users
-        // and
-        // 2) The 'availableinfo' is empty, i.e. the activity was
-        //     hidden in a way that leaves no info, such as using the
-        //     eye icon.
+    public function course_section_cm($course, &$completioninfo, cm_info $mod, $sectionreturn, $displayoptions = []) {
+
+        debugging('course_section_cm is deprecated. Use core_course\output\cm_format output classes instead.', DEBUG_DEVELOPER);
+
         if (!$mod->is_visible_on_course_page()) {
-            return $output;
+            return '';
         }
 
-        $indentclasses = 'mod-indent';
-        if (!empty($mod->indent)) {
-            $indentclasses .= ' mod-indent-'.$mod->indent;
-            if ($mod->indent > 15) {
-                $indentclasses .= ' mod-indent-huge';
-            }
+        $format = course_get_format($course);
+        $modinfo = $format->get_modinfo();
+        // Output renderers works only with real section_info objects.
+        if ($sectionreturn) {
+            $format->set_section_number($sectionreturn);
         }
+        $section = $modinfo->get_section_info($format->get_section_number());
 
-        $output .= html_writer::start_tag('div');
-
-        if ($this->page->user_is_editing()) {
-            $output .= course_get_cm_move($mod, $sectionreturn);
-        }
-
-        $output .= html_writer::start_tag('div', array('class' => 'mod-indent-outer w-100'));
-
-        // This div is used to indent the content.
-        $output .= html_writer::div('', $indentclasses);
-
-        // Start a wrapper for the actual content to keep the indentation consistent
-        $output .= html_writer::start_tag('div');
-
-        // Display the link to the module (or do nothing if module has no url)
-        $cmname = $this->course_section_cm_name($mod, $displayoptions);
-
-        if (!empty($cmname)) {
-            // Start the div for the activity title, excluding the edit icons.
-            $output .= html_writer::start_tag('div', array('class' => 'activityinstance'));
-            $output .= $cmname;
-
-
-            // Module can put text after the link (e.g. forum unread)
-            $output .= $mod->afterlink;
-
-            // Closing the tag which contains everything but edit icons. Content part of the module should not be part of this.
-            $output .= html_writer::end_tag('div'); // .activityinstance
-        }
-
-        // If there is content but NO link (eg label), then display the
-        // content here (BEFORE any icons). In this case cons must be
-        // displayed after the content so that it makes more sense visually
-        // and for accessibility reasons, e.g. if you have a one-line label
-        // it should work similarly (at least in terms of ordering) to an
-        // activity.
-        $contentpart = $this->course_section_cm_text($mod, $displayoptions);
-        $url = $mod->url;
-        if (empty($url)) {
-            $output .= $contentpart;
-        }
-
-        $modicons = '';
-        if ($this->page->user_is_editing()) {
-            $editactions = course_get_cm_edit_actions($mod, $mod->indent, $sectionreturn);
-            $modicons .= ' '. $this->course_section_cm_edit_actions($editactions, $mod, $displayoptions);
-            $modicons .= $mod->afterediticons;
-        }
-
-        $modicons .= $this->course_section_cm_completion($course, $completioninfo, $mod, $displayoptions);
-
-        if (!empty($modicons)) {
-            $output .= html_writer::div($modicons, 'actions');
-        }
-
-        // Show availability info (if module is not available).
-        $output .= $this->course_section_cm_availability($mod, $displayoptions);
-
-        // If there is content AND a link, then display the content here
-        // (AFTER any icons). Otherwise it was displayed before
-        if (!empty($url)) {
-            $output .= $contentpart;
-        }
-
-        $output .= html_writer::end_tag('div'); // $indentclasses
-
-        // End of indentation div.
-        $output .= html_writer::end_tag('div');
-
-        $output .= html_writer::end_tag('div');
-        return $output;
+        $cmclass = $format->get_output_classname('cm_format');
+        $cm = new $cmclass($format, $section, $completioninfo, $mod, $displayoptions);
+        // The course outputs works with format renderers, not with course renderers.
+        $renderer = $format->get_renderer($this->page);
+        return $renderer->render($cm);
     }
 
     /**
@@ -987,7 +925,7 @@ class core_course_renderer extends plugin_renderer_base {
      * Renders HTML to display a list of course modules in a course section
      * Also displays "move here" controls in Javascript-disabled mode.
      *
-     * Note: this Method will be deprecated when output components are created.
+     * @deprecated since 4.0 - use core_course output components instead.
      *
      * This function calls {@link core_course_renderer::course_section_cm()}
      *
@@ -997,70 +935,28 @@ class core_course_renderer extends plugin_renderer_base {
      * @param int $displayoptions
      * @return void
      */
-    public function course_section_cm_list($course, $section, $sectionreturn = null, $displayoptions = array()) {
+    public function course_section_cm_list($course, $section, $sectionreturn = null, $displayoptions = []) {
 
-        // TODO: use the new output here and add a deprecation message!
+        debugging('course_section_cm_list is deprecated. Use core_course output classes instead.', DEBUG_DEVELOPER);
 
-        global $USER;
+        $format = course_get_format($course);
+        $modinfo = $format->get_modinfo();
 
-        $output = '';
-        $modinfo = get_fast_modinfo($course);
-        if (is_object($section)) {
-            $section = $modinfo->get_section_info($section->section);
-        } else {
-            $section = $modinfo->get_section_info($section);
-        }
-        $completioninfo = new completion_info($course);
-
-        // check if we are currently in the process of moving a module with JavaScript disabled
-        $ismoving = $this->page->user_is_editing() && ismoving($course->id);
-        if ($ismoving) {
-            $strmovefull = strip_tags(get_string("movefull", "", "'$USER->activitycopyname'"));
+        // Output renderers works only with real section_info objects.
+        if (!($section instanceof section_info)) {
+            $sectionnum = (is_int($section)) ? $section : $section->section;
+            $section = $modinfo->get_section_info($sectionnum);
         }
 
-        // Get the list of modules visible to user (excluding the module being moved if there is one)
-        $moduleshtml = array();
-        if (!empty($modinfo->sections[$section->section])) {
-            foreach ($modinfo->sections[$section->section] as $modnumber) {
-                $mod = $modinfo->cms[$modnumber];
-
-                if ($ismoving and $mod->id == $USER->activitycopy) {
-                    // do not display moving mod
-                    continue;
-                }
-
-                if ($modulehtml = $this->course_section_cm_list_item($course,
-                        $completioninfo, $mod, $sectionreturn, $displayoptions)) {
-                    $moduleshtml[$modnumber] = $modulehtml;
-                }
-            }
+        if ($sectionreturn) {
+            $format->set_section_number($sectionreturn);
         }
 
-        $sectionoutput = '';
-        if (!empty($moduleshtml) || $ismoving) {
-            foreach ($moduleshtml as $modnumber => $modulehtml) {
-                if ($ismoving) {
-                    $movingurl = new moodle_url('/course/mod.php', array('moveto' => $modnumber, 'sesskey' => sesskey()));
-                    $sectionoutput .= html_writer::tag('li',
-                            html_writer::link($movingurl, '', array('title' => $strmovefull, 'class' => 'movehere')),
-                            array('class' => 'movehere'));
-                }
-
-                $sectionoutput .= $modulehtml;
-            }
-
-            if ($ismoving) {
-                $movingurl = new moodle_url('/course/mod.php', array('movetosection' => $section->id, 'sesskey' => sesskey()));
-                $sectionoutput .= html_writer::tag('li',
-                        html_writer::link($movingurl, '', array('title' => $strmovefull, 'class' => 'movehere')),
-                        array('class' => 'movehere'));
-            }
-        }
-
-        // Always output the section module list.
-        $output .= html_writer::tag('ul', $sectionoutput, array('class' => 'section img-text'));
-
-        return $output;
+        $cmlistclass = $format->get_output_classname('section_format\\cmlist');
+        $cmlist = new $cmlistclass($format, $section, $displayoptions);
+        // The course outputs works with format renderers, not with course renderers.
+        $renderer = $format->get_renderer($this->page);
+        return $renderer->render($cmlist);
     }
 
     /**
@@ -2267,52 +2163,17 @@ class core_course_renderer extends plugin_renderer_base {
 
         $modinfo = get_fast_modinfo($SITE);
         $section = $modinfo->get_section_info(1);
+
+
         if (($section && (!empty($modinfo->sections[1]) or !empty($section->summary))) or $editing) {
-            $output .= $this->box_start('generalbox sitetopic');
 
-            // If currently moving a file then show the current clipboard.
-            if (ismoving($SITE->id)) {
-                $stractivityclipboard = strip_tags(get_string('activityclipboard', '', $USER->activitycopyname));
-                $output .= '<p><font size="2">';
-                $cancelcopyurl = new moodle_url('/course/mod.php', ['cancelcopy' => 'true', 'sesskey' => sesskey()]);
-                $output .= "$stractivityclipboard&nbsp;&nbsp;(" . html_writer::link($cancelcopyurl, get_string('cancel')) .')';
-                $output .= '</font></p>';
-            }
+            $format = course_get_format($SITE);
+            $frontpageclass = $format->get_output_classname('course_format\\frontpagesection');
+            $frontpagesection = new $frontpageclass($format, $section);
 
-            $context = context_course::instance(SITEID);
-
-            // If the section name is set we show it.
-            if (trim($section->name) !== '') {
-                $output .= $this->heading(
-                    format_string($section->name, true, array('context' => $context)),
-                    2,
-                    'sectionname'
-                );
-            }
-
-            $summarytext = file_rewrite_pluginfile_urls($section->summary,
-                'pluginfile.php',
-                $context->id,
-                'course',
-                'section',
-                $section->id);
-            $summaryformatoptions = new stdClass();
-            $summaryformatoptions->noclean = true;
-            $summaryformatoptions->overflowdiv = true;
-
-            $output .= format_text($summarytext, $section->summaryformat, $summaryformatoptions);
-
-            if ($editing && has_capability('moodle/course:update', $context)) {
-                $streditsummary = get_string('editsummary');
-                $editsectionurl = new moodle_url('/course/editsection.php', ['id' => $section->id]);
-                $output .= html_writer::link($editsectionurl, $this->pix_icon('t/edit', $streditsummary)) .
-                    "<br /><br />";
-            }
-
-            $output .= $this->course_section_cm_list($SITE, $section);
-
-            $output .= $this->course_section_add_cm_control($SITE, $section->section);
-            $output .= $this->box_end();
+            // The course outputs works with format renderers, not with course renderers.
+            $renderer = $format->get_renderer($this->page);
+            $output .= $renderer->render($frontpagesection);
         }
 
         return $output;
