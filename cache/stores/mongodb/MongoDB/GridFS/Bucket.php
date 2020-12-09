@@ -143,19 +143,19 @@ class Bucket
             'disableMD5' => false,
         ];
 
-        if (isset($options['bucketName']) && ! is_string($options['bucketName'])) {
+        if (! is_string($options['bucketName'])) {
             throw InvalidArgumentException::invalidType('"bucketName" option', $options['bucketName'], 'string');
         }
 
-        if (isset($options['chunkSizeBytes']) && ! is_integer($options['chunkSizeBytes'])) {
+        if (! is_integer($options['chunkSizeBytes'])) {
             throw InvalidArgumentException::invalidType('"chunkSizeBytes" option', $options['chunkSizeBytes'], 'integer');
         }
 
-        if (isset($options['chunkSizeBytes']) && $options['chunkSizeBytes'] < 1) {
+        if ($options['chunkSizeBytes'] < 1) {
             throw new InvalidArgumentException(sprintf('Expected "chunkSizeBytes" option to be >= 1, %d given', $options['chunkSizeBytes']));
         }
 
-        if (isset($options['disableMD5']) && ! is_bool($options['disableMD5'])) {
+        if (! is_bool($options['disableMD5'])) {
             throw InvalidArgumentException::invalidType('"disableMD5" option', $options['disableMD5'], 'boolean');
         }
 
@@ -180,10 +180,10 @@ class Bucket
         $this->bucketName = $options['bucketName'];
         $this->chunkSizeBytes = $options['chunkSizeBytes'];
         $this->disableMD5 = $options['disableMD5'];
-        $this->readConcern = isset($options['readConcern']) ? $options['readConcern'] : $this->manager->getReadConcern();
-        $this->readPreference = isset($options['readPreference']) ? $options['readPreference'] : $this->manager->getReadPreference();
-        $this->typeMap = isset($options['typeMap']) ? $options['typeMap'] : self::$defaultTypeMap;
-        $this->writeConcern = isset($options['writeConcern']) ? $options['writeConcern'] : $this->manager->getWriteConcern();
+        $this->readConcern = $options['readConcern'] ?? $this->manager->getReadConcern();
+        $this->readPreference = $options['readPreference'] ?? $this->manager->getReadPreference();
+        $this->typeMap = $options['typeMap'] ?? self::$defaultTypeMap;
+        $this->writeConcern = $options['writeConcern'] ?? $this->manager->getWriteConcern();
 
         $collectionOptions = array_intersect_key($options, ['readConcern' => 1, 'readPreference' => 1, 'typeMap' => 1, 'writeConcern' => 1]);
 
@@ -688,7 +688,7 @@ class Bucket
         $metadata = stream_get_meta_data($stream);
 
         if (! isset($metadata['wrapper_data']) || ! $metadata['wrapper_data'] instanceof StreamWrapper) {
-            throw InvalidArgumentException::invalidType('$stream wrapper data', isset($metadata['wrapper_data']) ? $metadata['wrapper_data'] : null, StreamWrapper::class);
+            throw InvalidArgumentException::invalidType('$stream wrapper data', $metadata['wrapper_data'] ?? null, StreamWrapper::class);
         }
 
         return $metadata['wrapper_data']->getFile();
