@@ -3551,10 +3551,10 @@ class core_course_external extends external_api {
                     $section = $modinfo->get_section_info($newcm->sectionnum);
                     $cm = $modinfo->get_cm($id);
 
-                    // Get the new element html content.
-                    $cmitem = new $cmitemclass($format, $section, $cm);
-                    $newcmitem = new $cmitemclass($format, $section, $newcm);
-                    return $renderer->render($cmitem) . $renderer->render($newcmitem);
+                    // Get both original and new element html.
+                    $result = $renderer->course_section_updated_cm_item($format, $section, $cm);
+                    $result .= $renderer->course_section_updated_cm_item($format, $section, $newcm);
+                    return $result;
                 }
                 break;
             case 'groupsseparate':

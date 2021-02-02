@@ -24,7 +24,6 @@
 
 namespace core_course\output\section_format;
 
-use core\output\customtemplate;
 use core_course\course_format;
 use section_info;
 use renderable;
@@ -41,7 +40,7 @@ use stdClass;
  * @copyright 2020 Ferran Recio <ferran@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class availability implements renderable, templatable, customtemplate {
+class availability implements renderable, templatable {
 
     /** @var course_format the course format class */
     protected $format;
@@ -58,19 +57,6 @@ class availability implements renderable, templatable, customtemplate {
     public function __construct(course_format $format, section_info $section) {
         $this->format = $format;
         $this->section = $section;
-    }
-
-    /**
-     * Return the output template path for the current component.
-     *
-     * By default this method will return a core_course template but each individual
-     * course format component can override this method in case it uses a diferent template.
-     *
-     * @return string the template path
-     */
-    public function get_template(): string {
-        return 'core_course/local/section_format/availability';
-
     }
 
     /**
@@ -101,18 +87,18 @@ class availability implements renderable, templatable, customtemplate {
         $info = '';
         if (!$section->visible) {
             if ($canviewhidden) {
-                $info = $output->courserenderer->availability_info(get_string('hiddenfromstudents'), 'ishidden');
+                $info = $output->availability_info(get_string('hiddenfromstudents'), 'ishidden');
             } else {
                 // We are here because of the setting "Hidden sections are shown in collapsed form".
                 // Student can not see the section contents but can see its name.
-                $info = $output->courserenderer->availability_info(get_string('notavailable'), 'ishidden');
+                $info = $output->availability_info(get_string('notavailable'), 'ishidden');
             }
         } else if (!$section->uservisible) {
             if ($section->availableinfo) {
                 // Note: We only get to this function if availableinfo is non-empty,
                 // so there is definitely something to print.
                 $formattedinfo = info::format_info($section->availableinfo, $section->course);
-                $info = $output->courserenderer->availability_info($formattedinfo, 'isrestricted');
+                $info = $output->availability_info($formattedinfo, 'isrestricted');
             }
         } else if ($canviewhidden && !empty($CFG->enableavailability)) {
             // Check if there is an availability restriction.
@@ -120,7 +106,7 @@ class availability implements renderable, templatable, customtemplate {
             $fullinfo = $ci->get_full_information();
             if ($fullinfo) {
                 $formattedinfo = info::format_info($fullinfo, $section->course);
-                $info = $output->courserenderer->availability_info($formattedinfo, 'isrestricted isfullinfo');
+                $info = $output->availability_info($formattedinfo, 'isrestricted isfullinfo');
             }
         }
 

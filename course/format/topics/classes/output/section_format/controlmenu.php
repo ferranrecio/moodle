@@ -44,9 +44,11 @@ class controlmenu extends \core_course\output\section_format\controlmenu {
     /**
      * Generate the edit control items of a section.
      *
+     * This method must remain public until the final deprecation of section_edit_control_items.
+     *
      * @return array of edit control items
      */
-    protected function section_control_items() {
+    public function section_control_items() {
 
         $format = $this->format;
         $section = $this->section;

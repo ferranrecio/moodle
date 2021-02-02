@@ -24,7 +24,6 @@
 
 namespace core_course\output;
 
-use core\output\customtemplate;
 use core_course\course_format as course_format_base;
 use completion_info;
 use course_modinfo;
@@ -39,7 +38,7 @@ use stdClass;
  * @copyright 2020 Ferran Recio <ferran@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class course_format implements renderable, templatable, customtemplate {
+class course_format implements renderable, templatable {
 
     /** @var core_course\course_format the course format class */
     protected $format;
@@ -72,19 +71,6 @@ class course_format implements renderable, templatable, customtemplate {
     }
 
     /**
-     * Return the output template path for the current component.
-     *
-     * By default this method will return a core_course template but each individual
-     * course format component can override this method in case it uses a diferent template.
-     *
-     * @return string the template path
-     */
-    public function get_template(): string {
-        return 'core_course/local/course_format';
-
-    }
-
-    /**
      * Export this data so it can be used as the context for a mustache template (core/inplace_editable).
      *
      * @param renderer_base $output typically, the renderer that's calling this function
@@ -107,7 +93,7 @@ class course_format implements renderable, templatable, customtemplate {
             'title' => $format->page_title(), // This method should be in the course_format class.
             'initialsection' => $initialsection,
             'sections' => $sections,
-            'numsections' => $output->render($addsection),
+            'numsections' => $addsection->export_for_template($output),
             'format' => $format->get_format(),
         ];
 
@@ -115,10 +101,10 @@ class course_format implements renderable, templatable, customtemplate {
         $singlesection = $this->format->get_section_number();
         if ($singlesection) {
             $sectionnavigation = new $this->sectionnavigationclass($format, $singlesection);
-            $data->sectionnavigation = $output->render($sectionnavigation);
+            $data->sectionnavigation = $sectionnavigation->export_for_template($output);
 
             $sectionselector = new $this->sectionselectorclass($format, $sectionnavigation);
-            $data->sectionselector = $output->render($sectionselector);
+            $data->sectionselector = $sectionselector->export_for_template($output);
 
             $data->hasnavigation = true;
             $data->singlesection = array_shift($data->sections);
@@ -155,7 +141,7 @@ class course_format implements renderable, templatable, customtemplate {
             if ($sectionnum > $numsections) {
                 // Activities inside this section are 'orphaned', this section will be printed as 'stealth' below.
                 if (!empty($modinfo->sections[$sectionnum])) {
-                    $stealthsections[] = $output->render($section);
+                    $stealthsections[] = $section->export_for_template($output);
                 }
                 continue;
             }
@@ -170,7 +156,7 @@ class course_format implements renderable, templatable, customtemplate {
                 continue;
             }
 
-            $sections[] = $output->render($section);
+            $sections[] = $section->export_for_template($output);
         }
         if (!empty($stealthsections)) {
             $sections = array_merge($sections, $stealthsections);

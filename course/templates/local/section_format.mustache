@@ -43,16 +43,26 @@
         aria-labelledby="sectionid-{{id}}-title"
         data-sectionid="{{num}}"
         data-sectionreturnid="{{sectionreturnid}}">
-    {{#singleheader}} {{{singleheader}}} {{/singleheader}}
+    {{#singleheader}} {{> core_course/local/section_format/header }} {{/singleheader}}
     <div class="left side">{{#iscurrent}} {{{currentlink}}} {{/iscurrent}}</div>
-    <div class="right side">{{{controlmenu}}}</div>
+    <div class="right side">
+    {{#controlmenu}}
+            {{> core_course/local/section_format/controlmenu }}
+    {{/controlmenu}}
+    </div>
     <div class="content">
-        {{{header}}}
+        {{#header}} {{> core_course/local/section_format/header }} {{/header}}
         {{{completioninfo}}}
-        {{{availability}}}
-        <div class="summary">{{{summary}}}</div>
-        {{{activities}}}
-        {{{cmlist}}}
+        {{#availability}}
+            {{> core_course/local/section_format/availability }}
+        {{/availability}}
+        <div class="summary">
+        {{#summary}}
+            {{> core_course/local/section_format/summary }}
+        {{/summary}}
+        </div>
+        {{#cmsummary}} {{> core_course/local/section_format/cmsummary }} {{/cmsummary}}
+        {{#cmlist}} {{> core_course/local/section_format/cmlist }} {{/cmlist}}
         {{{cmcontrols}}}
     </div>
 </li>

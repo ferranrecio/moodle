@@ -62,10 +62,9 @@ class format_singleactivity_renderer extends format_section_renderer_base {
             $section = $modinfo->get_section_info(0);
             $output .= $this->render(new $cmlistclass($format, $section));
 
-            $courserenderer = $this->page->get_renderer('core', 'course');
             if (empty($modinfo->sections[0]) && course_get_format($course)->activity_has_subtypes()) {
                 // Course format was unable to automatically redirect to add module page.
-                $output .= $this->courserenderer->course_section_add_cm_control($course, 0, 0);
+                $output .= $this->course_section_add_cm_control($course, 0, 0);
             }
         }
         return $output;

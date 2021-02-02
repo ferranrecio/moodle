@@ -37,18 +37,22 @@
 <h2 class="accesshide">{{{title}}}</h2>
 {{{completionhelp}}}
 <ul class="{{format}}">
-    {{{initialsection}}}
+    {{#initialsection}}
+        {{> core_course/local/section_format }}
+    {{/initialsection}}
     {{#sections}}
-        {{{.}}}
+        {{> core_course/local/section_format }}
     {{/sections}}
 </ul>
 {{#hasnavigation}}
 <div class="single-section">
-    {{{sectionnavigation}}}
+    {{#sectionnavigation}} {{> core_course/local/course_format/sectionnavigation }} {{/sectionnavigation}}
     <ul class="{{format}}">
-        {{{singlesection}}}
+    {{#singlesection}}
+        {{> core_course/local/section_format }}
+    {{/singlesection}}
     </ul>
-    {{{sectionselector}}}
+    {{#sectionselector}} {{> core_course/local/course_format/sectionselector }} {{/sectionselector}}
 </div>
 {{/hasnavigation}}
-{{{numsections}}}
+{{#numsections}} {{> core_course/local/course_format/addsection}} {{/numsections}}

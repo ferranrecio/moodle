@@ -55,10 +55,9 @@ $renderer = $PAGE->get_renderer('format_topics');
 if (!empty($displaysection)) {
     $format->set_section_number($displaysection);
 }
-
 $outputclass = $format->get_output_classname('course_format');
-$output = new $outputclass($format);
-echo $renderer->render($output);
+$widget = new $outputclass($format);
+echo $renderer->render($widget);
 
 // Include course format js module.
 $PAGE->requires->js('/course/format/topics/format.js');

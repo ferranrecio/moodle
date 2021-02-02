@@ -24,7 +24,6 @@
 
 namespace core_course\output\section_format;
 
-use core\output\customtemplate;
 use core_course\course_format;
 use section_info;
 use completion_info;
@@ -40,7 +39,7 @@ use stdClass;
  * @copyright 2020 Ferran Recio <ferran@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class cmitem implements renderable, templatable, customtemplate {
+class cmitem implements renderable, templatable {
 
     /** @var course_format the course format class */
     protected $format;
@@ -76,19 +75,6 @@ class cmitem implements renderable, templatable, customtemplate {
     }
 
     /**
-     * Return the output template path for the current component.
-     *
-     * By default this method will return a core_course template but each individual
-     * course format component can override this method in case it uses a diferent template.
-     *
-     * @return string the template path
-     */
-    public function get_template(): string {
-        return 'core_course/local/section_format/cmitem';
-
-    }
-
-    /**
      * Export this data so it can be used as the context for a mustache template.
      *
      * @param renderer_base $output typically, the renderer that's calling this function
@@ -108,7 +94,7 @@ class cmitem implements renderable, templatable, customtemplate {
             'id' => $mod->id,
             'module' => $mod->modname,
             'extraclasses' => $mod->extraclasses,
-            'modhtml' => $output->render($item),
+            'cmformat' => $item->export_for_template($output),
         ];
     }
 }

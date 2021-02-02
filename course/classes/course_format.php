@@ -1092,6 +1092,18 @@ abstract class course_format {
     }
 
     /**
+     * return true if the course editor must be displayed.
+     *
+     * @return bool true if edit controls must be displayed
+     */
+    public function show_editor(): bool {
+        global $PAGE;
+        $course = $this->get_course();
+        $coursecontext = context_course::instance($course->id);
+        return $PAGE->user_is_editing() && has_capability('moodle/course:update', $coursecontext);
+    }
+
+    /**
      * Allows to specify for modinfo that section is not available even when it is visible and conditionally available.
      *
      * Note: affected user can be retrieved as: $section->modinfo->userid

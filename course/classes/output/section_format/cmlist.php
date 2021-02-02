@@ -24,7 +24,6 @@
 
 namespace core_course\output\section_format;
 
-use core\output\customtemplate;
 use core_course\course_format;
 use section_info;
 use renderable;
@@ -39,7 +38,7 @@ use stdClass;
  * @copyright 2020 Ferran Recio <ferran@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class cmlist implements renderable, templatable, customtemplate {
+class cmlist implements renderable, templatable {
 
     /** @var course_format the course format class */
     protected $format;
@@ -70,19 +69,6 @@ class cmlist implements renderable, templatable, customtemplate {
 
         // Get the necessary classes.
         $this->itemclass = $format->get_output_classname('section_format\cmitem');
-    }
-
-    /**
-     * Return the output template path for the current component.
-     *
-     * By default this method will return a core_course template but each individual
-     * course format component can override this method in case it uses a diferent template.
-     *
-     * @return string the template path
-     */
-    public function get_template(): string {
-        return 'core_course/local/section_format/cmlist';
-
     }
 
     /**
@@ -131,7 +117,7 @@ class cmlist implements renderable, templatable, customtemplate {
             if ($mod->is_visible_on_course_page()) {
                 $item = new $this->itemclass($format, $section, $mod, $this->displayoptions);
                 $data->cms[] = (object)[
-                    'cmhtml' => $output->render($item),
+                    'cmitem' => $item->export_for_template($output),
                     'moveurl' => new moodle_url('/course/mod.php', array('moveto' => $modnumber, 'sesskey' => sesskey())),
                 ];
             }

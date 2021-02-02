@@ -24,7 +24,6 @@
 
 namespace core_course\output\section_format;
 
-use core\output\customtemplate;
 use core_course\course_format;
 use section_info;
 use renderable;
@@ -43,7 +42,7 @@ use stdClass;
  * @copyright 2020 Ferran Recio <ferran@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class controlmenu implements renderable, templatable, customtemplate {
+class controlmenu implements renderable, templatable {
 
     /** @var course_format the course format class */
     protected $format;
@@ -60,19 +59,6 @@ class controlmenu implements renderable, templatable, customtemplate {
     public function __construct(course_format $format, section_info $section) {
         $this->format = $format;
         $this->section = $section;
-    }
-
-    /**
-     * Return the output template path for the current component.
-     *
-     * By default this method will return a core_course template but each individual
-     * course format component can override this method in case it uses a diferent template.
-     *
-     * @return string the template path
-     */
-    public function get_template(): string {
-        return 'core_course/local/section_format/controlmenu';
-
     }
 
     /**
@@ -125,9 +111,11 @@ class controlmenu implements renderable, templatable, customtemplate {
      * It is not clear this kind of controls are still available in 4.0 so, for now, this
      * method is almost a clone of the previous section_control_items from the course/renderer.php.
      *
+     * This method must remain public until the final deprecation of section_edit_control_items.
+     *
      * @return array of edit control items
      */
-    protected function section_control_items() {
+    public function section_control_items() {
         global $USER;
 
         $format = $this->format;

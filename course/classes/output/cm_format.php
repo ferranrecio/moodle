@@ -24,7 +24,6 @@
 
 namespace core_course\output;
 
-use core\output\customtemplate;
 use core_course\course_format;
 use section_info;
 use completion_info;
@@ -40,7 +39,7 @@ use stdClass;
  * @copyright 2020 Ferran Recio <ferran@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class cm_format implements renderable, templatable, customtemplate {
+class cm_format implements renderable, templatable {
 
     /** @var course_format the course format */
     protected $format;
@@ -77,18 +76,6 @@ class cm_format implements renderable, templatable, customtemplate {
     }
 
     /**
-     * Return the output template path for the current component.
-     *
-     * By default this method will return a core_course template but each individual
-     * course format component can override this method in case it uses a diferent template.
-     *
-     * @return string the template path
-     */
-    public function get_template(): string {
-        return 'core_course/local/cm_format';
-    }
-
-    /**
      * Export this data so it can be used as the context for a mustache template.
      *
      * @param renderer_base $output typically, the renderer that's calling this function
@@ -101,12 +88,12 @@ class cm_format implements renderable, templatable, customtemplate {
         $displayoptions = $this->displayoptions;
 
         $data = (object)[
-            'cmname' => $output->courserenderer->course_section_cm_name($mod, $displayoptions),
+            'cmname' => $output->course_section_cm_name($mod, $displayoptions),
             'afterlink' => $mod->afterlink,
-            'altcontent' => $output->courserenderer->course_section_cm_text($mod, $displayoptions),
-            'availability' => $output->courserenderer->course_section_cm_availability($mod, $displayoptions),
+            'altcontent' => $output->course_section_cm_text($mod, $displayoptions),
+            'availability' => $output->course_section_cm_availability($mod, $displayoptions),
             'url' => $mod->url,
-            'completion' => $output->courserenderer->course_section_cm_completion(
+            'completion' => $output->course_section_cm_completion(
                 $course, $this->completioninfo, $mod, $displayoptions
             ),
         ];
@@ -127,10 +114,10 @@ class cm_format implements renderable, templatable, customtemplate {
 
         $returnsection = $format->get_section_number();
         $data->extras = [];
-        if ($output->show_editor($course)) {
+        if ($format->show_editor()) {
             // Edit actions.
             $editactions = course_get_cm_edit_actions($mod, $mod->indent, $returnsection);
-            $data->extras[] = $output->courserenderer->course_section_cm_edit_actions($editactions, $mod, $displayoptions);
+            $data->extras[] = $output->course_section_cm_edit_actions($editactions, $mod, $displayoptions);
             if (!empty($mod->afterediticons)) {
                 $data->extras[] = $mod->afterediticons;
             }

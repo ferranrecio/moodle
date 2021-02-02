@@ -21,10 +21,14 @@
 
     Example context (json):
     {
-        "modhtml": "<a class=\"aalink\">[icon] <span class=\"instancename\">Forum</span></a>",
+        "cmformat": "<a class=\"aalink\">[icon] <span class=\"instancename\">Forum</span></a>",
         "id": 3,
         "module": "forum",
         "extraclasses": "newmessages"
     }
 }}
-<li class="activity {{module}} modtype_{{module}} {{extraclasses}}" id="module-{{id}}">{{{modhtml}}}</li>
+<li class="activity {{module}} modtype_{{module}} {{extraclasses}}" id="module-{{id}}">
+{{#cmformat}}
+    {{> core_course/local/cm_format}}
+{{/cmformat}}
+</li>

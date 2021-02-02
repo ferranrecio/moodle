@@ -23,10 +23,10 @@
     {
         "cms": [
             {
-                "cmhtml": "<li>Forum link</li>"
+                "cmitem": "<li>Forum link</li>"
             },
             {
-                "cmhtml": "<li>Assign link</li>"
+                "cmitem": "<li>Assign link</li>"
             }
         ],
         "hascms": true,
@@ -48,7 +48,9 @@
                 <a href="{{{moveurl}}}" title="{{strmovefull}}" class="movehere"></a>
             </li>
         {{/showmovehere}}
-        {{{cmhtml}}}
+        {{#cmitem}}
+            {{> core_course/local/section_format/cmitem}}
+        {{/cmitem}}
     {{/cms}}
     {{#showmovehere}}
     <li class="movehere">

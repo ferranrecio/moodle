@@ -28,7 +28,7 @@
         "decrease": {
             "url": "#"
         },
-        "add": {
+        "addsections": {
             "url": "#",
             "title": "Add section",
             "newsection": 3
@@ -47,10 +47,10 @@
         {{#pix}}t/switch_minus, moodle, {{#str}} reducesections, moodle {{/str}}{{/pix}}
     </a>
     {{/decrease}}
-    {{#add}}
+    {{#addsections}}
     <a href="{{{url}}}" class="add-sections" data-add-sections="{{title}}" data-new-sections="{{newsection}}">
         {{#pix}} t/add, moodle {{/pix}} {{title}}
     </a>
-    {{/add}}
+    {{/addsections}}
 </div>
 {{/showaddsection}}

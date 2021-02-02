@@ -829,22 +829,15 @@ class core_course_renderer extends plugin_renderer_base {
      */
     public function course_section_cm_list_item($course, &$completioninfo, cm_info $mod, $sectionreturn, $displayoptions = []) {
 
-        debugging('course_section_cm_list_item is deprecated. Use core_course output classes instead.', DEBUG_DEVELOPER);
+        debugging('course_section_cm_list_item is deprecated. Use core_course\\output\\section_format\\cmitem '
+                .'instead.', DEBUG_DEVELOPER);
 
-        $format = course_get_format($course);
-        $modinfo = $format->get_modinfo();
-
-        // Output renderers works only with real section_info objects.
-        if ($sectionreturn) {
-            $format->set_section_number($sectionreturn);
+        $output = '';
+        if ($modulehtml = $this->course_section_cm($course, $completioninfo, $mod, $sectionreturn, $displayoptions)) {
+            $modclasses = 'activity ' . $mod->modname . ' modtype_' . $mod->modname . ' ' . $mod->extraclasses;
+            $output .= html_writer::tag('li', $modulehtml, array('class' => $modclasses, 'id' => 'module-' . $mod->id));
         }
-        $section = $modinfo->get_section_info($format->get_section_number());
-
-        $cmitemclass = $format->get_output_classname('section_format\\cmitem');
-        $cmitem = new $cmitemclass($format, $section, $mod);
-        // The course outputs works with format renderers, not with course renderers.
-        $renderer = $format->get_renderer($this->page);
-        return $renderer->render($cmitem);
+        return $output;
     }
 
     /**
@@ -936,27 +929,82 @@ class core_course_renderer extends plugin_renderer_base {
      * @return void
      */
     public function course_section_cm_list($course, $section, $sectionreturn = null, $displayoptions = []) {
+        global $USER;
 
-        debugging('course_section_cm_list is deprecated. Use core_course output classes instead.', DEBUG_DEVELOPER);
+        debugging('course_section_cm_list is deprecated. Use core_course\\output\\section_format\\cmlist '.
+                'classes instead.', DEBUG_DEVELOPER);
+
+        $output = '';
 
         $format = course_get_format($course);
         $modinfo = $format->get_modinfo();
 
-        // Output renderers works only with real section_info objects.
-        if (!($section instanceof section_info)) {
-            $sectionnum = (is_int($section)) ? $section : $section->section;
-            $section = $modinfo->get_section_info($sectionnum);
+        if (is_object($section)) {
+            $section = $modinfo->get_section_info($section->section);
+        } else {
+            $section = $modinfo->get_section_info($section);
+        }
+        $completioninfo = new completion_info($course);
+
+        // check if we are currently in the process of moving a module with JavaScript disabled
+        $ismoving = $format->show_editor() && ismoving($course->id);
+
+        if ($ismoving) {
+            $strmovefull = strip_tags(get_string("movefull", "", "'$USER->activitycopyname'"));
         }
 
-        if ($sectionreturn) {
-            $format->set_section_number($sectionreturn);
+        // Get the list of modules visible to user (excluding the module being moved if there is one)
+        $moduleshtml = [];
+        if (!empty($modinfo->sections[$section->section])) {
+            foreach ($modinfo->sections[$section->section] as $modnumber) {
+                $mod = $modinfo->cms[$modnumber];
+
+                if ($ismoving and $mod->id == $USER->activitycopy) {
+                    // do not display moving mod
+                    continue;
+                }
+
+                if ($modulehtml = $this->course_section_cm_list_item(
+                    $course,
+                    $completioninfo,
+                    $mod,
+                    $sectionreturn,
+                    $displayoptions
+                )) {
+                    $moduleshtml[$modnumber] = $modulehtml;
+                }
+            }
         }
 
-        $cmlistclass = $format->get_output_classname('section_format\\cmlist');
-        $cmlist = new $cmlistclass($format, $section, $displayoptions);
-        // The course outputs works with format renderers, not with course renderers.
-        $renderer = $format->get_renderer($this->page);
-        return $renderer->render($cmlist);
+        $sectionoutput = '';
+        if (!empty($moduleshtml) || $ismoving) {
+            foreach ($moduleshtml as $modnumber => $modulehtml) {
+                if ($ismoving) {
+                    $movingurl = new moodle_url('/course/mod.php', array('moveto' => $modnumber, 'sesskey' => sesskey()));
+                    $sectionoutput .= html_writer::tag(
+                        'li',
+                        html_writer::link($movingurl, '', array('title' => $strmovefull, 'class' => 'movehere')),
+                        array('class' => 'movehere')
+                    );
+                }
+
+                $sectionoutput .= $modulehtml;
+            }
+
+            if ($ismoving) {
+                $movingurl = new moodle_url('/course/mod.php', array('movetosection' => $section->id, 'sesskey' => sesskey()));
+                $sectionoutput .= html_writer::tag(
+                    'li',
+                    html_writer::link($movingurl, '', array('title' => $strmovefull, 'class' => 'movehere')),
+                    array('class' => 'movehere')
+                );
+            }
+        }
+
+        // Always output the section module list.
+        $output .= html_writer::tag('ul', $sectionoutput, array('class' => 'section img-text'));
+
+        return $output;
     }
 
     /**

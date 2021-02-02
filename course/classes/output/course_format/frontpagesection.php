@@ -27,7 +27,6 @@
 namespace core_course\output\course_format;
 
 use core_course\course_format;
-use core\output\customtemplate;
 use renderable;
 use templatable;
 use section_info;
@@ -42,7 +41,7 @@ use stdClass;
  * @copyright 2020 Ferran Recio <ferran@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class frontpagesection implements renderable, templatable, customtemplate {
+class frontpagesection implements renderable, templatable {
 
     /** @var course_format the course format class */
     protected $format;
@@ -68,15 +67,6 @@ class frontpagesection implements renderable, templatable, customtemplate {
     }
 
     /**
-     * Return the output template path for the current component.
-     *
-     * @return string the template path
-     */
-    public function get_template(): string {
-        return 'core_course/local/course_format/frontpagesection';
-    }
-
-    /**
      * Export this data so it can be used as the context for a mustache template.
      *
      * @param renderer_base $output typically, the renderer that's calling this function
@@ -98,10 +88,10 @@ class frontpagesection implements renderable, templatable, customtemplate {
         }
 
         $data = (object)[
-            'sections' => [$output->render($sectionoutput)],
+            'sections' => [$sectionoutput->export_for_template($output)],
         ];
 
-        if ($output->show_editor($course) && has_capability('moodle/course:update', $context)) {
+        if ($format->show_editor() && has_capability('moodle/course:update', $context)) {
             $data->showsettings = true;
             $data->settingsurl = new moodle_url('/course/editsection.php', ['id' => $section->id]);
         }

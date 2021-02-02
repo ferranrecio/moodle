@@ -25,7 +25,6 @@
 namespace core_course\output\course_format;
 
 use core_course\course_format;
-use core\output\customtemplate;
 use renderable;
 use templatable;
 use section_info;
@@ -39,7 +38,7 @@ use stdClass;
  * @copyright 2020 Ferran Recio <ferran@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class sectionnavigation implements renderable, templatable, customtemplate {
+class sectionnavigation implements renderable, templatable {
 
     /** @var course_format the course format class */
     protected $format;
@@ -59,18 +58,6 @@ class sectionnavigation implements renderable, templatable, customtemplate {
     public function __construct(course_format $format, int $sectionno) {
         $this->format = $format;
         $this->sectionno = $sectionno;
-    }
-
-    /**
-     * Return the output template path for the current component.
-     *
-     * By default this method will return a core_course template but each individual
-     * course format component can override this method in case it uses a diferent template.
-     *
-     * @return string the template path
-     */
-    public function get_template(): string {
-        return 'core_course/local/course_format/sectionnavigation';
     }
 
     /**

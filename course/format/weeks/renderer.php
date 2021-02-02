@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot.'/course/format/renderer.php');
 require_once($CFG->dirroot.'/course/format/weeks/lib.php');
 
+use core_course\output\section_format\availability;
 
 /**
  * Basic renderer for weeks format.

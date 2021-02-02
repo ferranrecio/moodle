@@ -24,7 +24,6 @@
 
 namespace core_course\output\section_format;
 
-use core\output\customtemplate;
 use core_course\course_format;
 use section_info;
 use renderable;
@@ -38,7 +37,7 @@ use stdClass;
  * @copyright 2020 Ferran Recio <ferran@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class header implements renderable, templatable, customtemplate {
+class header implements renderable, templatable {
 
     /** @var course_format the course format class */
     protected $format;
@@ -55,19 +54,6 @@ class header implements renderable, templatable, customtemplate {
     public function __construct(course_format $format, section_info $section) {
         $this->format = $format;
         $this->section = $section;
-    }
-
-    /**
-     * Return the output template path for the current component.
-     *
-     * By default this method will return a core_course template but each individual
-     * course format component can override this method in case it uses a diferent template.
-     *
-     * @return string the template path
-     */
-    public function get_template(): string {
-        return 'core_course/local/section_format/header';
-
     }
 
     /**
@@ -104,7 +90,7 @@ class header implements renderable, templatable, customtemplate {
             $data->ishidden = true;
         }
 
-        if (!$output->show_editor($course) && $course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && empty($data->issinglesection)) {
+        if (!$format->show_editor() && $course->coursedisplay == COURSE_DISPLAY_MULTIPAGE && empty($data->issinglesection)) {
             $data->url = course_get_url($course, $section->section);
             $data->name = get_section_name($course, $section);
         }

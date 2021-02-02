@@ -24,7 +24,6 @@
 
 namespace core_course\output;
 
-use core\output\customtemplate;
 use core_course\course_format;
 use completion_info;
 use renderable;
@@ -39,7 +38,7 @@ use stdClass;
  * @copyright 2020 Ferran Recio <ferran@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class section_format implements renderable, templatable, customtemplate {
+class section_format implements renderable, templatable {
 
     /** @var course_format the course format */
     protected $format;
@@ -114,18 +113,6 @@ class section_format implements renderable, templatable, customtemplate {
     }
 
     /**
-     * Return the output template path for the current component.
-     *
-     * By default this method will return a core_course template but each individual
-     * course format component can override this method in case it uses a diferent template.
-     *
-     * @return string the template path
-     */
-    public function get_template(): string {
-        return 'core_course/local/section_format';
-    }
-
-    /**
      * Export this data so it can be used as the context for a mustache template.
      *
      * @param renderer_base $output typically, the renderer that's calling this function
@@ -145,8 +132,8 @@ class section_format implements renderable, templatable, customtemplate {
             'num' => $thissection->section ?? '0',
             'id' => $thissection->id,
             'sectionreturnid' => $singlesection,
-            'summary' => $output->render($summary),
-            'availability' => $output->render($availability),
+            'summary' => $summary->export_for_template($output),
+            'availability' => $availability->export_for_template($output),
         ];
 
         // Check if it is a stealth sections (orphaned).
@@ -155,20 +142,20 @@ class section_format implements renderable, templatable, customtemplate {
             $data->ishidden = true;
         }
 
-        if ($output->show_editor($course)) {
+        if ($format->show_editor()) {
             if (empty($this->hidecontrols)) {
                 $controlmenu = new $this->controlmenuclass($format, $thissection);
-                $data->controlmenu = $output->render($controlmenu);
+                $data->controlmenu = $controlmenu->export_for_template($output);
             }
             if (empty($data->isstealth)) {
-                $data->cmcontrols = $output->courserenderer->course_section_add_cm_control($course, $thissection->section, 0);
+                $data->cmcontrols = $output->course_section_add_cm_control($course, $thissection->section, 0);
             }
         }
 
         if ($thissection->section == 0) {
             // Section zero is always visible only as a cmlist.
             $cmlist = new $this->cmlistclass($format, $thissection);
-            $data->cmlist = $output->render($cmlist);
+            $data->cmlist = $cmlist->export_for_template($output);
 
             // Section 0 could have a completion help icon.
             $completioninfo = new completion_info($course);
@@ -182,17 +169,18 @@ class section_format implements renderable, templatable, customtemplate {
 
         if ($thissection->section == $singlesection) {
             if (empty($this->hidetitle)) {
-                $data->singleheader = $output->render($header);
+                $data->singleheader = $header->export_for_template($output);
             }
         } else {
             if (empty($this->hidetitle)) {
-                $data->header = $output->render($header);
+                $data->header = $header->export_for_template($output);
             }
 
             // Add activities summary if necessary.
-            if (!$output->show_editor($course) && $course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
-                $activities = new $this->cmsummaryclass($format, $thissection);
-                $data->activities = $output->render($activities);
+            if (!$format->show_editor() && $course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
+                $cmsummary = new $this->cmsummaryclass($format, $thissection);
+                $data->cmsummary = $cmsummary->export_for_template($output);
+
                 $data->onlysummary = true;
                 if (!$format->is_section_current($thissection)) {
                     // In multipage, only the current section (and the section zero) has elements.
@@ -204,7 +192,7 @@ class section_format implements renderable, templatable, customtemplate {
         // Add the cm list.
         if ($thissection->uservisible) {
             $cmlist = new $this->cmlistclass($format, $thissection);
-            $data->cmlist = $output->render($cmlist);
+            $data->cmlist = $cmlist->export_for_template($output);
         }
 
         if (!$thissection->visible) {
