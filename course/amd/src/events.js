@@ -25,5 +25,7 @@ define([], function() {
     return {
         favourited: 'core_course:favourited',
         unfavorited: 'core_course:unfavorited',
+        // Thi file needs to be transformed into the new events.js proposed in MDL-70990.
+        statechanged: 'core_course:statechanged',
     };
 });

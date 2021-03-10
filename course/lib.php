@@ -3182,95 +3182,102 @@ function course_ajax_enabled($course) {
 function include_course_ajax($course, $usedmodules = array(), $enabledmodules = null, $config = null) {
     global $CFG, $PAGE, $SITE;
 
-    // Ensure that ajax should be included
-    if (!course_ajax_enabled($course)) {
-        return false;
-    }
-
-    if (!$config) {
-        $config = new stdClass();
-    }
-
-    // The URL to use for resource changes
-    if (!isset($config->resourceurl)) {
-        $config->resourceurl = '/course/rest.php';
-    }
-
-    // The URL to use for section changes
-    if (!isset($config->sectionurl)) {
-        $config->sectionurl = '/course/rest.php';
-    }
-
-    // Any additional parameters which need to be included on page submission
-    if (!isset($config->pageparams)) {
-        $config->pageparams = array();
-    }
-
-    // Include course dragdrop
-    if (course_format_uses_sections($course->format)) {
-        $PAGE->requires->yui_module('moodle-course-dragdrop', 'M.course.init_section_dragdrop',
-            array(array(
-                'courseid' => $course->id,
-                'ajaxurl' => $config->sectionurl,
-                'config' => $config,
-            )), null, true);
-
-        $PAGE->requires->yui_module('moodle-course-dragdrop', 'M.course.init_resource_dragdrop',
-            array(array(
-                'courseid' => $course->id,
-                'ajaxurl' => $config->resourceurl,
-                'config' => $config,
-            )), null, true);
-    }
-
-    // Require various strings for the command toolbox
-    $PAGE->requires->strings_for_js(array(
-            'moveleft',
-            'deletechecktype',
-            'deletechecktypename',
-            'edittitle',
-            'edittitleinstructions',
-            'show',
-            'hide',
-            'highlight',
-            'highlightoff',
-            'groupsnone',
-            'groupsvisible',
-            'groupsseparate',
-            'clicktochangeinbrackets',
-            'markthistopic',
-            'markedthistopic',
-            'movesection',
-            'movecoursemodule',
-            'movecoursesection',
-            'movecontent',
-            'tocontent',
-            'emptydragdropregion',
-            'afterresource',
-            'aftersection',
-            'totopofsection',
-        ), 'moodle');
-
-    // Include section-specific strings for formats which support sections.
-    if (course_format_uses_sections($course->format)) {
-        $PAGE->requires->strings_for_js(array(
-                'showfromothers',
-                'hidefromothers',
-            ), 'format_' . $course->format);
-    }
-
-    // For confirming resource deletion we need the name of the module in question
-    foreach ($usedmodules as $module => $modname) {
-        $PAGE->requires->string_for_js('pluginname', $module);
-    }
-
-    // Load drag and drop upload AJAX.
-    require_once($CFG->dirroot.'/course/dnduploadlib.php');
-    dndupload_add_to_course($course, $enabledmodules);
-
-    $PAGE->requires->js_call_amd('core_course/actions', 'initCoursePage', array($course->format));
-
+    // All the new editor elements will be loaded adter the course is presented
+    // and the initial course state will be generated using core_course_get_state
+    // webservice.
+    $PAGE->requires->js_call_amd('core_course/editor', 'init', [$course->id]);
     return true;
+    // TODO: add a way to indicate we want the legacy libraries (and get a deprecation message)
+
+    // // Ensure that ajax should be included
+    // if (!course_ajax_enabled($course)) {
+    //     return false;
+    // }
+
+    // if (!$config) {
+    //     $config = new stdClass();
+    // }
+
+    // // The URL to use for resource changes
+    // if (!isset($config->resourceurl)) {
+    //     $config->resourceurl = '/course/rest.php';
+    // }
+
+    // // The URL to use for section changes
+    // if (!isset($config->sectionurl)) {
+    //     $config->sectionurl = '/course/rest.php';
+    // }
+
+    // // Any additional parameters which need to be included on page submission
+    // if (!isset($config->pageparams)) {
+    //     $config->pageparams = array();
+    // }
+
+    // // Include course dragdrop
+    // if (course_format_uses_sections($course->format)) {
+    //     $PAGE->requires->yui_module('moodle-course-dragdrop', 'M.course.init_section_dragdrop',
+    //         array(array(
+    //             'courseid' => $course->id,
+    //             'ajaxurl' => $config->sectionurl,
+    //             'config' => $config,
+    //         )), null, true);
+
+    //     $PAGE->requires->yui_module('moodle-course-dragdrop', 'M.course.init_resource_dragdrop',
+    //         array(array(
+    //             'courseid' => $course->id,
+    //             'ajaxurl' => $config->resourceurl,
+    //             'config' => $config,
+    //         )), null, true);
+    // }
+
+    // // Require various strings for the command toolbox
+    // $PAGE->requires->strings_for_js(array(
+    //         'moveleft',
+    //         'deletechecktype',
+    //         'deletechecktypename',
+    //         'edittitle',
+    //         'edittitleinstructions',
+    //         'show',
+    //         'hide',
+    //         'highlight',
+    //         'highlightoff',
+    //         'groupsnone',
+    //         'groupsvisible',
+    //         'groupsseparate',
+    //         'clicktochangeinbrackets',
+    //         'markthistopic',
+    //         'markedthistopic',
+    //         'movesection',
+    //         'movecoursemodule',
+    //         'movecoursesection',
+    //         'movecontent',
+    //         'tocontent',
+    //         'emptydragdropregion',
+    //         'afterresource',
+    //         'aftersection',
+    //         'totopofsection',
+    //     ), 'moodle');
+
+    // // Include section-specific strings for formats which support sections.
+    // if (course_format_uses_sections($course->format)) {
+    //     $PAGE->requires->strings_for_js(array(
+    //             'showfromothers',
+    //             'hidefromothers',
+    //         ), 'format_' . $course->format);
+    // }
+
+    // // For confirming resource deletion we need the name of the module in question
+    // foreach ($usedmodules as $module => $modname) {
+    //     $PAGE->requires->string_for_js('pluginname', $module);
+    // }
+
+    // // Load drag and drop upload AJAX.
+    // require_once($CFG->dirroot.'/course/dnduploadlib.php');
+    // dndupload_add_to_course($course, $enabledmodules);
+
+    // $PAGE->requires->js_call_amd('core_course/actions', 'initCoursePage', array($course->format));
+
+    // return true;
 }
 
 /**
