@@ -89,6 +89,7 @@ class cm_format implements renderable, templatable {
 
         $data = (object)[
             'cmname' => $output->course_section_cm_name($mod, $displayoptions),
+            'id' => $mod->id,
             'afterlink' => $mod->afterlink,
             'altcontent' => $output->course_section_cm_text($mod, $displayoptions),
             'availability' => $output->course_section_cm_availability($mod, $displayoptions),
