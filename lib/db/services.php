@@ -508,6 +508,23 @@ $functions = array(
         'type'        => 'read',
         'ajax'        => true,
     ),
+    'core_course_get_state' => [
+        'classname'     => 'core_course\external\course_get_state',
+        'methodname'    => 'execute',
+        'classpath'     => '',
+        'description'   => 'Get the current course state.',
+        'type'          => 'read',
+        'ajax'          => 'true',
+    ],
+    'core_course_edit' => [
+        'classname'     => 'core_course\external\course_edit',
+        'methodname'    => 'execute',
+        'classpath'     => '',
+        'description'   => 'Edit course contents.',
+        'type'          => 'write',
+        'ajax'          => 'true',
+        'capabilities'  => 'moodle/course:manageactivities',
+    ],
     'core_course_edit_module' => array(
         'classname'   => 'core_course_external',
         'methodname'  => 'edit_module',
