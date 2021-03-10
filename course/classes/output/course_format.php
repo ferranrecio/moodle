@@ -54,6 +54,9 @@ class course_format implements renderable, templatable {
     /** @var string section selector class name */
     protected $sectionselectorclass;
 
+    /** @var string course index class name */
+    protected $courseindexclass;
+
     /**
      * Constructor.
      *
@@ -67,6 +70,7 @@ class course_format implements renderable, templatable {
         $this->addsectionclass = $format->get_output_classname('course_format\\addsection');
         $this->sectionnavigationclass = $format->get_output_classname('course_format\\sectionnavigation');
         $this->sectionselectorclass = $format->get_output_classname('course_format\\sectionselector');
+        $this->courseindexclass = $format->get_output_classname('course_format\\courseindex');
     }
 
     /**
@@ -79,6 +83,7 @@ class course_format implements renderable, templatable {
         $format = $this->format;
 
         $addsection = new $this->addsectionclass($format);
+        $courseindex = new $this->courseindexclass($format);
 
         // Most formats uses section 0 as a separate section so we remove from the list.
         $sections = $this->export_sections($output);
@@ -93,6 +98,7 @@ class course_format implements renderable, templatable {
             'sections' => $sections,
             'numsections' => $addsection->export_for_template($output),
             'format' => $format->get_format(),
+            'courseindex' => $courseindex->export_for_template($output),
         ];
 
         // The single section format has extra navigation.

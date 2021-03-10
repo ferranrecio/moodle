@@ -1,0 +1,80 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template core_course/local/courseindex
+
+    Displays a course course index.
+
+    Example context (json):
+    {
+    }
+}}
+<div id="coureindex-content">
+    <div>Course index</div>
+    {{#sections}}
+    <nav class="list-group mt-1">
+        <ul>
+            <li class="">
+                <a class="list-group-item list-group-item-action ci-sectionitem {{^visible}} bg-light dimmed {{/visible}}"
+                        data-id="{{{id}}}">
+                    <div class="ml-0">
+                        <div class="media">
+                            <span class="media-left">{{#pix}} i/section {{/pix}}</span>
+                            <span class="media-body">
+                                {{title}}
+                            </span>
+                        </div>
+                    </div>
+                </a>
+                {{#hascms}}
+                {{#cms}}
+                <a class="list-group-item list-group-item-action ci-cmitem {{^visible}} bg-light dimmed {{/visible}}"
+                        data-id="{{{id}}}">
+                    <div class="ml-0">
+                        <div class="media">
+                            <span class="media-left">{{#pix}} i/empty {{/pix}}</span>
+                            <span class="media-body">
+                                {{name}}
+                            </span>
+                            {{#editmode}}
+                            <span class="media-right" data-action="cm_show" data-id="{{{id}}}">
+                                {{#pix}} i/hide {{/pix}}
+                            </span>
+                            <span class="media-right" data-action="cm_hide" data-id="{{{id}}}">
+                                {{#pix}} i/show {{/pix}}
+                            </span>
+                            {{/editmode}}
+                        </div>
+                    </div>
+                </a>
+                {{/cms}}
+                {{/hascms}}
+            </li>
+        </ul>
+    </nav>
+    {{/sections}}
+</div>
+{{#js}}
+require(['core_course/local/editor/courseindex'], function(component) {
+    // Init module with CSS selectors.
+    component.init({
+        section: '.ci-sectionitem',
+        cm: '.ci-cmitem',
+        cicontent: '#coureindex-content',
+    });
+});
+{{/js}}
