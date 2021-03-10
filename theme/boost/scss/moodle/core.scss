@@ -134,6 +134,11 @@ a.dimmed_text:visited,
     color: $text-muted;
 }
 
+.locked {
+    filter: blur(2px);
+    opacity: .7;
+}
+
 // Accessible focus styling for links, add .aalink to links with custom css classes to get
 // accessible focus styles.
 .aalink,

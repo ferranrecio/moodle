@@ -9740,6 +9740,10 @@ a.dimmed_text:visited,
 .dimmed_category a {
   color: #6c757d; }
 
+.locked {
+  filter: blur(2px);
+  opacity: .7; }
+
 .aalink.focus, .aalink:focus,
 #page-footer a:not([class]).focus,
 #page-footer a:not([class]):focus,
