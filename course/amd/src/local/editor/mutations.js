@@ -84,7 +84,7 @@ mutations.setLocked = async(statemanager, data, ids, newvalue) => {
 * @param {StateManager} statemanager the current state
 * @param {array} cmids the list of cm ids to hide
 */
-mutations.cm_hide = async(statemanager, cmids) => {
+mutations.cmHide = async(statemanager, cmids) => {
     let state = statemanager.state;
     // Filter cm ids that are already hidden or inexistent.
     const ids = cmids.filter((id) => {
@@ -114,7 +114,7 @@ mutations.cm_hide = async(statemanager, cmids) => {
 * @param {StateManager} statemanager the current state
 * @param {array} cmids the list of cm ids to hide
 */
-mutations.cm_show = async(statemanager, cmids) => {
+mutations.cmShow = async(statemanager, cmids) => {
     let state = statemanager.state;
     // Filter cm ids that are already visible or inexistent.
     const ids = cmids.filter((id) => {

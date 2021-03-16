@@ -37,7 +37,8 @@ let initialized = false;
  *
  * @method init
  * @param {object} newselectors optional selectors override
- * @returns {bool}
+ * ean}
+ * @return {boolean}
  */
 export const init = (newselectors) => {
 
