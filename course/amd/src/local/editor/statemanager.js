@@ -52,6 +52,16 @@ const StateManager = class {
         this.locked = false;
         // List of events to publish as an event.
         this.eventstopublish = [];
+
+        // The state_loaded event is special because it only happens one but all components
+        // may react to that state, even if they are registered after the init. For these reason
+        // we use a promise for that event.
+        this.initialPromise = new Promise((resolve) => {
+            const initialStateDone = (event) => {
+                resolve(event.detail.state);
+            };
+            this.target.addEventListener('state:loaded', initialStateDone);
+        });
     }
 
     /**
@@ -64,7 +74,6 @@ const StateManager = class {
      * @param {object} initialstate
      */
     setInitialState(initialstate) {
-
         let state = {};
         for (const prop in initialstate) {
             if (initialstate.hasOwnProperty(prop)) {
@@ -87,6 +96,15 @@ const StateManager = class {
             action: 'state:loaded',
             state: this.state,
         }, this.target);
+    }
+
+    /**
+     * Generate a promise that will be revolved when the initial state is loaded.
+     *
+     * @return {Promise} the resulting promise
+     */
+    getInitialPromise() {
+        return this.initialPromise;
     }
 
     /**
@@ -195,10 +213,10 @@ const publishEvents = debounce((statemanager) => {
         if (!publishedevents.has(eventkey)) {
             log.debug(`EVENT ${event.eventname}`);
             statemanager.dispatchEvent({
-                    action: event.eventname,
-                    state: statemanager.state,
-                    element: event.eventdata
-                }, statemanager.target);
+                action: event.eventname,
+                state: statemanager.state,
+                element: event.eventdata
+            }, statemanager.target);
             // PubSub.publish(event.eventname, {state, element: event.eventdata});
             publishedevents.add(eventkey);
         }

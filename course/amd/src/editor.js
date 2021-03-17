@@ -64,7 +64,7 @@ editor.init = async function(courseid) {
  * when the file is migrated to the new JS events structure proposed in MDL-70990.
  *
  * @method dispatchStateChangedEvent
- * @param {object} details the full state
+ * @param {object} detail the full state
  * @param {object} target the custom event target (document if none provided)
  */
 function dispatchStateChangedEvent(detail, target) {

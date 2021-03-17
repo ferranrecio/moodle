@@ -137,22 +137,32 @@ const Reactive = class {
     /**
     * Register a new component.
     *
+    * Component can provide some optional functions to the reactive module:
+    * - getWatchers: returns an array of watchers
+    * - stateReady: a method to call when the initial state is loaded
+    *
+    * It can also provide some optional attributes:
+    * - name: the component name (default value: "Unkown component") to customize debug messages.
+    *
     * @method registerComponent
     * @param {Object} component the new component
     */
     registerComponent(component) {
 
+        const componentname = component.name ?? 'Unkown component';
+
         // Register watchers.
-        const handlers = component.getWatchers();
+        let handlers = [];
+        if (component.getWatchers !== undefined) {
+            handlers = component.getWatchers();
+        }
         handlers.forEach(({watch, handler}) => {
 
-            const componentname = component.name ?? 'Unkown component';
-
             if (watch === undefined) {
-                throw new Error(`Empty watcher in ${componentname}`);
+                throw new Error(`Missing watch attribute in ${componentname} watcher`);
             }
             if (handler === undefined) {
-                throw new Error(`Empty handler for watcher ${watch} in ${componentname}`);
+                throw new Error(`Missing handler for watcher ${watch} in ${componentname}`);
             }
 
             // The state manager triggers a general "state changed" event at a document level. However,
@@ -160,16 +170,21 @@ const Reactive = class {
             // in the target element. This way we can use the native event loop wihtout colliding with other
             // reactive instances.
             this.target.addEventListener(watch, (event) => {
-                handler(event.detail);
+                handler.apply(component, [event.detail]);
             });
-
-            // There's the possibility a component is registered after the initial state
-            // is loaded. For those cases the subcription to state_loaded
-            // will not work so we execute this state manually.
-            if (watch == 'state:loaded' && this.statemanager !== undefined && this.statemanager.state !== undefined) {
-                handler({state: this.statemanager.state});
-            }
         });
+
+        // Register state ready function. There's the possibility a component is registered after the initial state
+        // is loaded. For those cases we have a state promise to handle this specific state change.
+        if (component.stateReady !== undefined) {
+            this.statemanager.getInitialPromise()
+                .then(component.stateReady)
+                .catch(reason => {
+                    log.error(`Initial state in ${componentname} rejected due to: ${reason}`);
+                });
+            return;
+        }
+
         this.components.add(component);
     }
 

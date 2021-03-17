@@ -58,6 +58,7 @@ export const init = (newselectors) => {
     editor.registerComponent({
         name: 'courseindex_lazyload',
         getWatchers,
+        stateReady,
 
     });
 
@@ -73,18 +74,16 @@ export const init = (newselectors) => {
  */
 export const getWatchers = () => {
     // In this case, this is just a lazy load. We wait until the state is loaded
-    // before rendering the real course index.
-    return [
-        {watch: 'state:loaded', handler: readyState},
-    ];
+    // before rendering the real course index. No watchers needed.
+    return [];
 };
 
 /**
  * Render the real course index using the course state.
  *
- * @param {*} arg an objkect containing the state as attribute
+ * @param {object} state the initial state
  */
-export const readyState = ({state}) => {
+export const stateReady = (state) => {
     // We are ready to replace the lazy load element with the real course index.
     // Generate mustache data from the current state.
     const data = {

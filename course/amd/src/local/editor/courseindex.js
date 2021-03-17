@@ -23,7 +23,6 @@
  */
 
 import editor from 'core_course/editor';
-import log from 'core/log';
 
 // Those are the default selector for this component.
 let cssselectors = {
@@ -57,6 +56,7 @@ export const init = (newselectors) => {
     editor.registerComponent({
         name: 'courseindex',
         getWatchers,
+        stateReady,
     });
 
     // Bind any necessary actions.
@@ -74,7 +74,6 @@ export const getWatchers = () => {
     // To see how to capture specific element attributes such as visible or title
     // look at core_course/local/cm_format module.
     return [
-        {watch: 'state:loaded', handler: readyState},
         {watch: 'cm:updated', handler: cmUpdate},
         {watch: 'section:updated', handler: sectionUpdate},
     ];
@@ -86,9 +85,9 @@ export const getWatchers = () => {
  * Using this watcher the component can add elements to the interface
  * like edition buttons or bind events.
  *
- * @param {object} arg
+ * @param {object} state the initial state
  */
-export const readyState = ({state}) => {
+export const stateReady = (state) => {
     // Create or bind the editor elements.
     if (state.course.editmode) {
         // Bind events. In this case we bind a click listener.
