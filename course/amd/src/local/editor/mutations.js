@@ -36,6 +36,7 @@ const mutations = {};
  * @param {array} ids
  */
 mutations.callEditWebservice = async(action, courseid, ids) => {
+    log.debug(action);
     try {
         let ajaxresult = await ajax.call([{
             methodname: 'core_course_edit',
@@ -47,9 +48,9 @@ mutations.callEditWebservice = async(action, courseid, ids) => {
         }])[0];
         return JSON.parse(ajaxresult);
     } catch (error) {
-        log.error(`Error calling ${action} action`);
+        log.error('ERROR IN WS');
         log.error(error);
-        return [];
+        throw Error(`Error calling core_course_edit on ${action} action`);
     }
 };
 
@@ -95,8 +96,12 @@ mutations.cm_hide = async(statemanager, cmids) => {
 
     mutations.setLocked(statemanager, state.cm, ids, true);
 
-    let updates = await mutations.callEditWebservice('cm_hide', state.course.id, ids);
-    statemanager.processUpdates(updates);
+    try {
+        let updates = await mutations.callEditWebservice('cm_hide', state.course.id, ids);
+        statemanager.processUpdates(updates);
+    } catch (error) {
+        // TODO: notify error.
+    }
 
     mutations.setLocked(statemanager, state.cm, ids, false);
 
@@ -121,9 +126,12 @@ mutations.cm_show = async(statemanager, cmids) => {
 
     mutations.setLocked(statemanager, state.cm, ids, true);
 
-    let updates = await mutations.callEditWebservice('cm_show', state.course.id, ids);
-
-    statemanager.processUpdates(updates);
+    try {
+        let updates = await mutations.callEditWebservice('cm_show', state.course.id, ids);
+        statemanager.processUpdates(updates);
+    } catch (error) {
+        // TODO: notify error.
+    }
 
     mutations.setLocked(statemanager, state.cm, ids, false);
 };

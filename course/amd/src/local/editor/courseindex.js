@@ -39,7 +39,7 @@ let initialized = false;
  * Initialize the component.
  *
  * @param {object} newselectors optional selectors override
- * @returns {bool}
+ * @returns {boolean}
  */
 export const init = (newselectors) => {
 
@@ -73,11 +73,11 @@ export const getEventHandlers = () => {
     // This is an example on how to capture any change in both cm and sections.
     // To see how to capture specific element attributes such as visible or title
     // look at core_course/local/cm_format module.
-    return {
-        state_loaded: readyState,
-        cm_updated: cmUpdate,
-        section_updated: sectionUpdate,
-    };
+    return [
+        {watch: 'state:loaded', handler: readyState},
+        {watch: 'cm:updated', handler: cmUpdate},
+        {watch: 'section:updated', handler: sectionUpdate},
+    ];
 };
 
 /**

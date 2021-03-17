@@ -37,7 +37,7 @@ let initialized = false;
  *
  * @method init
  * @param {object} newselectors optional selectors override
- * @returns
+ * @returns {bool}
  */
 export const init = (newselectors) => {
 
@@ -63,23 +63,24 @@ export const init = (newselectors) => {
 /**
  * Return a list of state watchers.
  *
- * @returns an array of state watchers functions.
+ * @returns {array} an array of state watchers functions.
  */
 export const getEventHandlers = () => {
     // This is just an example of how a component could watch only
     // some attributes of an element. For an example on how to capture
     // any change in an element see core_coure/local/editor/courseindex module.
-    return {
-        cm_visible_updated: cm_visibility,
-        cm_locked_updated: cm_locked,
-    };
+
+    return [
+        {watch: 'cm.visible:updated', handler: cmVisibility},
+        {watch: 'cm.locked:updated', handler: cmLocked},
+    ];
 };
 
 /**
  *
  * @param {*} arg
  */
-function cm_visibility({element}) {
+function cmVisibility({element}) {
     // Get DOM element.
     let domelement = document.querySelector(`${cssselectors.cm}[data-id='${element.id}']`);
     if (element.visible) {
@@ -93,7 +94,7 @@ function cm_visibility({element}) {
  *
  * @param {*} arg
  */
-function cm_locked({element}) {
+function cmLocked({element}) {
     // Get DOM element.
     let domelement = document.querySelector(`${cssselectors.cm}[data-id='${element.id}']`);
     if (element.locked) {

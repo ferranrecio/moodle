@@ -26,11 +26,12 @@ import log from 'core/log';
 import {debounce} from 'core/utils';
 
 /**
-* Set up general reactive class.
+* Set up general state manager class.
 *
-* The reactive class is responsible for contining the main store,
-* the complete components list that can be used and initialize the main
-* component.
+* The state manager contains the state data, trigger update events and
+* can lock and unlock the state data.
+*
+* This module will be mover to core\statemanager once the new editor dev starts.
 *
 * @return {void}
 */
@@ -42,8 +43,12 @@ const StateManager = class {
      * @param {function} dispatchevent the function to dispatch the custom event when the state changes.
      */
     constructor(dispatchevent) {
+        // The dispatch event function
         this.dispatchEvent = dispatchevent;
+        // State is not locked until initial state is set.
         this.locked = false;
+        // List of events to publish as an event.
+        this.eventstopublish = [];
     }
 
     /**
@@ -62,7 +67,7 @@ const StateManager = class {
             if (initialstate.hasOwnProperty(prop)) {
                 // Check is is an array.
                 if (Array.isArray(initialstate[prop])) {
-                    state[prop] = new Map();
+                    state[prop] = new StateMap(prop, this);
                     initialstate[prop].forEach((data) => {
                         state[prop].set(data.id ?? 0, new Proxy(data, handler(prop, this)));
                     });
@@ -75,7 +80,7 @@ const StateManager = class {
         this.state = new Proxy(state, handler('', this));
         // When the state is loaded we can lock it to prevent illegal changes.
         this.locked = true;
-        this.dispatchEvent('state_loaded', this.state);
+        this.dispatchEvent('state:loaded', this.state);
     }
 
     /**
@@ -120,20 +125,18 @@ const StateManager = class {
         // Process cm creation.
         if (action == 'create') {
             // Create can be applied only to lists, not to objects.
-            if (state[updatename] instanceof Map) {
-                let proxied = new Proxy(fields, handler(updatename, this));
+            let proxied = new Proxy(fields, handler(updatename, this));
+            if (state[updatename] instanceof StateMap) {
                 state[updatename].add(fields.id ?? 0, proxied);
-                this.dispatchEvent(`${updatename}_created`, state, proxied);
                 return;
             }
-            // TODO: add attribute creation suport (not needed for the proof of concept).
-            log.error(`Cannot execute create on ${updatename}`);
+            state[updatename] = proxied;
             return;
         }
 
         // Get the current value.
         let current = state[updatename];
-        if (current instanceof Map) {
+        if (current instanceof StateMap) {
             current = state[updatename].get(fields.id ?? 0);
             if (!current) {
                 log.error(`Inexistent ${updatename} ${fields.id ?? 0}`);
@@ -143,9 +146,8 @@ const StateManager = class {
 
         // Process cm deletion.
         if (action == 'delete') {
-            if (state[updatename] instanceof Map) {
+            if (state[updatename] instanceof StateMap) {
                 state[updatename].delete(fields.id ?? 0);
-                this.dispatchEvent(`${updatename}_deleted`, state, current);
                 return;
             }
             delete state[updatename];
@@ -165,9 +167,6 @@ export default StateManager;
 
 // Proxy helpers.
 
-// This array contains the events that are not yet dispatched.
-let eventstopublish = [];
-
 /**
  * Dispatch all the pending events.
  *
@@ -176,8 +175,8 @@ let eventstopublish = [];
  * @param {*} state the affected current state.
  */
 const publishEvents = debounce((statemanager) => {
-    const fieldChanges = eventstopublish;
-    eventstopublish = [];
+    const fieldChanges = statemanager.eventstopublish;
+    statemanager.eventstopublish = [];
 
     // List of the published events to prevent redundancies.
     let publishedevents = new Set();
@@ -208,11 +207,11 @@ const publishEvents = debounce((statemanager) => {
  */
 const handler = function(name, statemanager) {
     return {
-        $name: name,
-        $statemanager: statemanager,
+        name: name,
+        statemanager: statemanager,
         set: function(obj, prop, value) {
             // Only mutations should be able to set state values.
-            if (this.$statemanager.locked) {
+            if (this.statemanager.locked) {
                 throw new Error(`State locked. Use mutations to change ${prop} value.`);
             }
 
@@ -222,41 +221,104 @@ const handler = function(name, statemanager) {
 
             obj[prop] = value;
 
-            eventstopublish.push({
-                eventname: `${this.$name}_${prop}_updated`,
+            this.statemanager.eventstopublish.push({
+                eventname: `${this.name}.${prop}:updated`,
                 eventdata: obj,
             });
 
             // Register the general change.
-            eventstopublish.push({
-                eventname: `${this.$name}_updated`,
+            this.statemanager.eventstopublish.push({
+                eventname: `${this.name}:updated`,
                 eventdata: obj,
             });
 
-            publishEvents(this.$statemanager);
+            publishEvents(this.statemanager);
             return true;
         },
         deleteProperty: function(obj, prop) {
             // Only mutations should be able to set state values.
-            if (this.$statemanager.locked) {
+            if (this.statemanager.locked) {
                 throw new Error(`State locked. Use mutations to delete ${prop}.`);
             }
             if (prop in obj) {
 
                 delete obj[prop];
 
-                eventstopublish.push({
-                    eventname: `${this.$name}_${prop}_deleted`,
+                this.statemanager.eventstopublish.push({
+                    eventname: `${this.name}.${prop}:deleted`,
                     eventdata: obj,
                 });
 
                 // Register the general change.
-                eventstopublish.push({
-                    eventname: `${this.$name}_updated`,
+                this.statemanager.eventstopublish.push({
+                    eventname: `${this.name}:updated`,
                     eventdata: obj,
                 });
+
+                publishEvents(this.statemanager);
             }
             return true;
         },
     };
 };
+
+/**
+ * Class to add event trigger into the JS Map class.
+ */
+class StateMap extends Map {
+    /**
+     * Creat the reactive Map.
+     *
+     * @param {string} name the property name
+     * @param {StateManager} statemanager the state manager
+     * @param {*} iterable an iterable object to create the Map
+     */
+    constructor(name, statemanager, iterable) {
+        // We don't have any "this" until be call super.
+        super(iterable);
+        this.name = name;
+        this.statemanager = statemanager;
+    }
+    /**
+     * Set an element into the map
+     *
+     * @param {*} key the key to store
+     * @param {*} value the value to store
+     * @returns {Map} the resulting Map object
+     */
+    set(key, value) {
+        const result = super.set(key, value);
+        // If the state is not ready yet means the initial state is not yet loaded.
+        if (this.statemanager.state === undefined) {
+            return result;
+        }
+        // Trigger update opr create event.
+        let action = (super.has(key)) ? 'updated' : 'created';
+        this.statemanager.eventstopublish.push({
+            eventname: `${this.name}:${action}`,
+            eventdata: super.get(key),
+        });
+        publishEvents(this.statemanager);
+        return result;
+    }
+    /**
+     * Delete an element from the map
+     *
+     * @param {*} key
+     * @returns {boolean}
+     */
+    delete(key) {
+        const result = super.delete(key);
+        if (!result) {
+            return result;
+        }
+        // Trigger deleted event
+        const previous = super.get(key);
+        this.statemanager.eventstopublish.push({
+            eventname: `${this.name}:deleted`,
+            eventdata: previous,
+        });
+        publishEvents(this.statemanager);
+        return result;
+    }
+}

@@ -74,9 +74,9 @@ export const init = (newselectors) => {
 export const getEventHandlers = () => {
     // In this case, this is just a lazy load. We wait until the state is loaded
     // before rendering the real course index.
-    return {
-        state_loaded: readyState,
-    };
+    return [
+        {watch: 'state:loaded', handler: readyState},
+    ];
 };
 
 /**

@@ -22,16 +22,20 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import log from 'core/log';
 import defaultmutations from 'core_course/local/editor/mutations';
-import StateManager from 'core_course/local/editor/statemanager';
-import ajax from 'core/ajax';
+import Reactive from 'core_course/local/editor/reactive';
 import events from 'core_course/events';
+import log from 'core/log';
+import ajax from 'core/ajax';
 
-let mutations;
-let statemanager;
-let components = new Set([]);
-let watchers = new Map([]);
+
+const editor = new Reactive({
+    'name': 'CourseEditor',
+    eventname: events.statechanged,
+    eventdispatch: dispatchStateChangedEvent,
+    // Mutations can be overridden by the format plugin but we need the default one at least.
+    mutations: defaultmutations,
+});
 
 /**
 * Set up the course editor when the page is ready.
@@ -39,14 +43,7 @@ let watchers = new Map([]);
 * @method init
 * @param {int} courseid course id
 */
-async function init(courseid) {
-
-    // Mutations can be overridden by the format plugin
-    // but we need the default one at least.
-    mutations = defaultmutations;
-
-    // Register as event listener.
-    document.addEventListener(events.statechanged, callWatchersHandler);
+editor.init = async function(courseid) {
 
     try {
         // Async load the initial state.
@@ -55,13 +52,12 @@ async function init(courseid) {
             args: {courseid}
         }])[0];
         const statedata = JSON.parse(jsonstate);
-        statemanager = new StateManager(dispatchStateChangedEvent);
-        statemanager.setInitialState(statedata);
+        this.setInitialState(statedata);
     } catch (error) {
         log.error("EXCEPTION RAISED WHILE INIT COURSE EDITOR");
         log.error(error);
     }
-}
+};
 
 /**
  * This function will be moved to core_course/events module
@@ -80,116 +76,4 @@ function dispatchStateChangedEvent(action, state, element) {
     }));
 }
 
-/**
- * State changed listener.
- *
- * This function take any change in the course state and send it to the proper
- * watchers. Each component is free to register as state change listener,
- * but we use a regular loop to avoid redundant code in all components
- * and prevent unnecessary browser memory usage.
- *
- * @param {CustomEvent} event
- */
-function callWatchersHandler(event) {
-    const action = event.detail.action;
-    // Execute any registered component watchers.
-    if (watchers.has(action)) {
-        watchers.get(action).forEach((watcher) => {
-            try {
-                log.debug(`Executing "${watcher.name}" ${action} watcher`);
-                watcher.handler(event.detail);
-            } catch (error) {
-                log.error(`Component "${watcher.name}" error while watching ${action}`);
-                log.error(error);
-            }
-        });
-    }
-}
-
-/**
-* Set up the mutation manager.
-*
-* @method setMutations
-* @param {Object} manager the new mutation manager
-*/
-function setMutations(manager) {
-    mutations = manager;
-}
-
-/**
-* Notify a communication error during a mutation.
-*
-* @method notifyError
-* @param {string} message the error message
-*/
-function notifyError(message) {
-    // Not done yet.
-    log.error(message);
-}
-
-/**
-* Return the current state
-*
-* @method getState
-* @return {object}
-*/
-function getState() {
-    return statemanager.state;
-}
-
-/**
-* Dispatch a change in the state.
-*
-* @method dispatch
-* @param {string} actionname the action name (usually the mutation name)
-* @param {Object} data the mutation data
-*/
-function dispatch() {
-    let actionname, args;
-    [actionname, ...args] = arguments;
-    try {
-        const mutationfunction = mutations[actionname] ?? defaultmutations[actionname];
-        mutationfunction.apply(mutations, [statemanager, ...args]);
-    } catch (error) {
-        log.error(error);
-    }
-}
-
-/**
-* Register a new component.
-*
-* @method registerComponent
-* @param {Object} component the new component
-*/
-function registerComponent(component) {
-    // Register watchers.
-    const watch = component.getEventHandlers();
-    for (let key in watch) {
-        if (watch.hasOwnProperty(key)) {
-            let actionwathers = watchers.get(key) ?? [];
-            actionwathers.push({
-                name: component.name ?? 'Unkown component',
-                handler: watch[key],
-            });
-            watchers.set(key, actionwathers);
-        }
-    }
-    components.add(component);
-    // There's the possibility a component is registered after the initial state
-    // is loaded. For those cases the subcription to state_loaded
-    // will not work so we execute this state manually.
-    if (statemanager !== undefined && statemanager.state !== undefined) {
-        if (watch.state_loaded !== undefined) {
-            watch.state_loaded({state: statemanager.state});
-        }
-    }
-}
-
-export default {
-    init,
-    setMutations,
-    notifyError,
-    getState,
-    dispatch,
-    registerComponent,
-};
+export default editor;
