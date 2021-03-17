@@ -77,4 +77,8 @@ require(['core_course/local/editor/courseindex'], function(component) {
         cicontent: '#coureindex-content',
     });
 });
+// Small trick to publish the state manager for testing (only for the proof of concept)
+require(['core_course/editor'], function(editor) {
+    globalThis.sm = editor.statemanager;
+});
 {{/js}}

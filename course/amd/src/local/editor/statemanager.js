@@ -81,7 +81,7 @@ const StateManager = class {
                 if (Array.isArray(initialstate[prop])) {
                     state[prop] = new StateMap(prop, this);
                     initialstate[prop].forEach((data) => {
-                        state[prop].set(data.id ?? 0, new Proxy(data, handler(prop, this)));
+                        state[prop].set(data.id ?? 0, data);
                     });
                 } else {
                     state[prop] = new Proxy(initialstate[prop], handler(prop, this));
@@ -89,7 +89,7 @@ const StateManager = class {
             }
         }
         // Create the state object.
-        this.state = new Proxy(state, handler('', this));
+        this.state = new Proxy(state, handler('state', this));
         // When the state is loaded we can lock it to prevent illegal changes.
         this.locked = true;
         this.dispatchEvent({
@@ -150,12 +150,11 @@ const StateManager = class {
         // Process cm creation.
         if (action == 'create') {
             // Create can be applied only to lists, not to objects.
-            let proxied = new Proxy(fields, handler(updatename, this));
             if (state[updatename] instanceof StateMap) {
-                state[updatename].add(fields.id ?? 0, proxied);
+                state[updatename].add(fields.id ?? 0, fields);
                 return;
             }
-            state[updatename] = proxied;
+            state[updatename] = new Proxy(fields, handler(updatename, this));
             return;
         }
 
@@ -241,17 +240,19 @@ const handler = function(name, statemanager) {
         set: function(obj, prop, value) {
             // Only mutations should be able to set state values.
             if (this.statemanager.locked) {
-                throw new Error(`State locked. Use mutations to change ${prop} value.`);
+                throw new Error(`State locked. Use mutations to change ${prop} value in ${this.name}.`);
             }
 
             if (JSON.stringify(obj[prop]) === JSON.stringify(value)) {
                 return true;
             }
 
+            let action = (obj[prop] !== undefined) ? 'updated' : 'created';
+
             obj[prop] = value;
 
             this.statemanager.eventstopublish.push({
-                eventname: `${this.name}.${prop}:updated`,
+                eventname: `${this.name}.${prop}:${action}`,
                 eventdata: obj,
             });
 
@@ -267,7 +268,7 @@ const handler = function(name, statemanager) {
         deleteProperty: function(obj, prop) {
             // Only mutations should be able to set state values.
             if (this.statemanager.locked) {
-                throw new Error(`State locked. Use mutations to delete ${prop}.`);
+                throw new Error(`State locked. Use mutations to delete ${prop} in ${this.name}.`);
             }
             if (prop in obj) {
 
@@ -316,13 +317,29 @@ class StateMap extends Map {
      * @returns {Map} the resulting Map object
      */
     set(key, value) {
-        const result = super.set(key, value);
+        // Only mutations should be able to set state values.
+        if (this.statemanager.locked) {
+            throw new Error(`State locked. Use mutations to change ${prop} value in ${this.name}.`);
+        }
+
+        let action = (super.has(key)) ? 'updated' : 'created';
+
+        // ID is mandatory and should be the same as the key.
+        if (value.id === undefined) {
+            value.id = key;
+        }
+        if (value.id !== key) {
+            throw new Error(`State error: ${this.name} list element ID (${value.id}) and key (${key}) mismatch`);
+        }
+
+        // Save proxied data into the list.
+        const result = super.set(key, new Proxy(value, handler(this.name, this.statemanager)));
+
         // If the state is not ready yet means the initial state is not yet loaded.
         if (this.statemanager.state === undefined) {
             return result;
         }
         // Trigger update opr create event.
-        let action = (super.has(key)) ? 'updated' : 'created';
         this.statemanager.eventstopublish.push({
             eventname: `${this.name}:${action}`,
             eventdata: super.get(key),
@@ -337,12 +354,19 @@ class StateMap extends Map {
      * @returns {boolean}
      */
     delete(key) {
+
+        // Only mutations should be able to set state values.
+        if (this.statemanager.locked) {
+            throw new Error(`State locked. Use mutations to change ${prop} value in ${this.name}.`);
+        }
+
+        const previous = super.get(key);
+
         const result = super.delete(key);
         if (!result) {
             return result;
         }
-        // Trigger deleted event
-        const previous = super.get(key);
+
         this.statemanager.eventstopublish.push({
             eventname: `${this.name}:deleted`,
             eventdata: previous,
