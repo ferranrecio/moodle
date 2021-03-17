@@ -24,128 +24,131 @@
 
 import editor from 'core_course/editor';
 
-// Those are the default selector for this component.
-let cssselectors = {
-    section: '.ci-sectionitem',
-    cm: '.ci-cmitem',
-    cicontent: '#courseindex-content',
-};
+class CourseIndex {
 
-// Prevent multiple initialize.
-let initialized = false;
+    /**
+     * The class constructor.
+     */
+    constructor() {
+        // Optional component name.
+        this.name = 'courseindex';
+        // Default component css selectors.
+        this.selectors = {
+            section: '.ci-sectionitem',
+            cm: '.ci-cmitem',
+            cicontent: '#courseindex-content',
+        };
+    }
 
-/**
- * Initialize the component.
- *
- * @param {object} newselectors optional selectors override
- * @returns {boolean}
- */
-export const init = (newselectors) => {
+    /**
+     * Initialize the component.
+     *
+     * @param {object} newselectors optional selectors override
+     * @returns {boolean}
+     */
+    init(newselectors) {
 
-    if (initialized) {
+        // Overwrite the components selectors if necessary.
+        this.selectors.section = newselectors.section ?? this.selectors.section;
+        this.selectors.cm = newselectors.cm ?? this.selectors.cm;
+        this.selectors.cicontent = newselectors.cicontent ?? this.selectors.cicontent;
+
+        // Register the component.
+        editor.registerComponent(this);
+
+        // Bind actions if necessary.
+
         return true;
     }
-    initialized = true;
 
-    // Overwrite the components selectors if necessary.
-    cssselectors.section = newselectors.section ?? cssselectors.section;
-    cssselectors.cm = newselectors.cm ?? cssselectors.cm;
-    cssselectors.cicontent = newselectors.cicontent ?? cssselectors.cicontent;
-
-    // Register the component.
-    editor.registerComponent({
-        name: 'courseindex',
-        getWatchers,
-        stateReady,
-    });
-
-    // Bind any necessary actions.
-
-    return true;
-};
-
-/**
- * Return a list of state watchers.
- *
- * @returns {array} an array of state watchers functions.
- */
-export const getWatchers = () => {
-    // This is an example on how to capture any change in both cm and sections.
-    // To see how to capture specific element attributes such as visible or title
-    // look at core_course/local/cm_format module.
-    return [
-        {watch: 'cm:updated', handler: cmUpdate},
-        {watch: 'section:updated', handler: sectionUpdate},
-    ];
-};
-
-/**
- * This function is called when the course state is ready.
- *
- * Using this watcher the component can add elements to the interface
- * like edition buttons or bind events.
- *
- * @param {object} state the initial state
- */
-export const stateReady = (state) => {
-    // Create or bind the editor elements.
-    if (state.course.editmode) {
-        // Bind events. In this case we bind a click listener.
-        const cicontent = document.querySelector(cssselectors.cicontent);
-        cicontent.addEventListener("click", toogleVisibility);
+    /**
+     * Return a list of state watchers.
+     *
+     * @returns {array} an array of state watchers functions.
+     */
+    getWatchers() {
+        // This is an example on how to capture any change in both cm and sections.
+        // To see how to capture specific element attributes such as visible or title
+        // look at core_course/local/cm_format module.
+        return [
+            {watch: 'cm:updated', handler: this.cmUpdate},
+            {watch: 'section:updated', handler: this.sectionUpdate},
+        ];
     }
-};
 
-/**
- * Update an entry in the course index with the state information.
- *
- * @param {object} arg
- */
-function cmUpdate({element}) {
-    // Get DOM element.
-    let domelement = document.querySelector(`${cssselectors.cm}[data-id='${element.id}']`);
-    if (element.visible) {
-        domelement.classList.remove("dimmed");
-        domelement.classList.remove("bg-light");
-    } else {
-        domelement.classList.add("dimmed");
-        domelement.classList.add("bg-light");
+    /**
+     * Render the real course index using the course state.
+     *
+     * @param {object} state the initial state
+     */
+    stateReady(state) {
+        // Create or bind the editor elements.
+        if (state.course.editmode) {
+            // Bind events. In this case we bind a click listener.
+            const cicontent = document.querySelector(this.selectors.cicontent);
+            cicontent.addEventListener("click", this.toogleVisibility.bind(this));
+        }
     }
-    if (element.locked) {
-        domelement.classList.add("locked");
-    } else {
-        domelement.classList.remove("locked");
-    }
-}
 
-/**
- *
- * Update the section information with the current course state.
- *
- * @param {object} arg
- */
-function sectionUpdate({element}) {
-    // Get DOM element.
-    let domelement = document.querySelector(`${cssselectors.section} [data-id='${element.id}']`);
-    if (element.visible) {
-        domelement.classList.remove("dimmed");
-    } else {
-        domelement.classList.add("dimmed");
+    /**
+     * Update an entry in the course index with the state information.
+     *
+     * @param {object} arg
+     */
+    cmUpdate({element}) {
+        // Get DOM element.
+        let domelement = document.querySelector(`${this.selectors.cm}[data-id='${element.id}']`);
+        if (!domelement) {
+            return;
+        }
+        if (element.visible) {
+            domelement.classList.remove("dimmed");
+            domelement.classList.remove("bg-light");
+        } else {
+            domelement.classList.add("dimmed");
+            domelement.classList.add("bg-light");
+        }
+        if (element.locked) {
+            domelement.classList.add("locked");
+        } else {
+            domelement.classList.remove("locked");
+        }
     }
-}
 
-/**
- * Execute a mutation from a click event.
- *
- * This method is just an example on how to delegate evenets handling. In this case,
- * this function should be located in the main editor to capture all possible
- * actions.
- *
- * @param {*} event
- */
-function toogleVisibility(event) {
-    const actionbutton = event.target.closest('[data-action]');
-    if (actionbutton) {
-        editor.dispatch(actionbutton.dataset.action, [actionbutton.dataset.id]);
+    /**
+     *
+     * Update the section information with the current course state.
+     *
+     * @param {object} arg
+     */
+    sectionUpdate({element}) {
+        // Get DOM element.
+        let domelement = document.querySelector(`${this.selectors.section} [data-id='${element.id}']`);
+        if (!domelement) {
+            return;
+        }
+        if (element.visible) {
+            domelement.classList.remove("dimmed");
+        } else {
+            domelement.classList.add("dimmed");
+        }
+    }
+
+    /**
+     * Execute a mutation from a click event.
+     *
+     * This method is just an example on how to delegate evenets handling. In this case,
+     * this function should be located in the main editor to capture all possible
+     * actions.
+     *
+     * @param {*} event
+     */
+    toogleVisibility(event) {
+        const actionbutton = event.target.closest('[data-action]');
+        if (actionbutton) {
+            editor.dispatch(actionbutton.dataset.action, [actionbutton.dataset.id]);
+        }
     }
 }
+
+export default new CourseIndex();

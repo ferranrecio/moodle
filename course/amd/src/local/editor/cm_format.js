@@ -24,83 +24,83 @@
 
 import editor from 'core_course/editor';
 
-// Those are the default selector for this component.
-let cssselectors = {
-    cm: '.cm_format',
-};
 
-// Prevent multiple initialize.
-let initialized = false;
+class CmFormat {
 
-/**
- * Initialize the component.
- *
- * @method init
- * @param {object} newselectors optional selectors override
- * ean}
- * @return {boolean}
- */
-export const init = (newselectors) => {
+    /**
+     * The class constructor.
+     */
+    constructor() {
+        // Optional component name.
+        this.name = 'cm_format';
+        // Default component css selectors.
+        this.selectors = {
+            cm: '.cm_format',
+        };
+    }
 
-    if (initialized) {
+    /**
+     * Initialize the component.
+     *
+     * @param {object} newselectors optional selectors override
+     * @returns {boolean}
+     */
+    init(newselectors) {
+        // TODO: for now we replace the default drawer. Dele this when we have a proper
+        // course index component.
+        document.querySelector('#nav-drawer').innerHTML = 'Loading course index...';
+
+        // Overwrite the components selectors if necessary.
+        this.selectors.cm = newselectors.cm ?? this.selectors.cm;
+
+        // Register the component.
+        editor.registerComponent(this);
+
+        // Bind actions if necessary.
+
         return true;
     }
-    initialized = true;
 
-    // Overwrite the components selectors if necessary.
-    cssselectors.cm = newselectors.cm ?? cssselectors.cm;
+    getWatchers() {
+        return [
+            {watch: 'cm.visible:updated', handler: this.cmVisibility},
+            {watch: 'cm.locked:updated', handler: this.cmLocked},
+        ];
+    }
 
-    // Register the component.
-    editor.registerComponent({
-        name: 'cm_format',
-        getWatchers,
-    });
+    /**
+     *
+     * @param {*} arg
+     */
+    cmVisibility({element}) {
+        // Get DOM element.
+        let domelement = document.querySelector(`${this.selectors.cm}[data-id='${element.id}']`);
+        if (!domelement) {
+            return;
+        }
+        if (element.visible) {
+            domelement.classList.remove("dimmed_text");
+        } else {
+            domelement.classList.add("dimmed_text");
+        }
+    }
 
-    // Bind actions if necessary.
-
-    return true;
-};
-
-/**
- * Return a list of state watchers.
- *
- * @returns {array} an array of state watchers functions.
- */
-export const getWatchers = () => {
-    // This is just an example of how a component could watch only
-    // some attributes of an element. For an example on how to capture
-    // any change in an element see core_coure/local/editor/courseindex module.
-
-    return [
-        {watch: 'cm.visible:updated', handler: cmVisibility},
-        {watch: 'cm.locked:updated', handler: cmLocked},
-    ];
-};
-
-/**
- *
- * @param {*} arg
- */
-function cmVisibility({element}) {
-    // Get DOM element.
-    let domelement = document.querySelector(`${cssselectors.cm}[data-id='${element.id}']`);
-    if (element.visible) {
-        domelement.classList.remove("dimmed_text");
-    } else {
-        domelement.classList.add("dimmed_text");
+    /**
+     *
+     * @param {*} arg
+     */
+    cmLocked({element}) {
+        // Get DOM element.
+        let domelement = document.querySelector(`${this.selectors.cm}[data-id='${element.id}']`);
+        if (!domelement) {
+            return;
+        }
+        if (element.locked) {
+            domelement.classList.add("locked");
+        } else {
+            domelement.classList.remove("locked");
+        }
     }
 }
 
-/**
- *
- * @param {*} arg
- */
-function cmLocked({element}) {
-    // Get DOM element.
-    let domelement = document.querySelector(`${cssselectors.cm}[data-id='${element.id}']`);
-    if (element.locked) {
-        domelement.classList.add("locked");
-    } else {
-        domelement.classList.remove("locked");
-    }
-}
+export default new CmFormat();

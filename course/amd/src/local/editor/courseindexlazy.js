@@ -26,98 +26,86 @@ import editor from 'core_course/editor';
 import log from 'core/log';
 import Templates from 'core/templates';
 
-// Default component css selectors.
-let cssselectors = {
-    courseindex: '#courseindex',
-};
 
-// Prevent multiple initialize.
-let initialized = false;
+class CourseIndexLazy {
 
-/**
- * Initialize the component.
- *
- * @param {object} newselectors optional selectors override
- * @returns {boolean}
- */
-export const init = (newselectors) => {
+    /**
+     * The class constructor.
+     */
+    constructor() {
+        // Optional component name.
+        this.name = 'courseindex_lazyload';
+        // Default component css selectors.
+        this.selectors = {
+            courseindex: '#courseindex',
+        };
+    }
 
-    if (initialized) {
+    /**
+     * Initialize the component.
+     *
+     * @param {object} newselectors optional selectors override
+     * @returns {boolean}
+     */
+    init(newselectors) {
+        // TODO: for now we replace the default drawer. Dele this when we have a proper
+        // course index component.
+        document.querySelector('#nav-drawer').innerHTML = 'Loading course index...';
+
+        // Overwrite the components selectors if necessary.
+        this.selectors.courseindex = newselectors.courseindex ?? this.selectors.courseindex;
+
+        // Register the component.
+        editor.registerComponent(this);
+
+        // Bind actions if necessary.
+
         return true;
     }
-    initialized = true;
 
-    // TODO: for now we replace the default drawer. Dele this when we have a proper
-    // course index component.
-    document.querySelector('#nav-drawer').innerHTML = 'Loading course index...';
-
-    // Overwrite the components selectors if necessary.
-    cssselectors.courseindex = newselectors.courseindex ?? cssselectors.courseindex;
-
-    // Register the component.
-    editor.registerComponent({
-        name: 'courseindex_lazyload',
-        getWatchers,
-        stateReady,
-
-    });
-
-    // Bind actions if necessary.
-
-    return true;
-};
-
-/**
- * Return a list of state watchers.
- *
- * @returns {array} an array of state watchers functions.
- */
-export const getWatchers = () => {
-    // In this case, this is just a lazy load. We wait until the state is loaded
-    // before rendering the real course index. No watchers needed.
-    return [];
-};
-
-/**
- * Render the real course index using the course state.
- *
- * @param {object} state the initial state
- */
-export const stateReady = (state) => {
-    // We are ready to replace the lazy load element with the real course index.
-    // Generate mustache data from the current state.
-    const data = {
-        sections: [],
-        editmode: state.course.editmode,
-    };
-    state.course.sectionlist.forEach(sectionid => {
-        const sectioninfo = state.section.get(sectionid);
-        const section = {
-            title: sectioninfo.title,
-            visible: sectioninfo.visible,
-            id: sectionid,
-            cms: [],
+    /**
+     * Render the real course index using the course state.
+     *
+     * @param {object} state the initial state
+     */
+    stateReady(state) {
+        // We are ready to replace the lazy load element with the real course index.
+        // Generate mustache data from the current state.
+        const data = {
+            sections: [],
+            editmode: state.course.editmode,
         };
-        sectioninfo.cms.forEach(cmid => {
-            const cminfo = state.cm.get(cmid);
-            section.cms.push({
-                name: cminfo.name,
-                visible: cminfo.visible,
-                id: cmid,
+        state.course.sectionlist.forEach(sectionid => {
+            const sectioninfo = state.section.get(sectionid);
+            const section = {
+                title: sectioninfo.title,
+                visible: sectioninfo.visible,
+                id: sectionid,
+                cms: [],
+            };
+            sectioninfo.cms.forEach(cmid => {
+                const cminfo = state.cm.get(cmid);
+                section.cms.push({
+                    name: cminfo.name,
+                    visible: cminfo.visible,
+                    id: cmid,
+                });
             });
+            section.hascms = (section.cms.length != 0);
+            data.sections.push(section);
         });
-        section.hascms = (section.cms.length != 0);
-        data.sections.push(section);
-    });
-    data.hassections = (data.sections.length != 0);
+        data.hassections = (data.sections.length != 0);
 
-    Templates.render('core_course/local/courseindex', data)
-        .then((html, js) => {
-            document.querySelector(cssselectors.courseindex).innerHTML = '';
-            Templates.appendNodeContents(cssselectors.courseindex, html, js);
-            return true;
-        }).fail((ex) => {
-            log.error('Cannot load course index template');
-            log.error(ex);
-        });
-};
+        Templates.render('core_course/local/courseindex', data)
+            .then((html, js) => {
+                document.querySelector(this.selectors.courseindex).innerHTML = '';
+                Templates.appendNodeContents(this.selectors.courseindex, html, js);
+                return true;
+            }).fail((ex) => {
+                log.error('Cannot load course index template');
+                log.error(ex);
+            });
+    }
+}
+
+export default new CourseIndexLazy();

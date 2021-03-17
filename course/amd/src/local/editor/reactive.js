@@ -151,6 +151,11 @@ const Reactive = class {
 
         const componentname = component.name ?? 'Unkown component';
 
+        // Components can be registered only ones.
+        if (this.components.has(component)) {
+            return;
+        }
+
         // Register watchers.
         let handlers = [];
         if (component.getWatchers !== undefined) {
@@ -178,7 +183,7 @@ const Reactive = class {
         // is loaded. For those cases we have a state promise to handle this specific state change.
         if (component.stateReady !== undefined) {
             this.statemanager.getInitialPromise()
-                .then(component.stateReady)
+                .then(component.stateReady.bind(component))
                 .catch(reason => {
                     log.error(`Initial state in ${componentname} rejected due to: ${reason}`);
                 });
