@@ -41,56 +41,62 @@ const Reactive = class {
     /**
      * Create a basic reactive manager.
      *
+     * The instance description can provide information on how the reactive instance will interact with its
+     * components. The properties are:
+     *  - eventname: the custom event name used for state changed
+     *  - eventdispatch: the event dispatch function
+     *  - target (optional): the target of the event dispatch. If not passed a fake element will be created
+     *  - mutations (optional): an object with state mutations functions
+     *
      * @param {object} description reactive manager description.
      */
     constructor(description) {
-
-        if (description.name === undefined) {
-            throw new Error(`Reactivity name required`);
-        }
 
         if (description.eventname === undefined || description.eventdispatch === undefined) {
             throw new Error(`Reactivity event required`);
         }
 
-        this.name = description.name;
+        // To prevent every component from replicating the same eventlistener, each reactive
+        // instance has its own element anchor to propagate state changes internally.
+        // By default the module will create a fake DOM element to target custom evenets but
+        // if all reactive components is constrait to a single element, this can be passed as
+        // target in the description.
+        this.target = description.target ?? document.createTextNode(null);
+
         this.eventname = description.eventname;
         this.eventdispatch = description.eventdispatch;
 
-        this.statemanager = new StateManager(this.eventdispatch);
+        this.statemanager = new StateManager(this.eventdispatch, this.target);
         this.watchers = new Map([]);
         this.components = new Set([]);
 
         // Mutations can be overridden using setMutations method.
         this.mutations = description.mutations ?? {};
 
-        document.addEventListener(this.eventname, this.callWatchersHandler.bind(this));
+        // Register the event to alert watchers when specific state change happens.
+        this.target.addEventListener(this.eventname, this.callWatchersHandler.bind(this));
     }
 
     /**
      * State changed listener.
      *
-     * This function take any change in the course state and send it to the proper
-     * watchers. Each component is free to register as state change listener,
-     * but we use a regular loop to avoid redundant code in all components
-     * and prevent unnecessary browser memory usage.
+     * This function take any change in the course state and send it to the proper watchers.
+     * Any AMD module is free to register as state change listener at a document level,
+     * but components can register as watchers to listen to specific state changes directly.
+     *
+     * To prevent internal state changes from colliding with other reactive instances, only the
+     * general "state changed" is triggered at document level. All the internal changes are
+     * triggered at private target level without bubbling. This way any reactive instance can alert
+     * only its own watchers.
      *
      * @param {CustomEvent} event
      */
     callWatchersHandler(event) {
-        const action = event.detail.action;
         // Execute any registered component watchers.
-        if (this.watchers.has(action)) {
-            this.watchers.get(action).forEach((watcher) => {
-                try {
-                    log.debug(`Executing "${watcher.name}" ${action} watcher`);
-                    watcher.handler(event.detail);
-                } catch (error) {
-                    log.error(`Component "${watcher.name}" error while watching ${action}`);
-                    log.error(error);
-                }
-            });
-        }
+        this.target.dispatchEvent(new CustomEvent(event.detail.action, {
+            bubbles: false,
+            detail: event.detail,
+        }));
     }
 
     /**
@@ -135,8 +141,9 @@ const Reactive = class {
     * @param {Object} component the new component
     */
     registerComponent(component) {
+
         // Register watchers.
-        const handlers = component.getEventHandlers();
+        const handlers = component.getWatchers();
         handlers.forEach(({watch, handler}) => {
 
             const componentname = component.name ?? 'Unkown component';
@@ -148,12 +155,13 @@ const Reactive = class {
                 throw new Error(`Empty handler for watcher ${watch} in ${componentname}`);
             }
 
-            let actionwathers = this.watchers.get(watch) ?? [];
-            actionwathers.push({
-                name: componentname,
-                handler: handler,
+            // The state manager triggers a general "state changed" event at a document level. However,
+            // for the internal watchers, each component can listen to specific state changed custom events
+            // in the target element. This way we can use the native event loop wihtout colliding with other
+            // reactive instances.
+            this.target.addEventListener(watch, (event) => {
+                handler(event.detail);
             });
-            this.watchers.set(watch, actionwathers);
 
             // There's the possibility a component is registered after the initial state
             // is loaded. For those cases the subcription to state_loaded

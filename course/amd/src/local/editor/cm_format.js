@@ -53,7 +53,7 @@ export const init = (newselectors) => {
     // Register the component.
     editor.registerComponent({
         name: 'cm_format',
-        getEventHandlers,
+        getWatchers,
     });
 
     // Bind actions if necessary.
@@ -66,7 +66,7 @@ export const init = (newselectors) => {
  *
  * @returns {array} an array of state watchers functions.
  */
-export const getEventHandlers = () => {
+export const getWatchers = () => {
     // This is just an example of how a component could watch only
     // some attributes of an element. For an example on how to capture
     // any change in an element see core_coure/local/editor/courseindex module.

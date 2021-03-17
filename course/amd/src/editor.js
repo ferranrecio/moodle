@@ -64,15 +64,16 @@ editor.init = async function(courseid) {
  * when the file is migrated to the new JS events structure proposed in MDL-70990.
  *
  * @method dispatchStateChangedEvent
- * @param {string} action the action done
- * @param {object} state the full state
- * @param {object} element the modified element
+ * @param {object} details the full state
+ * @param {object} target the custom event target (document if none provided)
  */
-function dispatchStateChangedEvent(action, state, element) {
-    // Dispatch a custom event in case any component wants to listen.
-    document.dispatchEvent(new CustomEvent(events.statechanged, {
+function dispatchStateChangedEvent(detail, target) {
+    if (target === undefined) {
+        target = document;
+    }
+    target.dispatchEvent(new CustomEvent(events.statechanged, {
         bubbles: true,
-        detail: {action, state, element},
+        detail: detail,
     }));
 }
 

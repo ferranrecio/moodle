@@ -56,7 +56,7 @@ export const init = (newselectors) => {
     // Register the component.
     editor.registerComponent({
         name: 'courseindex',
-        getEventHandlers,
+        getWatchers,
     });
 
     // Bind any necessary actions.
@@ -69,7 +69,7 @@ export const init = (newselectors) => {
  *
  * @returns {array} an array of state watchers functions.
  */
-export const getEventHandlers = () => {
+export const getWatchers = () => {
     // This is an example on how to capture any change in both cm and sections.
     // To see how to capture specific element attributes such as visible or title
     // look at core_course/local/cm_format module.
@@ -147,7 +147,6 @@ function sectionUpdate({element}) {
 function toogleVisibility(event) {
     const actionbutton = event.target.closest('[data-action]');
     if (actionbutton) {
-        log.debug(`ACTION ${actionbutton.dataset.action}`);
         editor.dispatch(actionbutton.dataset.action, [actionbutton.dataset.id]);
     }
 }

@@ -36,7 +36,6 @@ const mutations = {};
  * @param {array} ids
  */
 mutations.callEditWebservice = async(action, courseid, ids) => {
-    log.debug(action);
     try {
         let ajaxresult = await ajax.call([{
             methodname: 'core_course_edit',

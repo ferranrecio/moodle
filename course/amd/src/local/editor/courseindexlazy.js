@@ -38,7 +38,7 @@ let initialized = false;
  * Initialize the component.
  *
  * @param {object} newselectors optional selectors override
- * @returns {bool}
+ * @returns {boolean}
  */
 export const init = (newselectors) => {
 
@@ -57,7 +57,7 @@ export const init = (newselectors) => {
     // Register the component.
     editor.registerComponent({
         name: 'courseindex_lazyload',
-        getEventHandlers,
+        getWatchers,
 
     });
 
@@ -71,7 +71,7 @@ export const init = (newselectors) => {
  *
  * @returns {array} an array of state watchers functions.
  */
-export const getEventHandlers = () => {
+export const getWatchers = () => {
     // In this case, this is just a lazy load. We wait until the state is loaded
     // before rendering the real course index.
     return [

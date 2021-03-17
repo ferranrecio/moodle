@@ -41,10 +41,13 @@ const StateManager = class {
      * Create a basic reactive state store.
      *
      * @param {function} dispatchevent the function to dispatch the custom event when the state changes.
+     * @param {element} target the state changed custom event target (document if none provided)
      */
-    constructor(dispatchevent) {
+    constructor(dispatchevent, target) {
         // The dispatch event function
         this.dispatchEvent = dispatchevent;
+        // The DOM container to trigger events.
+        this.target = target ?? document;
         // State is not locked until initial state is set.
         this.locked = false;
         // List of events to publish as an event.
@@ -80,7 +83,10 @@ const StateManager = class {
         this.state = new Proxy(state, handler('', this));
         // When the state is loaded we can lock it to prevent illegal changes.
         this.locked = true;
-        this.dispatchEvent('state:loaded', this.state);
+        this.dispatchEvent({
+            action: 'state:loaded',
+            state: this.state,
+        }, this.target);
     }
 
     /**
@@ -122,6 +128,7 @@ const StateManager = class {
      */
     processUpdate(updatename, action, fields) {
         let state = this.state;
+
         // Process cm creation.
         if (action == 'create') {
             // Create can be applied only to lists, not to objects.
@@ -187,7 +194,11 @@ const publishEvents = debounce((statemanager) => {
 
         if (!publishedevents.has(eventkey)) {
             log.debug(`EVENT ${event.eventname}`);
-            statemanager.dispatchEvent(event.eventname, statemanager.state, event.eventdata);
+            statemanager.dispatchEvent({
+                    action: event.eventname,
+                    state: statemanager.state,
+                    element: event.eventdata
+                }, statemanager.target);
             // PubSub.publish(event.eventname, {state, element: event.eventdata});
             publishedevents.add(eventkey);
         }
