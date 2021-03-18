@@ -1,0 +1,97 @@
+component: format_editortest
+
+## Human readable name of the plugin.
+name: Example plugin
+
+## Human readable release number.
+release: "0.1.0"
+
+## Plugin version number, e.g. 2016062100. Will be set to current date if left empty.
+#version: 2016121200
+
+## Required Moodle version, e.g. 2015051100 or "2.9".
+requires: "3.9"
+
+## Plugin maturity level. Possible options are MATURIY_ALPHA, MATURITY_BETA,
+## MATURITY_RC or MATURIY_STABLE.
+maturity: MATURITY_BETA
+
+## Copyright holder(s) of the generated files and classes.
+copyright: 2021 Ferran Recio <ferran@moodle.com>
+
+## Features flags can control generation of optional files/code fragments.
+features:
+    readme: true
+    license: true
+    settings: true
+
+    ## The db/upgrade.php file will be generated. Upgrade steps are defined in
+    ## this file.
+    upgrade: true
+
+    ## The file db/upgradelib.php will also be generated.
+    ## The upgrade feature will automatically be enabled.
+    upgradelib: true
+
+    install: true
+    uninstall: true
+
+## Privacy API implementation
+privacy:
+  haspersonaldata: false
+  uselegacypolyfill: false
+
+## Explicitly added strings
+lang_strings:
+    - id: mycustomstring
+      text: You can add 'extra' strings via the recipe file.
+    - id: mycustomstring2
+      text: Another string with {$a->some} placeholder.
+
+    ## Needed for mod plugins.
+    - id: modulenameplural
+      text: newmodules
+    - id: modulename_help
+      text: Use the newmodule module for...
+    - id: newmodulefieldset
+      text: Custom example fieldset.
+    - id: newmodulename
+      text: newmodule name
+    - id: newmodulename_help
+      text: This is the content of the help tooltip associated with the newmodulename field
+    - id: modulename
+      text: newmodule
+    - id: pluginadministration
+      text: newmodule administration
+    - id: newmodulesettings
+      text: Settings
+    - id: missingidandcmid
+      text: Missing id and cmid
+    - id: nonewmodules
+      text: No newmodules
+    - id: view
+      text: View
+
+    ## Needed for qtype plugins.
+    - id: pluginnamesummary
+      text: Rendered when choosing the question type to be added.
+    - id: pluginnameadding
+      text: Rendered when adding this question type.
+    - id: pluginnameediting
+      text: Rendered when editing this question type.
+    - id: pluginname_help
+      text: Help text when adding this question type.
+
+    ## Needed for theme plugins.
+    - id: choosereadme
+      text: Readme when selecting the theme.
+
+## Explicitly added contents, such as files not covered by the generator logic.
+##
+## Not yet implemented.
+##
+#extra:
+#  files:
+#    - path: mycustomfile.php
+#      skel: php
+#      description: Explicitly generated PHP file.

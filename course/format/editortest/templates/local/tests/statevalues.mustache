@@ -1,0 +1,13 @@
+<div class="card mb-2">
+  <div class="card-body">
+    <h3 class="card-title">State values test</h3>
+    <p class="card-text">Test the valid data types for states.</p>
+    <div id="statevalues_results"></div>
+  </div>
+</div>
+{{#js}}
+require(['format_editortest/local/tests/statevalues'], function(component) {
+    // Init module with CSS selectors.
+    component.init('statevalues_results');
+});
+{{/js}}

@@ -1,0 +1,13 @@
+<div class="card mb-2">
+  <div class="card-body">
+    <h3 class="card-title">State events test</h3>
+    <p class="card-text">Test that the state manager module triggers all the necessary events.</p>
+    <div id="stateevents_results"></div>
+  </div>
+</div>
+{{#js}}
+require(['format_editortest/local/tests/stateevents'], function(component) {
+    // Init module with CSS selectors.
+    component.init('stateevents_results');
+});
+{{/js}}

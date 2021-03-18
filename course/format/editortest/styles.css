@@ -1,0 +1,17 @@
+
+/* hide passed tests */
+#region-main p[data-state='pass'] {
+    display: none;
+}
+
+#region-main h4 {
+    display: none;
+}
+
+/* hide passed tests */
+#region-main.displaypass p[data-state='pass'] {
+    display: block;
+}
+#region-main.displaypass h4 {
+    display: block;
+}

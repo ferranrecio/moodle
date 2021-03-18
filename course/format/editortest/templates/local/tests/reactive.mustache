@@ -1,0 +1,13 @@
+<div class="card mb-2">
+  <div class="card-body">
+    <h3 class="card-title">Reactive library test</h3>
+    <p class="card-text">Check the general usage of the reactvie module.</p>
+    <div id="reactive_results"></div>
+  </div>
+</div>
+{{#js}}
+require(['format_editortest/local/tests/reactive'], function(component) {
+    // Init module with CSS selectors.
+    component.init('reactive_results');
+});
+{{/js}}
