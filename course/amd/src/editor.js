@@ -28,36 +28,57 @@ import events from 'core_course/events';
 import log from 'core/log';
 import ajax from 'core/ajax';
 
+class Editor extends Reactive {
 
-const editor = new Reactive({
-    'name': 'CourseEditor',
+    /**
+    * Set up the course editor when the page is ready.
+    *
+    * @method init
+    * @param {int} courseid course id
+    */
+    async init(courseid) {
+
+        try {
+            // Async load the initial state.
+            const jsonstate = await ajax.call([{
+                methodname: 'core_course_get_state',
+                args: {courseid}
+            }])[0];
+            const statedata = JSON.parse(jsonstate);
+
+            // Edit mode is part of the state but it could change over time,
+            // components should use isEditing method instead.
+            this.editing = false;
+            if (statedata.course !== undefined) {
+                this.editing = statedata.course.editmode ?? false;
+            }
+
+            this.setInitialState(statedata);
+        } catch (error) {
+            log.error("EXCEPTION RAISED WHILE INIT COURSE EDITOR");
+            log.error(error);
+        }
+    }
+
+    /**
+     * Return the current edit mode.
+     *
+     * The edit mode is parts of the course state, but it should only be checked on the initial state.
+     *
+     * @return {boolean} if edit is enabled
+     */
+    isEditing() {
+        return this.editing ?? false;
+    }
+}
+
+export default new Editor({
+    name: 'CourseEditor',
     eventname: events.statechanged,
     eventdispatch: dispatchStateChangedEvent,
     // Mutations can be overridden by the format plugin but we need the default one at least.
     mutations: defaultmutations,
 });
-
-/**
-* Set up the course editor when the page is ready.
-*
-* @method init
-* @param {int} courseid course id
-*/
-editor.init = async function(courseid) {
-
-    try {
-        // Async load the initial state.
-        const jsonstate = await ajax.call([{
-            methodname: 'core_course_get_state',
-            args: {courseid}
-        }])[0];
-        const statedata = JSON.parse(jsonstate);
-        this.setInitialState(statedata);
-    } catch (error) {
-        log.error("EXCEPTION RAISED WHILE INIT COURSE EDITOR");
-        log.error(error);
-    }
-};
 
 /**
  * This function will be moved to core_course/events module
@@ -76,5 +97,3 @@ function dispatchStateChangedEvent(detail, target) {
         detail: detail,
     }));
 }
-
-export default editor;

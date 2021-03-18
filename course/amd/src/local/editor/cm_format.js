@@ -16,21 +16,36 @@
 /**
  * Editor component for the cm_format template.
  *
+ * Important note: this is just an example of how a component can be instantiated
+ * several times in the same page (one per course-module in this case). In this case
+ * having one component for each course-module does not have any sense as we are
+ * losing performance and watching too many state events.
+ *
+ * To handle generic lists like this the component should be initialized
+ * in one of the parent elements (the course_format in this case) and use this
+ * component as a submodule that knows how to fins a specific course-module in the
+ * course structure.
+ *
  * @module     core_course/cm_format
  * @package    core_course
  * @copyright  2020 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+import ComponentBase from 'core_course/local/editor/component';
+import log from 'core/log';
 import editor from 'core_course/editor';
 
 
-class CmFormat {
+class Component extends ComponentBase {
 
     /**
      * The class constructor.
+     *
+     * @param {reactive} reactive the reactive module
      */
-    constructor() {
+    constructor(reactive) {
+        super(reactive);
         // Optional component name.
         this.name = 'cm_format';
         // Default component css selectors.
@@ -40,31 +55,26 @@ class CmFormat {
     }
 
     /**
-     * Initialize the component.
+     * Static method to create a component instance form the mustahce template.
      *
-     * @param {object} newselectors optional selectors override
-     * @returns {boolean}
+     * We use a static method to prevent mustache templates to know which
+     * reactive instance is used.
+     *
+     * @param {element|string} target the DOM main element or its ID
+     * @param {object} newselectors optional css selector overrides
+     * @return {Component}
      */
-    init(newselectors) {
-        // TODO: for now we replace the default drawer. Dele this when we have a proper
-        // course index component.
-        document.querySelector('#nav-drawer').innerHTML = 'Loading course index...';
-
-        // Overwrite the components selectors if necessary.
-        this.selectors.cm = newselectors.cm ?? this.selectors.cm;
-
-        // Register the component.
-        editor.registerComponent(this);
-
-        // Bind actions if necessary.
-
-        return true;
+    static init(target, newselectors) {
+        log.debug(`Init CM ${target}`);
+        let newcomponent = new Component(editor);
+        return newcomponent.register(target, newselectors);
     }
 
     getWatchers() {
+        const cmid = this.element.dataset.id;
         return [
-            {watch: 'cm.visible:updated', handler: this.cmVisibility},
-            {watch: 'cm.locked:updated', handler: this.cmLocked},
+            {watch: `cm[${cmid}].visible:updated`, handler: this.cmVisibility},
+            {watch: `cm[${cmid}].locked:updated`, handler: this.cmLocked},
         ];
     }
 
@@ -73,15 +83,13 @@ class CmFormat {
      * @param {*} arg
      */
     cmVisibility({element}) {
-        // Get DOM element.
-        let domelement = document.querySelector(`${this.selectors.cm}[data-id='${element.id}']`);
-        if (!domelement) {
-            return;
-        }
+        // If this wasn't a multiple instance object we will use this.selectors
+        // to find the specific course-mdoule element in the DOM, intead of altering
+        // the this.element directly.
         if (element.visible) {
-            domelement.classList.remove("dimmed_text");
+            this.element.classList.remove("dimmed_text");
         } else {
-            domelement.classList.add("dimmed_text");
+            this.element.classList.add("dimmed_text");
         }
     }
 
@@ -90,17 +98,15 @@ class CmFormat {
      * @param {*} arg
      */
     cmLocked({element}) {
-        // Get DOM element.
-        let domelement = document.querySelector(`${this.selectors.cm}[data-id='${element.id}']`);
-        if (!domelement) {
-            return;
-        }
+        // If this wasn't a multiple instance object we will use this.selectors
+        // to find the specific course-mdoule element in the DOM, intead of altering
+        // the this.element directly.
         if (element.locked) {
-            domelement.classList.add("locked");
+            this.element.classList.add("locked");
         } else {
-            domelement.classList.remove("locked");
+            this.element.classList.remove("locked");
         }
     }
 }
 
-export default new CmFormat();
+export default Component;

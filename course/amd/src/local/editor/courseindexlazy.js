@@ -22,44 +22,38 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+import ComponentBase from 'core_course/local/editor/component';
 import editor from 'core_course/editor';
 import log from 'core/log';
 import Templates from 'core/templates';
 
 
-class CourseIndexLazy {
+class Component extends ComponentBase {
 
     /**
-     * The class constructor.
+     * Static method to create a component instance form the mustahce template.
+     *
+     * We use a static method to prevent mustache templates to know which
+     * reactive instance is used.
+     *
+     * @param {element|string} target the DOM main element or its ID
+     * @param {object} newselectors optional css selector overrides
+     * @return {Component}
      */
-    constructor() {
-        // Optional component name.
-        this.name = 'courseindex_lazyload';
-        // Default component css selectors.
-        this.selectors = {
-            courseindex: '#courseindex',
-        };
+    static init(target, newselectors) {
+        let newcomponent = new Component(editor);
+        return newcomponent.register(target, newselectors);
     }
 
     /**
-     * Initialize the component.
+     * Component create hook.
      *
-     * @param {object} newselectors optional selectors override
      * @returns {boolean}
      */
-    init(newselectors) {
+    create() {
         // TODO: for now we replace the default drawer. Dele this when we have a proper
         // course index component.
-        document.querySelector('#nav-drawer').innerHTML = 'Loading course index...';
-
-        // Overwrite the components selectors if necessary.
-        this.selectors.courseindex = newselectors.courseindex ?? this.selectors.courseindex;
-
-        // Register the component.
-        editor.registerComponent(this);
-
-        // Bind actions if necessary.
-
+        this.getElement().innerHTML = 'Loading course index...';
         return true;
     }
 
@@ -73,17 +67,19 @@ class CourseIndexLazy {
         // Generate mustache data from the current state.
         const data = {
             sections: [],
-            editmode: state.course.editmode,
+            editmode: this.reactive.isEditing(),
         };
-        state.course.sectionlist.forEach(sectionid => {
-            const sectioninfo = state.section.get(sectionid);
+        const sectionlist = state.course.sectionlist ?? [];
+        sectionlist.forEach(sectionid => {
+            const sectioninfo = state.section.get(sectionid) ?? {};
             const section = {
                 title: sectioninfo.title,
                 visible: sectioninfo.visible,
                 id: sectionid,
                 cms: [],
             };
-            sectioninfo.cms.forEach(cmid => {
+            const cmlist = sectioninfo.cmlist ?? [];
+            cmlist.forEach(cmid => {
                 const cminfo = state.cm.get(cmid);
                 section.cms.push({
                     name: cminfo.name,
@@ -98,8 +94,8 @@ class CourseIndexLazy {
 
         Templates.render('core_course/local/courseindex', data)
             .then((html, js) => {
-                document.querySelector(this.selectors.courseindex).innerHTML = '';
-                Templates.appendNodeContents(this.selectors.courseindex, html, js);
+                this.getElement().innerHTML = '';
+                Templates.appendNodeContents(this.getElement(), html, js);
                 return true;
             }).fail((ex) => {
                 log.error('Cannot load course index template');
@@ -108,4 +104,4 @@ class CourseIndexLazy {
     }
 }
 
-export default new CourseIndexLazy();
+export default Component;

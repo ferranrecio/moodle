@@ -34,7 +34,7 @@
     }
 }}
 <div>
-    <div class="mod-indent-outer w-100 cm_format" data-id="{{id}}">
+    <div class="mod-indent-outer w-100 cm_format" data-id="{{id}}" id="{{uniqid}}-{{id}}-cmformat">
         {{#moveicon}} {{{moveicon}}} {{/moveicon}}
         {{! This div is used to indent the content. }}
         <div class="mod-indent {{#indent}}mod-indent-{{indent}}{{/indent}} {{#hugeindent}}mod-indent-huge{{/hugeindent}}"></div>
@@ -70,8 +70,6 @@
 {{#js}}
 require(['core_course/local/editor/cm_format'], function(component) {
     // Init module with CSS selectors.
-    component.init({
-        cm: '.cm_format',
-    });
+    component.init('{{uniqid}}-{{id}}-cmformat');
 });
 {{/js}}

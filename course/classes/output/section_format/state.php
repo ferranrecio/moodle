@@ -76,7 +76,7 @@ class state implements renderable {
 
         foreach ($modinfo->sections[$section->section] as $modnumber) {
             $mod = $modinfo->cms[$modnumber];
-            $data->cms[] = $mod->id;
+            $data->cmlist[] = $mod->id;
         }
 
         return $data;

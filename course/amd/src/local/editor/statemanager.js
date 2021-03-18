@@ -22,7 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import log from 'core/log';
 import {debounce} from 'core/utils';
 
 /**
@@ -62,6 +61,9 @@ const StateManager = class {
             };
             this.target.addEventListener('state:loaded', initialStateDone);
         });
+
+        // Add a public debounced publishEvents function.
+        this.publishEvents = debounce(this._publishEvents, 10);
     }
 
     /**
@@ -74,22 +76,20 @@ const StateManager = class {
      * @param {object} initialstate
      */
     setInitialState(initialstate) {
-        let state = {};
+
+        if (this.state !== undefined) {
+            throw Error('Initial state can only be initialized ones');
+        }
+
+        // Create the state object.
+        let state = new Proxy({}, handler('state', this, true));
         for (const prop in initialstate) {
             if (initialstate.hasOwnProperty(prop)) {
-                // Check is is an array.
-                if (Array.isArray(initialstate[prop])) {
-                    state[prop] = new StateMap(prop, this);
-                    initialstate[prop].forEach((data) => {
-                        state[prop].set(data.id ?? 0, data);
-                    });
-                } else {
-                    state[prop] = new Proxy(initialstate[prop], handler(prop, this));
-                }
+                state[prop] = initialstate[prop];
             }
         }
-        // Create the state object.
-        this.state = new Proxy(state, handler('state', this));
+        this.state = state;
+
         // When the state is loaded we can lock it to prevent illegal changes.
         this.locked = true;
         this.dispatchEvent({
@@ -123,15 +123,21 @@ const StateManager = class {
      * when finishes.
      *
      * @param {array} updates
-     * @returns {bool}
      */
     processUpdates(updates) {
         this.locked = false;
-        for (let update of updates) {
-            this.processUpdate(update.name, update.action, update.fields);
+        if (!Array.isArray(updates)) {
+            throw Error('State updates must be an array');
         }
+        updates.forEach((update) => {
+            if (update.name === undefined) {
+                throw Error('Missing state update name');
+            }
+            this.processUpdate(
+                update.name, update.action, update.fields
+            );
+        });
         this.locked = true;
-        return true;
     }
 
     /**
@@ -147,31 +153,37 @@ const StateManager = class {
     processUpdate(updatename, action, fields) {
         let state = this.state;
 
+        if (!fields) {
+            throw Error('Missing state update fields');
+        }
+
         // Process cm creation.
         if (action == 'create') {
             // Create can be applied only to lists, not to objects.
             if (state[updatename] instanceof StateMap) {
-                state[updatename].add(fields.id ?? 0, fields);
+                state[updatename].add(fields);
                 return;
             }
-            state[updatename] = new Proxy(fields, handler(updatename, this));
+            state[updatename] = fields;
             return;
         }
 
         // Get the current value.
         let current = state[updatename];
         if (current instanceof StateMap) {
-            current = state[updatename].get(fields.id ?? 0);
+            if (fields.id === undefined) {
+                throw Error(`Missing id for ${updatename} state update`);
+            }
+            current = state[updatename].get(fields.id);
             if (!current) {
-                log.error(`Inexistent ${updatename} ${fields.id ?? 0}`);
-                return;
+                throw Error(`Inexistent ${updatename} ${fields.id}`);
             }
         }
 
         // Process cm deletion.
         if (action == 'delete') {
             if (state[updatename] instanceof StateMap) {
-                state[updatename].delete(fields.id ?? 0);
+                state[updatename].delete(fields.id);
                 return;
             }
             delete state[updatename];
@@ -179,11 +191,42 @@ const StateManager = class {
         }
 
         // Execute updates.
-        for (const prop in fields) {
-            if (fields.hasOwnProperty(prop)) {
-                current[prop] = fields[prop];
+        if (action == 'update' || action === undefined) {
+            for (const prop in fields) {
+                if (fields.hasOwnProperty(prop)) {
+                    current[prop] = fields[prop];
+                }
             }
+            return;
         }
+    }
+
+    /**
+     * Internal method to publish events.
+     *
+     * This is a private method, use de beounced "publishEvents" instead.
+     */
+    _publishEvents() {
+        const fieldChanges = this.eventstopublish;
+        this.eventstopublish = [];
+
+        // List of the published events to prevent redundancies.
+        let publishedevents = new Set();
+
+        fieldChanges.forEach((event) => {
+
+            const eventkey = `${event.eventname}.${event.eventdata.id ?? 0}`;
+
+            if (!publishedevents.has(eventkey)) {
+                this.dispatchEvent({
+                    action: event.eventname,
+                    state: this.state,
+                    element: event.eventdata
+                }, this.target);
+                // PubSub.publish(event.eventname, {state, element: event.eventdata});
+                publishedevents.add(eventkey);
+            }
+        });
     }
 };
 
@@ -192,52 +235,25 @@ export default StateManager;
 // Proxy helpers.
 
 /**
- * Dispatch all the pending events.
- *
- * This is a debounced function to prevent repeated updates.
- *
- * @param {*} state the affected current state.
- */
-const publishEvents = debounce((statemanager) => {
-    const fieldChanges = statemanager.eventstopublish;
-    statemanager.eventstopublish = [];
-
-    // List of the published events to prevent redundancies.
-    let publishedevents = new Set();
-
-    fieldChanges.forEach(function(event) {
-
-        const eventkey = `${event.eventname}.${event.eventdata.id ?? 0}`;
-
-        if (!publishedevents.has(eventkey)) {
-            log.debug(`EVENT ${event.eventname}`);
-            statemanager.dispatchEvent({
-                action: event.eventname,
-                state: statemanager.state,
-                element: event.eventdata
-            }, statemanager.target);
-            // PubSub.publish(event.eventname, {state, element: event.eventdata});
-            publishedevents.add(eventkey);
-        }
-    });
-}, 10);
-
-
-/**
  * The proxy handler class.
  *
  * This proxy will trigger two events everytime an attribute is modified:
  * one for the specific attribute and one for the variable.
  *
- * @param {*} name
- * @param {*} statemanager
+ * @param {string} name the variable name used for identify triggered actions
+ * @param {StateManager} statemanager
+ * @param {boolean} proxyvalues if new values must be proxied (default false)
  * @returns {object}
  */
-const handler = function(name, statemanager) {
+const handler = function(name, statemanager, proxyvalues) {
+
+    proxyvalues = proxyvalues ?? false;
+
     return {
-        name: name,
-        statemanager: statemanager,
-        set: function(obj, prop, value) {
+        name,
+        statemanager,
+        proxyvalues,
+        set: function(obj, prop, value, receiver) {
             // Only mutations should be able to set state values.
             if (this.statemanager.locked) {
                 throw new Error(`State locked. Use mutations to change ${prop} value in ${this.name}.`);
@@ -249,20 +265,47 @@ const handler = function(name, statemanager) {
 
             let action = (obj[prop] !== undefined) ? 'updated' : 'created';
 
-            obj[prop] = value;
+            // Proxy value if necessary.
+            if (this.proxyvalues) {
+                if (Array.isArray(value)) {
+                    obj[prop] = new StateMap(prop, this.statemanager).loadValues(value);
+                } else {
+                    obj[prop] = new Proxy(value, handler(prop, this.statemanager));
+                }
+            } else {
+                obj[prop] = value;
+            }
 
+            // If the state is not ready yet means the initial state is not yet loaded.
+            if (this.statemanager.state === undefined) {
+                return true;
+            }
+
+            // Publish attribute update or create event.
             this.statemanager.eventstopublish.push({
                 eventname: `${this.name}.${prop}:${action}`,
-                eventdata: obj,
+                eventdata: receiver,
             });
+
+            // Trigger extra events if the element has an ID attrribute.
+            if (obj.id !== undefined) {
+                this.statemanager.eventstopublish.push({
+                    eventname: `${this.name}[${obj.id}].${prop}:${action}`,
+                    eventdata: receiver,
+                });
+                this.statemanager.eventstopublish.push({
+                    eventname: `${this.name}[${obj.id}]:${action}`,
+                    eventdata: receiver,
+                });
+            }
 
             // Register the general change.
             this.statemanager.eventstopublish.push({
                 eventname: `${this.name}:updated`,
-                eventdata: obj,
+                eventdata: receiver,
             });
 
-            publishEvents(this.statemanager);
+            this.statemanager.publishEvents(this.statemanager);
             return true;
         },
         deleteProperty: function(obj, prop) {
@@ -279,13 +322,25 @@ const handler = function(name, statemanager) {
                     eventdata: obj,
                 });
 
+                // Trigger extra events if the element has an ID attrribute.
+                if (obj.id !== undefined) {
+                    this.statemanager.eventstopublish.push({
+                        eventname: `${this.name}[${obj.id}].${prop}:deleted`,
+                        eventdata: obj,
+                    });
+                    this.statemanager.eventstopublish.push({
+                        eventname: `${this.name}[${obj.id}]:updated`,
+                        eventdata: obj,
+                    });
+                }
+
                 // Register the general change.
                 this.statemanager.eventstopublish.push({
                     eventname: `${this.name}:updated`,
                     eventdata: obj,
                 });
 
-                publishEvents(this.statemanager);
+                this.statemanager.publishEvents(this.statemanager);
             }
             return true;
         },
@@ -301,7 +356,7 @@ class StateMap extends Map {
      *
      * @param {string} name the property name
      * @param {StateManager} statemanager the state manager
-     * @param {*} iterable an iterable object to create the Map
+     * @param {iterable} iterable an iterable object to create the Map
      */
     constructor(name, statemanager, iterable) {
         // We don't have any "this" until be call super.
@@ -312,6 +367,9 @@ class StateMap extends Map {
     /**
      * Set an element into the map
      *
+     * Each value needs it's own id attribute. Objects withouts id will be rejected.
+     * The function will throw an error if the value id and the key are not the same.
+     *
      * @param {*} key the key to store
      * @param {*} value the value to store
      * @returns {Map} the resulting Map object
@@ -319,18 +377,21 @@ class StateMap extends Map {
     set(key, value) {
         // Only mutations should be able to set state values.
         if (this.statemanager.locked) {
-            throw new Error(`State locked. Use mutations to change ${prop} value in ${this.name}.`);
+            throw new Error(`State locked. Use mutations to change ${key} value in ${this.name}.`);
         }
 
-        let action = (super.has(key)) ? 'updated' : 'created';
+        this.checkValue(value);
+
+        if (key === undefined || key === null) {
+            throw Error('State lists keys cannot be null or undefined');
+        }
 
         // ID is mandatory and should be the same as the key.
-        if (value.id === undefined) {
-            value.id = key;
-        }
         if (value.id !== key) {
             throw new Error(`State error: ${this.name} list element ID (${value.id}) and key (${key}) mismatch`);
         }
+
+        let action = (super.has(key)) ? 'updated' : 'created';
 
         // Save proxied data into the list.
         const result = super.set(key, new Proxy(value, handler(this.name, this.statemanager)));
@@ -339,14 +400,53 @@ class StateMap extends Map {
         if (this.statemanager.state === undefined) {
             return result;
         }
-        // Trigger update opr create event.
+
+        // Trigger update opr create events.
+        this.statemanager.eventstopublish.push({
+            eventname: `${this.name}[${value.id}]:${action}`,
+            eventdata: super.get(key),
+        });
         this.statemanager.eventstopublish.push({
             eventname: `${this.name}:${action}`,
             eventdata: super.get(key),
         });
-        publishEvents(this.statemanager);
+
+        this.statemanager.publishEvents(this.statemanager);
         return result;
     }
+
+    /**
+     * Check a value is valid to be stored in a a State List.
+     *
+     * Only objects with id attribute can be stored in State lists.
+     *
+     * This method throws an error if the value is not valid.
+     *
+     * @param {object} value (with ID)
+     */
+    checkValue(value) {
+        if (!typeof value === 'object' && value !== null) {
+            throw Error('State lists can contain objects only');
+        }
+
+        if (value.id === undefined) {
+            throw Error('State lists elements must contains at least an id attribute');
+        }
+    }
+
+    /**
+     * Insert a new element int a list.
+     *
+     * Each value needs it's own id attribute. Objects withouts id will be rejected.
+     *
+     * @param {object} value the value to add (needs an id attribute)
+     * @returns {Map} the resulting Map object
+     */
+    add(value) {
+        this.checkValue(value);
+        return this.set(value.id, value);
+    }
+
     /**
      * Delete an element from the map
      *
@@ -357,7 +457,7 @@ class StateMap extends Map {
 
         // Only mutations should be able to set state values.
         if (this.statemanager.locked) {
-            throw new Error(`State locked. Use mutations to change ${prop} value in ${this.name}.`);
+            throw new Error(`State locked. Use mutations to change ${key} value in ${this.name}.`);
         }
 
         const previous = super.get(key);
@@ -368,10 +468,50 @@ class StateMap extends Map {
         }
 
         this.statemanager.eventstopublish.push({
+            eventname: `${this.name}[${key}]:deleted`,
+            eventdata: previous,
+        });
+        this.statemanager.eventstopublish.push({
             eventname: `${this.name}:deleted`,
             eventdata: previous,
         });
-        publishEvents(this.statemanager);
+        this.statemanager.publishEvents(this.statemanager);
         return result;
+    }
+
+    /**
+     * Return a suitable structure for JSON conversion.
+     *
+     * This function is needed because new values are compared in JSON StateMap has Private
+     * attributes which cannot be stringified (like this.statremanager which will produce an
+     * infinite recursivity).
+     *
+     * @returns {array}
+     */
+    toJSON() {
+        let result = [];
+        this.forEach((value) => {
+            result.push(value);
+        });
+        return result;
+    }
+
+    /**
+     * Insert a full list of values without triggering events.
+     *
+     * This method is used mainly to initialize the list. Note each element is indexed by its "id" attribute.
+     * This is a basic restriction of StateMap. All elements need an id attribute, otherwise it won't be saved.
+     *
+     * @param {iterable} values the values to load
+     * @returns {StateMap} return the this value
+     */
+    loadValues(values) {
+        values.forEach((data) => {
+            this.checkValue(data);
+            const key = data.id;
+            let newvalue = new Proxy(data, handler(this.name, this.statemanager));
+            this.set(key, newvalue);
+        });
+        return this;
     }
 }

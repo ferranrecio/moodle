@@ -22,43 +22,40 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+import ComponentBase from 'core_course/local/editor/component';
 import editor from 'core_course/editor';
 
-class CourseIndex {
+class Component extends ComponentBase {
 
     /**
      * The class constructor.
+     *
+     * @param {reactive} reactive the reactive module
      */
-    constructor() {
+    constructor(reactive) {
+        super(reactive);
         // Optional component name.
         this.name = 'courseindex';
         // Default component css selectors.
         this.selectors = {
             section: '.ci-sectionitem',
             cm: '.ci-cmitem',
-            cicontent: '#courseindex-content',
         };
     }
 
     /**
-     * Initialize the component.
+     * Static method to create a component instance form the mustahce template.
      *
-     * @param {object} newselectors optional selectors override
-     * @returns {boolean}
+     * We use a static method to prevent mustache templates to know which
+     * reactive instance is used.
+     *
+     * @param {element|string} target the DOM main element or its ID
+     * @param {object} newselectors optional css selector overrides
+     * @return {Component}
      */
-    init(newselectors) {
-
-        // Overwrite the components selectors if necessary.
-        this.selectors.section = newselectors.section ?? this.selectors.section;
-        this.selectors.cm = newselectors.cm ?? this.selectors.cm;
-        this.selectors.cicontent = newselectors.cicontent ?? this.selectors.cicontent;
-
-        // Register the component.
-        editor.registerComponent(this);
-
-        // Bind actions if necessary.
-
-        return true;
+    static init(target, newselectors) {
+        let newcomponent = new Component(editor);
+        return newcomponent.register(target, newselectors);
     }
 
     /**
@@ -81,12 +78,11 @@ class CourseIndex {
      *
      * @param {object} state the initial state
      */
-    stateReady(state) {
+    stateReady() {
         // Create or bind the editor elements.
-        if (state.course.editmode) {
+        if (this.reactive.isEditing()) {
             // Bind events. In this case we bind a click listener.
-            const cicontent = document.querySelector(this.selectors.cicontent);
-            cicontent.addEventListener("click", this.toogleVisibility.bind(this));
+            this.element.addEventListener("click", this.toogleVisibility.bind(this));
         }
     }
 
@@ -146,9 +142,9 @@ class CourseIndex {
     toogleVisibility(event) {
         const actionbutton = event.target.closest('[data-action]');
         if (actionbutton) {
-            editor.dispatch(actionbutton.dataset.action, [actionbutton.dataset.id]);
+            this.reactive.dispatch(actionbutton.dataset.action, [actionbutton.dataset.id]);
         }
     }
 }
 
-export default new CourseIndex();
+export default Component;

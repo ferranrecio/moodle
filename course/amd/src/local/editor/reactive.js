@@ -47,6 +47,9 @@ const Reactive = class {
      *  - eventdispatch: the event dispatch function
      *  - target (optional): the target of the event dispatch. If not passed a fake element will be created
      *  - mutations (optional): an object with state mutations functions
+     *  - state (optional): if your state is not async loaded, you can pass directly on creation.
+     *                      Note that passing state on creation will initialize the state, this means
+     *                      setInitialState will throw an exception because the state is already defined.
      *
      * @param {object} description reactive manager description.
      */
@@ -75,6 +78,11 @@ const Reactive = class {
 
         // Register the event to alert watchers when specific state change happens.
         this.target.addEventListener(this.eventname, this.callWatchersHandler.bind(this));
+
+        // Set initial state if we already have it.
+        if (description.state !== undefined) {
+            this.setInitialState(description.state);
+        }
     }
 
     /**
@@ -135,6 +143,20 @@ const Reactive = class {
     }
 
     /**
+    * Return the initial state promise.
+    *
+    * Typically, components does not require to use this promise because registerComponent
+    * will trigger their stateReady method authomatically. But it could be useful for complex
+    * components that require to combine state, template and string loadings.
+    *
+    * @method getState
+    * @return {Promise}
+    */
+    getInitialStatePromise() {
+        return this.statemanager.getInitialPromise();
+    }
+
+    /**
     * Register a new component.
     *
     * Component can provide some optional functions to the reactive module:
@@ -182,10 +204,11 @@ const Reactive = class {
         // Register state ready function. There's the possibility a component is registered after the initial state
         // is loaded. For those cases we have a state promise to handle this specific state change.
         if (component.stateReady !== undefined) {
-            this.statemanager.getInitialPromise()
+            this.getInitialStatePromise()
                 .then(component.stateReady.bind(component))
                 .catch(reason => {
                     log.error(`Initial state in ${componentname} rejected due to: ${reason}`);
+                    log.error(reason);
                 });
             return;
         }

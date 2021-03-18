@@ -71,14 +71,12 @@
 {{#js}}
 require(['core_course/local/editor/courseindex'], function(component) {
     // Init module with CSS selectors.
-    component.init({
-        section: '.ci-sectionitem',
-        cm: '.ci-cmitem',
-        cicontent: '#coureindex-content',
-    });
-});
-// Small trick to publish the state manager for testing (only for the proof of concept)
-require(['core_course/editor'], function(editor) {
-    globalThis.sm = editor.statemanager;
+    component.init(
+        'coureindex-content',
+        {
+            section: '.ci-sectionitem',
+            cm: '.ci-cmitem',
+        }
+    );
 });
 {{/js}}
