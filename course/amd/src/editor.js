@@ -100,6 +100,8 @@ export default new Editor({
 });
 
 /**
+ * Trigger a state changed event.
+ *
  * This function will be moved to core_course/events module
  * when the file is migrated to the new JS events structure proposed in MDL-70990.
  *

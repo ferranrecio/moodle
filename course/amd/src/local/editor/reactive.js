@@ -127,6 +127,8 @@ const Reactive = class {
     addMutations(manager) {
         for (const mutation in manager) {
             if (manager.hasOwnProperty(mutation)) {
+                // Mutations can be a class or just a collection of functions.
+                // In both cases keep the "this" value is a good idea.
                 this.mutations[mutation] = manager[mutation].bind(manager);
             }
         }

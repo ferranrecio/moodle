@@ -210,6 +210,24 @@ const StateManager = class {
         const fieldChanges = this.eventstopublish;
         this.eventstopublish = [];
 
+        // State changes can be registered in any orded. However it will avoid many
+        // components errors if they are sorted to have creations-updates-deletes
+        // in case some component needs to create or destroy DOM elements.
+        fieldChanges.sort((a, b) => {
+            const weights = {
+                created: 0,
+                updated: 1,
+                deleted: 2,
+            };
+            const aweight = weights[a.action] ?? 0;
+            const bweight = weights[b.action] ?? 0;
+            // In case both have the same weight, the eventname length decide.
+            if (aweight === bweight) {
+                return b.eventname.length - a.eventname.length;
+            }
+            return aweight - bweight;
+        });
+
         // List of the published events to prevent redundancies.
         let publishedevents = new Set();
 
@@ -250,15 +268,29 @@ const handler = function(name, statemanager, proxyvalues) {
     proxyvalues = proxyvalues ?? false;
 
     return {
+        /** Var {string} name the state element name. */
         name,
+        /** Var {StateManager} statemanager the state manager object. */
         statemanager,
+        /** Var {boolean} if new values must be proxied. */
         proxyvalues,
+        /**
+         * Set trap to trigger events when the state change.
+         *
+         * @param {object} obj the source object (not proxied)
+         * @param {string} prop the attribute to set
+         * @param {*} value the value to save
+         * @param {*} receiver the proxied element to be attached to events
+         * @returns {boolean} if the value is set
+         */
         set: function(obj, prop, value, receiver) {
+
             // Only mutations should be able to set state values.
             if (this.statemanager.locked) {
                 throw new Error(`State locked. Use mutations to change ${prop} value in ${this.name}.`);
             }
 
+            // Check any data change.
             if (JSON.stringify(obj[prop]) === JSON.stringify(value)) {
                 return true;
             }
@@ -285,6 +317,7 @@ const handler = function(name, statemanager, proxyvalues) {
             this.statemanager.eventstopublish.push({
                 eventname: `${this.name}.${prop}:${action}`,
                 eventdata: receiver,
+                action,
             });
 
             // Trigger extra events if the element has an ID attrribute.
@@ -292,10 +325,12 @@ const handler = function(name, statemanager, proxyvalues) {
                 this.statemanager.eventstopublish.push({
                     eventname: `${this.name}[${obj.id}].${prop}:${action}`,
                     eventdata: receiver,
+                    action,
                 });
                 this.statemanager.eventstopublish.push({
                     eventname: `${this.name}[${obj.id}]:${action}`,
                     eventdata: receiver,
+                    action,
                 });
             }
 
@@ -303,11 +338,19 @@ const handler = function(name, statemanager, proxyvalues) {
             this.statemanager.eventstopublish.push({
                 eventname: `${this.name}:updated`,
                 eventdata: receiver,
+                action: 'updated',
             });
 
             this.statemanager.publishEvents(this.statemanager);
             return true;
         },
+        /**
+         * Delete property trap to trigger state change events.
+         *
+         * @param {*} obj the affected object (not proxied)
+         * @param {*} prop the prop to delete
+         * @returns {boolean} if prop is deleted
+         */
         deleteProperty: function(obj, prop) {
             // Only mutations should be able to set state values.
             if (this.statemanager.locked) {
@@ -320,6 +363,7 @@ const handler = function(name, statemanager, proxyvalues) {
                 this.statemanager.eventstopublish.push({
                     eventname: `${this.name}.${prop}:deleted`,
                     eventdata: obj,
+                    action: 'deleted',
                 });
 
                 // Trigger extra events if the element has an ID attrribute.
@@ -327,10 +371,12 @@ const handler = function(name, statemanager, proxyvalues) {
                     this.statemanager.eventstopublish.push({
                         eventname: `${this.name}[${obj.id}].${prop}:deleted`,
                         eventdata: obj,
+                        action: 'deleted',
                     });
                     this.statemanager.eventstopublish.push({
                         eventname: `${this.name}[${obj.id}]:updated`,
                         eventdata: obj,
+                        action: 'updated',
                     });
                 }
 
@@ -338,6 +384,7 @@ const handler = function(name, statemanager, proxyvalues) {
                 this.statemanager.eventstopublish.push({
                     eventname: `${this.name}:updated`,
                     eventdata: obj,
+                    action: 'updated',
                 });
 
                 this.statemanager.publishEvents(this.statemanager);
@@ -405,10 +452,12 @@ class StateMap extends Map {
         this.statemanager.eventstopublish.push({
             eventname: `${this.name}[${value.id}]:${action}`,
             eventdata: super.get(key),
+            action,
         });
         this.statemanager.eventstopublish.push({
             eventname: `${this.name}:${action}`,
             eventdata: super.get(key),
+            action,
         });
 
         this.statemanager.publishEvents(this.statemanager);
@@ -470,10 +519,12 @@ class StateMap extends Map {
         this.statemanager.eventstopublish.push({
             eventname: `${this.name}[${key}]:deleted`,
             eventdata: previous,
+            action: 'deleted',
         });
         this.statemanager.eventstopublish.push({
             eventname: `${this.name}:deleted`,
             eventdata: previous,
+            action: 'deleted',
         });
         this.statemanager.publishEvents(this.statemanager);
         return result;
