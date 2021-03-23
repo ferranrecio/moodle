@@ -23,8 +23,8 @@
  */
 
 import DefaultMutations from 'core_course/local/editor/mutations';
-import Reactive from 'core_course/local/editor/reactive';
 import events from 'core_course/events';
+import Reactive from 'core/reactive';
 import log from 'core/log';
 import ajax from 'core/ajax';
 import notification from 'core/notification';

@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import ComponentBase from 'core_course/local/editor/component';
+import ComponentBase from 'core/reactive/component';
 import editor from 'core_course/editor';
 import log from 'core/log';
 
@@ -48,14 +48,14 @@ class Component extends ComponentBase {
      * reactive instance is used.
      *
      * @param {element|string} target the DOM main element or its ID
-     * @param {object} newselectors optional css selector overrides
+     * @param {object} selectors optional css selector overrides
      * @return {Component}
      */
-    static init(target, newselectors) {
+    static init(target, selectors) {
         return new Component({
             element: document.getElementById(target),
             reactive: editor,
-            selectors: newselectors,
+            selectors,
         });
     }
 
