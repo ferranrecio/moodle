@@ -26,7 +26,21 @@ import log from 'core/log';
 
 class TestBase {
 
-    addTest(fullname, initialstate) {
+    /**
+     * Initialize the test object.
+     *
+     * @param {string} resultsid the result element id.
+     * @returns {boolean}
+     */
+    init(resultsid) {
+        this.target = document.getElementById(resultsid);
+
+        this.runTests();
+
+        return true;
+    }
+
+    addAssert(fullname, initialstate) {
         if (this.anoncounter === undefined) {
             this.anoncounter = 0;
         }
@@ -113,7 +127,7 @@ class TestBase {
     getTestItem(shortname, extraselectors) {
         // Check if it is an anonymous test
         if (shortname === null) {
-            shortname = this.addTest('Anonymous assert');
+            shortname = this.addAssert('Anonymous assert');
         }
         extraselectors = extraselectors ?? '';
         return this.target.querySelector(`[data-shortname='${shortname}'] ${extraselectors}`);
@@ -189,6 +203,11 @@ class TestBase {
     }
 
     runTests() {
+        // Check if we have any setup before.
+        if (this.setUpBeforeTests !== undefined) {
+            this.setUpBeforeTests();
+        }
+        // Proceed to execute each test.
         let tests = this.getAllTests(this);
         tests.forEach(test => {
             // Check for data providers.
@@ -209,6 +228,8 @@ class TestBase {
                 }
                 this.addTitle(testitle);
 
+                this.expectexception = null;
+
                 // Test setup.
                 if (this.setUp !== undefined) {
                     this.setUp();
@@ -218,10 +239,14 @@ class TestBase {
                 try {
                     this[test](dataset[scenario]);
                 } catch (error) {
-                    log.error(`Exception raised in test ${testitle}`);
-                    log.error(error);
-                    const key = this.addTest(`Exception raised in test ${testitle}`);
-                    this.markTestException(key, error);
+                    if (this.expectexception) {
+                        this.assertTrue(this.expectexception, true);
+                    } else {
+                        log.error(`Exception raised in test ${testitle}`);
+                        log.error(error);
+                        const key = this.addAssert(`Exception raised in test ${testitle}`);
+                        this.markTestException(key, error);
+                    }
                 }
 
                 // Test tear down.
@@ -253,6 +278,11 @@ class TestBase {
         } else {
             this.markTestFail(shortname, expected, reality);
         }
+    }
+
+    expectException() {
+        this.expectexception = this.addAssert(`Expect exception in ${this.currenttitle}`);
+        this.markTestFail(this.expectexception, 'Exception raised', 'No exception');
     }
 
 }

@@ -25,28 +25,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import StateManager from 'core_course/local/editor/statemanager';
+import StateManager from 'core/reactive/statemanager';
 import TestBase from 'format_editortest/local/tests/testbase';
 
 class Test extends TestBase {
-
-    /**
-     * Initialize the component.
-     *
-     * @param {string} resultsid the result element id.
-     * @returns {boolean}
-     */
-    init(resultsid) {
-        this.target = document.getElementById(resultsid);
-        this.eventname = 'reactive_changed';
-
-        // This test module only tests the reactive module. We don't not need
-        // to be registered as an editor component for this.
-
-        this.runTests();
-
-        return true;
-    }
 
     /**
      * Scenario setup.
@@ -93,12 +75,9 @@ class Test extends TestBase {
      * @param {*} state the initial state
      */
     testInvalidState(state) {
-        try {
-            this.statemanager.setInitialState(state);
-            this.assertTrue(null, false);
-        } catch (error) {
-            this.assertTrue(null, true);
-        }
+
+        this.expectException();
+        this.statemanager.setInitialState(state);
     }
 
     /**
@@ -176,12 +155,8 @@ class Test extends TestBase {
 
         this.statemanager.setLocked(false);
 
-        try {
-            this.statemanager.state.samples.set(key, value);
-            this.assertTrue(null, false);
-        } catch (error) {
-            this.assertTrue(null, true);
-        }
+        this.expectException();
+        this.statemanager.state.samples.set(key, value);
     }
 
     /**
@@ -257,12 +232,8 @@ class Test extends TestBase {
 
         this.statemanager.setLocked(false);
 
-        try {
-            this.statemanager.state.samples.add(value);
-            this.assertTrue(null, false);
-        } catch (error) {
-            this.assertTrue(null, true);
-        }
+        this.expectException();
+        this.statemanager.state.samples.add(value);
     }
 
     /**

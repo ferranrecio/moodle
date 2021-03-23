@@ -1,0 +1,13 @@
+<div class="card mb-2">
+  <div class="card-body">
+    <h3 class="card-title">Course editor class test</h3>
+    <p class="card-text">Check the general usage of the course editor reactive module.</p>
+    <div id="editor_results"></div>
+  </div>
+</div>
+{{#js}}
+require(['format_editortest/local/tests/editor'], function(component) {
+    // Init module with CSS selectors.
+    component.init('editor_results');
+});
+{{/js}}

@@ -1,0 +1,13 @@
+<div class="card mb-2">
+  <div class="card-body">
+    <h3 class="card-title">Component class test</h3>
+    <p class="card-text">Check the general usage of the Component module.</p>
+    <div id="component_results"></div>
+  </div>
+</div>
+{{#js}}
+require(['format_editortest/local/tests/component'], function(component) {
+    // Init module with CSS selectors.
+    component.init('component_results');
+});
+{{/js}}

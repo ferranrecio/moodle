@@ -25,29 +25,17 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// Iimport log from 'core/log';
-import Reactive from 'core_course/local/editor/reactive';
+import Reactive from 'core/reactive';
 import TestBase from 'format_editortest/local/tests/testbase';
 import log from 'core/log';
 
 class Test extends TestBase {
 
     /**
-     * Initialize the component.
-     *
-     * @param {string} resultsid the result element id.
-     * @returns {boolean}
+     * Function to prepare test scenario.
      */
-    init(resultsid) {
-        this.target = document.getElementById(resultsid);
+    setUp() {
         this.eventname = 'reactive_changed';
-
-        // This test module only tests the reactive module. We don't not need
-        // to be registered as an editor component for this.
-
-        this.runTests();
-
-        return true;
     }
 
     /**
@@ -70,7 +58,7 @@ class Test extends TestBase {
      * Test the creation of a Reactive module and checks stateReady is called.
      */
     testCreation() {
-        const test1 = this.addTest('Create a new reactive instance');
+        const test1 = this.addAssert('Create a new reactive instance');
 
         const reactive = new Reactive({
             name: 'TestReactive',
@@ -95,7 +83,7 @@ class Test extends TestBase {
      * the component registration.
      */
     testSetInitialState() {
-        const test1 = this.addTest('Initial state after creationt');
+        const test1 = this.addAssert('Initial state after creationt');
 
         const reactive = new Reactive({
             name: 'TestReactive',
@@ -119,7 +107,6 @@ class Test extends TestBase {
      * Check that initialState cannot be used when the initial state is passed on creation.
      */
     testSetInitialStateWrong() {
-        const test1 = this.addTest('Exception when setInitial state loaded but it was lready defined');
 
         const reactive = new Reactive({
             name: 'TestReactive',
@@ -132,21 +119,17 @@ class Test extends TestBase {
             mutations: {},
         });
 
-        try {
-            reactive.setInitialState({
-                tocheck: {value: 'OK'},
-            });
-            this.assertTrue(test1, false);
-        } catch (error) {
-            this.assertTrue(test1, true);
-        }
+        this.expectException();
+
+        reactive.setInitialState({
+            tocheck: {value: 'OK'},
+        });
     }
 
     /**
      * Check that initial state cannot be set twice.
      */
     testSetInitialStateTwice() {
-        const test1 = this.addTest('Exception when execture setInitialStgate twice');
 
         const reactive = new Reactive({
             name: 'TestReactive',
@@ -160,21 +143,18 @@ class Test extends TestBase {
             tocheck: {value: 'OK'},
         });
 
-        try {
-            reactive.setInitialState({
-                tocheck: {value: 'OK'},
-            });
-            this.assertTrue(test1, false);
-        } catch (error) {
-            this.assertTrue(test1, true);
-        }
+        this.expectException();
+
+        reactive.setInitialState({
+            tocheck: {value: 'OK'},
+        });
     }
 
     /**
      * Check a reactive module can be created without a DOM element.
      */
     testWithoutTarget() {
-        const test1 = this.addTest('Instantiate reactive without a DOM target');
+        const test1 = this.addAssert('Instantiate reactive without a DOM target');
 
         const reactive = new Reactive({
             name: 'TestReactive',
@@ -211,7 +191,7 @@ class Test extends TestBase {
             }
         });
 
-        const test1 = this.addTest('Components stateReady should be called when the state is ready');
+        const test1 = this.addAssert('Components stateReady should be called when the state is ready');
 
         reactive.setInitialState({
             tocheck: {value: 'OK'},
@@ -222,7 +202,7 @@ class Test extends TestBase {
      * Test mutations.
      */
     testMutations() {
-        const test1 = this.addTest('Call mutations from a component');
+        const test1 = this.addAssert('Call mutations from a component');
 
         const reactive = new Reactive({
             name: 'TestReactive',
@@ -249,8 +229,8 @@ class Test extends TestBase {
      * Test state watchers.
      */
     testWatchers() {
-        const test1 = this.addTest('Test attribute watcher');
-        const test2 = this.addTest('Test general watcher');
+        const test1 = this.addAssert('Test attribute watcher');
+        const test2 = this.addAssert('Test general watcher');
 
         const reactive = new Reactive({
             name: 'TestReactive',
@@ -292,10 +272,10 @@ class Test extends TestBase {
 
     /**
      * Test exceptions when registering a watcher.
+     *
+     * @param {object} watcher invalid watcher data
      */
-    testWrongWatchers() {
-        const test1 = this.addTest('Watchers has to watch something');
-        const test2 = this.addTest('Watchers need a handle function');
+    testWrongWatchers(watcher) {
 
         const reactive = new Reactive({
             name: 'TestReactive',
@@ -303,42 +283,31 @@ class Test extends TestBase {
             eventdispatch: this.eventdispatch,
         });
 
-        // Watcher without "watch"
-        try {
-            reactive.registerComponent({
-                getWatchers: () => [
-                    {
-                        handler: () => {
-                            this.assertTrue(test1, false);
-                        }
-                    },
-                ],
-            });
-            this.assertTrue(test1, false);
-        } catch (error) {
-            this.assertTrue(test1, error !== undefined);
-        }
+        this.expectException();
 
-        // Watcher without "handler"
-        try {
-            reactive.registerComponent({
-                getWatchers: () => [
-                    {
-                        watch: 'tocheck.value:updated',
-                    },
-                ],
-            });
-            this.assertTrue(test2, false);
-        } catch (error) {
-            this.assertTrue(test2, error !== undefined);
-        }
+        reactive.registerComponent({
+            getWatchers: () => [watcher],
+        });
+    }
+
+    dataProviderTestWrongWatchers() {
+        return {
+            nowatch: {
+                handler: () => {
+                    return true;
+                }
+            },
+            nohandler: {
+                watch: 'tocheck.value:updated',
+            },
+        };
     }
 
     /**
      * Test exceptions when calling a non-existent mutation.
      */
     testWrongMutation() {
-        const test1 = this.addTest('Call inexistent mutations from a component');
+        const test1 = this.addAssert('Call inexistent mutations from a component');
 
         const reactive = new Reactive({
             name: 'TestReactive',
@@ -350,6 +319,7 @@ class Test extends TestBase {
         });
         reactive.registerComponent({
             stateReady: () => {
+                // This function is executed in a promise, we cannot use this.expectException();
                 try {
                     reactive.dispatch('somemutation', 'Q', true);
                     this.assertTrue(test1, false);
@@ -364,7 +334,7 @@ class Test extends TestBase {
      * Test exceptions on mutations.
      */
     testMutationException() {
-        const test1 = this.addTest('A mutation throws an exception.');
+        const test1 = this.addAssert('A mutation throws an exception.');
 
         const reactive = new Reactive({
             name: 'TestReactive',
@@ -381,6 +351,7 @@ class Test extends TestBase {
         });
         reactive.registerComponent({
             stateReady: () => {
+                // This function is executed in a promise, we cannot use this.expectException();
                 try {
                     reactive.dispatch('somemutation', 'Q', true);
                     this.assertTrue(test1, false);
@@ -392,12 +363,12 @@ class Test extends TestBase {
     }
 
     /**
-     * Test add mutations function.
+     * Test add mutations functions.
      */
     testAddMutations() {
-        const test1 = this.addTest('Call an original mutaiton after adding new ones.');
-        const test2 = this.addTest('Call an overridden mutation.');
-        const test3 = this.addTest('Call an added mutation.');
+        const test1 = this.addAssert('Call an original mutaiton after adding new ones.');
+        const test2 = this.addAssert('Call an overridden mutation.');
+        const test3 = this.addAssert('Call an added mutation.');
 
         const reactive = new Reactive({
             name: 'TestReactive',
@@ -433,10 +404,47 @@ class Test extends TestBase {
     }
 
     /**
+         * Test set mutations class.
+         */
+    testSetMutations() {
+        const test1 = this.addAssert('Mutation class can be overridden', false);
+
+        const reactive = new Reactive({
+            name: 'TestReactive',
+            eventname: this.eventname,
+            eventdispatch: this.eventdispatch,
+            state: {
+                tocheck: {value: 'OK'},
+            },
+            mutations: {
+                alter: () => {
+                    this.assertTrue(test1, false);
+                },
+            },
+        });
+
+        // Auxiliar mutation class.
+        class NewMutations {
+
+            constructor(test) {
+                this.test = test;
+            }
+
+            alter(statemanager, testid) {
+                this.test.assertTrue(testid, true);
+            }
+        }
+
+        reactive.setMutations(new NewMutations(this));
+
+        reactive.dispatch('alter', test1);
+    }
+
+    /**
      * Test get state.
      */
     testGetState() {
-        const test1 = this.addTest('Call get state');
+        const test1 = this.addAssert('Call get state');
 
         const reactive = new Reactive({
             name: 'TestReactive',
@@ -454,9 +462,9 @@ class Test extends TestBase {
      * Test exceptions when a component tries to modify the state.
      */
     testWriteStateFromComponent() {
-        const test1 = this.addTest('Components cannot write in the state from stateReady.');
-        const test2 = this.addTest('Components cannot write in the state from watchers.');
-        const test3 = this.addTest('Components cannot write in the element from watchers.');
+        const test1 = this.addAssert('Components cannot write in the state from stateReady.');
+        const test2 = this.addAssert('Components cannot write in the state from watchers.');
+        const test3 = this.addAssert('Components cannot write in the element from watchers.');
 
         const reactive = new Reactive({
             name: 'TestReactive',
@@ -479,6 +487,7 @@ class Test extends TestBase {
                 {
                     watch: 'tocheck:updated',
                     handler: ({state, element}) => {
+                        // This function is executed in an event, we cannot use this.expectException();
                         try {
                             state.tocheck.value = 'Nope';
                             this.assertTrue(test2, false);
@@ -496,6 +505,7 @@ class Test extends TestBase {
                 },
             ],
             stateReady: (state) => {
+                // This function is executed in a promise, we cannot use this.expectException();
                 try {
                     state.tocheck.value = 'Nope';
                     this.assertTrue(test1, false);
@@ -512,10 +522,10 @@ class Test extends TestBase {
      * Test evenet bubbling.
      */
     testEventBubble() {
-        const test1 = this.addTest('General state change triggered.');
-        const test2 = this.addTest('General state change bubbles.', true);
-        const test3 = this.addTest('Private state watcher event trigger.');
-        const test4 = this.addTest('Private state watcher change does not bubble.', true);
+        const test1 = this.addAssert('General state change triggered.');
+        const test2 = this.addAssert('General state change bubbles.', true);
+        const test3 = this.addAssert('Private state watcher event trigger.');
+        const test4 = this.addAssert('Private state watcher change does not bubble.', true);
 
         const reactive = new Reactive({
             name: 'TestReactive',
@@ -566,12 +576,12 @@ class Test extends TestBase {
      * Test reactives instances does not interfere which each other.
      */
     testSimultaneousReactives() {
-        const test1 = this.addTest('Reactive instance 1 execute the correct stateReady.');
-        const test2 = this.addTest('Reactive instance 2 execute the correct stateReady.');
-        const test3 = this.addTest('Watcher 1 works with reactive 1 changes.');
-        const test4 = this.addTest('Watcher 2 ignore reactive 1 changes.', true);
-        const test5 = this.addTest('Watcher 1 ignore reactive 2 changes.', true);
-        const test6 = this.addTest('Watcher 2 works with reactive 2 changes.');
+        const test1 = this.addAssert('Reactive instance 1 execute the correct stateReady.');
+        const test2 = this.addAssert('Reactive instance 2 execute the correct stateReady.');
+        const test3 = this.addAssert('Watcher 1 works with reactive 1 changes.');
+        const test4 = this.addAssert('Watcher 2 ignore reactive 1 changes.', true);
+        const test5 = this.addAssert('Watcher 1 ignore reactive 2 changes.', true);
+        const test6 = this.addAssert('Watcher 2 works with reactive 2 changes.');
 
         const reactive1 = new Reactive({
             name: 'TestReactive1',

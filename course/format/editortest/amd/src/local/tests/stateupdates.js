@@ -25,28 +25,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import StateManager from 'core_course/local/editor/statemanager';
+import StateManager from 'core/reactive/statemanager';
 import TestBase from 'format_editortest/local/tests/testbase';
 
 class Test extends TestBase {
-
-    /**
-     * Initialize the component.
-     *
-     * @param {string} resultsid the result element id.
-     * @returns {boolean}
-     */
-    init(resultsid) {
-        this.target = document.getElementById(resultsid);
-        this.eventname = 'reactive_changed';
-
-        // This test module only tests the reactive module. We don't not need
-        // to be registered as an editor component for this.
-
-        this.runTests();
-
-        return true;
-    }
 
     /**
      * Test setup.
@@ -235,12 +217,9 @@ class Test extends TestBase {
                 {id: 1, value: 'OK List'}
             ],
         });
-        const test1 = this.addTest('Test invalid update', false);
-        try {
-            this.statemanager.processUpdates(updates);
-        } catch (error) {
-            this.assertTrue(test1, true);
-        }
+
+        this.expectException();
+        this.statemanager.processUpdates(updates);
     }
 
     dataProviderTestUpdateExceptions() {
