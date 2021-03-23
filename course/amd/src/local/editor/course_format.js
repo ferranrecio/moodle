@@ -14,19 +14,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Editor component for the cm_format template.
+ * Editor component for the course_format template.
  *
- * Important note: this is just an example of how a component can be instantiated
- * several times in the same page (one per course-module in this case). In this case
- * having one component for each course-module does not have any sense as we are
- * losing performance and watching too many state events.
- *
- * To handle generic lists like this the component should be initialized
- * in one of the parent elements (the course_format in this case) and use this
- * component as a submodule that knows how to fins a specific course-module in the
- * course structure.
- *
- * @module     core_course/cm_format
+ * @module     core_course/course_format
  * @package    core_course
  * @copyright  2020 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -34,18 +24,21 @@
 
 import ComponentBase from 'core_course/local/editor/component';
 import editor from 'core_course/editor';
+import log from 'core/log';
 
 
 class Component extends ComponentBase {
 
     /**
-     * Constructor hook.
+     * Create hook method.
      */
     create() {
-        // Optional component name for debugging.
-        this.name = 'cm_format';
-        // Save dom internal data.
-        this.id = this.element.dataset.id;
+        // Optional component name.
+        this.name = 'course_format';
+        // Default component css selectors.
+        this.selectors = {
+            cmitem: `[data-editor='cmitem']`,
+        };
     }
 
     /**
@@ -68,7 +61,7 @@ class Component extends ComponentBase {
 
     getWatchers() {
         return [
-            {watch: `cm[${this.id}].locked:updated`, handler: this.cmLocked},
+            {watch: `cm.visible:updated`, handler: this.cmVisibility},
         ];
     }
 
@@ -77,28 +70,16 @@ class Component extends ComponentBase {
      * @param {*} arg
      */
     cmVisibility({element}) {
-        // If this wasn't a multiple instance object we will use this.selectors
-        // to find the specific course-mdoule element in the DOM, intead of altering
-        // the this.element directly.
-        if (element.visible) {
-            this.element.classList.remove("dimmed_text");
+        // Find the right element to apply the change.
+        const target = this.element.querySelector(`${this.selectors.cmitem}[data-id='${element.id}']`);
+        if (target) {
+            if (element.visible) {
+                target.classList.remove("dimmed_text");
+            } else {
+                target.classList.add("dimmed_text");
+            }
         } else {
-            this.element.classList.add("dimmed_text");
-        }
-    }
-
-    /**
-     *
-     * @param {*} arg
-     */
-    cmLocked({element}) {
-        // If this wasn't a multiple instance object we will use this.selectors
-        // to find the specific course-mdoule element in the DOM, intead of altering
-        // the this.element directly.
-        if (element.locked) {
-            this.element.classList.add("locked");
-        } else {
-            this.element.classList.remove("locked");
+            log.debug(`Course module with id ${element.id} not found in page`);
         }
     }
 }

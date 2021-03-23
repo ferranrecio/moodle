@@ -180,3 +180,8 @@
 {{/hasnavigation}}
 {{#numsections}} {{> core_course/local/course_format/addsection}} {{/numsections}}
 {{#courseindex}} {{> core_course/local/course_format/courseindexlazy}}{{/courseindex}}
+{{#js}}
+require(['core_course/local/editor/course_format'], function(component) {
+    component.init('region-main');
+});
+{{/js}}

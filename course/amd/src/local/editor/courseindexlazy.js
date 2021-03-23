@@ -41,8 +41,11 @@ class Component extends ComponentBase {
      * @return {Component}
      */
     static init(target, newselectors) {
-        let newcomponent = new Component(editor);
-        return newcomponent.register(target, newselectors);
+        return new Component({
+            element: document.getElementById(target),
+            reactive: editor,
+            selectors: newselectors,
+        });
     }
 
     /**
@@ -62,7 +65,7 @@ class Component extends ComponentBase {
      *
      * @param {object} state the initial state
      */
-    stateReady(state) {
+    async stateReady(state) {
         // We are ready to replace the lazy load element with the real course index.
         // Generate mustache data from the current state.
         const data = {
@@ -92,15 +95,14 @@ class Component extends ComponentBase {
         });
         data.hassections = (data.sections.length != 0);
 
-        Templates.render('core_course/local/courseindex', data)
-            .then((html, js) => {
-                this.getElement().innerHTML = '';
-                Templates.appendNodeContents(this.getElement(), html, js);
-                return true;
-            }).fail((ex) => {
-                log.error('Cannot load course index template');
-                log.error(ex);
-            });
+        try {
+            const {html, js} = await Templates.renderForPromise('core_course/local/courseindex', data);
+            this.getElement().innerHTML = '';
+            Templates.appendNodeContents(this.getElement(), html, js);
+        } catch (error) {
+            log.error('Cannot load course index template');
+            log.error(error);
+        }
     }
 }
 

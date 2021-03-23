@@ -127,7 +127,7 @@ const Reactive = class {
     addMutations(manager) {
         for (const mutation in manager) {
             if (manager.hasOwnProperty(mutation)) {
-                this.mutations[mutation] = manager[mutation];
+                this.mutations[mutation] = manager[mutation].bind(manager);
             }
         }
     }
@@ -221,7 +221,7 @@ const Reactive = class {
     *
     * @method dispatch
     * @param {string} actionname the action name (usually the mutation name)
-    * @param {Object} data the mutation data
+    * @param {*} param any number of params the mutaiton needs.
     */
     dispatch(...args) {
         let actionname, params;
@@ -229,13 +229,8 @@ const Reactive = class {
         if (this.mutations[actionname] === undefined) {
             throw new Error(`Unkown ${actionname} mutation`);
         }
-        try {
-            const mutationfunction = this.mutations[actionname];
-            mutationfunction.apply(this.mutations, [this.statemanager, ...params]);
-        } catch (error) {
-            log.error(error);
-            throw new Error(`Exception dispatching ${actionname}`);
-        }
+        const mutationfunction = this.mutations[actionname];
+        mutationfunction.apply(this.mutations, [this.statemanager, ...params]);
     }
 };
 

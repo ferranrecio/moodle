@@ -27,13 +27,11 @@ import editor from 'core_course/editor';
 
 class Component extends ComponentBase {
 
+
     /**
-     * The class constructor.
-     *
-     * @param {reactive} reactive the reactive module
+     * Construct hook.
      */
-    constructor(reactive) {
-        super(reactive);
+    create() {
         // Optional component name.
         this.name = 'courseindex';
         // Default component css selectors.
@@ -54,8 +52,11 @@ class Component extends ComponentBase {
      * @return {Component}
      */
     static init(target, newselectors) {
-        let newcomponent = new Component(editor);
-        return newcomponent.register(target, newselectors);
+        return new Component({
+            element: document.getElementById(target),
+            reactive: editor,
+            selectors: newselectors,
+        });
     }
 
     /**
@@ -69,7 +70,6 @@ class Component extends ComponentBase {
         // look at core_course/local/cm_format module.
         return [
             {watch: 'cm:updated', handler: this.cmUpdate},
-            {watch: 'section:updated', handler: this.sectionUpdate},
         ];
     }
 
@@ -108,25 +108,6 @@ class Component extends ComponentBase {
             domelement.classList.add("locked");
         } else {
             domelement.classList.remove("locked");
-        }
-    }
-
-    /**
-     *
-     * Update the section information with the current course state.
-     *
-     * @param {object} arg
-     */
-    sectionUpdate({element}) {
-        // Get DOM element.
-        let domelement = document.querySelector(`${this.selectors.section} [data-id='${element.id}']`);
-        if (!domelement) {
-            return;
-        }
-        if (element.visible) {
-            domelement.classList.remove("dimmed");
-        } else {
-            domelement.classList.add("dimmed");
         }
     }
 

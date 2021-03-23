@@ -22,11 +22,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import defaultmutations from 'core_course/local/editor/mutations';
+import DefaultMutations from 'core_course/local/editor/mutations';
 import Reactive from 'core_course/local/editor/reactive';
 import events from 'core_course/events';
 import log from 'core/log';
 import ajax from 'core/ajax';
+import notification from 'core/notification';
 
 class Editor extends Reactive {
 
@@ -70,6 +71,24 @@ class Editor extends Reactive {
     isEditing() {
         return this.editing ?? false;
     }
+
+    /**
+    * Dispatch a change in the state.
+    *
+    * Usually reactive modules throw an error directly to the components when something
+    * goes wrong. However, course editor can directly display a notification.
+    *
+    * @method dispatch
+    * @param {string} actionname the action name (usually the mutation name)
+    * @param {*} param any number of params the mutaiton needs.
+    */
+    dispatch(...args) {
+        try {
+            super.dispatch(...args);
+        } catch (error) {
+            notification.exception(error);
+        }
+    }
 }
 
 export default new Editor({
@@ -77,7 +96,7 @@ export default new Editor({
     eventname: events.statechanged,
     eventdispatch: dispatchStateChangedEvent,
     // Mutations can be overridden by the format plugin but we need the default one at least.
-    mutations: defaultmutations,
+    mutations: new DefaultMutations(),
 });
 
 /**

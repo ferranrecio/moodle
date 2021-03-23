@@ -26,61 +26,45 @@ class Component {
 
     /**
      * The class constructor.
-     * @param {reactive} reactive the reactive module to register the component and execute mutations
-     */
-    constructor(reactive) {
-        // Optional component name.
-        this.reactive = reactive;
-        // Empty default component selectors.
-        this.selectors = {};
-    }
-
-    /**
-     * Initialize the component.
      *
-     * @param {element|string} target the component DOM root element or its ID
-     * @param {object} newselectors optional selectors overrides
-     * @returns {Component}
+     * The only param this method gets is a constructor with all the mandatory
+     * and optional component data. Component will receive the same descriptor
+     * as create method param.
+     *
+     * The main descriptor attributes are:
+     * - reactive {reactive}: this is mandatory reactive module to register
+     * - element {DOMelement}: all components needs an element to anchor events
+     * - (optional) selectors {object}: an optional object to override query selectors
+     *
+     * @param {object} descriptor data to create the object.
      */
-    register(target, newselectors) {
+    constructor(descriptor) {
 
-        if (target === undefined) {
+        if (descriptor.element === undefined || !(descriptor.element instanceof HTMLElement)) {
             throw Error(`Reactive components needs a main DOM element to dispatch events`);
         }
 
-        // Save DOM element.
-        this.setElement(target);
-
-        // Overwrite the components selectors if necessary.
-        if (newselectors !== undefined) {
-            this.addSelectors(newselectors);
+        if (descriptor.reactive === undefined) {
+            throw Error(`Reactive components needs a reactive module to work with`);
         }
 
-        // Call create function.
-        this.create();
+        this.reactive = descriptor.reactive;
+
+        this.element = descriptor.element;
+
+        // Empty default component selectors.
+        this.selectors = {};
+
+        // Call create function to get the component defaults.
+        this.create(descriptor);
+
+        // Overwrite the components selectors if necessary.
+        if (descriptor.selectors !== undefined) {
+            this.addSelectors(descriptor.selectors);
+        }
 
         // Register the component.
         this.reactive.registerComponent(this);
-
-        return this;
-    }
-
-    /**
-     * Update the current component target.
-     *
-     * @param {element|string} target the component DOM root element or its ID
-     */
-    setElement(target) {
-        // The target can be a string selector if it is called from a mustache file
-        // or a HTML element in case the component is created directly from JS.
-        if (typeof target === 'string') {
-            this.element = document.getElementById(target);
-            if (!this.element) {
-                throw Error(`Element ${target} not found in page`);
-            }
-        } else {
-            this.element = target;
-        }
     }
 
     /**
@@ -110,9 +94,36 @@ class Component {
      *
      * Default init method will call create when all internal attributes but
      * the component is not yet registered in the reactive module.
+     *
+     * This method is mainly for any component to define its own defaults such as:
+     * - this.selectors {object} the default query selectors of this component.
+     * - this.events {object} a list of event names this component dispatch
+     * - extract any data form the main dom element (this.element)
+     * - any other data this component uses
+     *
+     * @param {object} descriptor the component descriptor
      */
-    create() {
+    create(descriptor) {
         // Components can override this method.
+        this.events = descriptor.events ?? {};
+    }
+
+    /**
+     * Dispatch a custom event form this.element
+     *
+     * This is just a quick way to dispatch custom events from within a component.
+     * Components are free to use an alternative function to dispatch custom
+     * events. The only restriction is that it should be dispatched on this.element
+     * and specify "bubbles:true" to alert component listeners.
+     *
+     * @param {string} eventname the event name
+     * @param {*} detail event detail data
+     */
+    dispatchEvent(eventname, detail) {
+        this.element.dispatchEvent(new CustomEvent(eventname, {
+            bubbles: true,
+            detail: detail,
+        }));
     }
 
     /**

@@ -25,18 +25,16 @@
 import log from 'core/log';
 import ajax from 'core/ajax';
 
-const mutations = {};
-
-/**
- * Call core_course_edit webservice.
- *
- * @method callEditWebservice
- * @param {string} action
- * @param {int} courseid
- * @param {array} ids
- */
-mutations.callEditWebservice = async(action, courseid, ids) => {
-    try {
+class Mutations {
+    /**
+     * Call core_course_edit webservice.
+     *
+     * @method callEditWebservice
+     * @param {string} action
+     * @param {int} courseid
+     * @param {array} ids
+     */
+    async callEditWebservice(action, courseid, ids) {
         let ajaxresult = await ajax.call([{
             methodname: 'core_course_edit',
             args: {
@@ -46,93 +44,84 @@ mutations.callEditWebservice = async(action, courseid, ids) => {
             }
         }])[0];
         return JSON.parse(ajaxresult);
-    } catch (error) {
-        log.error('ERROR IN WS');
-        log.error(error);
-        throw Error(`Error calling core_course_edit on ${action} action`);
     }
-};
 
-/**
- * Set the locked value to all elements in a list.
- *
- * @method setLocked
- * @param {StateManager} statemanager the state element
- * @param {Map} data the state element
- * @param {array} ids
- * @param {bool} newvalue
- */
-mutations.setLocked = async(statemanager, data, ids, newvalue) => {
-    // Before doing any manual change to the state we need to unlock it.
-    // That is the reason why mutations uses the full statemanager instead that
-    // just the state as the components.
-    statemanager.setLocked(false);
-    ids.forEach((id) => {
-        if (data.has(id)) {
-            data.get(id).locked = newvalue;
-        }
-    });
-    // Lock again the state to prevent illegal writes.
-    statemanager.setLocked(true);
-};
+    /**
+     * Set the locked value to all elements in a list.
+     *
+     * @method setLocked
+     * @param {StateManager} statemanager the state element
+     * @param {Map} data the state element
+     * @param {array} ids
+     * @param {bool} newvalue
+     */
+    setLocked(statemanager, data, ids, newvalue) {
+        // Before doing any manual change to the state we need to unlock it.
+        // That is the reason why mutations uses the full statemanager instead that
+        // just the state as the components.
+        statemanager.setLocked(false);
+        ids.forEach((id) => {
+            if (data.has(id)) {
+                data.get(id).locked = newvalue;
+            }
+        });
+        // Lock again the state to prevent illegal writes.
+        statemanager.setLocked(true);
+    }
 
-/**
-* Hide an activity.
-*
-* @method cm_hide
-* @param {StateManager} statemanager the current state
-* @param {array} cmids the list of cm ids to hide
-*/
-mutations.cmHide = async(statemanager, cmids) => {
-    let state = statemanager.state;
-    // Filter cm ids that are already hidden or inexistent.
-    const ids = cmids.filter((id) => {
-        if (!state.cm.has(id)) {
-            log.error(`Course module with ID ${id} does not exists`);
-        }
-        return state.cm.get(id).visible;
-    });
+    /**
+    * Hide an activity.
+    *
+    * @method cm_hide
+    * @param {StateManager} statemanager the current state
+    * @param {array} cmids the list of cm ids to hide
+    */
+    async cmHide(statemanager, cmids) {
+        let state = statemanager.state;
+        // Filter cm ids that are already hidden or inexistent.
+        const ids = cmids.filter((id) => {
+            if (!state.cm.has(id)) {
+                log.error(`Course module with ID ${id} does not exists`);
+            }
+            return state.cm.get(id).visible;
+        });
 
-    mutations.setLocked(statemanager, state.cm, ids, true);
+        this.setLocked(statemanager, state.cm, ids, true);
 
-    try {
-        let updates = await mutations.callEditWebservice('cm_hide', state.course.id, ids);
+        let updates = await this.callEditWebservice('cm_hide', state.course.id, ids);
         statemanager.processUpdates(updates);
-    } catch (error) {
-        // TODO: notify error.
+
+        this.setLocked(statemanager, state.cm, ids, false);
     }
 
-    mutations.setLocked(statemanager, state.cm, ids, false);
+    /**
+    * Show an activity.
+    *
+    * @method cm_show
+    * @param {StateManager} statemanager the current state
+    * @param {array} cmids the list of cm ids to hide
+    */
+    async cmShow(statemanager, cmids) {
+        let state = statemanager.state;
+        // Filter cm ids that are already visible or inexistent.
+        const ids = cmids.filter((id) => {
+            if (state.cm.get(id) === undefined) {
+                log.error(`Course module with ID ${id} does not exists`);
+            }
+            return !state.cm.get(id).visible;
+        });
 
-};
+        this.setLocked(statemanager, state.cm, ids, true);
 
-/**
-* Show an activity.
-*
-* @method cm_show
-* @param {StateManager} statemanager the current state
-* @param {array} cmids the list of cm ids to hide
-*/
-mutations.cmShow = async(statemanager, cmids) => {
-    let state = statemanager.state;
-    // Filter cm ids that are already visible or inexistent.
-    const ids = cmids.filter((id) => {
-        if (state.cm.get(id) === undefined) {
-            log.error(`Course module with ID ${id} does not exists`);
+        try {
+            let updates = await this.callEditWebservice('cm_show', state.course.id, ids);
+            statemanager.processUpdates(updates);
+        } catch (error) {
+            // TODO: notify error.
         }
-        return !state.cm.get(id).visible;
-    });
 
-    mutations.setLocked(statemanager, state.cm, ids, true);
-
-    try {
-        let updates = await mutations.callEditWebservice('cm_show', state.course.id, ids);
-        statemanager.processUpdates(updates);
-    } catch (error) {
-        // TODO: notify error.
+        this.setLocked(statemanager, state.cm, ids, false);
     }
+}
 
-    mutations.setLocked(statemanager, state.cm, ids, false);
-};
-
-export default mutations;
+export default Mutations;
