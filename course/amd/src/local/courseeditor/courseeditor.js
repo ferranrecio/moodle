@@ -85,7 +85,7 @@ export default class CourseEditor extends Reactive {
     *
     * @method dispatch
     * @param {string} actionname the action name (usually the mutation name)
-    * @param {*} param any number of params the mutaiton needs.
+    * @param {*} param any number of params the mutation needs.
     */
     dispatch(...args) {
         try {
