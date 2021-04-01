@@ -14,18 +14,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Contain the events the course component can trigger.
+ * Default mutation manager
  *
- * @module     core_course/events
+ * @module     core_course/local/courseeditor/mutations
  * @package    core_course
- * @copyright  2018 Simey Lameze <simey@moodle.com>
+ * @copyright  2021 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define([], function() {
-    return {
-        favourited: 'core_course:favourited',
-        unfavorited: 'core_course:unfavorited',
-        // This file needs to be transformed into the new events.js proposed in MDL-70990.
-        statechanged: 'core_course:statechanged',
-    };
-});
+
+export default class Mutations {
+
+    // All course editor mutations for Moodle 4.0 will be located in this file.
+
+}
