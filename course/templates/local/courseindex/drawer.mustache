@@ -1,0 +1,148 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template core_course/local/courseindex/drawer
+
+    This template renders the course index drawer with the placeholder.
+
+    The code from this file is just an stub as the final code will come from
+    the new layouts for Moodle 4.0.
+
+    Example context (json):
+    {
+        courseid: 23,
+    }
+}}
+<style>
+    /* Of course, the final version won't have this kind of embed css. */
+    [data-action="show-drawerleft"] {
+        position: fixed;
+        top: 190px;
+        left: 100px;
+        transform: rotate(-90deg);
+        transform-origin: top left;
+        white-space: nowrap;
+        transition: left 0.5s ease,right 0.5s ease,top 0.5s ease,bottom 0.5s ease;
+        border-radius: 0 0 0 20px;
+        z-index: 999;
+    }
+
+    [data-action="show-drawerleft"].show {
+        left: 0px;
+    }
+
+    body.scrolled [data-action="show-drawerleft"] {
+        top: 90px;
+    }
+    body.scrolled [data-action="show-drawerleft"]:hover {
+        top: 190px;
+    }
+
+    .drawer.drawer-left.show {
+        left: 0px;
+    }
+
+    .drawer.drawer-left {
+        width: 350px;
+        max-width: 300px;
+        z-index: 1041;
+        transition: left 0.5s ease,right 0.5s ease,top 0.5s ease,bottom 0.5s ease;
+        background-color: #fff;
+        position: fixed;
+        height: 100vh;
+        top: 0;
+        left: -360px;
+    }
+
+    /* Drawer Header */
+
+    .drawerheader {
+        padding: 0 .75rem;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .drawerheader .drawertoggle {
+        margin-left: auto;
+    }
+
+    /* Big X to close */
+
+    .iconcross {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .iconcross>i {
+        display: block;
+        height: 2rem;
+        width: 2px;
+        margin-left: 12px;
+        background-color: #212529;
+        transform: rotate(45deg);
+        z-index: 1;
+    }
+
+    .iconcross>i>i {
+    display: block;
+    height: 2rem;
+    width: 2px;
+    background-color: #212529;
+    transform: rotate(90deg);
+    z-index: 2;
+}
+</style>
+<button class="btn btn-secondary show" data-action="show-drawerleft" aria-controls="courseindex-drawer" aria-expanded="false">
+    {{#pix}} i/menubars, moodle {{/pix}}
+    <span class="show-drawer-text">Course index</span>
+</button>
+<div id="courseindex-drawer" class="drawer drawer-left" data-region="drawerleft">
+    <div class="drawerheader">
+        Title!
+        <button class="btn drawertoggle icon-no-margin icon-size-4" data-action="closedrawer">
+            <div class="iconcross"><i><i></i></i></div>
+        </button>
+    </div>
+    <div class="p-2">
+        {{> core_course/local/courseindex/placeholders }}
+    </div>
+</div>
+{{#js}}
+// This JS is temporal while theme_boost/drawer is being refactored.
+require([], function() {
+    const openbutton = document.querySelector("[data-action='show-drawerleft']");
+    const drawer = document.querySelector("[data-region='drawerleft']");
+    // Drawer open button.
+    openbutton.addEventListener(
+        'click',
+        (event) => {
+            drawer.classList.toggle("show");
+            openbutton.classList.toggle("show");
+        }
+    );
+    // Drawer close button.
+    document.querySelector("[data-action='closedrawer']").addEventListener(
+        'click',
+        (event) => {
+            openbutton.classList.toggle("show");
+            drawer.classList.toggle("show");
+        }
+    );
+});
+{{/js}}

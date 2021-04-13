@@ -13,6 +13,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+import ajax from 'core/ajax';
+import log from 'core/log';
+
 /**
  * Default mutation manager
  *
@@ -26,4 +29,97 @@ export default class Mutations {
 
     // All course editor mutations for Moodle 4.0 will be located in this file.
 
+    /**
+     * Private method to call core_course_edit webservice.
+     *
+     * @method _callEditWebservice
+     * @param {string} action
+     * @param {int} courseid
+     * @param {array} ids
+     */
+    async _callEditWebservice(action, courseid, ids) {
+        let ajaxresult = await ajax.call([{
+            methodname: 'core_course_edit',
+            args: {
+                action,
+                courseid,
+                ids,
+            }
+        }])[0];
+        return JSON.parse(ajaxresult);
+    }
+
+    /**
+    * Get updated state data related to some cm ids.
+    *
+    * @param {StateManager} statemanager the current state
+    * @param {array} cmids the list of cm ids to update
+    */
+    async cmState(statemanager, cmids) {
+        log.debug('cmState');
+        const state = statemanager.state;
+        const updates = await this._callEditWebservice('cm_state', state.course.id, cmids);
+        statemanager.setReadOnly(false);
+        this._processUpdates(statemanager, updates);
+    }
+
+    /**
+    * Get updated state data related to some section numbers.
+    *
+    * @param {StateManager} statemanager the current state
+    * @param {array} sectionnums the list of section numbers to update
+    */
+    async sectionState(statemanager, sectionnums) {
+        log.debug('sectionState');
+        const state = statemanager.state;
+        const updates = await this._callEditWebservice('section_state', state.course.id, sectionnums);
+        this._processUpdates(statemanager, updates);
+    }
+
+    /**
+    * Get the full updated state data of the course.
+    *
+    * @param {StateManager} statemanager the current state
+    */
+    async courseState(statemanager) {
+        log.debug('courseState');
+        const state = statemanager.state;
+        const updates = await this._callEditWebservice('course_state', state.course.id);
+        this._processUpdates(statemanager, updates);
+    }
+
+    /**
+     * Helper to propcess both section_state and cm_state action results.
+     *
+     * @param {StateManager} statemanager the current state
+     * @param {Array} updates of updates.
+     */
+    _processUpdates(statemanager, updates) {
+
+        const state = statemanager.state;
+
+        statemanager.setReadOnly(false);
+
+        // The cm_state and section_state state action returns only updated states. However, most of the time we need this
+        // mutation to fix discrepancies between the course content and the course state because core_course_edit_module
+        // does not provide enough information to rebuild some state objects. This is the reason why we cannot use
+        // the batch method processUpdates as the rest of mutations do.
+        updates.forEach((update) => {
+            if (update.name === undefined) {
+                throw Error('Missing state update name');
+            }
+            // Compare the action with the current state.
+            let current = state[update.name];
+            if (current instanceof Map) {
+                current = state[update.name].get(update.fields.id);
+            }
+            if (!current) {
+                update.action = 'create';
+            }
+
+            statemanager.processUpdate(update.name, update.action, update.fields);
+        });
+
+        statemanager.setReadOnly(true);
+    }
 }

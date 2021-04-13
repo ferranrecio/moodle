@@ -74,6 +74,9 @@ class state implements renderable {
             'id' => $cm->id,
             'name' => $cm->name,
             'visible' => !empty($cm->visible),
+            'url' => $cm->url->out(),
+            'sectionid' => $section->id,
+            'sectionnumber' => $section->section,
         ];
 
         if ($this->exportcontent) {

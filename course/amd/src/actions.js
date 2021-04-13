@@ -23,8 +23,8 @@
  * @since      3.3
  */
 define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str', 'core/url', 'core/yui',
-        'core/modal_factory', 'core/modal_events', 'core/key_codes', 'core/log'],
-    function($, ajax, templates, notification, str, url, Y, ModalFactory, ModalEvents, KeyCodes, log) {
+        'core/modal_factory', 'core/modal_events', 'core/key_codes', 'core/log', 'core_course/courseeditor'],
+    function($, ajax, templates, notification, str, url, Y, ModalFactory, ModalEvents, KeyCodes, log, courseeditor) {
         var CSS = {
             EDITINPROGRESS: 'editinprogress',
             SECTIONDRAGGABLE: 'sectiondraggable',
@@ -210,6 +210,36 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
         };
 
         /**
+         * Compatibility function to update Moodle 4.0 course state using legacy actions.
+         *
+         * This method only updates some actions which does not require to use cmState mutation
+         * to get updated data form the server.
+         *
+         * @param {Object} state the current state in read write mode
+         * @param {String} action the performed action
+         * @param {Number} cmid the affected course module id
+         */
+        let updateCmState = function(state, action, cmid) {
+
+            const cm = state.cm.get(cmid);
+            if (cm === undefined) {
+                return;
+            }
+
+            switch (action) {
+                case 'delete':
+                    state.cm.delete(cmid);
+                    break;
+
+                case 'hide':
+                case 'show':
+                    cm.visible = (action === 'show') ? true : false;
+                    break;
+
+            }
+        };
+
+        /**
          * Performs an action on a module (moving, deleting, duplicating, hiding, etc.)
          *
          * @param {JQuery} moduleElement activity element we perform action on
@@ -235,6 +265,7 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
                 .done(function(data) {
                     var elementToFocus = findNextFocusable(moduleElement);
                     moduleElement.replaceWith(data);
+                    let affectedids = [];
                     // Initialise action menu for activity(ies) added as a result of this.
                     $('<div>' + data + '</div>').find(SELECTOR.ACTIVITYLI).each(function(index) {
                         initActionMenu($(this).attr('id'));
@@ -242,6 +273,8 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
                             focusActionItem($(this).attr('id'), action);
                             elementToFocus = null;
                         }
+                        // Save any activity id in cmids.
+                        affectedids.push(getModuleId($(this)));
                     });
                     // In case of activity deletion focus the next focusable element.
                     if (elementToFocus) {
@@ -252,6 +285,17 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
                     removeLightbox(lightbox, 400);
                     // Trigger event that can be observed by course formats.
                     moduleElement.trigger($.Event('coursemoduleedited', {ajaxreturn: data, action: action}));
+
+                    // Modify cm state.
+                    if (action == 'duplicate') {
+                        // Duplicate requires to get extra data from the server.
+                        log.debug('dup');
+                        log.debug(affectedids);
+                    } else {
+                        courseeditor.dispatch('actionsLegacyUpdateState', (state) => {
+                            updateCmState(state, action, cmid, affectedids);
+                        });
+                    }
                 }).fail(function(ex) {
                     // Remove spinner and lightbox.
                     removeSpinner(moduleElement, spinner);
@@ -378,8 +422,9 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
          * @param {JQuery} actionItem
          * @param {Object} data
          * @param {String} courseformat
+         * @param {Number} sectionid
          */
-        var defaultEditSectionHandler = function(sectionElement, actionItem, data, courseformat) {
+        var defaultEditSectionHandler = function(sectionElement, actionItem, data, courseformat, sectionid) {
             var action = actionItem.attr('data-action');
             if (action === 'hide' || action === 'show') {
                 if (action === 'hide') {
@@ -401,6 +446,13 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
                 if (data.section_availability !== undefined) {
                     sectionElement.find('.section_availability').first().replaceWith(data.section_availability);
                 }
+                // Modify course state.
+                courseeditor.dispatch('actionsLegacyUpdateState', (state) => {
+                    let section = state.section.get(sectionid);
+                    if (section !== undefined) {
+                        section.visible = (action === 'show') ? true : false;
+                    }
+                });
             } else if (action === 'setmarker') {
                 var oldmarker = $(SELECTOR.SECTIONLI + '.current'),
                     oldActionItem = oldmarker.find(SELECTOR.SECTIONACTIONMENU + ' ' + 'a[data-action=removemarker]');
@@ -461,7 +513,7 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
                     var e = $.Event('coursesectionedited', {ajaxreturn: data, action: action});
                     sectionElement.trigger(e);
                     if (!e.isDefaultPrevented()) {
-                        defaultEditSectionHandler(sectionElement, target, data, courseformat);
+                        defaultEditSectionHandler(sectionElement, target, data, courseformat, sectionid);
                     }
                 }).fail(function(ex) {
                     // Remove spinner and lightbox.
@@ -490,6 +542,27 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
                     }
                 }
             });
+        });
+
+        // From Moodle 4.0 all edit actions are being re-implemented as state mutation. This means all method from this
+        // "actions" module will be deprecated when all the course interface is migrated to reactive components. Meanwhile,
+        // we need a legacy mutation to allow the current action interact with the centralized course state.
+        courseeditor.addMutations({
+            /**
+             * Execute a random change in the current course state.
+             *
+             * Important note: this mutation is created only for legacy purposes. It should not be used to execute actions
+             * outsite this module. It will be deleted when this module is replaced by standard mutations.
+             *
+             * @param {*} statemanager the course state manager object
+             * @param {*} callback a callback to executen on the current state
+             */
+            actionsLegacyUpdateState: function(statemanager, callback) {
+                log.debug('actionsLegacyUpdateState');
+                statemanager.setReadOnly(false);
+                callback(statemanager.state);
+                statemanager.setReadOnly(true);
+            }
         });
 
         return /** @alias module:core_course/actions */ {

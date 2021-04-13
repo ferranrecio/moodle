@@ -164,6 +164,26 @@ abstract class format_section_renderer_base extends core_course_renderer {
     }
 
     /**
+     * Get the course index drawer with placeholder.
+     *
+     * The default course index is loaded aftet the page is ready. Format plugins can override
+     * this method to provide an alternative course index.
+     *
+     * If the format is not compatible with the course index, this method will return null.
+     *
+     * @param course_format $format the course format
+     * @return String|null the course index HTML.
+     */
+    public function course_index_drawer(course_format $format): ?String {
+        if ($format->uses_course_index()) {
+            $course = $format->get_course();
+            $this->page->requires->js_call_amd('core_course/courseeditor', 'init', [$course->id]);
+            return $this->render_from_template('core_course/local/courseindex/drawer', []);
+        }
+        return null;
+    }
+
+    /**
      * Generate the edit control action menu
      *
      * @deprecated since 4.0 - use core_course output components instead.

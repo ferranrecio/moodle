@@ -371,6 +371,18 @@ abstract class course_format {
     }
 
     /**
+     * Returns true if this course format uses course index
+     *
+     * This function may be called without specifying the course id
+     * i.e. in course_format_uses_sections()
+     *
+     * @return bool
+     */
+    public function uses_course_index() {
+        return true;
+    }
+
+    /**
      * Returns a list of sections used in the course
      *
      * This is a shortcut to get_fast_modinfo()->get_section_info_all()

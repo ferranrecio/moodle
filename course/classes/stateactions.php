@@ -216,13 +216,163 @@ class stateactions {
     }
 
     /**
+     * Return the updated version of any cm and section related to the ids.
+     *
+     * This action is mainly used by legacy actions to partially update the course state when the
+     * result of core_course_edit_module is not enough to generate the correct state data.
+     *
+     * @param stateupdates $updates the affected course elements track
+     * @param stdClass $course the course object
+     * @param int[] $ids the list of affected course module ids
+     * @param int $targetsectionid optional target section id
+     * @param int $targetcmid optional target cm id
+     */
+    public function cm_state(
+        stateupdates $updates,
+        stdClass $course,
+        array $ids,
+        ?int $targetsectionid = null,
+        ?int $targetcmid = null
+    ): void {
+
+        $validationresult = $this->validate_cms($course, $ids);
+        if (!empty($validationresult)) {
+            $action = debug_backtrace()[1]['function'];
+            throw new \moodle_exception($validationresult, 'core', null, $action);
+        }
+
+        $modinfo = course_modinfo::instance($course);
+
+        // Collect all section and cm to return.
+        $cmids = [];
+        foreach ($ids as $cmid) {
+            $cmids[$cmid] = true;
+        }
+        if ($targetcmid) {
+            $cmids[$targetcmid] = true;
+        }
+
+        $sectionids = [];
+        if ($targetsectionid) {
+            $sectionids[$targetsectionid] = true;
+        }
+
+        foreach ($cmids as $cmid => $notused) {
+
+            // Add this action to updates array.
+            $updates->add_cm_update($cmid);
+
+            $cm = $modinfo->get_cm($cmid);
+            $sectionids[$cm->sectionnum] = true;
+        }
+
+        foreach ($sectionids as $sectionnum => $notused) {
+            $sectioninfo = $modinfo->get_section_info($sectionnum);
+            $updates->add_section_update($sectioninfo->section);
+        }
+    }
+
+    /**
+     * Return the updated version of any cm and section related to the ids.
+     *
+     * This action is mainly used by legacy actions to partially update the course state when the
+     * result of core_course_edit_module is not enough to generate the correct state data.
+     *
+     * @param stateupdates $updates the affected course elements track
+     * @param stdClass $course the course object
+     * @param int[] $ids the list of affected course module ids
+     * @param int $targetsectionid optional target section id
+     * @param int $targetcmid optional target cm id
+     */
+    public function section_state(
+        stateupdates $updates,
+        stdClass $course,
+        array $ids,
+        ?int $targetsectionid = null,
+        ?int $targetcmid = null
+    ): void {
+
+        $validationresult = $this->validate_sections($course, $ids, true);
+        if (!empty($validationresult) && $validationresult != 'sectionactionnotsupportedforzerosection') {
+            $action = debug_backtrace()[1]['function'];
+            throw new \moodle_exception($validationresult, 'core', null, $action);
+        }
+
+        $modinfo = course_modinfo::instance($course);
+
+        $cmids = [];
+        if ($targetcmid) {
+            $cmids[$targetcmid] = true;
+        }
+
+        $sectionids = [];
+        foreach ($ids as $sectionnum) {
+            $sectionids[$sectionnum] = true;
+        }
+        if ($targetsectionid) {
+            $sectionids[$targetsectionid] = true;
+        }
+
+        foreach ($sectionids as $sectionnum => $notused) {
+            $sectioninfo = $modinfo->get_section_info($sectionnum);
+            $updates->add_section_update($sectioninfo->section);
+            // Add cms.
+            if (empty($modinfo->sections[$sectionnum])) {
+                continue;
+            }
+
+            foreach ($modinfo->sections[$sectionnum] as $modnumber) {
+                $mod = $modinfo->cms[$modnumber];
+                if ($mod->is_visible_on_course_page()) {
+                    $cmids[$mod->id] = true;
+                }
+            }
+        }
+
+        foreach ($cmids as $cmid => $notused) {
+            // Add this action to updates array.
+            $updates->add_cm_update($cmid);
+        }
+    }
+
+    /**
+     * Return the complete state updates.
+     *
+     * This action is mainly used by legacy actions to partially update the course state when the
+     * result of core_course_edit_module is not enough to generate the correct state data.
+     *
+     * @param stateupdates $updates the affected course elements track
+     * @param stdClass $course the course object
+     * @param int[] $ids the list of affected course module ids
+     * @param int $targetsectionid optional target section id
+     * @param int $targetcmid optional target cm id
+     */
+    public function course_state(
+        stateupdates $updates,
+        stdClass $course,
+        array $ids,
+        ?int $targetsectionid = null,
+        ?int $targetcmid = null
+    ): void {
+
+        $modinfo = course_modinfo::instance($course);
+
+        $updates->add_course_update();
+
+        // Add sections updates.
+        $sections = $modinfo->get_section_info_all();
+        $this->section_state($updates, $course, array_keys($sections));
+    }
+
+    /**
      * Checks related to sections: course format support them, all given sections exist and topic 0 is not included.
      *
      * @param stdClass $course The course where given $sectionnums belong.
      * @param array $sectionnums List of sections to validate.
+     * @param bool $allowsectionzero if the action can be done on section zero
      * @return string A string containing the reason for not accepting sections as valid; null if they all are considered valid.
      */
-    protected function validate_sections(stdClass $course, array $sectionnums): ?string {
+    protected function validate_sections(stdClass $course, array $sectionnums, bool $allowsectionzero = false): ?string {
         global $DB;
 
         // No section actions are allowed if course format does not support sections.
@@ -232,7 +382,7 @@ class stateactions {
         }
 
         // No section actions are allowed on the 0-section by default (overwrite in course format if needed).
-        if (in_array(0, $sectionnums)) {
+        if (!$allowsectionzero && in_array(0, $sectionnums)) {
             return 'sectionactionnotsupportedforzerosection';
         }
 

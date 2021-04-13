@@ -3829,6 +3829,24 @@ function core_course_core_calendar_get_valid_event_timestart_range(\calendar_eve
 }
 
 /**
+ * Render the message drawer to be included in the top of the body of each page.
+ *
+ * @return string HTML
+ */
+function core_course_standard_after_main_region_html(): string {
+    global $PAGE;
+    // Only course and mod pages are able to render course index.
+    if (!preg_match('/^(mod|course).*/', $PAGE->pagetype)) {
+        return '';
+    }
+
+    $format = course_get_format($PAGE->course);
+    $renderer = $format->get_renderer($PAGE);
+    $placeholder = $renderer->course_index_drawer($format);
+    return $placeholder;
+}
+
+/**
  * Returns course modules tagged with a specified tag ready for output on tag/index.php page
  *
  * This is a callback used by the tag area core/course_modules to search for course modules
