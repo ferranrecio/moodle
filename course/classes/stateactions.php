@@ -293,7 +293,7 @@ class stateactions {
     ): void {
 
         $validationresult = $this->validate_sections($course, $ids, true);
-        if (!empty($validationresult) && $validationresult != 'sectionactionnotsupportedforzerosection') {
+        if (!empty($validationresult)) {
             $action = debug_backtrace()[1]['function'];
             throw new \moodle_exception($validationresult, 'core', null, $action);
         }

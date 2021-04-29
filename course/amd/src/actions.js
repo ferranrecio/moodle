@@ -210,36 +210,6 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
         };
 
         /**
-         * Compatibility function to update Moodle 4.0 course state using legacy actions.
-         *
-         * This method only updates some actions which does not require to use cmState mutation
-         * to get updated data form the server.
-         *
-         * @param {Object} state the current state in read write mode
-         * @param {String} action the performed action
-         * @param {Number} cmid the affected course module id
-         */
-        let updateCmState = function(state, action, cmid) {
-
-            const cm = state.cm.get(cmid);
-            if (cm === undefined) {
-                return;
-            }
-
-            switch (action) {
-                case 'delete':
-                    state.cm.delete(cmid);
-                    break;
-
-                case 'hide':
-                case 'show':
-                    cm.visible = (action === 'show') ? true : false;
-                    break;
-
-            }
-        };
-
-        /**
          * Performs an action on a module (moving, deleting, duplicating, hiding, etc.)
          *
          * @param {JQuery} moduleElement activity element we perform action on
@@ -287,15 +257,8 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
                     moduleElement.trigger($.Event('coursemoduleedited', {ajaxreturn: data, action: action}));
 
                     // Modify cm state.
-                    if (action == 'duplicate') {
-                        // Duplicate requires to get extra data from the server.
-                        log.debug('dup');
-                        log.debug(affectedids);
-                    } else {
-                        courseeditor.dispatch('actionsLegacyUpdateState', (state) => {
-                            updateCmState(state, action, cmid, affectedids);
-                        });
-                    }
+                    courseeditor.dispatch('legacyActivityAction', action, cmid, affectedids);
+
                 }).fail(function(ex) {
                     // Remove spinner and lightbox.
                     removeSpinner(moduleElement, spinner);
@@ -447,12 +410,10 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
                     sectionElement.find('.section_availability').first().replaceWith(data.section_availability);
                 }
                 // Modify course state.
-                courseeditor.dispatch('actionsLegacyUpdateState', (state) => {
-                    let section = state.section.get(sectionid);
-                    if (section !== undefined) {
-                        section.visible = (action === 'show') ? true : false;
-                    }
-                });
+                const section = courseeditor.getState().section.get(sectionid);
+                if (section !== undefined) {
+                    courseeditor.dispatch('sectionState', [section.number]);
+                }
             } else if (action === 'setmarker') {
                 var oldmarker = $(SELECTOR.SECTIONLI + '.current'),
                     oldActionItem = oldmarker.find(SELECTOR.SECTIONACTIONMENU + ' ' + 'a[data-action=removemarker]');
@@ -462,10 +423,12 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
                 sectionElement.addClass('current');
                 replaceActionItem(actionItem, 'i/marked',
                     'highlightoff', 'core', 'removemarker');
+                courseeditor.dispatch('legacySectionAction', action, sectionid);
             } else if (action === 'removemarker') {
                 sectionElement.removeClass('current');
                 replaceActionItem(actionItem, 'i/marker',
                     'highlight', 'core', 'setmarker');
+                courseeditor.dispatch('legacySectionAction', action, sectionid);
             }
         };
 
@@ -540,29 +503,119 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
                         var sectionreturn = mainelement.find('.' + CSS.EDITINGMOVE).attr('data-sectionreturn');
                         refreshModule(mainelement, cmid, sectionreturn);
                     }
-                }
+                },
+                /**
+                 * Update the course state when some cm is moved via YUI.
+                 * @param {*} params
+                 */
+                updateMovedCmState: (params) => {
+                    const state = courseeditor.getState();
+
+                    // Update old section.
+                    const cm = state.cm.get(params.cmid);
+                    if (cm !== undefined) {
+                        courseeditor.dispatch('sectionState', [cm.sectionnumber]);
+                    }
+                    // Update cm state.
+                    courseeditor.dispatch('cmState', [params.cmid]);
+                },
+                /**
+                 * Update the course state when some section is moved via YUI.
+                 */
+                updateMovedSectionState: () => {
+                    courseeditor.dispatch('courseState');
+                },
             });
         });
 
-        // From Moodle 4.0 all edit actions are being re-implemented as state mutation. This means all method from this
-        // "actions" module will be deprecated when all the course interface is migrated to reactive components. Meanwhile,
-        // we need a legacy mutation to allow the current action interact with the centralized course state.
+        // From Moodle 4.0 all edit actions are being re-implemented as state mutation.
+        // This means all method from this "actions" module will be deprecated when all the course
+        // interface is migrated to reactive components.
+        // Most legacy actions did not provide enough information to regenarate the course so they
+        // use the mutations courseState, sectionState and cmState to get the updated state from
+        // the server. However, some activity actions where we can prevent an extra webservice
+        // call by implementing an adhoc mutation.
         courseeditor.addMutations({
             /**
-             * Execute a random change in the current course state.
+             * Compatibility function to update Moodle 4.0 course state using legacy actions.
              *
-             * Important note: this mutation is created only for legacy purposes. It should not be used to execute actions
-             * outsite this module. It will be deleted when this module is replaced by standard mutations.
+             * This method only updates some actions which does not require to use cmState mutation
+             * to get updated data form the server.
              *
-             * @param {*} statemanager the course state manager object
-             * @param {*} callback a callback to executen on the current state
+             * @param {Object} statemanager the current state in read write mode
+             * @param {String} action the performed action
+             * @param {Number} cmid the affected course module id
+             * @param {Array} affectedids all affected cm ids (for duplicate action)
              */
-            actionsLegacyUpdateState: function(statemanager, callback) {
-                log.debug('actionsLegacyUpdateState');
+            legacyActivityAction: function(statemanager, action, cmid, affectedids) {
+
+                const state = statemanager.state;
+                const cm = state.cm.get(cmid);
+                if (cm === undefined) {
+                    return;
+                }
+                const section = state.section.get(cm.sectionid);
+                if (section === undefined) {
+                    return;
+                }
+
                 statemanager.setReadOnly(false);
-                callback(statemanager.state);
+
+                switch (action) {
+                    case 'delete':
+                        // Remove from section.
+                        section.cmlist = section.cmlist.reduce(
+                            (cmlist, current) => {
+                                if (current != cmid) {
+                                    cmlist.push(current);
+                                }
+                                return cmlist;
+                            },
+                            []
+                        );
+                        // Delete form list.
+                        state.cm.delete(cmid);
+                        break;
+
+                    case 'hide':
+                    case 'show':
+                        cm.visible = (action === 'show') ? true : false;
+                        break;
+
+                    case 'duplicate':
+                        // Duplicate requires to get extra data from the server.
+                        courseeditor.dispatch('cmState', affectedids);
+                        break;
+                }
                 statemanager.setReadOnly(true);
-            }
+            },
+            legacySectionAction: function(statemanager, action, sectionid) {
+
+                const state = statemanager.state;
+                const section = state.section.get(sectionid);
+                if (section === undefined) {
+                    return;
+                }
+
+                statemanager.setReadOnly(false);
+
+                switch (action) {
+                    case 'setmarker':
+                        // Remove previous marker.
+                        state.section.forEach((current) => {
+                            if (current.id != sectionid) {
+                                current.current = false;
+                            }
+                        });
+                        section.current = true;
+                        break;
+
+                    case 'removemarker':
+                        section.current = false;
+                        break;
+                }
+                statemanager.setReadOnly(true);
+            },
         });
 
         return /** @alias module:core_course/actions */ {
@@ -633,6 +686,23 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
                         });
                     } else {
                         editSection(sectionElement, sectionId, actionItem, courseformat);
+                    }
+                });
+
+                // The section and activity names are edited using inplace editable.
+                // The "update" jQuery event must be captured in order to update the course state.
+                $('body').on('updated', `${SELECTOR.SECTIONLI} [data-inplaceeditable]`, function(e) {
+                    if (e.ajaxreturn && e.ajaxreturn.itemid) {
+                        const state = courseeditor.getState();
+                        const section = state.section.get(e.ajaxreturn.itemid);
+                        if (section !== undefined) {
+                            courseeditor.dispatch('sectionState', [section.number]);
+                        }
+                    }
+                });
+                $('body').on('updated', `${SELECTOR.ACTIVITYLI} [data-inplaceeditable]`, function(e) {
+                    if (e.ajaxreturn && e.ajaxreturn.itemid) {
+                        courseeditor.dispatch('cmState', [e.ajaxreturn.itemid]);
                     }
                 });
 
