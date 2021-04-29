@@ -39,6 +39,12 @@ export default class CourseEditor extends Reactive {
     */
     async init(courseid) {
 
+        if (this.courseid) {
+            return;
+        }
+
+        this.courseid = courseid;
+
         try {
             // Async load the initial state.
             const jsonstate = await ajax.call([{

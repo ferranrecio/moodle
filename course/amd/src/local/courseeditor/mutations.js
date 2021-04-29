@@ -14,7 +14,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 import ajax from 'core/ajax';
-import log from 'core/log';
 
 /**
  * Default mutation manager
@@ -24,7 +23,6 @@ import log from 'core/log';
  * @copyright  2021 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 export default class Mutations {
 
     // All course editor mutations for Moodle 4.0 will be located in this file.
@@ -56,7 +54,6 @@ export default class Mutations {
     * @param {array} cmids the list of cm ids to update
     */
     async cmState(statemanager, cmids) {
-        log.debug('cmState');
         const state = statemanager.state;
         const updates = await this._callEditWebservice('cm_state', state.course.id, cmids);
         statemanager.setReadOnly(false);
@@ -70,7 +67,6 @@ export default class Mutations {
     * @param {array} sectionnums the list of section numbers to update
     */
     async sectionState(statemanager, sectionnums) {
-        log.debug('sectionState');
         const state = statemanager.state;
         const updates = await this._callEditWebservice('section_state', state.course.id, sectionnums);
         this._processUpdates(statemanager, updates);
@@ -82,7 +78,6 @@ export default class Mutations {
     * @param {StateManager} statemanager the current state
     */
     async courseState(statemanager) {
-        log.debug('courseState');
         const state = statemanager.state;
         const updates = await this._callEditWebservice('course_state', state.course.id);
         this._processUpdates(statemanager, updates);
