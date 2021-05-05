@@ -48,17 +48,33 @@ class stateactions_test extends \advanced_testcase {
      * @param bool $expectedvisibility The expected visibility after running the given action.
      * @param string|null $expectedexception If this call will raise an exception, this is its name.
      */
-    public function test_set_section_visibility(string $method, array $sectionnums, string $format, string $role,
-            array $expectedsections, array $expectedcms, bool $expectedvisibility, ?string $expectedexception = null): void {
+    public function test_set_section_visibility(
+        string $method,
+        array $sectionnums,
+        string $format,
+        string $role,
+        array $expectedsections,
+        array $expectedcms,
+        bool $expectedvisibility,
+        ?string $expectedexception = null
+    ): void {
 
         $this->resetAfterTest();
 
         // Create a course with 4 sections, 2 of them hidden.
-        $numsections = 4;
-        $course = $this->getDataGenerator()->create_course(['numsections' => $numsections, 'format' => $format]);
+        $totalsections = 4;
+        $course = $this->getDataGenerator()->create_course(['numsections' => $totalsections, 'format' => $format]);
         $hiddensections = [2, 4];
         foreach ($hiddensections as $section) {
             set_section_visible($course->id, $section, 0);
+        }
+
+        // Load section index to translate number to ids.
+        $sectionindex = [];
+        $modinfo = get_fast_modinfo($course);
+        $allsections = $modinfo->get_section_info_all();
+        foreach ($allsections as $section) {
+            $sectionindex[$section->section] = $section->id;
         }
 
         // Create and enrol user using given role.
@@ -84,9 +100,14 @@ class stateactions_test extends \advanced_testcase {
             // Initialise stateupdates.
             $courseformat = course_get_format($course->id);
             $updates = new stateupdates($courseformat);
+            // Get section ids.
+            $sectionids = [];
+            foreach ($sectionnums as $sectionnum) {
+                $sectionids[] = $sectionindex[$sectionnum] ?? -1;
+            }
             // Execute given method.
             $actions = new stateactions();
-            $actions->$method($updates, $course, $sectionnums);
+            $actions->$method($updates, $course, $sectionids);
 
             // Check state returned after executing given action.
             $results = $updates->jsonSerialize();
@@ -161,9 +182,14 @@ class stateactions_test extends \advanced_testcase {
      * @param array $expectedcmsforhidden List of course modules changed after the call when 1 hidden section is given.
      * @return array
      */
-    private function set_section_visibility_provider_generator(string $method, bool $expectedvisibility,
-            array $expectedsectionsforvisible, array $expectedcmsforvisible, array $expectedsectionsforhidden,
-            array $expectedcmsforhidden): array {
+    private function set_section_visibility_provider_generator(
+        string $method,
+        bool $expectedvisibility,
+        array $expectedsectionsforvisible,
+        array $expectedcmsforvisible,
+        array $expectedsectionsforhidden,
+        array $expectedcmsforhidden
+    ): array {
         $defaultexpectedsections = [
             0 => [1, 3],
             1 => [2, 4],
@@ -314,8 +340,15 @@ class stateactions_test extends \advanced_testcase {
      * @param string|null $expectedexception If this call will raise an exception, this is its name.
      * @param bool $unexistingactivities Whether activities should exist or not.
      */
-    public function test_set_cm_visibility(string $method, string $format, string $role, array $expectedresults,
-            bool $expectedvisibility, ?string $expectedexception = null, bool $unexistingactivities = false): void {
+    public function test_set_cm_visibility(
+        string $method,
+        string $format,
+        string $role,
+        array $expectedresults,
+        bool $expectedvisibility,
+        ?string $expectedexception = null,
+        bool $unexistingactivities = false
+    ): void {
 
         $this->resetAfterTest();
 
@@ -494,7 +527,13 @@ class stateactions_test extends \advanced_testcase {
      * @param bool $visible Whether the activity will be visible or not.
      * @param bool $canedit Whether the activity will be accessed later by a user with editing capabilities.
      */
-    private function create_activity(int $courseid, string $type, int $section, bool $visible = true, bool $canedit = true): void {
+    private function create_activity(
+        int $courseid,
+        string $type,
+        int $section,
+        bool $visible = true,
+        bool $canedit = true
+    ): void {
         $activity = $this->getDataGenerator()->create_module($type,
             ['course' => $courseid], ['section' => $section, 'visible' => $visible]);
         list(, $activitycm) = get_course_and_cm_from_instance($activity->id, $type);

@@ -91,37 +91,50 @@ class stateupdates implements JsonSerializable {
     /**
      * Add track about a section state update.
      *
-     * @param int $sectionnum The affected section number.
+     * @param int $sectionid The affected section id.
      * @return stdClass The updated object.
      */
-    public function add_section_update(int $sectionnum): void {
-        $this->create_or_update_section($sectionnum, 'update');
+    public function add_section_update(int $sectionid): void {
+        $this->create_or_update_section($sectionid, 'update');
     }
 
     /**
      * Add track about a new section created.
      *
-     * @param int $sectionnum The affected section number.
+     * @param int $sectionid The affected section id.
      */
-    public function add_section_create(int $sectionnum): void {
-        $this->create_or_update_section($sectionnum, 'create');
+    public function add_section_create(int $sectionid): void {
+        $this->create_or_update_section($sectionid, 'create');
     }
 
     /**
      * Add track about section created or updated.
      *
-     * @param int $sectionnum The affected section number.
+     * @param int $sectionid The affected section id.
      * @param string $action The action to track for the section ('create' or 'update).
      */
-    protected function create_or_update_section(int $sectionnum, string $action): void {
+    protected function create_or_update_section(int $sectionid, string $action): void {
         if ($action != 'create' && $action != 'update') {
             throw new coding_exception(
                 "Invalid action passed ($action) to create_or_update_section. Only 'create' and 'update' are valid."
             );
         }
-        $modinfo = course_modinfo::instance($this->format->get_course());
+        $course = $this->format->get_course();
+        $modinfo = course_modinfo::instance($course);
 
-        $section = $modinfo->get_section_info($sectionnum);
+        $section = $modinfo->get_section_info_by_id($sectionid);
+
+        // Export the section if the user is permitted to access it, OR if it's not available
+        // but there is some available info text which explains the reason & should display,
+        // OR it is hidden but the course has a setting to display hidden sections as unavilable.
+        $showsection = $section->uservisible ||
+            ($section->visible && !$section->available && !empty($section->availableinfo)) ||
+            (!$section->visible && !$course->hiddensections);
+
+        if (!$showsection) {
+            return;
+        }
+
         $sectionclass = $this->format->get_output_classname('section_format\state');
         $currentstate = new $sectionclass($this->format, $section);
 
@@ -135,13 +148,13 @@ class stateupdates implements JsonSerializable {
     /**
      * Add track about a section deleted.
      *
-     * @param int $sectionnum The affected section number.
+     * @param int $sectionid The affected section id.
      */
-    public function add_section_delete(int $sectionnum): void {
+    public function add_section_delete(int $sectionid): void {
         $this->updates[] = (object)[
             'name' => 'section',
             'action' => 'delete',
-            'fields' => (object)['id' => $sectionnum],
+            'fields' => (object)['id' => $sectionid],
         ];
     }
 
@@ -153,19 +166,7 @@ class stateupdates implements JsonSerializable {
      *             the pre-rendered cmitem content
      */
     public function add_cm_update(int $cmid, bool $exportcontent = false): void {
-
-        $modinfo = course_modinfo::instance($this->format->get_course());
-
-        $cm = $modinfo->get_cm($cmid);
-        $cmclass = $this->format->get_output_classname('cm_format\state');
-        $section = $modinfo->get_section_info($cm->sectionnum);
-        $currentstate = new $cmclass($this->format, $section, $cm, $exportcontent);
-
-        $this->updates[] = (object)[
-            'name' => 'cm',
-            'action' => 'update',
-            'fields' => $currentstate->export_for_template($this->output),
-        ];
+        $this->create_or_update_cm($cmid, 'update');
     }
 
     /**
@@ -174,9 +175,35 @@ class stateupdates implements JsonSerializable {
      * @param int $cmid the affected course module id
      */
     public function add_cm_create(int $cmid): void {
-        $result = $this->add_section_update($cmid, true);
-        $result->action = 'create';
-        $this->updates[] = $result;
+        $this->create_or_update_cm($cmid, 'create', true);
+    }
+
+    /**
+     * Add track about section created or updated.
+     *
+     * @param int $cmid The affected course module id.
+     * @param string $action The action to track for the section ('create' or 'update').
+     * @param bool $exportcontent if the tracked state should contain also
+     *             the pre-rendered cmitem content
+     */
+    protected function create_or_update_cm(int $cmid, string $action, bool $exportcontent = false): void {
+        $modinfo = course_modinfo::instance($this->format->get_course());
+
+        $cm = $modinfo->get_cm($cmid);
+
+        if (!$cm->is_visible_on_course_page()) {
+            return;
+        }
+
+        $cmclass = $this->format->get_output_classname('cm_format\state');
+        $section = $modinfo->get_section_info_by_id($cm->section);
+        $currentstate = new $cmclass($this->format, $section, $cm, $exportcontent);
+
+        $this->updates[] = (object)[
+            'name' => 'cm',
+            'action' => $action,
+            'fields' => $currentstate->export_for_template($this->output),
+        ];
     }
 
     /**

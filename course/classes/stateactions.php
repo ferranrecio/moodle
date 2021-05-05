@@ -92,8 +92,8 @@ class stateactions {
         $coursecontext = context_course::instance($course->id);
         // Check permission.
         require_capability('moodle/course:sectionvisibility', $coursecontext);
-        foreach ($ids as $sectionnum) {
-            $sectioninfo = $modinfo->get_section_info($sectionnum);
+        foreach ($ids as $sectionid) {
+            $sectioninfo = $modinfo->get_section_info_by_id($sectionid);
             if ($visible == (bool)$sectioninfo->visible) {
                 // Only set visibility, trigger event and add this change to update state if it's different; otherwise, ignore it.
                 continue;
@@ -119,7 +119,7 @@ class stateactions {
             $event->trigger();
 
             // Add this action to updates array.
-            $updates->add_section_update($sectionnum);
+            $updates->add_section_update($sectioninfo->id);
 
             // If section visibility has changed, hide the modules in this section too.
             if (!empty($sectioninfo->sequence)) {
@@ -218,11 +218,16 @@ class stateactions {
     /**
      * Checks related to sections: course format support them, all given sections exist and topic 0 is not included.
      *
-     * @param stdClass $course The course where given $sectionnums belong.
-     * @param array $sectionnums List of sections to validate.
+     * @param stdClass $course The course where given $sectionids belong.
+     * @param array $sectionids List of sections to validate.
+     * @param bool $allowsectionzero if the action can be done on section zero
      * @return string A string containing the reason for not accepting sections as valid; null if they all are considered valid.
      */
-    protected function validate_sections(stdClass $course, array $sectionnums): ?string {
+    protected function validate_sections(
+            stdClass $course,
+            array $sectionids,
+            bool $allowsectionzero = false
+    ): ?string {
         global $DB;
 
         // No section actions are allowed if course format does not support sections.
@@ -231,18 +236,23 @@ class stateactions {
             return 'sectionactionnotsupported';
         }
 
+        if (empty($sectionids)) {
+            return 'emptysectionids';
+        }
+
+        list($insql, $inparams) = $DB->get_in_or_equal($sectionids, SQL_PARAMS_NAMED);
+
         // No section actions are allowed on the 0-section by default (overwrite in course format if needed).
-        if (in_array(0, $sectionnums)) {
-            return 'sectionactionnotsupportedforzerosection';
+        if (!$allowsectionzero) {
+            $exists = $DB->record_exists_select('course_sections', "id $insql AND section = 0", $inparams);
+            if ($exists) {
+                return 'sectionactionnotsupportedforzerosection';
+            }
         }
 
         // Check if all the given sections exist.
-        list($insql, $inparams) = $DB->get_in_or_equal($sectionnums, SQL_PARAMS_NAMED);
-        $sql = "SELECT cs.id
-                  FROM {course_sections} cs
-                 WHERE cs.section {$insql}";
-        $sections = $DB->get_records_sql($sql, $inparams);
-        if (count($sections) != count($sectionnums)) {
+        $couintsections = $DB->count_records_select('course_sections', "id $insql", $inparams);
+        if ($couintsections != count($sectionids)) {
             return 'unexistingsectionnumber';
         }
 
