@@ -15,6 +15,7 @@
 
 import {Reactive} from 'core/reactive';
 import notification from 'core/notification';
+import Exporter from 'core_course/local/courseeditor/exporter';
 import log from 'core/log';
 import ajax from 'core/ajax';
 
@@ -36,14 +37,19 @@ export default class CourseEditor extends Reactive {
     *
     * @method init
     * @param {int} courseid course id
+    * @param {Object} setup format, page and course settings
     */
-    async init(courseid) {
+    async init(courseid, setup) {
 
         if (this.courseid) {
             return;
         }
 
         this.courseid = courseid;
+
+        // Save setup variables needed before having the state ready.
+        this.editing = setup.editing ?? false;
+        this.supportscomponents = setup.supportscomponents ?? false;
 
         try {
             // Async load the initial state.
@@ -57,13 +63,6 @@ export default class CourseEditor extends Reactive {
             statedata.course = statedata.course ?? {};
             statedata.section = statedata.section ?? [];
             statedata.cm = statedata.cm ?? [];
-
-            // Edit mode is part of the state but it could change over time.
-            // Components should use isEditing method to check the editing mode instead.
-            this.editing = false;
-            if (statedata.course !== undefined) {
-                this.editing = statedata.course.editmode ?? false;
-            }
 
             this.setInitialState(statedata);
         } catch (error) {
@@ -81,6 +80,24 @@ export default class CourseEditor extends Reactive {
      */
     isEditing() {
         return this.editing ?? false;
+    }
+
+    /**
+     * Return a data exporter to transform state part into mustache contexts.
+     *
+     * @return {Exporter} the exporter class
+     */
+    getExporter() {
+        return new Exporter(this);
+    }
+
+    /**
+     * Return if the current course support components to refresh the content.
+     *
+     * @returns {boolean} if the current content support components
+     */
+    supportComponents() {
+        return this.supportscomponents ?? false;
     }
 
     /**

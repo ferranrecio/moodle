@@ -50,62 +50,53 @@ export default class Mutations {
     /**
     * Get updated state data related to some cm ids.
     *
-    * @method cmShow
     * @param {StateManager} statemanager the current state
     * @param {array} cmids the list of cm ids to update
     */
     async cmState(statemanager, cmids) {
-        const state = statemanager.state;
-        const updates = await this._callEditWebservice('cm_state', state.course.id, cmids);
-        statemanager.setReadOnly(false);
-        this._processUpdates(statemanager, updates);
+        const course = statemanager.get('course');
+        const updates = await this._callEditWebservice('cm_state', course.id, cmids);
+        statemanager.processUpdates(updates, {update: this._forcedUpdateAction});
     }
 
     /**
     * Get updated state data related to some section numbers.
     *
-    * @method cmShow
     * @param {StateManager} statemanager the current state
-    * @param {array} sectionnums the list of section numbers to update
+    * @param {array} sectionids the list of section ids to update
     */
-    async sectionState(statemanager, sectionnums) {
-        const state = statemanager.state;
-        const updates = await this._callEditWebservice('section_state', state.course.id, sectionnums);
-        this._processUpdates(statemanager, updates);
+    async sectionState(statemanager, sectionids) {
+        const course = statemanager.get('course');
+        const updates = await this._callEditWebservice('section_state', course.id, sectionids);
+        statemanager.processUpdates(updates, {update: this._forcedUpdateAction});
     }
 
     /**
-     * Helper to propcess both section_state and cm_state action results.
+    * Get the full updated state data of the course.
+    *
+    * @param {StateManager} statemanager the current state
+    */
+    async courseState(statemanager) {
+        const course = statemanager.get('course');
+        const updates = await this._callEditWebservice('course_state', course.id);
+        statemanager.processUpdates(updates, {update: this._forcedUpdateAction});
+    }
+
+    /**
+     * Alternative update action for processUpdates.
      *
-     * @param {StateManager} statemanager the current state
-     * @param {Array} updates of updates.
+     * This method is used in sectionState, cmState and courseState mutations to tranform
+     * update actions in creates if necessary.
+     *
+     * @param {Object} statemanager the state manager
+     * @param {String} updatename the state element to update
+     * @param {Object} fields the new data
      */
-    _processUpdates(statemanager, updates) {
-
-        const state = statemanager.state;
-
-        statemanager.setReadOnly(false);
-
-        // The cm_state and section_state state action returns only updated states. However, most of the time we need this
-        // mutation to fix discrepancies between the course content and the course state because core_course_edit_module
-        // does not provide enough information to rebuild some state objects. This is the reason why we cannot use
-        // the batch method processUpdates as the rest of mutations do.
-        updates.forEach((update) => {
-            if (update.name === undefined) {
-                throw Error('Missing state update name');
-            }
-            // Compare the action with the current state.
-            let current = state[update.name];
-            if (current instanceof Map) {
-                current = state[update.name].get(update.fields.id);
-            }
-            if (!current) {
-                update.action = 'create';
-            }
-
-            statemanager.processUpdate(update.name, update.action, update.fields);
-        });
-
-        statemanager.setReadOnly(true);
+    _forcedUpdateAction(statemanager, updatename, fields) {
+        if (statemanager.get(updatename, fields.id)) {
+            statemanager.defaultUpdate(statemanager, updatename, fields);
+        } else {
+            statemanager.defaultCreate(statemanager, updatename, fields);
+        }
     }
 }
