@@ -45,6 +45,10 @@ class format_weeks extends core_course\course_format {
         return true;
     }
 
+    public function uses_course_index() {
+        return true;
+    }
+
     /**
      * Generate the title for this section page
      * @return string the page title
@@ -154,6 +158,10 @@ class format_weeks extends core_course\course_format {
         $ajaxsupport = new stdClass();
         $ajaxsupport->capable = true;
         return $ajaxsupport;
+    }
+
+    public function supports_components() {
+        return true;
     }
 
     /**
