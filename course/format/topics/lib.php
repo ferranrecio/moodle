@@ -46,6 +46,10 @@ class format_topics extends core_course\course_format {
         return true;
     }
 
+    public function uses_course_index() {
+        return true;
+    }
+
     /**
      * Returns the display name of the given section that the course prefers.
      *
@@ -153,6 +157,10 @@ class format_topics extends core_course\course_format {
         $ajaxsupport = new stdClass();
         $ajaxsupport->capable = true;
         return $ajaxsupport;
+    }
+
+    public function supports_components() {
+        return true;
     }
 
     /**
