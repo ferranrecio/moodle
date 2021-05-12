@@ -15,6 +15,7 @@
 
 import {Reactive} from 'core/reactive';
 import notification from 'core/notification';
+import Exporter from 'core_course/local/courseeditor/exporter';
 import log from 'core/log';
 import ajax from 'core/ajax';
 
@@ -32,18 +33,23 @@ import ajax from 'core/ajax';
 export default class extends Reactive {
 
     /**
-     * Set up the course editor when the page is ready.
-     *
-     * @method init
-     * @param {int} courseId course id
-     */
-    async init(courseId) {
+    * Set up the course editor when the page is ready.
+    *
+    * @method init
+    * @param {int} courseId course id
+    * @param {Object} setup format, page and course settings
+    */
+    async init(courseId, setup) {
 
         if (this.courseId) {
             return;
         }
 
         this.courseId = courseId;
+
+        // Save setup variables needed before having the state ready.
+        this._editing = setup.editing ?? false;
+        this._supportscomponents = setup.supportscomponents ?? false;
 
         let stateData;
 
@@ -54,10 +60,6 @@ export default class extends Reactive {
             log.error(error);
             return;
         }
-
-        // Edit mode is part of the state but it could change over time.
-        // Components should use isEditing method to check the editing mode instead.
-        this._editing = stateData.course.editmode ?? false;
 
         this.setInitialState(stateData);
     }
@@ -97,15 +99,33 @@ export default class extends Reactive {
     }
 
     /**
-     * Dispatch a change in the state.
+     * Return a data exporter to transform state part into mustache contexts.
      *
-     * Usually reactive modules throw an error directly to the components when something
-     * goes wrong. However, course editor can directly display a notification.
-     *
-     * @method dispatch
-     * @param {string} actionName the action name (usually the mutation name)
-     * @param {*} param any number of params the mutation needs.
+     * @return {Exporter} the exporter class
      */
+    getExporter() {
+        return new Exporter(this);
+    }
+
+    /**
+     * Return if the current course support components to refresh the content.
+     *
+     * @returns {boolean} if the current content support components
+     */
+    get supportComponents() {
+        return this._supportscomponents ?? false;
+    }
+
+    /**
+    * Dispatch a change in the state.
+    *
+    * Usually reactive modules throw an error directly to the components when something
+    * goes wrong. However, course editor can directly display a notification.
+    *
+    * @method dispatch
+    * @param {string} actionname the action name (usually the mutation name)
+    * @param {*} param any number of params the mutation needs.
+    */
     async dispatch(...args) {
         try {
             await super.dispatch(...args);

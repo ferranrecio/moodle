@@ -121,7 +121,7 @@ class course_get_state_test extends \externallib_advanced_testcase {
 
         // Check sections information.
         foreach ($result->section as $section) {
-            if (in_array($section->section, $hiddensections)) {
+            if (in_array($section->number, $hiddensections)) {
                 $this->assertFalse($section->visible);
             } else {
                 $this->assertTrue($section->visible);
@@ -129,8 +129,8 @@ class course_get_state_test extends \externallib_advanced_testcase {
             // Check section is defined in course->sectionlist.
             $this->assertContains($section->id, $result->course->sectionlist);
             // Check course modules list for this section is the expected.
-            if (array_key_exists($section->section, $this->sections)) {
-                $this->assertEquals($this->sections[$section->section], $section->cmlist);
+            if (array_key_exists($section->number, $this->sections)) {
+                $this->assertEquals($this->sections[$section->number], $section->cmlist);
             }
         }
         // Check course modules information.
