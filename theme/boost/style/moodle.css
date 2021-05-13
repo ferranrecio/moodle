@@ -11914,6 +11914,25 @@ input[disabled] {
 .core_payment_gateways_modal .custom-control-label::after {
   top: 45%; }
 
+body.dragging .drop-zone {
+  border: 2px dashed #212529; }
+
+body.dragging .drop-up {
+  border-top: 2px solid #212529; }
+
+body.dragging .drop-down {
+  border-bottom: 2px solid #212529; }
+
+body.dragging .dragging {
+  opacity: .6; }
+
+.dragicon {
+  visibility: hidden; }
+
+.draggable:hover .dragicon {
+  visibility: visible;
+  cursor: move; }
+
 .icon {
   font-size: 16px;
   width: 16px;
@@ -19999,6 +20018,10 @@ div.editor_atto_toolbar button .icon {
 
 .courseindex .courseindex-section.current {
   border-left: solid 3px #0f6fc5; }
+
+.courseindex .courseindex-section.dropready .courseindex-item-content {
+  /* Extra dropzone space */
+  padding-bottom: 1em; }
 
 .courseindex .d-flex-noedit {
   display: none; }

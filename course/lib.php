@@ -3213,7 +3213,8 @@ function include_course_ajax($course, $usedmodules = array(), $enabledmodules = 
     global $CFG, $PAGE, $SITE;
 
     // Initi the course editor module to support UI components.
-    include_course_editor(course_get_format($course));
+    $format = course_get_format($course);
+    include_course_editor($format);
 
     // Ensure that ajax should be included
     if (!course_ajax_enabled($course)) {
@@ -3239,7 +3240,7 @@ function include_course_ajax($course, $usedmodules = array(), $enabledmodules = 
         $config->pageparams = array();
     }
 
-    // Include course dragdrop
+    // Component based formats don't use YUI drag and drop anymore.
     if (course_format_uses_sections($course->format)) {
         $PAGE->requires->yui_module('moodle-course-dragdrop', 'M.course.init_section_dragdrop',
             array(array(
