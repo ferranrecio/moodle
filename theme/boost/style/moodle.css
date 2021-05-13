@@ -19797,11 +19797,34 @@ div.editor_atto_toolbar button .icon {
 .courseindex .courseindex-section.current {
   border-left: solid 3px yellow; }
 
+.courseindex .courseindex-section.dropready .courseindex-item-content {
+  /* Extra dropzone space */
+  padding-bottom: 1em; }
+
 .courseindex .d-flex-noedit {
   display: none; }
 
 .courseindex.editing .d-flex-noedit {
   display: flex; }
+
+.courseindex .drop-zone {
+  border: 2px dashed #212529; }
+
+.courseindex .drop-up {
+  border-top: 2px solid #212529; }
+
+.courseindex .drop-down {
+  border-bottom: 2px solid #212529; }
+
+.courseindex .dragging {
+  opacity: .6; }
+
+.courseindex .dragicon {
+  visibility: hidden; }
+
+.courseindex .draggable:hover .dragicon {
+  visibility: visible;
+  cursor: move; }
 
 body {
   -webkit-font-smoothing: antialiased;

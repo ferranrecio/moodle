@@ -14,11 +14,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Course index cm component.
+ * Course index section component.
  *
- * This component is used to control specific course modules interactions like drag and drop.
+ * This component is used to control specific course section interactions like drag and drop.
  *
- * @module     core_course/local/courseindex/courseindex
+ * @module     core_course/local/courseindex/section
  * @package    core_course
  * @copyright  2020 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,6 +26,7 @@
 
 import {BaseComponent, DragDrop} from 'core/reactive';
 import courseeditor from 'core_course/courseeditor';
+import SectionTitle from 'core_course/local/courseindex/sectiontitle';
 
 export default class Component extends BaseComponent {
 
@@ -34,14 +35,11 @@ export default class Component extends BaseComponent {
      */
     create() {
         // Optional component name for debugging.
-        this.name = 'courseindex_cm';
+        this.name = 'courseindex_section';
         // Default query selectors.
         this.selectors = {
-            DROPZONE: `[data-for='cm_over_dropzone']`,
-        };
-        // Default classes to toggle on refresh.
-        this.classes = {
-            HIDDEN: 'd-none',
+            SECTION_ITEM: `[data-for='section_item']`,
+            CM_LAST: `[data-for="cm"]:last-child`,
         };
         // We need our id to watch specific events.
         this.id = this.element.dataset.id;
@@ -64,41 +62,29 @@ export default class Component extends BaseComponent {
 
     /**
      * Initial state ready method.
+     *
+     * @param {Object} state the initial state
      */
-    stateReady() {
-        this.dropzone = this.getElement(this.selectors.DROPZONE);
+    stateReady(state) {
+
+        this.section = state.section.get(this.id);
+        this.course = state.course;
 
         // Drag and drop is only available for components compatible course formats.
         if (this.reactive.isEditing() && this.reactive.supportComponents()) {
-            // Init element drag and drop.
+            // Init the inner dragable element.
+            this.titleitem = new SectionTitle({
+                ...this,
+                element: this.getElement(this.selectors.SECTION_ITEM),
+            });
+            // Init the dropzone.
             this.dragdrop = new DragDrop(this);
             // Save dropzone classes.
             this.classes = this.dragdrop.getClasses();
         }
     }
 
-    /**
-     * Component watchers.
-     *
-     * @returns {Array} of watchers
-     */
-    getWatchers() {
-        return [
-            {watch: `cm[${this.id}]:deleted`, handler: this.remove},
-        ];
-    }
-
     // Drag and drop methods.
-
-    /**
-     * Get the draggable data of this component.
-     *
-     * @returns {Object} exported course module drop data
-     */
-    getDraggableData() {
-        const exporter = this.reactive.getExporter();
-        return exporter.cmDraggableData(this.reactive.getState(), this.id);
-    }
 
     /**
      * Validate if the drop data can be dropped over the component.
@@ -107,7 +93,16 @@ export default class Component extends BaseComponent {
      * @returns {boolean}
      */
     validateDropData(dropdata) {
-        return dropdata?.type === 'cm';
+        // We accept any course module.
+        if (dropdata?.type === 'cm') {
+            return true;
+        }
+        // We accept any section bu the section 0 or ourself
+        if (dropdata?.type === 'section') {
+            const sectionzeroid = this.course.sectionlist[0];
+            return dropdata?.id != this.id && dropdata?.id != sectionzeroid && this.id != sectionzeroid;
+        }
+        return false;
     }
 
     /**
@@ -116,10 +111,18 @@ export default class Component extends BaseComponent {
      * @param {Object} dropdata the accepted drop data
      */
     showDropZone(dropdata) {
-        // If we are the next cmid of the dragged element we accept the drop because otherwise it
-        // will get captured by the section. However, we won't trigger any mutation.
-        if (dropdata.nextcmid != this.id) {
-            this.element.classList.add(this.classes.DROPUP);
+        if (dropdata.type == 'cm') {
+            this.getElement(this.selectors.CM_LAST)?.classList.add(this.classes.DROPDOWN);
+        }
+        if (dropdata.type == 'section') {
+            // The relative move of section depends on the section number.
+            if (this.section.number > dropdata.number) {
+                this.element.classList.remove(this.classes.DROPUP);
+                this.element.classList.add(this.classes.DROPDOWN);
+            } else {
+                this.element.classList.add(this.classes.DROPUP);
+                this.element.classList.remove(this.classes.DROPDOWN);
+            }
         }
     }
 
@@ -127,7 +130,9 @@ export default class Component extends BaseComponent {
      * Hide the component dropzone.
      */
     hideDropZone() {
+        this.getElement(this.selectors.CM_LAST)?.classList.remove(this.classes.DROPDOWN);
         this.element.classList.remove(this.classes.DROPUP);
+        this.element.classList.remove(this.classes.DROPDOWN);
     }
 
     /**
@@ -136,9 +141,13 @@ export default class Component extends BaseComponent {
      * @param {Object} dropdata the accepted drop data
      */
     drop(dropdata) {
-        // Call the move mutation if necessary.
-        if (dropdata.id != this.id && dropdata.nextcmid != this.id) {
-            this.reactive.dispatch('cmMove', [dropdata.id], null, this.id);
+        // Call the move mutation.
+        if (dropdata.type == 'cm') {
+            this.reactive.dispatch('cmMove', [dropdata.id], this.id);
+        }
+        if (dropdata.type == 'section') {
+            this.reactive.dispatch('sectionMove', [dropdata.id], this.id);
         }
     }
+
 }

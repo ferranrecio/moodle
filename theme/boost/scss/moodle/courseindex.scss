@@ -1,5 +1,6 @@
 $courseindex-link-color: $list-group-action-color !default;
 $courseindex-link-hover-color: $list-group-action-hover-color !default;
+$courseindex-dropzone-border: $gray-900 !default;
 $courseindex-item-hover-bg: theme-color-level('info', -11) !default;
 $courseindex-item-hover-border: theme-color-level('info', -9) !default;
 $courseindex-item-active-border: $gray-300 !default;
@@ -55,8 +56,15 @@ $courseindex-item-radius: $border-radius !default;
         }
     }
 
-    .courseindex-section.current {
-        border-left: solid 3px yellow;
+    .courseindex-section {
+        &.current {
+            border-left: solid 3px yellow;
+        }
+
+        &.dropready .courseindex-item-content {
+            /* Extra dropzone space */
+            padding-bottom: 1em;
+        }
     }
 
     .d-flex-noedit {
@@ -67,5 +75,30 @@ $courseindex-item-radius: $border-radius !default;
         .d-flex-noedit {
             display: flex;
         }
+    }
+
+    .drop-zone {
+        border: 2px dashed $courseindex-dropzone-border;
+    }
+
+    .drop-up {
+        border-top: 2px solid $courseindex-dropzone-border;
+    }
+
+    .drop-down {
+        border-bottom: 2px solid $courseindex-dropzone-border;
+    }
+
+    .dragging {
+        opacity: .6;
+    }
+
+    .dragicon {
+        visibility: hidden;
+    }
+
+    .draggable:hover .dragicon {
+        visibility: visible;
+        cursor: move;
     }
 }
