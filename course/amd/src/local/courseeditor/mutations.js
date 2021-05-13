@@ -34,26 +34,74 @@ export default class {
      * @param {string} action
      * @param {int} courseId
      * @param {array} ids
+     * @param {int} targetSectionId optional target section id (for moving actions)
+     * @param {int} targetCmId optional target cm id (for moving actions)
      */
-    async _callEditWebservice(action, courseId, ids) {
+    async _callEditWebservice(action, courseId, ids, targetSectionId, targetCmId) {
+        const args = {
+            action,
+            courseid: courseId,
+            ids,
+        };
+        if (targetSectionId) {
+            args.targetsectionid = targetSectionId;
+        }
+        if (targetCmId) {
+            args.targetcmid = targetCmId;
+        }
         let ajaxresult = await ajax.call([{
             methodname: 'core_course_edit',
-            args: {
-                action,
-                courseid: courseId,
-                ids,
-            }
+            args,
         }])[0];
         return JSON.parse(ajaxresult);
     }
 
     /**
-     * Get updated state data related to some cm ids.
+     * Move course modules to specific course location.
      *
-     * @method cmState
-     * @param {StateManager} stateManager the current state
-     * @param {array} cmids the list of cm ids to update
+     * Note that one of targetSectionId or targetCmId should be provided in order to identify the
+     * new location:
+     *  - targetCmId: the activities will be located avobe the target cm. The targetSectionId
+     *                value will be ignored in this case.
+     *  - targetSectionId: the activities will be appended to the section. In this case
+     *                     targetSectionId should not be present.
+     *
+     * @param {StateManager} stateManager the current state manager
+     * @param {array} cmids the list of cm ids to move
+     * @param {int} targetSectionId the target section id
+     * @param {int} targetCmId the target course module id
      */
+    async cmMove(stateManager, cmids, targetSectionId, targetCmId) {
+        if (!targetSectionId && !targetCmId) {
+            throw new Error(`Mutation cmMove requires targetSectionId or targetCmId`);
+        }
+        const course = stateManager.get('course');
+        const updates = await this._callEditWebservice('cm_move', course.id, cmids, targetSectionId, targetCmId);
+        stateManager.processUpdates(updates);
+    }
+
+    /**
+     * Move course modules to specific course location.
+     *
+     * @param {StateManager} stateManager the current state manager
+     * @param {array} sectionIds the list of section ids to move
+     * @param {int} targetSectionId the target section id
+     */
+    async sectionMove(stateManager, sectionIds, targetSectionId) {
+        if (!targetSectionId) {
+            throw new Error(`Mutation sectionMove requires targetSectionId`);
+        }
+        const course = stateManager.get('course');
+        const updates = await this._callEditWebservice('section_move', course.id, sectionIds, targetSectionId);
+        stateManager.processUpdates(updates);
+    }
+
+    /**
+    * Get updated state data related to some cm ids.
+    *
+    * @param {StateManager} stateManager the current state
+    * @param {array} cmids the list of cm ids to update
+    */
     async cmState(stateManager, cmids) {
         const course = stateManager.get('course');
         const updates = await this._callEditWebservice('cm_state', course.id, cmids);
