@@ -14,35 +14,40 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Course index cm component.
+ * Course index section component.
  *
- * This component is used to control specific course modules interactions like drag and drop.
+ * This component is used to control specific course section interactions like drag and drop.
  *
- * @module     core_course/local/courseindex/courseindex
+ * @module     core_course/local/courseindex/section
  * @package    core_course
  * @copyright  2020 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// import {BaseComponent, DragDrop} from 'core/reactive';
 import courseeditor from 'core_course/courseeditor';
-import DndCmItem from 'core_course/local/courseeditor/dndcmitem';
+import SectionTitle from 'core_course/local/courseindex/sectiontitle';
+import DndSection from 'core_course/local/courseeditor/dndsection';
 
-export default class Component extends DndCmItem {
+export default class Component extends DndSection {
 
     /**
      * Constructor hook.
      */
     create() {
         // Optional component name for debugging.
-        this.name = 'courseindex_cm';
-        // We need our id to watch specific events.
-        this.id = this.element.dataset.id;
+        this.name = 'courseindex_section';
+        // Default query selectors.
+        this.selectors = {
+            SECTION_ITEM: `[data-for='section_item']`,
+            CM_LAST: `[data-for="cm"]:last-child`,
+        };
     }
 
     /**
      * Static method to create a component instance form the mustahce template.
      *
-     * @param {element|string} target the DOM main element or its ID
+     * @param {string} target the DOM main element or its ID
      * @param {object} selectors optional css selector overrides
      * @return {Component}
      */
@@ -56,19 +61,29 @@ export default class Component extends DndCmItem {
 
     /**
      * Initial state ready method.
+     *
+     * @param {Object} state the initial state
      */
-    stateReady() {
-        this.configDragDrop(this.id);
+    stateReady(state) {
+        this.configState(state);
+        // Drag and drop is only available for components compatible course formats.
+        if (this.reactive.isEditing() && this.reactive.supportComponents()) {
+            // Init the inner dragable element passing the full section as affected region.
+            const titleitem = new SectionTitle({
+                ...this,
+                element: this.getElement(this.selectors.SECTION_ITEM),
+                fullregion: this.element,
+            });
+            this.configDragDrop(titleitem);
+        }
     }
 
     /**
-     * Component watchers.
+     * Get the last CM element of that section.
      *
-     * @returns {Array} of watchers
+     * @returns {element|null}
      */
-    getWatchers() {
-        return [
-            {watch: `cm[${this.id}]:deleted`, handler: this.remove},
-        ];
+    getLastCm() {
+        return this.getElement(this.selectors.CM_LAST);
     }
 }

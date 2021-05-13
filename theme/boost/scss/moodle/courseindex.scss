@@ -55,8 +55,15 @@ $courseindex-item-radius: $border-radius !default;
         }
     }
 
-    .courseindex-section.current {
-        border-left: solid 3px yellow;
+    .courseindex-section {
+        &.current {
+            border-left: solid 3px yellow;
+        }
+
+        &.dropready .courseindex-item-content {
+            /* Extra dropzone space */
+            padding-bottom: 1em;
+        }
     }
 
     .d-flex-noedit {
