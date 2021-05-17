@@ -56,22 +56,20 @@
 {{#showmovehere}}
 <p>{{movingstr}} (<a href="{{{cancelcopyurl}}}">{{#str}} cancel {{/str}}</a>)</p>
 {{/showmovehere}}
-{{#hascms}}
-    <ul class="section img-text">
-    {{#cms}}
-        {{#showmovehere}}
-            <li class="movehere">
-                <a href="{{{moveurl}}}" title="{{strmovefull}}" class="movehere"></a>
-            </li>
-        {{/showmovehere}}
-        {{#cmitem}}
-            {{> core_course/local/section_format/cmitem}}
-        {{/cmitem}}
-    {{/cms}}
+<ul class="section img-text {{#hascms}} d-something {{/hascms}}" data-for="cmlist">
+{{#cms}}
     {{#showmovehere}}
-    <li class="movehere">
-        <a href="{{{movetosectionurl}}}" title="{{strmovefull}}" class="movehere"></a>
-    </li>
+        <li class="movehere">
+            <a href="{{{moveurl}}}" title="{{strmovefull}}" class="movehere"></a>
+        </li>
     {{/showmovehere}}
-    </ul>
-{{/hascms}}
+    {{#cmitem}}
+        {{> core_course/local/section_format/cmitem}}
+    {{/cmitem}}
+{{/cms}}
+{{#showmovehere}}
+<li class="movehere">
+    <a href="{{{movetosectionurl}}}" title="{{strmovefull}}" class="movehere"></a>
+</li>
+{{/showmovehere}}
+</ul>
