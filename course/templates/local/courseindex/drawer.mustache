@@ -66,6 +66,11 @@
         left: -360px;
     }
 
+    .drawercontent {
+        overflow: auto;
+        max-height: calc(100% - 60px);
+    }
+
     /* Drawer Header */
 
     .drawerheader {
@@ -117,7 +122,7 @@
             <div class="iconcross"><i><i></i></i></div>
         </button>
     </div>
-    <div class="p-2" id="courseindex-content">
+    <div class="p-2 drawercontent" id="courseindex-content">
         {{> core_course/local/courseindex/placeholders }}
     </div>
 </div>

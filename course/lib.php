@@ -3221,27 +3221,28 @@ function include_course_ajax($course, $usedmodules = array(), $enabledmodules = 
         return false;
     }
 
-    if (!$config) {
-        $config = new stdClass();
-    }
-
-    // The URL to use for resource changes
-    if (!isset($config->resourceurl)) {
-        $config->resourceurl = '/course/rest.php';
-    }
-
-    // The URL to use for section changes
-    if (!isset($config->sectionurl)) {
-        $config->sectionurl = '/course/rest.php';
-    }
-
-    // Any additional parameters which need to be included on page submission
-    if (!isset($config->pageparams)) {
-        $config->pageparams = array();
-    }
-
     // Component based formats don't use YUI drag and drop anymore.
-    if (course_format_uses_sections($course->format)) {
+    if (!$format->supports_components() && course_format_uses_sections($course->format)) {
+
+        if (!$config) {
+            $config = new stdClass();
+        }
+
+        // The URL to use for resource changes
+        if (!isset($config->resourceurl)) {
+            $config->resourceurl = '/course/rest.php';
+        }
+
+        // The URL to use for section changes
+        if (!isset($config->sectionurl)) {
+            $config->sectionurl = '/course/rest.php';
+        }
+
+        // Any additional parameters which need to be included on page submission
+        if (!isset($config->pageparams)) {
+            $config->pageparams = array();
+        }
+
         $PAGE->requires->yui_module('moodle-course-dragdrop', 'M.course.init_section_dragdrop',
             array(array(
                 'courseid' => $course->id,
