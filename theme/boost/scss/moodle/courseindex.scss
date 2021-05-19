@@ -1,6 +1,6 @@
 $courseindex-link-color: $list-group-action-color !default;
 $courseindex-link-hover-color: $list-group-action-hover-color !default;
-$courseindex-dropzone-border: $gray-900 !default;
+$courseindex-dropzone-border: $dropzone-border !default;
 $courseindex-item-hover-bg: theme-color-level('info', -11) !default;
 $courseindex-item-hover-border: theme-color-level('info', -9) !default;
 $courseindex-item-active-border: $gray-300 !default;
@@ -87,18 +87,5 @@ $courseindex-item-radius: $border-radius !default;
 
     .drop-down {
         border-bottom: 2px solid $courseindex-dropzone-border;
-    }
-
-    .dragging {
-        opacity: .6;
-    }
-
-    .dragicon {
-        visibility: hidden;
-    }
-
-    .draggable:hover .dragicon {
-        visibility: visible;
-        cursor: move;
     }
 }

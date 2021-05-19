@@ -25,6 +25,10 @@
 import {BaseComponent} from 'core/reactive';
 import courseeditor from 'core_course/courseeditor';
 import inplaceeditable from 'core/inplace_editable';
+import SectionFormat from 'core_course/local/section_format';
+import CmItem from 'core_course/local/section_format/cmitem';
+import courseactions from 'core_course/actions';
+import log from 'core/log';
 
 export default class Component extends BaseComponent {
 
@@ -46,6 +50,9 @@ export default class Component extends BaseComponent {
         // Array to save dettached elements during element resorting.
         this.dettachedcms = {};
         this.dettachedsections = {};
+        // Index of sections and cms components.
+        this.sections = {};
+        this.cms = {};
     }
 
     /**
@@ -64,6 +71,19 @@ export default class Component extends BaseComponent {
     }
 
     /**
+     * Initial state ready method.
+     *
+     * Course content elements could not provide JS Components because the elements HTML is applied
+     * directly from the course actions. To keep internal components updated this module keeps
+     * a list of the active components and mark them as "indexed". This way when any action replace
+     * the HTML this component will recreate the components an add any necessary event listener.
+     *
+     */
+    stateReady() {
+        this._indexContents();
+    }
+
+    /**
      * Return the component watchers.
      *
      * @returns {Array} of watchers
@@ -75,6 +95,11 @@ export default class Component extends BaseComponent {
             {watch: `transaction:start`, handler: this._startProcessing},
             {watch: `course.sectionlist:updated`, handler: this._refreshCourseSectionlist},
             {watch: `section.cmlist:updated`, handler: this._refreshSectionCmlist},
+            // Reindex sections and cms.
+            {watch: `state:updated`, handler: this._indexContents},
+            // State changes thaty require to reload course modules.
+            {watch: `cm.visible:updated`, handler: this._reloadCm},
+            {watch: `cm.sectionid:updated`, handler: this._reloadCm},
         ];
     }
 
@@ -160,6 +185,59 @@ export default class Component extends BaseComponent {
         const listparent = this.getElement(this.selectors.COURSE_SECTIONLIST);
         if (listparent) {
             this._fixOrder(listparent, sectionlist, this.selectors.SECTION, this.dettachedsections);
+        }
+    }
+
+    _indexContents() {
+        // Find unindexed sections.
+        this._scanIndex(
+            this.selectors.SECTION,
+            this.sections,
+            (item) => {
+                return new SectionFormat(item);
+            }
+        );
+
+        // Find unindexed cms.
+        this._scanIndex(
+            this.selectors.CM,
+            this.cms,
+            (item) => {
+                return new CmItem(item);
+            }
+        );
+    }
+
+    _scanIndex(selector, index, creationhandler) {
+        const items = this.getElements(`${selector}:not([data-indexed])`);
+        items.forEach((item) => {
+            if (!item?.dataset?.id) {
+                return;
+            }
+            // Delete previous item component.
+            if (index[item.dataset.id] !== undefined) {
+                index[item.dataset.id].unregister();
+            }
+            // Create the new component.
+            index[item.dataset.id] = creationhandler({
+                ...this,
+                element: item,
+            });
+            // Mark as indexed.
+            item.dataset.indexed = true;
+        });
+    }
+
+    _reloadCm({element}) {
+        log.debug(`Refreshign ${element.id}`);
+        const cmitem = this.getElement(this.selectors.CM, element.id);
+        if (cmitem) {
+            const promise = courseactions.refreshModule(cmitem, element.id);
+            promise.then(() => {
+                log.debug(`Reindex`);
+                this._indexContents();
+                return;
+            }).catch();
         }
     }
 

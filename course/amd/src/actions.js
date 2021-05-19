@@ -277,11 +277,13 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
          *
          * Used after d&d of the module to another section
          *
-         * @param {JQuery} activityElement
+         * @param {JQuery|Element} element
          * @param {Number} cmid
          * @param {Number} sectionreturn
+         * @return {Promise} the ajax call promise
          */
-        var refreshModule = function(activityElement, cmid, sectionreturn) {
+        var refreshModule = function(element, cmid, sectionreturn) {
+            const activityElement = $(element);
             var spinner = addActivitySpinner(activityElement);
             var promises = ajax.call([{
                 methodname: 'core_course_get_module',
@@ -295,6 +297,7 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
                 }).fail(function() {
                     removeSpinner(activityElement, spinner);
                 });
+            return promises[0];
         };
 
         /**
@@ -764,6 +767,9 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
                 log.debug('replaceSectionActionItem() is deprecated and will be removed.');
                 var actionitem = sectionelement.find(SELECTOR.SECTIONACTIONMENU + ' ' + selector);
                 replaceActionItem(actionitem, image, stringname, stringcomponent, newaction);
-            }
+            },
+
+            // Method to refresh a module.
+            refreshModule,
         };
     });
