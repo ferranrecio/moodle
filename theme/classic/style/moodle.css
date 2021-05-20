@@ -14537,7 +14537,7 @@ body.drawer-ease {
 
 @media (min-width: 992px) {
   .drawer {
-    z-index: 0; } }
+    z-index: inherit; } }
 
 .drawer-md,
 .drawer-sm {
@@ -14607,6 +14607,7 @@ body.drawer-ease {
     margin-left: auto; }
 
 .drawercontent {
+  position: relative;
   height: calc(100% - 50px);
   display: flex;
   flex-direction: column;
@@ -19482,6 +19483,7 @@ div[data-flexitour="backdrop"] {
 div[data-flexitour="step-background-fader"],
 div[data-flexitour="step-background"] {
   border-radius: 0.3rem;
+  padding: 10px;
   z-index: 1041; }
 
 span[data-flexitour="container"],
@@ -19700,6 +19702,7 @@ span[data-flexitour="container"][x-placement="right"], span[data-flexitour="cont
     top: calc(50px + 1px);
     height: calc(100vh - 50px); }
   #page.drawers {
+    position: relative;
     overflow-y: auto;
     transition: 0.2s;
     height: calc(100vh - 50px);
