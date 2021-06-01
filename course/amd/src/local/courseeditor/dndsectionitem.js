@@ -100,6 +100,14 @@ export default class extends BaseComponent {
         return false;
     }
 
+    dragStart(dropdata) {
+        this.reactive.dispatch('sectionDrag', [dropdata.id], true);
+    }
+
+    dragEnd(dropdata) {
+        this.reactive.dispatch('sectionDrag', [dropdata.id], false);
+    }
+
     /**
      * Display the component dropzone.
      *

@@ -49,6 +49,10 @@ export default class Component extends BaseComponent {
             SECTIONHIDDEN: 'dimmed',
             CMHIDDEN: 'dimmed',
             SECTIONCURRENT: 'current',
+            CMLOCKED: 'editinprogress',
+            CMDRAGGING: 'dragging',
+            SECTIONLOCKED: 'editinprogress',
+            SECTIONDRAGGING: 'dragging',
         };
         // Arrays to keep cms and sections elements.
         this.sections = {};
@@ -91,8 +95,8 @@ export default class Component extends BaseComponent {
     getWatchers() {
         return [
             {watch: `section:updated`, handler: this._refreshSection},
-            {watch: `cm:updated`, handler: this._refreshCm},
             {watch: `cm:created`, handler: this._createCm},
+            {watch: `cm:updated`, handler: this._refreshCm},
             {watch: `cm:deleted`, handler: this._deleteCm},
             // Sections and cm sorting.
             {watch: `course.sectionlist:updated`, handler: this._refreshCourseSectionlist},
@@ -131,6 +135,8 @@ export default class Component extends BaseComponent {
         const sectionitem = target.querySelector(this.selectors.SECTION_ITEM);
         sectionitem.classList.toggle(this.classes.SECTIONHIDDEN, !element.visible);
         target.classList.toggle(this.classes.SECTIONCURRENT, element.current);
+        target.classList.toggle(this.classes.SECTIONLOCKED, element.locked ?? false);
+        target.classList.toggle(this.classes.SECTIONDRAGGING, element.dragging ?? false);
         // Update title.
         target.querySelector(this.selectors.SECTION_TITLE).innerHTML = element.title;
     }
@@ -148,6 +154,8 @@ export default class Component extends BaseComponent {
         }
         // Update classes.
         target.classList.toggle(this.classes.CMHIDDEN, !element.visible);
+        target.classList.toggle(this.classes.CMLOCKED, element.locked ?? false);
+        target.classList.toggle(this.classes.CMDRAGGING, element.dragging ?? false);
         target.querySelector(this.selectors.CM_NAME).innerHTML = element.name;
     }
 

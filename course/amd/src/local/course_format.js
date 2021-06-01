@@ -46,6 +46,13 @@ export default class Component extends BaseComponent {
             COURSE_SECTIONLIST: `[data-for='course_sectionlist']`,
             CM: `[data-for='cmitem']`,
         };
+        // Default classes to toggle on refresh.
+        this.classes = {
+            CMLOCKED: 'editinprogress',
+            CMDRAGGING: 'dragging',
+            SECTIONLOCKED: 'editinprogress',
+            SECTIONDRAGGING: 'dragging',
+        };
         // Array to save dettached elements during element resorting.
         this.dettachedcms = {};
         this.dettachedsections = {};
@@ -93,8 +100,6 @@ export default class Component extends BaseComponent {
             return [];
         }
         return [
-            // State changes that require to reload some course modules.
-            {watch: `cm.visible:updated`, handler: this._reloadCm},
             // Update section number and title.
             {watch: `section.number:updated`, handler: this._refreshSectionNumber},
             // Sections and cm sorting.
@@ -106,6 +111,9 @@ export default class Component extends BaseComponent {
             // State changes thaty require to reload course modules.
             {watch: `cm.visible:updated`, handler: this._reloadCm},
             {watch: `cm.sectionid:updated`, handler: this._reloadCm},
+            // Other elements updates.
+            {watch: `section:updated`, handler: this._refreshSection},
+            {watch: `cm:updated`, handler: this._refreshCm},
         ];
     }
 
@@ -122,6 +130,38 @@ export default class Component extends BaseComponent {
         if (cmitem) {
             courseactions.refreshModule(cmitem, element.id);
         }
+    }
+
+    /**
+     * Update a course index section using the state information.
+     *
+     * @param {Object} details the update details.
+     */
+    _refreshSection({element}) {
+        // Find the element.
+        const target = this.getElement(this.selectors.SECTION, element.id);
+        if (!target) {
+            return;
+        }
+        // Update some direct classes.
+        target.classList.toggle(this.classes.SECTIONLOCKED, element.locked ?? false);
+        target.classList.toggle(this.classes.SECTIONDRAGGING, element.dragging ?? false);
+    }
+
+    /**
+     * Update a course index cm using the state information.
+     *
+     * @param {Object} details the update details.
+     */
+    _refreshCm({element}) {
+        // Find the element.
+        const target = this.getElement(this.selectors.CM, element.id);
+        if (!target) {
+            return;
+        }
+        // Update classes.
+        target.classList.toggle(this.classes.CMLOCKED, element.locked ?? false);
+        target.classList.toggle(this.classes.CMDRAGGING, element.dragging ?? false);
     }
 
     /**
