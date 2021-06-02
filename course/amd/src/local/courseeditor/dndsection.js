@@ -78,6 +78,24 @@ export default class extends BaseComponent {
         return null;
     }
 
+    /**
+     * The element drop start hook.
+     *
+     * @param {Object} dropdata the dropdata
+     */
+    dragStart(dropdata) {
+        this.reactive.dispatch('sectionDrag', [dropdata.id], true);
+    }
+
+    /**
+     * The element drop end hook.
+     *
+     * @param {Object} dropdata the dropdata
+     */
+    dragEnd(dropdata) {
+        this.reactive.dispatch('sectionDrag', [dropdata.id], false);
+    }
+
     // Drag and drop methods.
 
     /**
