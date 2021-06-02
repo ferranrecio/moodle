@@ -42,6 +42,7 @@ export default class Component extends DndCmItem {
         // Default classes to toggle on refresh.
         this.classes = {
             CMHIDDEN: 'dimmed',
+            LOCKED: 'editinprogress',
         };
         // We need our id to watch specific events.
         this.id = this.element.dataset.id;
@@ -66,9 +67,7 @@ export default class Component extends DndCmItem {
      * Initial state ready method.
      */
     stateReady() {
-        const currentClasses = this.classes;
         this.configDragDrop(this.id);
-        Object.assign(this.classes, currentClasses);
     }
 
     /**
@@ -93,5 +92,7 @@ export default class Component extends DndCmItem {
         this.element.classList.toggle(this.classes.CMHIDDEN, !element.visible);
         this.getElement(this.selectors.CM_NAME).innerHTML = element.name;
         this.element.classList.toggle(this.classes.DRAGGING, element.dragging ?? false);
+        this.element.classList.toggle(this.classes.LOCKED, element.locked ?? false);
+        this.locked = element.locked;
     }
 }

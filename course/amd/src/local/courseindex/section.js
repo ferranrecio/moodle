@@ -47,6 +47,7 @@ export default class Component extends DndSection {
         this.classes = {
             SECTIONHIDDEN: 'dimmed',
             SECTIONCURRENT: 'current',
+            LOCKED: 'editinprogress',
         };
 
         // We need our id to watch specific events.
@@ -84,9 +85,7 @@ export default class Component extends DndSection {
                 fullregion: this.element,
             });
             // Init dropzone.
-            const currentClasses = this.classes;
             this.configDragDrop(titleitem);
-            Object.assign(this.classes, currentClasses);
         }
     }
 
@@ -123,5 +122,7 @@ export default class Component extends DndSection {
         this.element.classList.toggle(this.classes.DRAGGING, element.dragging ?? false);
         // Update title.
         this.getElement(this.selectors.SECTION_TITLE).innerHTML = element.title;
+        this.element.classList.toggle(this.classes.LOCKED, element.locked ?? false);
+        this.locked = element.locked;
     }
 }

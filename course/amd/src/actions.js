@@ -577,7 +577,14 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
                     return;
                 }
 
+                // Send the element is locked.
                 statemanager.setReadOnly(false);
+                cm.locked = true;
+                statemanager.setReadOnly(true);
+
+                statemanager.setReadOnly(false);
+
+                cm.locked = false;
 
                 switch (action) {
                     case 'delete':
@@ -615,7 +622,14 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
                     return;
                 }
 
+                // Send the element is locked.
                 statemanager.setReadOnly(false);
+                section.locked = true;
+                statemanager.setReadOnly(true);
+
+                statemanager.setReadOnly(false);
+
+                section.locked = false;
 
                 switch (action) {
                     case 'setmarker':
