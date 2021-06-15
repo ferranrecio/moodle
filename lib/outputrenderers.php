@@ -820,7 +820,7 @@ class core_renderer extends renderer_base {
      * @return string HTML fragment.
      */
     public function standard_footer_html() {
-        global $CFG, $SCRIPT;
+        global $CFG, $SCRIPT, $OUTPUT;
 
         $output = '';
         if (during_initial_install()) {
@@ -855,6 +855,11 @@ class core_renderer extends renderer_base {
 
         // Get links to switch device types (only shown for users not on a default device)
         $output .= $this->theme_switch_links();
+
+        // Reactive panel (TODO: replace if by config setting)
+        if (debugging(null, DEBUG_DEVELOPER) and has_capability('moodle/site:config', context_system::instance())) {
+            $output .= $OUTPUT->render_from_template('core/local/reactive/debugpanel', []);
+        }
 
         if (!empty($CFG->debugpageinfo)) {
             $output .= '<div class="performanceinfo pageinfo">' . get_string('pageinfodebugsummary', 'core_admin',
