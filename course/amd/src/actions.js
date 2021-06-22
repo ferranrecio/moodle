@@ -579,7 +579,18 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
                     return;
                 }
 
+                // Send the element is locked. Reactive events are only triggered when the state
+                // read only mode is restored. We want to notify the interface the element is
+                // locked so we need to do a quick lock and unlock operation before performing the rest
+                // of the mutation.
                 statemanager.setReadOnly(false);
+                cm.locked = true;
+                statemanager.setReadOnly(true);
+
+                // Now we do the real mutation.
+                statemanager.setReadOnly(false);
+
+                cm.locked = false;
 
                 switch (action) {
                     case 'delete':
@@ -617,7 +628,18 @@ define(['jquery', 'core/ajax', 'core/templates', 'core/notification', 'core/str'
                     return;
                 }
 
+                // Send the element is locked. Reactive events are only triggered when the state
+                // read only mode is restored. We want to notify the interface the element is
+                // locked so we need to do a quick lock and unlock operation before performing the rest
+                // of the mutation.
                 statemanager.setReadOnly(false);
+                section.locked = true;
+                statemanager.setReadOnly(true);
+
+                // Now we do the real mutation.
+                statemanager.setReadOnly(false);
+
+                section.locked = false;
 
                 switch (action) {
                     case 'setmarker':
