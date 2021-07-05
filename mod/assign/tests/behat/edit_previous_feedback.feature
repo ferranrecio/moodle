@@ -30,7 +30,7 @@ Feature: In an assignment, teachers can edit feedback for a students previous su
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student first submission |
@@ -38,7 +38,7 @@ Feature: In an assignment, teachers can edit feedback for a students previous su
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Student 2" "table_row"
     And I set the following fields to these values:
@@ -50,12 +50,12 @@ Feature: In an assignment, teachers can edit feedback for a students previous su
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I should see "I'm the teacher first feedback" in the "Feedback comments" "table_row"
     And I log out
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Student 2" "table_row"
     And I click on "View a different attempt" "link"
@@ -69,7 +69,7 @@ Feature: In an assignment, teachers can edit feedback for a students previous su
     And I log out
     Then I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I should see "I'm the teacher second feedback" in the "Feedback comments" "table_row"
     And I should see "50.00"
     And I click on ".mod-assign-history-link" "css_element"

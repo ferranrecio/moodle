@@ -53,7 +53,7 @@ Feature: A teacher can delete questions in the question bank
     And I click on "Also show old questions" "checkbox"
     And I should see "Test used question to be deleted"
     And I am on "Course 1" course homepage
-    And I follow "Test quiz"
+    And I follow "Test quiz" in the course content
     And I click on "Preview quiz now" "button"
     And I should see "Write about whatever you want"
 

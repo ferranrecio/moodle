@@ -28,7 +28,7 @@ Feature: A teacher can choose whether to provide a printer-friendly glossary ent
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test glossary name"
+    And I follow "Test glossary name" in the course content
     When I add a glossary entry with the following data:
       | Concept | Just a test concept |
       | Definition | Concept definition |
@@ -46,7 +46,7 @@ Feature: A teacher can choose whether to provide a printer-friendly glossary ent
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test glossary name"
+    And I follow "Test glossary name" in the course content
     When I add a glossary entry with the following data:
       | Concept | Just a test concept |
       | Definition | Concept definition |

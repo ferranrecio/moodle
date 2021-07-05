@@ -30,7 +30,7 @@ Feature: View activity completion information in the Workshop activity
       | Show activity completion conditions | Yes |
     And I press "Save and display"
     And I turn editing mode on
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Completion tracking | Show activity as complete when conditions are met |
@@ -45,14 +45,14 @@ Feature: View activity completion information in the Workshop activity
   Scenario: View automatic completion items as a teacher
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    When I follow "Music history"
+    When I follow "Music history" in the course content
     Then "Music history" should have the "Receive a grade" completion condition
     And "Music history" should have the "View" completion condition
 
   Scenario: View automatic completion items as a student
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And the "View" completion condition of "Music history" is displayed as "done"
     And the "Receive a grade" completion condition of "Music history" is displayed as "todo"
     # Add a submission.
@@ -71,7 +71,7 @@ Feature: View activity completion information in the Workshop activity
     # Assess the submission.
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And I assess submission "Pinch harmonics" in workshop "Music history" as:"
       | grade__idx_0            | 9 / 10      |
       | peercomment__idx_0      | Well done   |
@@ -87,7 +87,7 @@ Feature: View activity completion information in the Workshop activity
     # Confirm completion condition is updated.
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     Then the "View" completion condition of "Music history" is displayed as "done"
     And the "Receive a grade" completion condition of "Music history" is displayed as "done"
 
@@ -95,7 +95,7 @@ Feature: View activity completion information in the Workshop activity
   Scenario: Use manual completion
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "Completion tracking" to "Students can manually mark the activity as completed"
@@ -106,7 +106,7 @@ Feature: View activity completion information in the Workshop activity
     # Student view.
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     Then the manual completion button of "Music history" is displayed as "Mark as done"
     And I toggle the manual completion state of "Music history"
     And the manual completion button of "Music history" is displayed as "Done"

@@ -34,7 +34,7 @@ Feature: Lesson group override
       | lesson   | Test lesson name | Test lesson description | 1          | C1     | lesson1  |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    And I follow "Test lesson name"
+    And I follow "Test lesson name" in the course content
     And I follow "Add a question page"
     And I set the field "Select a question type" to "True/false"
     And I press "Add a question page"
@@ -53,7 +53,7 @@ Feature: Lesson group override
   Scenario: Add, modify then delete a group override
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test lesson name"
+    When I follow "Test lesson name" in the course content
     And I navigate to "Group overrides" in current page administration
     And I press "Add group override"
     And I set the following fields to these values:
@@ -78,7 +78,7 @@ Feature: Lesson group override
   Scenario: Duplicate a user override
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test lesson name"
+    When I follow "Test lesson name" in the course content
     And I navigate to "Group overrides" in current page administration
     And I press "Add group override"
     And I set the following fields to these values:
@@ -102,7 +102,7 @@ Feature: Lesson group override
   Scenario: Allow a single group to have re-take the lesson
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test lesson name"
+    When I follow "Test lesson name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Re-takes allowed | 0 |
@@ -117,33 +117,35 @@ Feature: Lesson group override
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test lesson name" in the course content
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
       | False | 1 |
     And I press "Submit"
     And I press "Continue"
     And I should see "Congratulations - end of lesson reached"
-    And I follow "Test lesson name"
+    And I am on "Course 1" course homepage
+    And I follow "Test lesson name" in the course content
     Then I should not see "You are not allowed to retake this lesson."
     And I should see "Cat is an amphibian"
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test lesson name" in the course content
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
       | False | 1 |
     And I press "Submit"
     And I press "Continue"
     And I should see "Congratulations - end of lesson reached"
-    And I follow "Test lesson name"
+    And I am on "Course 1" course homepage
+    And I follow "Test lesson name" in the course content
     And I should see "You are not allowed to retake this lesson."
 
   Scenario: Allow a single group to have a different password
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test lesson name"
+    When I follow "Test lesson name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Password protected lesson | Yes |
@@ -159,7 +161,7 @@ Feature: Lesson group override
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test lesson name" in the course content
     Then I should see "Test lesson name is a password protected lesson"
     And I should not see "Cat is an amphibian"
     And I set the field "userpassword" to "moodle_rules"
@@ -177,7 +179,7 @@ Feature: Lesson group override
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test lesson name" in the course content
     And I should see "Test lesson name is a password protected lesson"
     And I should not see "Cat is an amphibian"
     And I set the field "userpassword" to "12345"
@@ -190,7 +192,7 @@ Feature: Lesson group override
   Scenario: Allow a group to have a different due date
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test lesson name"
+    When I follow "Test lesson name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | id_deadline_enabled | 1 |
@@ -215,19 +217,19 @@ Feature: Lesson group override
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test lesson name" in the course content
     Then the activity date in "Test lesson name" should contain "Closed: Saturday, 1 January 2000, 8:00"
     And I should not see "Cat is an amphibian"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test lesson name" in the course content
     And I should see "Cat is an amphibian"
 
   Scenario: Allow a group to have a different start date
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test lesson name"
+    When I follow "Test lesson name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | id_available_enabled | 1 |
@@ -252,19 +254,19 @@ Feature: Lesson group override
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test lesson name" in the course content
     Then the activity date in "Test lesson name" should contain "Opens: Tuesday, 1 January 2030, 8:00"
     And I should not see "Cat is an amphibian"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test lesson name" in the course content
     And I should see "Cat is an amphibian"
 
   Scenario: Allow a single group to have multiple attempts at each question
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test lesson name"
+    When I follow "Test lesson name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Re-takes allowed | 1 |
@@ -279,7 +281,7 @@ Feature: Lesson group override
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test lesson name" in the course content
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
       | True | 1 |
@@ -294,7 +296,7 @@ Feature: Lesson group override
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test lesson name" in the course content
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
       | True | 1 |
@@ -306,7 +308,7 @@ Feature: Lesson group override
   Scenario: Add both a user and group override and verify that both are applied correctly
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test lesson name"
+    When I follow "Test lesson name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | id_available_enabled | 1 |
@@ -316,7 +318,8 @@ Feature: Lesson group override
       | available[hour]      | 08 |
       | available[minute]    | 00 |
     And I press "Save and display"
-    And I follow "Test lesson name"
+    And I am on "Course 1" course homepage
+    And I follow "Test lesson name" in the course content
     And I navigate to "Group overrides" in current page administration
     And I press "Add group override"
     And I set the following fields to these values:
@@ -329,7 +332,8 @@ Feature: Lesson group override
       | available[minute]    | 00 |
     And I press "Save"
     And I should see "Tuesday, 1 January 2030, 8:00"
-    And I follow "Test lesson name"
+    And I am on "Course 1" course homepage
+    And I follow "Test lesson name" in the course content
     And I navigate to "User overrides" in current page administration
     And I press "Add user override"
     And I set the following fields to these values:
@@ -345,17 +349,17 @@ Feature: Lesson group override
     And I log out
     Then I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test lesson name" in the course content
     And the activity date in "Test lesson name" should contain "Opens: Wednesday, 1 January 2031, 8:00"
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test lesson name" in the course content
     And the activity date in "Test lesson name" should contain "Opens: Sunday, 1 January 2040, 8:00"
     And I log out
     And I log in as "student3"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test lesson name" in the course content
     And the activity date in "Test lesson name" should contain "Opens: Tuesday, 1 January 2030, 8:00"
 
   Scenario: Override a group when teacher is in no group, and does not have accessallgroups permission, and the activity's group mode is 'separate groups'
@@ -367,7 +371,7 @@ Feature: Lesson group override
       | lesson   | Lesson 2 | Lesson 2 description | C1     | lesson2  | 1         |
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Lesson 2"
+    And I follow "Lesson 2" in the course content
     And I navigate to "Group overrides" in current page administration
     Then I should see "No groups you can access."
     And the "Add group override" "button" should be disabled
@@ -384,7 +388,7 @@ Feature: Lesson group override
       | teacher1 | G1    |
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Lesson 2"
+    And I follow "Lesson 2" in the course content
     And I navigate to "Group overrides" in current page administration
     And I press "Add group override"
     Then the "Override group" select box should contain "Group 1"
@@ -402,7 +406,7 @@ Feature: Lesson group override
       | teacher1 | G1    |
     And I log in as "admin"
     And I am on "Course 1" course homepage
-    And I follow "Lesson 2"
+    And I follow "Lesson 2" in the course content
     And I navigate to "Group overrides" in current page administration
     And I press "Add group override"
     And I set the following fields to these values:
@@ -426,7 +430,7 @@ Feature: Lesson group override
     And I log out
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Lesson 2"
+    And I follow "Lesson 2" in the course content
     And I navigate to "Group overrides" in current page administration
     Then I should see "Group 1" in the ".generaltable" "css_element"
     And I should not see "Group 2" in the ".generaltable" "css_element"

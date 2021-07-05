@@ -39,7 +39,7 @@ Feature: View discussion while grading in a forum
   Scenario: Viewing a discussion
     Given I log in as "teacher"
     And I am on "Course 1" course homepage
-    And I follow "Gradable forum"
+    And I follow "Gradable forum" in the course content
     And I press "Grade users"
     When I press "View discussion"
     Then I should see "I disagree" in the "My topic" "dialogue"
@@ -49,7 +49,7 @@ Feature: View discussion while grading in a forum
   Scenario: Viewing a discussion while grading is fullscreen
     Given I log in as "teacher"
     And I am on "Course 1" course homepage
-    And I follow "Gradable forum"
+    And I follow "Gradable forum" in the course content
     And I press "Grade users"
     # Uses the aria-label for the menu in in the grading interface.
     And I press "Actions for the grader interface"

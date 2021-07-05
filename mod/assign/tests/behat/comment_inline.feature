@@ -30,7 +30,7 @@ Feature: In an assignment, teachers can edit a students submission inline
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student first submission |
@@ -38,7 +38,7 @@ Feature: In an assignment, teachers can edit a students submission inline
     And I log out
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the following fields to these values:
@@ -58,7 +58,7 @@ Feature: In an assignment, teachers can edit a students submission inline
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I should see "Submitted for grading" in the "Submission status" "table_row"
     And I should see "Graded" in the "Grading status" "table_row"
     And I should see "I'm the student first submission" in the "Online text" "table_row"

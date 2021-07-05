@@ -33,7 +33,7 @@ Feature: New discussions and discussions with recently added replies are display
   Scenario: Replying to a forum post or editing it puts the discussion to the front
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Course general forum"
+    And I follow "Course general forum" in the course content
     #
     # Add three posts into the forum.
     #
@@ -61,12 +61,12 @@ Feature: New discussions and discussions with recently added replies are display
     #
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Course general forum"
+    And I follow "Course general forum" in the course content
     And I follow "Forum post 1"
     And I reply "Forum post 1" post from "Course general forum" forum with:
       | Message | Reply to the first post |
     And I am on "Course 1" course homepage
-    And I follow "Course general forum"
+    And I follow "Course general forum" in the course content
     #
     # Make sure the order of the forum posts is as expected, with most recent new participation first (ie excluding edits).
     #

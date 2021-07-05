@@ -32,7 +32,7 @@ Feature: In an assignment, teacher can submit feedback files during grading
       | Description                      | Submit your PDF file |
       | Maximum number of uploaded files | 2                    |
       | Students submit in groups        | Yes                  |
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I follow "Expand all"
     And I set the field "assignfeedback_file_enabled" to "1"
@@ -40,7 +40,7 @@ Feature: In an assignment, teacher can submit feedback files during grading
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I upload "mod/assign/feedback/file/tests/fixtures/submission.txt" file to "File submissions" filemanager
     And I press "Save changes"
@@ -50,7 +50,7 @@ Feature: In an assignment, teacher can submit feedback files during grading
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I click on "Grade" "link" in the ".submissionlinks" "css_element"
     And I upload "mod/assign/feedback/file/tests/fixtures/feedback.txt" file to "Feedback files" filemanager
 
@@ -62,12 +62,12 @@ Feature: In an assignment, teacher can submit feedback files during grading
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I should see "feedback.txt"
     And I log out
     When I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     Then I should not see "feedback.txt"
 
   @javascript
@@ -77,10 +77,10 @@ Feature: In an assignment, teacher can submit feedback files during grading
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I should see "feedback.txt"
     And I log out
     When I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     Then I should see "feedback.txt"

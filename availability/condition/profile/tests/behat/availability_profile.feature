@@ -96,7 +96,7 @@ Feature: availability_profile
     And I click on "Save and return to course" "button"
 
     # Edit it again and check the setting still works.
-    When I follow "P1"
+    When I follow "P1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     Then the field "User profile field" matches value "Super field"

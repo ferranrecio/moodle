@@ -34,7 +34,7 @@ Feature: Grant an extension to an offline student
       | assign   | C1     | assign1  | Test assignment name | Test assignment description | 0                                   | 0                             | 1388534400 |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     When I navigate to "View all submissions" in current page administration
     And I open the action menu in "Student 1" "table_row"
     And I follow "Grant extension"
@@ -45,7 +45,7 @@ Feature: Grant an extension to an offline student
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I should see "Extension due date"
 
   @javascript @_alert
@@ -55,7 +55,7 @@ Feature: Grant an extension to an offline student
       | assign   | C1     | assign1  | Test assignment name | Test assignment description | 0                                   | 0                             | 1388534400 |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     When I navigate to "View all submissions" in current page administration
     And I set the field "selectall" to "1"
     And I set the field "operation" to "Grant extension"
@@ -77,7 +77,7 @@ Feature: Grant an extension to an offline student
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I should see "Extension due date"
 
   @javascript
@@ -87,7 +87,7 @@ Feature: Grant an extension to an offline student
       | assign   | C1     | assign1  | Test assignment name | Test assignment description | 0                                   | 0                             | 1388534400                  | 1388620800 |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     When I navigate to "View all submissions" in current page administration
     And I open the action menu in "Student 1" "table_row"
     And I follow "Grant extension"
@@ -109,7 +109,7 @@ Feature: Grant an extension to an offline student
       | assign   | C1     | assign1  | Test assignment name | Test assignment description | 0                                   | 0                             | 1388534400                  | 1388620800 |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     When I navigate to "View all submissions" in current page administration
     And I set the field "selectall" to "1"
     And I set the field "operation" to "Grant extension"

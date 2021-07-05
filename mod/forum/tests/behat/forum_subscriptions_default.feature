@@ -21,7 +21,7 @@ Feature: A user can control their default discussion subscription settings
       | forum      | Test forum name        | Test forum description | C1     | forump1  | general | 1       |
     And I log in as "admin"
     And I am on "Course 1" course homepage
-    And I follow "Test forum name"
+    And I follow "Test forum name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Subscription mode | Optional subscription |
@@ -32,14 +32,14 @@ Feature: A user can control their default discussion subscription settings
     Given I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test forum name"
+    And I follow "Test forum name" in the course content
     When I click on "Add a new discussion topic" "link"
     And I click on "Advanced" "button"
     Then "input[name=discussionsubscribe][checked=checked]" "css_element" should exist
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test forum name"
+    And I follow "Test forum name" in the course content
     And I click on "Add a new discussion topic" "link"
     And I click on "Advanced" "button"
     And "input[name=discussionsubscribe]:not([checked=checked])" "css_element" should exist
@@ -51,14 +51,14 @@ Feature: A user can control their default discussion subscription settings
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test forum name"
+    And I follow "Test forum name" in the course content
     And I follow "Test post subject"
     When I follow "Reply"
     Then "input[name=discussionsubscribe][checked=checked]" "css_element" should exist
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test forum name"
+    And I follow "Test forum name" in the course content
     And I follow "Test post subject"
     And I follow "Reply"
     And "input[name=discussionsubscribe]:not([checked=checked])" "css_element" should exist
@@ -72,21 +72,21 @@ Feature: A user can control their default discussion subscription settings
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test forum name"
+    And I follow "Test forum name" in the course content
     When I click on "Add a new discussion topic" "link"
     And I click on "Advanced" "button"
     Then "input[name=discussionsubscribe][checked=checked]" "css_element" should exist
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test forum name"
+    And I follow "Test forum name" in the course content
     And I click on "Add a new discussion topic" "link"
     And I click on "Advanced" "button"
     And "input[name=discussionsubscribe][checked=checked]" "css_element" should exist
 
   Scenario: Replying to an existing discussion in an automatic forum follows forum subscription
     Given I am on "Course 1" course homepage
-    And I follow "Test forum name"
+    And I follow "Test forum name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Subscription mode | Optional subscription |
@@ -97,21 +97,21 @@ Feature: A user can control their default discussion subscription settings
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test forum name"
+    And I follow "Test forum name" in the course content
     And I follow "Test post subject"
     When I follow "Reply"
     Then "input[name=discussionsubscribe][checked=checked]" "css_element" should exist
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test forum name"
+    And I follow "Test forum name" in the course content
     And I follow "Test post subject"
     And I follow "Reply"
     And "input[name=discussionsubscribe]:not([checked=checked])" "css_element" should exist
 
   @javascript
   Scenario: Replying to an existing discussion in an automatic forum which has been unsubscribed from follows user preferences
-    Given I follow "Test forum name"
+    Given I follow "Test forum name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Subscription mode | Auto subscription |
@@ -122,7 +122,7 @@ Feature: A user can control their default discussion subscription settings
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test forum name"
+    And I follow "Test forum name" in the course content
     And I click on "input[id^=subscription-toggle]" "css_element" in the "Test post subject" "table_row"
     And I follow "Test post subject"
     When I follow "Reply"
@@ -131,7 +131,7 @@ Feature: A user can control their default discussion subscription settings
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test forum name"
+    And I follow "Test forum name" in the course content
     And I click on "input[id^=subscription-toggle]" "css_element" in the "Test post subject" "table_row"
     And I follow "Test post subject"
     And I follow "Reply"

@@ -37,7 +37,7 @@ Feature: Scorm multi-sco completion
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Basic Multi-sco SCORM package"
+    And I follow "Basic Multi-sco SCORM package" in the course content
     And I should see "Normal"
     And I press "Enter"
     And I switch to "scorm_object" iframe
@@ -45,7 +45,7 @@ Feature: Scorm multi-sco completion
     And I switch to the main frame
     And I follow "Exit activity"
     And I wait until the page is ready
-    Then I should see "Basic Multi-sco SCORM package"
+    Then I should see "Basic Multi-sco SCORM package" in the "page" "region"
     And I am on homepage
     And I log out
     And I log in as "teacher1"
@@ -69,11 +69,11 @@ Feature: Scorm multi-sco completion
     And I set the field "Completed" to "1"
     And I upload "mod/scorm/tests/packages/RuntimeMinimumCalls_SCORM12.zip" file to "Package file" filemanager
     And I click on "Save and display" "button"
-    Then I should see "ADV Multi-sco SCORM package"
+    Then I should see "ADV Multi-sco SCORM package" in the "page" "region"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "ADV Multi-sco SCORM package"
+    And I follow "ADV Multi-sco SCORM package" in the course content
     And I should see "Normal"
     And I press "Enter"
     And I switch to "scorm_object" iframe
@@ -81,7 +81,7 @@ Feature: Scorm multi-sco completion
     And I switch to the main frame
     And I follow "Exit activity"
     And I wait until the page is ready
-    Then I should see "ADV Multi-sco SCORM package"
+    Then I should see "ADV Multi-sco SCORM package" in the "page" "region"
     And I am on homepage
     And I log out
     And I log in as "teacher1"
@@ -90,7 +90,7 @@ Feature: Scorm multi-sco completion
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "ADV Multi-sco SCORM package"
+    And I follow "ADV Multi-sco SCORM package" in the course content
     And I should see "Normal"
     And I press "Enter"
     And I switch to "scorm_object" iframe
@@ -178,7 +178,7 @@ Feature: Scorm multi-sco completion
     And I switch to the main frame
     And I follow "Exit activity"
     And I wait until the page is ready
-    Then I should see "ADV Multi-sco SCORM package"
+    Then I should see "ADV Multi-sco SCORM package" in the "page" "region"
     And I am on homepage
     And I log out
     And I log in as "teacher1"

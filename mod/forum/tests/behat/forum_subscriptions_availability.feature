@@ -44,13 +44,14 @@ Feature: As a teacher I need to see an accurate list of subscribed users
       | Forum type        | Standard forum for general use |
       | Description       | Test forum description |
       | Subscription mode | Forced subscription |
-    And I follow "Forced Forum 1"
+    And I follow "Forced Forum 1" in the course content
     And I navigate to "Show/edit current subscribers" in current page administration
     Then I should see "Student 1"
     And I should see "Teacher Teacher"
     And I should see "Student 2"
     And I should see "Student 3"
-    And I follow "Forced Forum 1"
+    And I am on "Course 1" course homepage
+    And I follow "Forced Forum 1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I click on "Add restriction..." "button"
@@ -73,13 +74,13 @@ Feature: As a teacher I need to see an accurate list of subscribed users
       | idnumber    | 0001                           |
       | section     | 1                              |
     And I am on "Course 1" course homepage
-    And I follow "Forced Forum 2"
+    And I follow "Forced Forum 2" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Subscription mode | Forced subscription |
       | Availability      | Show on course page |
     And I press "Save and return to course"
-    And I follow "Forced Forum 2"
+    And I follow "Forced Forum 2" in the course content
     And I navigate to "Show/edit current subscribers" in current page administration
     Then I should see "Teacher Teacher"
     And I should see "Student 1"
@@ -97,13 +98,13 @@ Feature: As a teacher I need to see an accurate list of subscribed users
       | idnumber    | 0001                           |
       | section     | 1                              |
     And I am on "Course 1" course homepage
-    And I follow "Forced Forum 2"
+    And I follow "Forced Forum 2" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Subscription mode | Forced subscription |
       | Availability      | Hide from students |
     And I press "Save and return to course"
-    And I follow "Forced Forum 2"
+    And I follow "Forced Forum 2" in the course content
     And I navigate to "Show/edit current subscribers" in current page administration
     Then I should see "Teacher Teacher"
     And I should not see "Student 1"
@@ -117,13 +118,14 @@ Feature: As a teacher I need to see an accurate list of subscribed users
       | Forum type        | Standard forum for general use |
       | Description       | Test forum description |
       | Subscription mode | Auto subscription |
-    And I follow "Forced Forum 1"
+    And I follow "Forced Forum 1" in the course content
     And I navigate to "Show/edit current subscribers" in current page administration
     Then I should see "Student 1"
     And I should see "Teacher Teacher"
     And I should see "Student 2"
     And I should see "Student 3"
-    And I follow "Forced Forum 1"
+    And I am on "Course 1" course homepage
+    And I follow "Forced Forum 1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I click on "Add restriction..." "button"

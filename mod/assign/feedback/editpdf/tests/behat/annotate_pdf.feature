@@ -39,7 +39,7 @@ Feature: In an assignment, teacher can annotate PDF files during grading
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I upload "mod/assign/feedback/editpdf/tests/fixtures/submission.pdf" file to "File submissions" filemanager
     And I upload "mod/assign/feedback/editpdf/tests/fixtures/testgs.pdf" file to "File submissions" filemanager
@@ -50,7 +50,7 @@ Feature: In an assignment, teacher can annotate PDF files during grading
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Submitted for grading" "table_row"
     And I should see "Page 1 of 3"
@@ -114,7 +114,7 @@ Feature: In an assignment, teacher can annotate PDF files during grading
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I upload "mod/assign/feedback/editpdf/tests/fixtures/submission.pdf" file to "File submissions" filemanager
     And I press "Save changes"
@@ -124,7 +124,7 @@ Feature: In an assignment, teacher can annotate PDF files during grading
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I open the action menu in "Student 2" "table_row"
     And I click on "Grade" "link" in the "Student 2" "table_row"
@@ -134,6 +134,7 @@ Feature: In an assignment, teacher can annotate PDF files during grading
     And I press "Save changes"
     And I should see "The changes to the grade and feedback were saved"
     And I click on "Edit settings" "link"
-    And I follow "Test assignment name"
+    And I am on "Course 1" course homepage
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I should see "View annotated PDF..." in the "student2@example.com" "table_row"

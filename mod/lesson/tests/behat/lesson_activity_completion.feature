@@ -37,7 +37,7 @@ Feature: View activity completion in the lesson activity
       | completiontimespentenabled | 1             |
       | completiontimespent        | 1             |
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And I follow "Add a content page"
     And I set the following fields to these values:
     | Page title  | Music history part 1        |
@@ -67,13 +67,13 @@ Feature: View activity completion in the lesson activity
   Scenario: View automatic completion items as a student
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And the "View" completion condition of "Music history" is displayed as "done"
     And the "Spend at least 1 sec on this activity" completion condition of "Music history" is displayed as "todo"
     And the "Go through the activity to the end" completion condition of "Music history" is displayed as "todo"
     And the "Receive a grade" completion condition of "Music history" is displayed as "todo"
     When I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And I wait "2" seconds
     And I reload the page
     And the "View" completion condition of "Music history" is displayed as "done"
@@ -92,7 +92,7 @@ Feature: View activity completion in the lesson activity
   Scenario: Use manual completion
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "Completion tracking" to "Students can manually mark the activity as completed"
@@ -103,7 +103,7 @@ Feature: View activity completion in the lesson activity
     # Student view.
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     Then the manual completion button of "Music history" is displayed as "Mark as done"
     And I toggle the manual completion state of "Music history"
     And the manual completion button of "Music history" is displayed as "Done"

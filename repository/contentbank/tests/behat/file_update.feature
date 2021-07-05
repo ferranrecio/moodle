@@ -21,7 +21,7 @@ Feature: Updating a file in the content bank after using in a course
 
   Scenario: Referenced files is the default option and updates alias as well
     Given I am on "Course1" course homepage
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I click on "Insert H5P" "button" in the "#fitem_id_page" "css_element"
     And I click on "Browse repositories..." "button" in the "Insert H5P" "dialogue"
@@ -54,7 +54,7 @@ Feature: Updating a file in the content bank after using in a course
     And I switch to the main frame
     # Check the course page is updated.
     Then I am on "Course1" course homepage
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     And I switch to "h5p-iframe" class iframe
     And I switch to "h5p-iframe" class iframe
     And I should see "This is a new text"
@@ -62,7 +62,7 @@ Feature: Updating a file in the content bank after using in a course
 
   Scenario: Copied files should not be updated if the original is edited
     Given I am on "Course1" course homepage
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I click on "Insert H5P" "button" in the "#fitem_id_page" "css_element"
     And I click on "Browse repositories..." "button" in the "Insert H5P" "dialogue"
@@ -96,7 +96,7 @@ Feature: Updating a file in the content bank after using in a course
     And I switch to the main frame
     # Check the course page is not updated.
     Then I am on "Course1" course homepage
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     And I switch to "h5p-iframe" class iframe
     And I switch to "h5p-iframe" class iframe
     And I should see "Press here to reveal answer"

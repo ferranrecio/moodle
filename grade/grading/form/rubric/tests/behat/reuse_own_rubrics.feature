@@ -20,7 +20,7 @@ Feature: Reuse my rubrics in other activities
       | assign     | Test assignment 2 name    | Test assignment 2 description   | C1     | 1       | assign1  |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment 1"
+    And I follow "Test assignment 1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Grading method | Rubric |
@@ -36,7 +36,7 @@ Feature: Reuse my rubrics in other activities
     And I press "Save rubric and make it ready"
     And I am on "Course 1" course homepage
     And I am on "Course 1" course homepage
-    And I follow "Test assignment 2"
+    And I follow "Test assignment 2" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Grading method | Rubric |

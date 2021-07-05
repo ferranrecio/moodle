@@ -31,7 +31,7 @@ Feature: Assignments correctly add feedback to the grade report when workflow an
     # Add a submission.
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    When I follow "Test assignment name"
+    When I follow "Test assignment name" in the course content
     Then I should not see "Feedback"
     And I should see "Not marked" in the "Grading status" "table_row"
     And I press "Add submission"
@@ -42,7 +42,7 @@ Feature: Assignments correctly add feedback to the grade report when workflow an
     # Mark the submission.
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I should see "Not marked" in the "I'm the student's first submission" "table_row"
     And I click on "Grade" "link" in the "I'm the student's first submission" "table_row"
@@ -52,7 +52,8 @@ Feature: Assignments correctly add feedback to the grade report when workflow an
     And I set the field "Notify students" to "0"
     And I press "Save changes"
     And I click on "Edit settings" "link"
-    And I follow "Test assignment name"
+    And I am on "Course 1" course homepage
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I should see "In review" in the "I'm the student's first submission" "table_row"
 
@@ -63,14 +64,16 @@ Feature: Assignments correctly add feedback to the grade report when workflow an
     And I set the field "Notify students" to "0"
     And I press "Save changes"
     And I click on "Edit settings" "link"
-    And I follow "Test assignment name"
+    And I am on "Course 1" course homepage
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I should see "Ready for release" in the "I'm the student's first submission" "table_row"
     And I click on "Grade" "link" in the "I'm the student's first submission" "table_row"
     And I set the field "Marking workflow state" to "Released"
     And I press "Save changes"
     And I click on "Edit settings" "link"
-    And I follow "Test assignment name"
+    And I am on "Course 1" course homepage
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I should see "Released" in the "I'm the student's first submission" "table_row"
     And I set the field "Grading action" to "Reveal student identities"
@@ -89,7 +92,8 @@ Feature: Assignments correctly add feedback to the grade report when workflow an
     And I set the field "Notify students" to "0"
     And I press "Save changes"
     And I click on "Edit settings" "link"
-    And I follow "Test assignment name"
+    And I am on "Course 1" course homepage
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I should see "Ready for release" in the "I'm the student's first submission" "table_row"
     And I set the field "Grading action" to "Reveal student identities"
@@ -98,7 +102,8 @@ Feature: Assignments correctly add feedback to the grade report when workflow an
     And I set the field "Marking workflow state" to "Released"
     And I press "Save changes"
     And I click on "Edit settings" "link"
-    And I follow "Test assignment name"
+    And I am on "Course 1" course homepage
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I should see "Released" in the "Student 1" "table_row"
     And I log out
@@ -110,7 +115,8 @@ Feature: Assignments correctly add feedback to the grade report when workflow an
 
   @javascript
   Scenario: Submissions table visible with overrides and blind marking
-    When I follow "Test assignment name"
+    When I am on "Course 1" course homepage
+    And I follow "Test assignment name" in the course content
     And I navigate to "User overrides" in current page administration
     And I press "Add user override"
     And I set the following fields to these values:
@@ -118,6 +124,7 @@ Feature: Assignments correctly add feedback to the grade report when workflow an
       | Due date      | ##2030-01-01 08:00## |
     And I press "Save"
     And I should see "Tuesday, 1 January 2030, 8:00"
-    And I follow "Test assignment name"
+    And I am on "Course 1" course homepage
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I should see "In review" in the "I'm the student's first submission" "table_row"

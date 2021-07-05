@@ -87,7 +87,7 @@ Feature: In a report, admin can see loglive data
     Given I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test name"
+    And I follow "Test name" in the course content
     And I log out
     And I log in as "admin"
     And I am on "Course 1" course homepage

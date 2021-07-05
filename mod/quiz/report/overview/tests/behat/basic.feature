@@ -51,7 +51,7 @@ Feature: Basic use of the Grades report
     # Basic check of the Grades report
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Quiz 1"
+    And I follow "Quiz 1" in the course content
     And I navigate to "Results > Grades" in current page administration
     Then I should see "Attempts: 2"
     # Check student1's grade
@@ -88,7 +88,7 @@ Feature: Basic use of the Grades report
       | showuseridentity | email,profile_field_fruit |
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Quiz 1"
+    And I follow "Quiz 1" in the course content
     And I navigate to "Results > Grades" in current page administration
     Then I should see "Apple" in the "S1 Student1" "table_row"
     And I should see "Banana" in the "S2 Student2" "table_row"

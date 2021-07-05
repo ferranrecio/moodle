@@ -25,14 +25,13 @@ Feature: Edit quiz marks with attempts
       | Question name | First question |
       | Question text | Answer me      |
       | Default mark  | 2.0            |
+    And I am on "Course 1" course homepage
     And I add a "True/False" question to the "Quiz 1" quiz with:
       | Question name | Second question |
       | Question text | Answer again    |
       | Default mark  | 3.0             |
     And I log out
-    And I log in as "student1"
-    And I am on "Course 1" course homepage
-    And I follow "Quiz 1"
+    And I am on the "Quiz 1" "mod_quiz > View" page logged in as "student1"
     And I press "Attempt quiz now"
     And I log out
     And I log in as "teacher1"
@@ -71,7 +70,8 @@ Feature: Edit quiz marks with attempts
     And I should not see "2.000"
     And I should not see "3.000"
     And I should not see "Total of marks: 5.000"
-    And I follow "Quiz 1"
+    And I click on "Quiz 1" "link" in the "page-header" "region"
+    And I change window size to "large"
     When I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Decimal places in grades | 3 |

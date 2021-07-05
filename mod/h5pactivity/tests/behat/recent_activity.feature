@@ -33,7 +33,7 @@ Feature: Users can see the H5P recent activity from the recent activity block
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Awesome H5P package"
+    And I follow "Awesome H5P package" in the course content
     And I switch to "h5p-player" class iframe
     And I switch to "h5p-iframe" class iframe
     And I click on "Wrong one" "text" in the ".h5p-question-content" "css_element"
@@ -42,7 +42,7 @@ Feature: Users can see the H5P recent activity from the recent activity block
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Awesome H5P package"
+    And I follow "Awesome H5P package" in the course content
     And I switch to "h5p-player" class iframe
     And I switch to "h5p-iframe" class iframe
     And I click on "Correct one" "text" in the ".h5p-question-content" "css_element"

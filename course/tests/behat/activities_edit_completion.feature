@@ -21,14 +21,14 @@ Feature: Edit completion settings of an activity
     And I should not see "Completion options locked"
 
   Scenario: Completion is locked after the activity has been viewed
-    Given I follow "TestPage"
+    Given I follow "TestPage" in the course content
     When I follow "Edit settings"
     And I expand all fieldsets
     Then I should see "Completion options locked"
 
   @javascript
   Scenario: Pressing the unlock button allows the user to edit completion settings
-    Given I follow "TestPage"
+    Given I follow "TestPage" in the course content
     When I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I press "Unlock completion options"
@@ -41,7 +41,7 @@ Feature: Edit completion settings of an activity
 
   @javascript
   Scenario: Even when completion is locked, the user can still set the date
-    Given I follow "TestPage"
+    Given I follow "TestPage" in the course content
     When I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     When I click on "id_completionexpected_enabled" "checkbox"

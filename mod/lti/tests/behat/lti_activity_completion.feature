@@ -40,14 +40,14 @@ Feature: View activity completion information in the LTI activity
   Scenario: View automatic completion items as a teacher
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    When I follow "Music history"
+    When I follow "Music history" in the course content
     Then "Music history" should have the "Receive a grade" completion condition
     And "Music history" should have the "View" completion condition
 
   Scenario: View automatic completion items as a student
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And the "View" completion condition of "Music history" is displayed as "done"
     And the "Receive a grade" completion condition of "Music history" is displayed as "todo"
     And I log out
@@ -60,7 +60,7 @@ Feature: View activity completion information in the LTI activity
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     Then the "Receive a grade" completion condition of "Music history" is displayed as "done"
     And the "View" completion condition of "Music history" is displayed as "done"
 
@@ -71,15 +71,15 @@ Feature: View activity completion information in the LTI activity
     And I click on "Edit settings" "link" in the "Music history" activity
     And I expand all fieldsets
     And I set the field "Completion tracking" to "Students can manually mark the activity as completed"
-    And I press "Save and display"
+    And I press "Save and return to course"
     # Teacher view.
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And the manual completion button for "Music history" should be disabled
     And I log out
     # Student view.
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     Then the manual completion button of "Music history" is displayed as "Mark as done"
     And I toggle the manual completion state of "Music history"
     And the manual completion button of "Music history" is displayed as "Done"

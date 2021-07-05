@@ -26,14 +26,15 @@ Feature: Check that the assignment grade can be updated correctly
       | Assignment name | Test assignment name |
       | Description | Test assignment description |
       | Use marking workflow | Yes |
-    When I follow "Test assignment name"
+    When I follow "Test assignment name" in the course content
     Then I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the field "Grade out of 100" to "50"
     And I set the field "Notify students" to "0"
     And I press "Save changes"
     And I click on "Edit settings" "link"
-    And I follow "Test assignment name"
+    And I am on "Course 1" course homepage
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And "Student 1" row "Grade" column of "generaltable" table should contain "50.00"
 
@@ -61,13 +62,14 @@ Feature: Check that the assignment grade can be updated correctly
       | Use marking workflow | Yes |
       | Students submit in groups | Yes |
       | Group mode | No groups |
-    When I follow "Test assignment name"
+    When I follow "Test assignment name" in the course content
     Then I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the field "Grade out of 100" to "50"
     And I set the field "Notify students" to "0"
     And I press "Save changes"
     And I click on "Edit settings" "link"
-    And I follow "Test assignment name"
+    And I am on "Course 1" course homepage
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And "Student 1" row "Grade" column of "generaltable" table should contain "50.00"

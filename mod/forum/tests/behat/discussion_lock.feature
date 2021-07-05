@@ -68,7 +68,7 @@ Feature: As a teacher, you can manually lock individual discussions when viewing
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test forum name"
+    And I follow "Test forum name" in the course content
     # Check discussion list accessibility with danger pill shown when discussion is locked.
     And the page should meet accessibility standards with "wcag143" extra tests
     And I follow "Preferences" in the user menu

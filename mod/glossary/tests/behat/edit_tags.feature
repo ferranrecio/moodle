@@ -26,7 +26,7 @@ Feature: Edited glossary entries handle tags correctly
   Scenario: Glossary entry edition of custom tags works as expected
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test glossary"
+    And I follow "Test glossary" in the course content
     And I press "Add a new entry"
     And I set the following fields to these values:
       | Concept | Dummy first entry |
@@ -52,7 +52,7 @@ Feature: Edited glossary entries handle tags correctly
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test glossary"
+    And I follow "Test glossary" in the course content
     And I press "Add a new entry"
     And I expand all fieldsets
     And I open the autocomplete suggestions list

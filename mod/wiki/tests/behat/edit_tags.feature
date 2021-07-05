@@ -28,7 +28,7 @@ Feature: Edited wiki pages handle tags correctly
   Scenario: Wiki page edition of custom tags works as expected
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test wiki name"
+    And I follow "Test wiki name" in the course content
     And I press "Create page"
     When I set the following fields to these values:
       | HTML format | Student page contents to be tagged |
@@ -54,7 +54,7 @@ Feature: Edited wiki pages handle tags correctly
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test wiki name"
+    And I follow "Test wiki name" in the course content
     And I press "Create page"
     And I open the autocomplete suggestions list
     And I should see "OT1" in the ".form-autocomplete-suggestions" "css_element"

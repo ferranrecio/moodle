@@ -28,7 +28,7 @@ Feature: Users can search wikis
       | Description | Collaborative wiki description |
       | First page name | Collaborative index |
       | Wiki mode | Collaborative wiki |
-    And I follow "Collaborative wiki name"
+    And I follow "Collaborative wiki name" in the course content
     And I press "Create page"
     And I set the following fields to these values:
       | HTML format | Collaborative teacher1 page [[new page]] |
@@ -37,7 +37,7 @@ Feature: Users can search wikis
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Collaborative wiki name"
+    And I follow "Collaborative wiki name" in the course content
     And I follow "new page"
     And I press "Create page"
     And I set the following fields to these values:
@@ -66,7 +66,7 @@ Feature: Users can search wikis
       | Description | Individual wiki description |
       | First page name | Individual index |
       | Wiki mode | Individual wiki |
-    And I follow "Individual wiki name"
+    And I follow "Individual wiki name" in the course content
     And I press "Create page"
     And I set the following fields to these values:
       | HTML format | Individual teacher1 page |
@@ -74,7 +74,7 @@ Feature: Users can search wikis
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Individual wiki name"
+    And I follow "Individual wiki name" in the course content
     And I press "Create page"
     And I set the following fields to these values:
       | HTML format | Individual student1 page |
@@ -86,7 +86,7 @@ Feature: Users can search wikis
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Individual wiki name"
+    And I follow "Individual wiki name" in the course content
     And I press "Create page"
     And I set the following fields to these values:
       | HTML format | Individual student2 page |
@@ -99,7 +99,7 @@ Feature: Users can search wikis
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Individual wiki name"
+    And I follow "Individual wiki name" in the course content
     And I set the field "searchstring" to "page"
     And I press "Search wikis"
     And I should see "Individual teacher1 page"
@@ -133,7 +133,7 @@ Feature: Users can search wikis
       | First page name | Groups index |
       | Wiki mode | Collaborative wiki |
       | Group mode | Separate groups |
-    And I follow "Group wiki name"
+    And I follow "Group wiki name" in the course content
     And I set the field "Group" to "All participants"
     And I press "Create page"
     And I set the following fields to these values:
@@ -152,7 +152,7 @@ Feature: Users can search wikis
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Group wiki name"
+    And I follow "Group wiki name" in the course content
     And I follow "new page1"
     And I press "Create page"
     And I set the following fields to these values:
@@ -167,7 +167,7 @@ Feature: Users can search wikis
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Group wiki name"
+    And I follow "Group wiki name" in the course content
     And I follow "new page2"
     And I press "Create page"
     And I set the following fields to these values:
@@ -183,4 +183,4 @@ Feature: Users can search wikis
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Group wiki name"
+    And I follow "Group wiki name" in the course content

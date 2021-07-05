@@ -20,7 +20,7 @@ Feature: Teachers can reset wiki pages, tags and files
       | Wiki name | Test wiki |
       | Description | Test wiki description |
       | First page name | Test wiki page |
-    And I follow "Test wiki"
+    And I follow "Test wiki" in the course content
     And I press "Create page"
     And I set the following fields to these values:
       | HTML format | Test wiki content |
@@ -52,7 +52,8 @@ Feature: Teachers can reset wiki pages, tags and files
     And I should see "Wiki tags have been deleted"
     And I should see "Delete all comments"
     And I press "Continue"
-    And I follow "Test wiki"
+    And I am on "Course 1" course homepage
+    And I follow "Test wiki" in the course content
     And I press "Create page"
     When I follow "View"
     Then I should not see "Test tag 1"
@@ -70,7 +71,8 @@ Feature: Teachers can reset wiki pages, tags and files
     And I should see "Wiki tags have been deleted"
     And I should not see "Delete all comments"
     And I press "Continue"
-    And I follow "Test wiki"
+    And I am on "Course 1" course homepage
+    And I follow "Test wiki" in the course content
     Then I should not see "Test tag 1"
     And I should not see "Test tag 2"
     And I follow "Comments"
@@ -86,7 +88,8 @@ Feature: Teachers can reset wiki pages, tags and files
     And I should not see "Wiki tags have been deleted"
     And I should see "Delete all comments"
     And I press "Continue"
-    When I follow "Test wiki"
+    And I am on "Course 1" course homepage
+    When I follow "Test wiki" in the course content
     Then I should see "Test tag 1"
     And I should see "Test tag 2"
     And I follow "Comments"

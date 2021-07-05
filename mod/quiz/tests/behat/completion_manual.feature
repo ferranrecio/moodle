@@ -36,13 +36,13 @@ Feature: Manually complete a quiz
     When I log in as "teacher1"
     # Teacher view.
     And I am on "Course 1" course homepage
-    And I follow "Test quiz name"
+    And I follow "Test quiz name" in the course content
     And the manual completion button for "Test quiz name" should be disabled
     And I log out
     # Student view.
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test quiz name"
+    And I follow "Test quiz name" in the course content
     Then the manual completion button of "Test quiz name" is displayed as "Mark as done"
     And I toggle the manual completion state of "Test quiz name"
     And the manual completion button of "Test quiz name" is displayed as "Done"

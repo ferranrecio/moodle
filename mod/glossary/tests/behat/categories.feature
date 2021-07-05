@@ -31,7 +31,7 @@ Feature: Glossary entries can be organised in categories
     And I should see "CategoryNoLinks"
     And "a.glossary.autolink" "css_element" should not exist
 # Create, edit and delete categories
-    And I follow "MyGlossary"
+    And I follow "MyGlossary" in the course content
     And I follow "Browse by category"
     And I press "Edit categories"
     And I press "Add category"
@@ -98,7 +98,7 @@ Feature: Glossary entries can be organised in categories
     And "//a[contains(.,'CategoryNoLinks')]" "xpath_element" should not exist
 # Delete a category with entries
     And I am on "Course 1" course homepage
-    And I follow "MyGlossary"
+    And I follow "MyGlossary" in the course content
     And I follow "Browse by category"
     And I press "Edit categories"
     And I should see "2 Entries" in the "CategoryNoLinks" "table_row"
@@ -106,7 +106,8 @@ Feature: Glossary entries can be organised in categories
     And I click on "Delete" "link" in the "CategoryAutoLinks" "table_row"
     And I press "Yes"
     And I wait to be redirected
-    And I follow "MyGlossary"
+    And I am on "Course 1" course homepage
+    And I follow "MyGlossary" in the course content
     And I follow "Browse by category"
     And I should see "EntryCategoryNL"
     And I should not see "EntryNoCategory"

@@ -73,19 +73,19 @@ Feature: Inline editing H5P content
     # Check teacher1 can see the Edit button (because she is the author of this file in the content bank).
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    And I follow "H5P package added as link to content bank"
+    And I follow "H5P package added as link to content bank" in the course content
     And I should see "Edit H5P content"
     And I log out
     # Check teacher2 can't see the Edit button (because the file was created by the teacher1).
     And I log in as "teacher2"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "H5P package added as link to content bank"
+    When I follow "H5P package added as link to content bank" in the course content
     Then I should not see "Edit H5P content"
     And I log out
     # Check student1 can't see the Edit button.
     And I log in as "student1"
     And I am on "Course 1" course homepage with editing mode on
-    And I follow "H5P package added as link to content bank"
+    And I follow "H5P package added as link to content bank" in the course content
     And I should not see "Edit H5P content"
 
   @javascript
@@ -139,19 +139,19 @@ Feature: Inline editing H5P content
     # Check teacher1 can see the Edit button (because the file is a copy).
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    And I follow "H5P package added as copy to content bank"
+    And I follow "H5P package added as copy to content bank" in the course content
     And I should see "Edit H5P content"
     And I log out
     # Check teacher2 can also see the Edit button (because the file is a copy).
     And I log in as "teacher2"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "H5P package added as copy to content bank"
+    When I follow "H5P package added as copy to content bank" in the course content
     Then I should see "Edit H5P content"
     And I log out
     # Check student1 can't see the Edit button.
     And I log in as "student1"
     And I am on "Course 1" course homepage with editing mode on
-    And I follow "H5P package added as copy to content bank"
+    And I follow "H5P package added as copy to content bank" in the course content
     And I should not see "Edit H5P content"
 
   @javascript
@@ -194,17 +194,17 @@ Feature: Inline editing H5P content
     # Check admin can't see the Edit button (because the file belongs to teacher1).
     And I log in as "admin"
     And I am on "Course 1" course homepage with editing mode on
-    And I follow "H5P package added as private user file"
+    And I follow "H5P package added as private user file" in the course content
     And I should not see "Edit H5P content"
     And I log out
     # Check teacher2 can't see the Edit button (because the file belongs to teacher1).
     And I log in as "teacher2"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "H5P package added as private user file"
+    When I follow "H5P package added as private user file" in the course content
     Then I should not see "Edit H5P content"
     And I log out
     # Check student1 can't see the Edit button.
     And I log in as "student1"
     And I am on "Course 1" course homepage with editing mode on
-    And I follow "H5P package added as private user file"
+    And I follow "H5P package added as private user file" in the course content
     And I should not see "Edit H5P content"

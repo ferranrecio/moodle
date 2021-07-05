@@ -26,7 +26,7 @@ Feature: In an assignment, teachers grade multiple students on one page
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student1 submission |
@@ -34,7 +34,7 @@ Feature: In an assignment, teachers grade multiple students on one page
     And I log out
     And I log in as "admin"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I wait until the page is ready
@@ -88,7 +88,7 @@ Feature: In an assignment, teachers grade multiple students on one page
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student1 submission |
@@ -96,7 +96,7 @@ Feature: In an assignment, teachers grade multiple students on one page
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     When I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student2 submission |
@@ -104,7 +104,7 @@ Feature: In an assignment, teachers grade multiple students on one page
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the following fields to these values:
@@ -123,7 +123,7 @@ Feature: In an assignment, teachers grade multiple students on one page
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I should see "I'm the teacher first feedback"
     And I should see "60.0"
     And I follow "Grades" in the user menu
@@ -132,7 +132,7 @@ Feature: In an assignment, teachers grade multiple students on one page
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I should not see "I'm the teacher first feedback"
     And I should not see "60.0"
     And I follow "Grades" in the user menu
@@ -141,7 +141,7 @@ Feature: In an assignment, teachers grade multiple students on one page
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I click on "Hide User picture" "link"
     And I click on "Hide Full name" "link"
@@ -162,7 +162,7 @@ Feature: In an assignment, teachers grade multiple students on one page
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I should see "I'm the teacher first feedback"
     And I should see "60.0"
     And I follow "Grades" in the user menu
@@ -171,7 +171,7 @@ Feature: In an assignment, teachers grade multiple students on one page
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I should not see "I'm the teacher first feedback"
     And I should not see "60.0"
     And I follow "Grades" in the user menu

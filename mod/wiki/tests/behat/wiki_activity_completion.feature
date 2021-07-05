@@ -33,14 +33,14 @@ Feature: View activity completion information in the Wiki activity
       | completion     | 2             |
       | completionview | 1             |
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And I click on "Create page" "button"
     And I log out
 
   Scenario: View automatic completion items as a teacher and confirm all tabs display conditions
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    When I follow "Music history"
+    When I follow "Music history" in the course content
     Then "Music history" should have the "View" completion condition
     And I click on "Edit" "link" in the "region-main" "region"
     And "Music history" should have the "View" completion condition
@@ -56,14 +56,14 @@ Feature: View activity completion information in the Wiki activity
   Scenario: View automatic completion items as a student
     Given I log in as "student1"
     When I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     Then the "View" completion condition of "Music history" is displayed as "done"
 
   @javascript
   Scenario: Use manual completion
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I press "Unlock completion options"
@@ -75,7 +75,7 @@ Feature: View activity completion information in the Wiki activity
     # Student view.
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     Then the manual completion button of "Music history" is displayed as "Mark as done"
     And I toggle the manual completion state of "Music history"
     And the manual completion button of "Music history" is displayed as "Done"

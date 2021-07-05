@@ -24,7 +24,7 @@ Feature: Test creating different types of feedback questions for non-anonymous f
       | feedback   | Learning experience | C1     | feedback0   | 2         |
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Learning experience"
+    And I follow "Learning experience" in the course content
     And I click on "Edit questions" "link" in the "[role=main]" "css_element"
     And I add a "Information" question to the feedback with:
       | Question         | this is an information question |
@@ -71,7 +71,7 @@ Feature: Test creating different types of feedback questions for non-anonymous f
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Learning experience"
+    And I follow "Learning experience" in the course content
     And I follow "Answer the questions"
     And I set the following fields to these values:
       | this is a longer text answer | my long answer |
@@ -86,7 +86,7 @@ Feature: Test creating different types of feedback questions for non-anonymous f
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Learning experience"
+    And I follow "Learning experience" in the course content
     And I follow "Answer the questions"
     And I set the following fields to these values:
       | this is a longer text answer | lots of feedbacks |
@@ -101,14 +101,14 @@ Feature: Test creating different types of feedback questions for non-anonymous f
     And I log out
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Learning experience"
+    And I follow "Learning experience" in the course content
     And I navigate to "Analysis" in current page administration
     And I should see "Submitted answers: 2"
     And I should see "Questions: 9"
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Learning experience"
+    And I follow "Learning experience" in the course content
     And I navigate to "Analysis" in current page administration
     And I should see "C1" in the "(info)" "table"
     And I should see "my long answer" in the "(longertext)" "table"

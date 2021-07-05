@@ -21,7 +21,7 @@ Feature: In a participation report, admin can filter student actions
     And I add a "Book" to section "1" and I fill the form with:
       | Name | Test book name |
       | Description | Test book |
-    And I follow "Test book name"
+    And I follow "Test book name" in the course content
     And I set the following fields to these values:
       | Chapter title | Test chapter |
       | Content | Test chapter content |
@@ -38,7 +38,7 @@ Feature: In a participation report, admin can filter student actions
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test book name"
+    And I follow "Test book name" in the course content
     And I log out
     When I log in as "admin"
     And I am on "Course 1" course homepage
@@ -59,7 +59,7 @@ Feature: In a participation report, admin can filter student actions
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test book name"
+    And I follow "Test book name" in the course content
     And I log out
     And I log in as "admin"
     And I navigate to "Plugins > Logging > Manage log stores" in site administration
@@ -67,7 +67,7 @@ Feature: In a participation report, admin can filter student actions
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test book name"
+    And I follow "Test book name" in the course content
     And I log out
     And I log in as "admin"
     And I am on "Course 1" course homepage
@@ -81,7 +81,7 @@ Feature: In a participation report, admin can filter student actions
   Scenario: Filter participation report when only standard log reader is enabled by default
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test book name"
+    And I follow "Test book name" in the course content
     And I log out
     And I log in as "admin"
     And I am on "Course 1" course homepage

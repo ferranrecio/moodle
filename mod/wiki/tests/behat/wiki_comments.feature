@@ -25,7 +25,7 @@ Feature: Users can comment on wiki pages
       | Description | Test wiki description |
       | First page name | First page |
       | Wiki mode | Collaborative wiki |
-    And I follow "Test wiki name"
+    And I follow "Test wiki name" in the course content
     And I press "Create page"
     And I set the following fields to these values:
       | HTML format | First edition |
@@ -33,7 +33,7 @@ Feature: Users can comment on wiki pages
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test wiki name"
+    And I follow "Test wiki name" in the course content
     And I follow "Comments"
     And I follow "Add comment"
     And I set the following fields to these values:
@@ -59,7 +59,7 @@ Feature: Users can comment on wiki pages
     When I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test wiki name"
+    And I follow "Test wiki name" in the course content
     And I follow "Comments"
     Then "Edit" "link" should not exist in the "wiki-comments" "table"
     And "Delete" "link" should not exist in the "wiki-comments" "table"
@@ -69,7 +69,7 @@ Feature: Users can comment on wiki pages
     When I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test wiki name"
+    And I follow "Test wiki name" in the course content
     And I follow "Comments"
     Then "Edit" "link" should not exist in the "wiki-comments" "table"
     And "Delete" "link" should exist in the "wiki-comments" "table"

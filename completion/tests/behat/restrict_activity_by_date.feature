@@ -40,7 +40,7 @@ Feature: Restrict activity availability through date conditions
     And I am on "Course 1" course homepage
     Then I should see "Available from 31 December 2037"
     And "Test assignment 1" activity should be dimmed
-    And "Test assignment 1" "link" should not exist
+    And "Test assignment 1" "link" should not exist in the "page" "region"
     And I log out
 
   @javascript
@@ -62,4 +62,4 @@ Feature: Restrict activity availability through date conditions
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    Then I should not see "Test assignment 2"
+    Then I should not see "Test assignment 2" in the "page" "region"

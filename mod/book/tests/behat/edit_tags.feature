@@ -26,7 +26,7 @@ Feature: Edited book chapters handle tags correctly
   Scenario: Book chapter edition of custom tags works as expected
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test book"
+    And I follow "Test book" in the course content
     And I set the following fields to these values:
       | Chapter title | Dummy first chapter |
       | Content | Dream is the start of a journey |
@@ -52,7 +52,7 @@ Feature: Edited book chapters handle tags correctly
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test book"
+    And I follow "Test book" in the course content
     And I open the autocomplete suggestions list
     And I should see "OT1" in the ".form-autocomplete-suggestions" "css_element"
     And I should see "OT2" in the ".form-autocomplete-suggestions" "css_element"

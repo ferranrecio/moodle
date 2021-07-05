@@ -34,7 +34,7 @@ Feature: Search content bank files using the content bank files repository
   Scenario: User can see a search field and reset search button in the content bank files repository
     Given I log in as "admin"
     And I am on "Course1" course homepage
-    And I follow "Folder"
+    And I follow "Folder" in the course content
     And I click on "Edit" "button"
     And I click on "Add..." "button"
     And I should see "Content bank" in the ".fp-repo-area" "css_element"
@@ -45,7 +45,7 @@ Feature: Search content bank files using the content bank files repository
   Scenario: User can see search results when there is content that matches the search criteria
     Given I log in as "admin"
     And I am on "Course1" course homepage
-    And I follow "Folder"
+    And I follow "Folder" in the course content
     And I click on "Edit" "button"
     And I click on "Add..." "button"
     And I should see "Content bank" in the ".fp-repo-area" "css_element"
@@ -62,7 +62,7 @@ Feature: Search content bank files using the content bank files repository
   Scenario: User can see search results when there is content that matches the search criteria ignoring case sensitivity
     Given I log in as "admin"
     And I am on "Course1" course homepage
-    And I follow "Folder"
+    And I follow "Folder" in the course content
     And I click on "Edit" "button"
     And I click on "Add..." "button"
     And I should see "Content bank" in the ".fp-repo-area" "css_element"
@@ -76,7 +76,7 @@ Feature: Search content bank files using the content bank files repository
   Scenario: User can not see any search results when there is not a content that matches the search criteria
     Given I log in as "admin"
     And I am on "Course1" course homepage
-    And I follow "Folder"
+    And I follow "Folder" in the course content
     And I click on "Edit" "button"
     And I click on "Add..." "button"
     And I should see "Content bank" in the ".fp-repo-area" "css_element"
@@ -89,7 +89,7 @@ Feature: Search content bank files using the content bank files repository
   Scenario: User can reset search criteria and see all content displayed prior the search action
     Given I log in as "admin"
     And I am on "Course1" course homepage
-    And I follow "Folder"
+    And I follow "Folder" in the course content
     And I click on "Edit" "button"
     And I click on "Add..." "button"
     And I should see "Content bank" in the ".fp-repo-area" "css_element"
@@ -108,7 +108,7 @@ Feature: Search content bank files using the content bank files repository
   Scenario: Editing teacher can see search results when the content is available to him and matches the search criteria
     Given I log in as "teacher"
     And I am on "Course1" course homepage
-    And I follow "Folder"
+    And I follow "Folder" in the course content
     And I click on "Edit" "button"
     And I click on "Add..." "button"
     And I should see "Content bank" in the ".fp-repo-area" "css_element"

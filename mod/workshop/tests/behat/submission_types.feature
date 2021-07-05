@@ -70,7 +70,7 @@ Feature: Submission types
       | activity | name         | intro                     | course | idnumber  | submissiontypetext | submissiontypefile |
       | workshop | All required | Test workshop description | TEST   | workshop1 | 2                  | 2                  |
     And I am on "Test" course homepage
-    And I follow "All required"
+    And I follow "All required" in the course content
     And I follow "Switch to the submission phase"
     And I press "Continue"
     And I press "Add submission"
@@ -92,7 +92,7 @@ Feature: Submission types
       | activity | name          | intro                     | course | idnumber  | submissiontypetext | submissiontypefile |
       | workshop | Optional file | Test workshop description | TEST   | workshop1 | 2                  | 1                  |
     And I am on "Test" course homepage
-    And I follow "Optional file"
+    And I follow "Optional file" in the course content
     And I follow "Switch to the submission phase"
     And I press "Continue"
     And I press "Add submission"
@@ -112,7 +112,7 @@ Feature: Submission types
       | activity | name          | intro                     | course | idnumber  | submissiontypetext | submissiontypefile |
       | workshop | Optional text | Test workshop description | TEST   | workshop1 | 1                  | 2                  |
     And I am on "Test" course homepage
-    And I follow "Optional text"
+    And I follow "Optional text" in the course content
     And I follow "Switch to the submission phase"
     And I press "Continue"
     And I press "Add submission"
@@ -131,7 +131,7 @@ Feature: Submission types
       | activity | name      | intro                     | course | idnumber  | submissiontypetext | submissiontypefile |
       | workshop | Only text | Test workshop description | TEST   | workshop1 | 2                  | 0                  |
     And I am on "Test" course homepage
-    And I follow "Only text"
+    And I follow "Only text" in the course content
     And I follow "Switch to the submission phase"
     And I press "Continue"
     When I press "Add submission"
@@ -152,7 +152,7 @@ Feature: Submission types
       | activity | name      | intro                     | course | idnumber  | submissiontypetext | submissiontypefile |
       | workshop | Only file | Test workshop description | TEST   | workshop1 | 0                  | 2                  |
     And I am on "Test" course homepage
-    And I follow "Only file"
+    And I follow "Only file" in the course content
     And I follow "Switch to the submission phase"
     And I press "Continue"
     When I press "Add submission"
@@ -174,7 +174,7 @@ Feature: Submission types
       | activity | name             | intro                     | course | idnumber  |
       | workshop | Neither required | Test workshop description | TEST   | workshop1 |
     And I am on "Test" course homepage
-    And I follow "Neither required"
+    And I follow "Neither required" in the course content
     And I follow "Switch to the submission phase"
     And I press "Continue"
     And I press "Add submission"

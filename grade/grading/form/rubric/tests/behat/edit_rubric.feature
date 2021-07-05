@@ -72,7 +72,7 @@ Feature: Rubrics can be created and edited
     # Viewing it as a student.
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment 1 name"
+    And I follow "Test assignment 1 name" in the course content
     And I should see "35" in the ".feedback" "css_element"
     And I should see "Rubric test description" in the ".feedback" "css_element"
     And I should see "In general... work harder..."
@@ -95,7 +95,7 @@ Feature: Rubrics can be created and edited
     # Check that the student still sees the grade.
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment 1 name"
+    And I follow "Test assignment 1 name" in the course content
     And I should see "35" in the ".feedback" "css_element"
     And the level with "20" points is selected for the rubric criterion "Criterion 1"
     And I log out
@@ -112,14 +112,14 @@ Feature: Rubrics can be created and edited
     # Check that the student doesn't see the grade.
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment 1 name"
+    And I follow "Test assignment 1 name" in the course content
     And I should see "35" in the ".feedback" "css_element"
     And the level with "20" points is not selected for the rubric criterion "Criterion 1"
     And I log out
     # Regrade student.
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment 1 name"
+    And I follow "Test assignment 1 name" in the course content
     And I go to "Student 1" "Test assignment 1 name" activity advanced grading page
     And I should see "The rubric definition was changed after this student had been graded. The student can not see this rubric until you check the rubric and update the grade."
     And I save the advanced grading form
@@ -127,7 +127,7 @@ Feature: Rubrics can be created and edited
     # Check that the student sees the grade again.
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment 1 name"
+    And I follow "Test assignment 1 name" in the course content
     And I should see "31.82" in the ".feedback" "css_element"
     And the level with "20" points is not selected for the rubric criterion "Criterion 1"
     # Hide all rubric info for students
@@ -147,7 +147,7 @@ Feature: Rubrics can be created and edited
     # Students should not see anything.
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment 1 name"
+    And I follow "Test assignment 1 name" in the course content
     And I should not see "Criterion 1" in the ".submissionstatustable" "css_element"
     And I should not see "Criterion 2" in the ".submissionstatustable" "css_element"
     And I should not see "Criterion 3" in the ".submissionstatustable" "css_element"

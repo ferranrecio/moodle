@@ -20,7 +20,7 @@ Feature: There is a choice of formats for editing a wiki page
       | Wiki name | Test wiki name |
       | Description | Test wiki description |
       | First page name | First page |
-    And I follow "Test wiki name"
+    And I follow "Test wiki name" in the course content
 
   @javascript
   Scenario: Creole format

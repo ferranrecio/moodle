@@ -27,7 +27,7 @@ Feature: Using the glossary activities which support point scale
   Scenario: Glossary rescale grade should not be possible when users are graded
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test glossary name"
+    And I follow "Test glossary name" in the course content
     And I press "Add a new entry"
     And I set the following fields to these values:
       | Concept    | Testing score                   |
@@ -36,16 +36,16 @@ Feature: Using the glossary activities which support point scale
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test glossary name"
+    And I follow "Test glossary name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "Ratings > Aggregate type" to "Count of ratings"
     And I set the field "Ratings > Type" to "Point"
     And I press "Save and return to course"
-    And I follow "Test glossary name"
+    And I follow "Test glossary name" in the course content
     And I set the field "rating" to "50"
     And I am on "Course 1" course homepage
-    And I follow "Test glossary name"
+    And I follow "Test glossary name" in the course content
     When I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     Then the "Maximum grade" "field" should be disabled

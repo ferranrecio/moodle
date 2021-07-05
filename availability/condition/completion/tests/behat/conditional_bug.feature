@@ -51,7 +51,7 @@ Feature: Confirm that conditions on completion no longer cause a bug
     And I should see "Not available unless:" in the ".activity.glossary" "css_element"
     And I should see "The activity Page1 is marked complete" in the ".activity.glossary" "css_element"
     And I should see "The activity Page2 is marked complete" in the ".activity.glossary" "css_element"
-    And I follow "TestGlossary"
+    And I follow "TestGlossary" in the course content
 
     # Behat will automatically check there is no error on this page.
     Then I should see "TestGlossary"

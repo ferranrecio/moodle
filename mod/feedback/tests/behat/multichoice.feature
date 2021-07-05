@@ -23,7 +23,7 @@ Feature: Testing multichoice questions in feedback
       | feedback   | Learning experience | C1     | feedback0   |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Learning experience"
+    And I follow "Learning experience" in the course content
     And I click on "Edit questions" "link" in the "[role=main]" "css_element"
 
   @javascript
@@ -58,7 +58,7 @@ Feature: Testing multichoice questions in feedback
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Learning experience"
+    And I follow "Learning experience" in the course content
     And I follow "Answer the questions"
     # Examine the first page, select nothing, go to the next page
     Then the following fields match these values:
@@ -125,7 +125,7 @@ Feature: Testing multichoice questions in feedback
     # goes back and changes dependency question. Analysis should not show this answer!
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Learning experience"
+    And I follow "Learning experience" in the course content
     And I follow "Answer the questions"
     And I set the field "option a" to "1"
     And I press "Next page"
@@ -140,7 +140,7 @@ Feature: Testing multichoice questions in feedback
     # Login as teacher and check analysis
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Learning experience"
+    And I follow "Learning experience" in the course content
     And I navigate to "Analysis" in current page administration
     And I should see "Submitted answers: 2"
     And I should see "Questions: 3"
@@ -202,7 +202,7 @@ Feature: Testing multichoice questions in feedback
     # Login as the first student.
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Learning experience"
+    And I follow "Learning experience" in the course content
     And I follow "Answer the questions"
     # Examine the first page, select nothing, go to the next page
     And I should not see "Not selected"
@@ -267,7 +267,7 @@ Feature: Testing multichoice questions in feedback
     # goes back and changes dependency question. Analysis should not show this answer!
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Learning experience"
+    And I follow "Learning experience" in the course content
     And I follow "Answer the questions"
     And I set the field "option a" to "1"
     And I set the field "option b" to "1"
@@ -284,7 +284,7 @@ Feature: Testing multichoice questions in feedback
     # Login as teacher and check analysis
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Learning experience"
+    And I follow "Learning experience" in the course content
     And I navigate to "Analysis" in current page administration
     And I should see "Submitted answers: 2"
     And I should see "Questions: 3"
@@ -344,7 +344,7 @@ Feature: Testing multichoice questions in feedback
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Learning experience"
+    And I follow "Learning experience" in the course content
     And I follow "Answer the questions"
     # Examine the first page, select nothing, go to the next page
     Then the following fields match these values:
@@ -392,7 +392,7 @@ Feature: Testing multichoice questions in feedback
     # goes back and changes dependency question. Analysis should not show this answer!
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Learning experience"
+    And I follow "Learning experience" in the course content
     And I follow "Answer the questions"
     And I set the field "this is a multiple choice 1" to "option a"
     And I press "Next page"
@@ -407,7 +407,7 @@ Feature: Testing multichoice questions in feedback
     # Login as teacher and check analysis
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Learning experience"
+    And I follow "Learning experience" in the course content
     And I navigate to "Analysis" in current page administration
     And I should see "Submitted answers: 2"
     And I should see "Questions: 3"

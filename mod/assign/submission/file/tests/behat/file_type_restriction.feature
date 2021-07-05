@@ -26,7 +26,7 @@ Feature: In an assignment, limit submittable file types
       | assign   | C1     | assign1  | Test assignment name | Test assignment description | 1388534400 | 0                                   | 1                             | 1                              | 0                                  |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "Edit settings" in current page administration
     When I set the field "Accepted file types" to "image/png;doesntexist;.anything;unreal/mimetype;nodot"
     And I press "Save and display"
@@ -50,7 +50,7 @@ Feature: In an assignment, limit submittable file types
       | assign   | C1     | assign1  | Test assignment name | Test assignment description | 1388534400 | 0                                   | 1                             | 3                              | 0                                  | image/png,spreadsheet,.xml,.txt  |
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     When I press "Add submission"
     And I should see "Accepted file types"
     And I should see "Image (PNG)"
@@ -71,7 +71,7 @@ Feature: In an assignment, limit submittable file types
       | assign   | C1     | assign1  | Test assignment name | Test assignment description | 1388534400 | 0                                   | 1                             | 2                              | 0                                  |                                 |
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     When I press "Add submission"
     And I should not see "Accepted file types"
     And I upload "lib/tests/fixtures/gd-logo.png" file to "File submissions" filemanager

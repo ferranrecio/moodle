@@ -39,7 +39,7 @@ Feature: Do a H5P attempt
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Awesome H5P package"
+    And I follow "Awesome H5P package" in the course content
     And I wait until the page is ready
     And I should not see "This content is displayed in preview mode"
     And I switch to "h5p-player" class iframe

@@ -25,7 +25,7 @@ Feature: A teacher can set a time limit for a lesson
       | timelimit[enabled] | 1 |
       | timelimit[timeunit] | 60 |
       | timelimit[number]   | 1  |
-    And I follow "Test lesson"
+    And I follow "Test lesson" in the course content
     And I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | Lesson page name |
@@ -35,7 +35,7 @@ Feature: A teacher can set a time limit for a lesson
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    When I follow "Test lesson"
+    When I follow "Test lesson" in the course content
     Then I should see "You have 1 min to finish the lesson."
     And I wait "3" seconds
     And I should see "Time remaining"

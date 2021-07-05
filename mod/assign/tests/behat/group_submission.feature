@@ -33,13 +33,14 @@ Feature: Group assignment submissions
       | Description | Test assignment description |
       | Students submit in groups | Yes |
       | Group mode | No groups |
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     When I navigate to "View all submissions" in current page administration
     Then "//tr[contains(., 'Student 0')][contains(., 'Default group')]" "xpath_element" should exist
     And "//tr[contains(., 'Student 1')][contains(., 'Default group')]" "xpath_element" should exist
     And "//tr[contains(., 'Student 2')][contains(., 'Default group')]" "xpath_element" should exist
     And "//tr[contains(., 'Student 3')][contains(., 'Default group')]" "xpath_element" should exist
-    And I follow "Test assignment name"
+    And I am on "Course 1" course homepage
+    And I follow "Test assignment name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Group mode | Separate groups |
@@ -52,7 +53,7 @@ Feature: Group assignment submissions
     And I add "Student 0 (student0@example.com)" user to "Group 1" group members
     And I add "Student 1 (student1@example.com)" user to "Group 1" group members
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And "//tr[contains(., 'Student 0')][contains(., 'Group 1')]" "xpath_element" should exist
     And "//tr[contains(., 'Student 1')][contains(., 'Group 1')]" "xpath_element" should exist
@@ -102,7 +103,7 @@ Feature: Group assignment submissions
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student's first submission |
@@ -110,7 +111,7 @@ Feature: Group assignment submissions
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     When I navigate to "View all submissions" in current page administration
     Then "Student 1" row "Status" column of "generaltable" table should contain "Submitted for grading"
     And "Student 2" row "Status" column of "generaltable" table should contain "Submitted for grading"
@@ -119,7 +120,7 @@ Feature: Group assignment submissions
     And I log out
     And I log in as "student3"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student's first submission |
@@ -127,7 +128,7 @@ Feature: Group assignment submissions
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And "Student 1" row "Status" column of "generaltable" table should contain "Submitted for grading"
     And "Student 2" row "Status" column of "generaltable" table should contain "Submitted for grading"
@@ -174,7 +175,7 @@ Feature: Group assignment submissions
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student's first submission |
@@ -182,7 +183,7 @@ Feature: Group assignment submissions
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the following fields to these values:
@@ -193,7 +194,7 @@ Feature: Group assignment submissions
       | Allow another attempt | 1 |
     And I press "Save changes"
     When I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     Then "Student 1" row "Status" column of "generaltable" table should contain "Reopened"
     And "Student 2" row "Status" column of "generaltable" table should contain "Reopened"
@@ -249,7 +250,7 @@ Feature: Group assignment submissions
       | assignsubmission_file_enabled       | 0                           |
     And I log in as "admin"
     And I am on "Course 1" course homepage with editing mode on
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Students submit in groups | Yes |
@@ -260,7 +261,7 @@ Feature: Group assignment submissions
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student's 1 submission |
@@ -270,7 +271,7 @@ Feature: Group assignment submissions
     And I log out
     And I log in as "student3"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student's 3 submission |
@@ -280,7 +281,7 @@ Feature: Group assignment submissions
     And I log out
     And I log in as "student5"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student's 5 submission |
@@ -290,7 +291,7 @@ Feature: Group assignment submissions
     And I log out
     And I log in as "admin"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I should see "3" in the "Groups" "table_row"
     And I should see "3" in the "Submitted" "table_row"
     When I set the field "Separate groups" to "Group 1"
@@ -338,7 +339,7 @@ Feature: Group assignment submissions
       | assignsubmission_file_enabled       | 0                           |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Require students to click the submit button | Yes |
@@ -352,7 +353,7 @@ Feature: Group assignment submissions
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student's first submission |
@@ -370,7 +371,7 @@ Feature: Group assignment submissions
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     When I navigate to "View all submissions" in current page administration
     Then "Student 1" row "Status" column of "generaltable" table should contain "Submitted for grading"
     And "Student 2" row "Status" column of "generaltable" table should contain "Submitted for grading"

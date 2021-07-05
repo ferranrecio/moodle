@@ -92,7 +92,7 @@ Feature: availability_grade
     And I am on "Course 1" course homepage
 
     # Do the assignment.
-    And I follow "A1"
+    And I follow "A1" in the course content
     And I click on "Add submission" "button"
     And I set the field "Online text" to "Q"
     And I click on "Save changes" "button"
@@ -110,7 +110,7 @@ Feature: availability_grade
     And I am on "Course 1" course homepage
 
     # Give the assignment 40%.
-    And I follow "A1"
+    And I follow "A1" in the course content
     And I navigate to "View all submissions" in current page administration
     # Pick the grade link in the row that has s@example.com in it.
     And I click on "Grade" "link" in the "s@example.com" "table_row"

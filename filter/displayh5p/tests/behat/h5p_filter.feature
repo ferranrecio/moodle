@@ -26,7 +26,7 @@ Feature: Render H5P content using filters
   Scenario: Render an external H5P content URL.
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the field "Page content" to "<div>Go for it</div>https://moodle.h5p.com/content/1290772960722742119/embed"
     When I click on "Save and display" "button"
@@ -38,7 +38,7 @@ Feature: Render H5P content using filters
   Scenario: Add an external H5P content URL in a link with the URL. Should be rendered.
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     And I navigate to "Edit settings" in current page administration
 #   This content won't be displayed, so this scenario shouldn't be labeled as external.
     And I set the field "Page content" to "<a href='https://moodle.h5p.com/content/1290772960722742119/embed'>https://moodle.h5p.com/content/1290772960722742119/embed</a>"
@@ -50,7 +50,7 @@ Feature: Render H5P content using filters
   Scenario: Add an external H5P content URL in a link with text. Shouldn't be rendered.
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     And I navigate to "Edit settings" in current page administration
 #   This content won't be displayed, so this scenario shouldn't be labeled as external.
     And I set the field "Page content" to "<a href='https://moodle.h5p.com/content/1290772960722742119/embed'>Here you are the content</a>"
@@ -67,7 +67,7 @@ Feature: Render H5P content using filters
       | Name                      | ipsumFile     |
     And I upload "h5p/tests/fixtures/ipsums.h5p" file to "Select files" filemanager
     And I press "Save and return to course"
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I click on "Insert H5P" "button" in the "#fitem_id_page" "css_element"
     And I click on "Browse repositories..." "button" in the "Insert H5P" "dialogue"
@@ -87,7 +87,7 @@ Feature: Render H5P content using filters
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
 #   Switch to iframe created by filter
     And I switch to "h5p-iframe" class iframe
 #   Switch to iframe created by embed.php page
@@ -104,7 +104,7 @@ Feature: Render H5P content using filters
       | Name                      | ipsumFile     |
     And I upload "h5p/tests/fixtures/ipsums.h5p" file to "Select files" filemanager
     And I press "Save and return to course"
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I click on "Insert H5P" "button" in the "#fitem_id_page" "css_element"
     And I click on "Browse repositories..." "button" in the "Insert H5P" "dialogue"
@@ -129,7 +129,7 @@ Feature: Render H5P content using filters
       | Name                      | ipsumFileTeacher     |
     And I upload "h5p/tests/fixtures/ipsums.h5p" file to "Select files" filemanager
     And I press "Save and return to course"
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I click on "Insert H5P" "button" in the "#fitem_id_page" "css_element"
     And I click on "Browse repositories..." "button" in the "Insert H5P" "dialogue"
@@ -153,7 +153,7 @@ Feature: Render H5P content using filters
       | Name                      | ipsumFile     |
     And I upload "h5p/tests/fixtures/ipsums.h5p" file to "Select files" filemanager
     And I press "Save and return to course"
-    And I follow "PageName2"
+    And I follow "PageName2" in the course content
     And I navigate to "Edit settings" in current page administration
     And I click on "Insert H5P" "button" in the "#fitem_id_page" "css_element"
     And I click on "Browse repositories..." "button" in the "Insert H5P" "dialogue"
@@ -174,7 +174,7 @@ Feature: Render H5P content using filters
     And I log out
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
 #   Switch to iframe created by filter
     And I switch to "h5p-iframe" class iframe
 #   Switch to iframe created by embed.php page
@@ -196,7 +196,7 @@ Feature: Render H5P content using filters
     And I click on "Disable" "link" in the "Accordion" "table_row"
 # Add H5P content to the page.
     And I am on "Course 1" course homepage with editing mode on
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     And I navigate to "Edit settings" in current page administration
     When I click on "Insert H5P" "button" in the "#fitem_id_page" "css_element"
     And I click on "Browse repositories..." "button" in the "Insert H5P" "dialogue"
@@ -214,7 +214,7 @@ Feature: Render H5P content using filters
     And I click on "Enable" "link" in the "Accordion" "table_row"
     And I am on "Course 1" course homepage
 #   Content should be deployed now that main library is enabled.
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
 #   Switch to iframe created by filter.
     And I switch to "h5p-iframe" class iframe
 #   Switch to iframe created by embed.php page.
@@ -226,7 +226,7 @@ Feature: Render H5P content using filters
     And I click on "Disable" "link" in the "Accordion" "table_row"
     And I am on "Course 1" course homepage
 #   Library is disabled again, so an error should be displayed.
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     And I switch to "h5p-iframe" class iframe
     And I should see "This file can't be displayed because its content type is disabled."
     And I should not see "Lorum ipsum"

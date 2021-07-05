@@ -35,7 +35,7 @@ Feature: Report relevant content availability
   Scenario: Teachers can access report data about other users by default
     Given I log in as "teacher1"
     When I am on "Course 1" course homepage
-    And I follow "forum1"
+    And I follow "forum1" in the course content
     And I navigate to "Forum summary report" in current page administration
     Then the following should exist in the "forumreport_summary_table" table:
       | -2-       | -3- | -4- | -5- | -6- | -7- | -8- |
@@ -59,7 +59,7 @@ Feature: Report relevant content availability
   Scenario: Students cannot access the summary report by default
     Given I log in as "student1"
     When I am on "Course 1" course homepage
-    And I follow "forum1"
+    And I follow "forum1" in the course content
     Then "Forum summary report" "link" should not exist in current page administration
 
   @javascript
@@ -69,7 +69,7 @@ Feature: Report relevant content availability
       | forumreport/summary:view | Allow      | student | Course       | C1        |
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "forum1"
+    And I follow "forum1" in the course content
     And I navigate to "Forum summary report" in current page administration
     Then the following should exist in the "forumreport_summary_table" table:
       | -1-       | -2- | -3- | -4- | -5- | -6- | -7- |

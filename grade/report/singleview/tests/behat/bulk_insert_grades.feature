@@ -32,7 +32,7 @@ Feature: We can bulk insert grades for students in a course
   Scenario: I can bulk insert grades and check their override flags for grade view.
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment one"
+    And I follow "Test assignment one" in the course content
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the following fields to these values:
@@ -72,7 +72,7 @@ Feature: We can bulk insert grades for students in a course
   Scenario: I can bulk insert grades and check their override flags for user view.
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment two"
+    And I follow "Test assignment two" in the course content
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the following fields to these values:

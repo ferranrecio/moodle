@@ -109,7 +109,7 @@ class behat_mod_feedback extends behat_base {
 
         // Navigate to feedback complete form.
         $this->execute('behat_navigation::i_am_on_course_homepage', $coursename);
-        $this->execute('behat_general::click_link', $feedbackname);
+        $this->execute("behat_general::i_click_on_in_the", [$feedbackname, 'link', 'page', 'region']);
         $this->execute('behat_general::click_link', $completeform);
 
         // Fill form and submit.

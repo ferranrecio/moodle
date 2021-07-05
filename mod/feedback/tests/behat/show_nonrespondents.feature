@@ -44,7 +44,7 @@ Feature: Show users who have not responded to the feedback survey
       | Description         | x                                                 |
       | Record user names   | User's name will be logged and shown with answers |
       | Access restrictions | Grouping: GX1                                     |
-    And I follow "Frogs"
+    And I follow "Frogs" in the course content
     And I click on "Edit questions" "link" in the "[role=main]" "css_element"
     And I set the field "Add question" to "Short text answer"
     And I set the following fields to these values:
@@ -55,7 +55,7 @@ Feature: Show users who have not responded to the feedback survey
     # Go in as student 1 and do the feedback.
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Frogs"
+    And I follow "Frogs" in the course content
     And I follow "Answer the questions"
     And I set the field "Y/N?" to "Y"
     And I press "Submit your answers"
@@ -64,7 +64,7 @@ Feature: Show users who have not responded to the feedback survey
     # Go in as teacher and check the users who haven't completed it.
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Frogs"
+    And I follow "Frogs" in the course content
     And I navigate to "Show non-respondents" in current page administration
 
     # Should only show student 2; not student 1 (they did it) or 3 (not in grouping).

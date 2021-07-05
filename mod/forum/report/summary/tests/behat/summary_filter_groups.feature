@@ -64,7 +64,7 @@ Feature: Groups report filter is available if groups exist
   Scenario: All groups can be selected or cleared together in the groups filter, and are unchecked by default
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "forum1"
+    And I follow "forum1" in the course content
     And I navigate to "Forum summary report" in current page administration
     Then "Groups" "button" should exist
     And the following should exist in the "forumreport_summary_table" table:
@@ -114,7 +114,7 @@ Feature: Groups report filter is available if groups exist
   Scenario: The summary report can be filtered by a subset of groups, and re-ordering the results retains the filter
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "forum1"
+    And I follow "forum1" in the course content
     And I navigate to "Forum summary report" in current page administration
     Then "Groups" "button" should exist
     And the following should exist in the "forumreport_summary_table" table:
@@ -150,7 +150,7 @@ Feature: Groups report filter is available if groups exist
   Scenario: The summary report can be filtered as a mixture of groups and no groups
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "forum2"
+    And I follow "forum2" in the course content
     And I navigate to "Forum summary report" in current page administration
     Then "Groups" "button" should exist
     And the following should exist in the "forumreport_summary_table" table:
@@ -176,7 +176,7 @@ Feature: Groups report filter is available if groups exist
   Scenario: The summary report can be filtered by no groups only
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "forum2"
+    And I follow "forum2" in the course content
     And I navigate to "Forum summary report" in current page administration
     Then the following should exist in the "forumreport_summary_table" table:
     # |                      | Discussions | Replies |
@@ -201,7 +201,7 @@ Feature: Groups report filter is available if groups exist
     # Log in as admin so Teacher 1 not existing on page can be confirmed.
     When I log in as "admin"
     And I am on "Course 1" course homepage
-    And I follow "forum1"
+    And I follow "forum1" in the course content
     And I navigate to "Forum summary report" in current page administration
     Then "Groups" "button" should exist
     And the following should exist in the "forumreport_summary_table" table:
@@ -226,7 +226,7 @@ Feature: Groups report filter is available if groups exist
   Scenario: Course forum summary report can be filtered by group
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "forum2"
+    And I follow "forum2" in the course content
     And I navigate to "Forum summary report" in current page administration
     And I select "All forums in course" from the "Forum selected" singleselect
     And I click on "Groups" "button"

@@ -19,7 +19,7 @@ Feature: When a Teacher hides an assignment from view for students it should con
       | Assignment name | Test hidden assignment |
     And I open "Test hidden assignment" actions menu
     And I choose "Hide" in the open action menu
-    And I follow "Test hidden assignment"
+    And I follow "Test hidden assignment" in the course content
     And I should see "Test hidden assignment"
     And I should see "Yes" in the "Hidden from students" "table_row"
     And I log out
@@ -27,7 +27,7 @@ Feature: When a Teacher hides an assignment from view for students it should con
     And I am on "Course 1" course homepage with editing mode on
     And I add a "Assignment" to section "2" and I fill the form with:
       | Assignment name | Test visible assignment |
-    And I follow "Test visible assignment"
+    And I follow "Test visible assignment" in the course content
     And I should see "Test visible assignment"
     And I should see "No" in the "Hidden from students" "table_row"
     And I log out

@@ -30,7 +30,7 @@ I need to limit the submittable file types
       | TF1      | 1    |
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Quiz 1"
+    And I follow "Quiz 1" in the course content
     And I navigate to "Edit quiz" in current page administration
     And I click on "Edit question TF1" "link"
     And I set the field "Allow attachments" to "1"
@@ -47,7 +47,7 @@ I need to limit the submittable file types
     And I upload "lib/tests/fixtures/empty.txt" file to "Files" filemanager
     And I press "Save changes"
     And I am on "Course 1" course homepage
-    And I follow "Quiz 1"
+    And I follow "Quiz 1" in the course content
     And I press "Attempt quiz now"
     And I should see "First question"
     And I should see "You can drag and drop files here to add them."
@@ -66,7 +66,7 @@ I need to limit the submittable file types
     And I upload "lib/tests/fixtures/upload_users.csv" file to "Files" filemanager
     And I press "Save changes"
     And I am on "Course 1" course homepage
-    And I follow "Quiz 1"
+    And I follow "Quiz 1" in the course content
     And I press "Attempt quiz now"
     And I should see "First question"
     And I should see "You can drag and drop files here to add them."
