@@ -47,7 +47,7 @@ class behat_mod_choice extends behat_base {
      */
     public function I_choose_option_from_activity($option, $choiceactivity) {
 
-        $this->execute("behat_general::click_link", $this->escape($choiceactivity));
+        $this->execute("behat_general::i_click_on_in_the", [$this->escape($choiceactivity), 'link', 'page', 'region']);
 
         $this->execute('behat_forms::i_set_the_field_to', array( $this->escape($option), 1));
 
@@ -69,7 +69,7 @@ class behat_mod_choice extends behat_base {
         $behatforms = behat_context_helper::get('behat_forms');
 
         // Go to choice activity.
-        $behatgeneral->click_link($this->escape($choiceactivity));
+        $behatgeneral->i_click_on_in_the($this->escape($choiceactivity), 'link', 'page', 'region');
 
         // Wait for page to be loaded.
         $this->wait_for_pending_js();

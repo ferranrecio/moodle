@@ -41,7 +41,7 @@ Feature: Clear my answers
   Scenario: Attempt a quiz and reset my chosen answer.
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Quiz 1"
+    And I follow "Quiz 1" in the course content
     And I press "Attempt quiz now"
     And I should see "Question One"
     And I click on "Four" "qtype_multichoice > Answer" in the "Question One" "question"
@@ -55,7 +55,7 @@ Feature: Clear my answers
   Scenario: Attempt a quiz and revisit a cleared answer.
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Quiz 1"
+    And I follow "Quiz 1" in the course content
     And I press "Attempt quiz now"
     And I should see "Question One"
     And I click on "Four" "qtype_multichoice > Answer" in the "Question One" "question"

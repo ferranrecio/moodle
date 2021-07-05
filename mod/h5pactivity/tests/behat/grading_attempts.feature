@@ -30,7 +30,7 @@ Feature: Change grading options in an H5P activity
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Awesome H5P package"
+    And I follow "Awesome H5P package" in the course content
     And I switch to "h5p-player" class iframe
     And I switch to "h5p-iframe" class iframe
     And I click on "Wrong one" "text" in the ".h5p-question-content" "css_element"
@@ -49,7 +49,7 @@ Feature: Change grading options in an H5P activity
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Awesome H5P package"
+    And I follow "Awesome H5P package" in the course content
 
   @javascript
   Scenario: Default grading is max attempt grade
@@ -134,7 +134,7 @@ Feature: Change grading options in an H5P activity
 
     # Now we modify the maximum grade with rescaling.
     When I am on "Course 1" course homepage
-    And I follow "Awesome H5P package"
+    And I follow "Awesome H5P package" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Rescale existing grades | Yes |
@@ -161,7 +161,7 @@ Feature: Change grading options in an H5P activity
 
     # Now we modify the maximum grade with rescaling.
     When I am on "Course 1" course homepage
-    And I follow "Awesome H5P package"
+    And I follow "Awesome H5P package" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Rescale existing grades | No |

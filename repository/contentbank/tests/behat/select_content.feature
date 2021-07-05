@@ -41,7 +41,7 @@ Feature: Select content bank files using the content bank files repository
   Scenario: Admin can navigate and see all existing content bank files using the content bank repository
     Given I log in as "admin"
     And I am on "MiscellaneousCourse1" course homepage
-    And I follow "Folder"
+    And I follow "Folder" in the course content
     And I click on "Edit" "button"
     And I click on "Add..." "button"
     And I should see "Content bank" in the ".fp-repo-area" "css_element"
@@ -83,7 +83,7 @@ Feature: Select content bank files using the content bank files repository
   Scenario: Admin can select and re-use content bank files using the content bank repository
     Given I log in as "admin"
     And I am on "MiscellaneousCourse1" course homepage
-    And I follow "Folder"
+    And I follow "Folder" in the course content
     And I click on "Edit" "button"
     And I click on "Add..." "button"
     And I should see "Content bank" in the ".fp-repo-area" "css_element"
@@ -101,7 +101,7 @@ Feature: Select content bank files using the content bank files repository
   Scenario: Editing teacher can navigate and see content bank files available to him using the content bank repository
     Given I log in as "teacher1"
     And I am on "MiscellaneousCourse1" course homepage
-    And I follow "Folder"
+    And I follow "Folder" in the course content
     And I click on "Edit" "button"
     And I click on "Add..." "button"
     And I should see "Content bank" in the ".fp-repo-area" "css_element"
@@ -122,7 +122,7 @@ Feature: Select content bank files using the content bank files repository
   Scenario: Editing teacher can select and re-use content bank files available to him using the content bank repository
     Given I log in as "teacher1"
     And I am on "MiscellaneousCourse1" course homepage
-    And I follow "Folder"
+    And I follow "Folder" in the course content
     And I click on "Edit" "button"
     And I click on "Add..." "button"
     And I should see "Content bank" in the ".fp-repo-area" "css_element"
@@ -139,7 +139,7 @@ Feature: Select content bank files using the content bank files repository
   Scenario: Non-editing teacher can not see the content bank repository
     Given I log in as "teacher2"
     And I am on "MiscellaneousCourse1" course homepage
-    And I follow "Forum"
+    And I follow "Forum" in the course content
     And I click on "Add a new discussion topic" "link"
     And I click on "Link" "button"
     When I click on "Browse repositories..." "button"
@@ -148,7 +148,7 @@ Feature: Select content bank files using the content bank files repository
   Scenario: Student can not see the content bank repository
     Given I log in as "student"
     And I am on "MiscellaneousCourse1" course homepage
-    And I follow "Forum"
+    And I follow "Forum" in the course content
     And I click on "Add a new discussion topic" "link"
     And I click on "Link" "button"
     When I click on "Browse repositories..." "button"
@@ -160,7 +160,7 @@ Feature: Select content bank files using the content bank files repository
       | Course       | mscC1     | contenttype_h5p | admin | My content  | /h5p/tests/fixtures/ipsums.h5p |
     And I log in as "admin"
     And I am on "MiscellaneousCourse1" course homepage
-    And I follow "Folder"
+    And I follow "Folder" in the course content
     And I click on "Edit" "button"
     And I click on "Add..." "button"
     And I should see "Content bank" in the ".fp-repo-area" "css_element"

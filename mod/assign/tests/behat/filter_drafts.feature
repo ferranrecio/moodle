@@ -25,7 +25,7 @@ Feature: In an assignment, teachers can filter displayed submissions and see dra
       | assign   | C1     | assign1  | Test assignment | 1                                   | 1                |
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment"
+    And I follow "Test assignment" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | This submission is submitted |
@@ -35,7 +35,7 @@ Feature: In an assignment, teachers can filter displayed submissions and see dra
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment"
+    And I follow "Test assignment" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | This submission is NOT submitted |
@@ -46,7 +46,7 @@ Feature: In an assignment, teachers can filter displayed submissions and see dra
   Scenario: View assignments with draft status on the view all submissions page
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment"
+    And I follow "Test assignment" in the course content
     And I navigate to "View all submissions" in current page administration
     When I set the field "Filter" to "Draft"
     Then I should see "Student 2"
@@ -57,7 +57,7 @@ Feature: In an assignment, teachers can filter displayed submissions and see dra
   Scenario: View assignments with draft status in the grader
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment"
+    And I follow "Test assignment" in the course content
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Student 1" "table_row"
     When I click on "[data-region=user-filters]" "css_element"

@@ -30,14 +30,14 @@ Feature: We can change what we are viewing on the grader report
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name 1"
+    And I follow "Test assignment name 1" in the course content
     When I press "Add submission"
     And I set the following fields to these values:
       | Online text | This is a submission for assignment 1 |
     And I press "Save changes"
     Then I should see "Submitted for grading"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name 2"
+    And I follow "Test assignment name 2" in the course content
     When I press "Add submission"
     And I set the following fields to these values:
       | Online text | This is a submission for assignment 2 |

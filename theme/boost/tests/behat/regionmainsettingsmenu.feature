@@ -22,7 +22,7 @@ Feature: Region main settings menu
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And "#region-main-settings-menu [role=button]" "css_element" should not exist
-    And I follow "Choice name"
+    And I follow "Choice name" in the course content
     And I click on "#region-main-settings-menu [role=button]" "css_element"
     And I choose "Edit settings" in the open action menu
     And I should see "Updating: Choice"
@@ -36,6 +36,6 @@ Feature: Region main settings menu
     And I log in as "student1"
     And I am on "Course 1" course homepage
     And "#region-main-settings-menu [role=button]" "css_element" should not exist
-    And I follow "Choice name"
+    And I follow "Choice name" in the course content
     And "#region-main-settings-menu [role=button]" "css_element" should not exist
     And I log out

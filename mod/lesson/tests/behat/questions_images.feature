@@ -24,7 +24,7 @@ Feature: In a lesson activity, teacher can add embedded images in questions answ
     And I add a "Lesson" to section "1" and I fill the form with:
       | Name | Test lesson name |
       | Description | Test lesson description |
-    And I follow "Test lesson name"
+    And I follow "Test lesson name" in the course content
     And I follow "Add a question page"
     And I set the field "Select a question type" to "Multichoice"
     And I press "Add a question page"
@@ -78,7 +78,7 @@ Feature: In a lesson activity, teacher can add embedded images in questions answ
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    When I follow "Test lesson name"
+    When I follow "Test lesson name" in the course content
     Then I should see "What animal is an amphibian?"
     And "//*[contains(@class, 'answeroption')]//img[contains(@src, 'pluginfile.php')]" "xpath_element" should exist
     And "//*[contains(@class, 'answeroption')]//img[contains(@src, 'moodle_logo.jpg')]" "xpath_element" should exist

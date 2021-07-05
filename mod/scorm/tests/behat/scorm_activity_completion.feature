@@ -45,7 +45,7 @@ Feature: View activity completion in the SCORM activity
   Scenario: View automatic completion items as a teacher
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    When I follow "Music history"
+    When I follow "Music history" in the course content
     Then "Music history" should have the "View" completion condition
     And "Music history" should have the "Receive a score of 3 or more" completion condition
     And "Music history" should have the "Do all parts of this activity" completion condition
@@ -56,7 +56,7 @@ Feature: View activity completion in the SCORM activity
   Scenario: View automatic completion items as a student
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And the "View" completion condition of "Music history" is displayed as "todo"
     And the "Receive a score of 3 or more" completion condition of "Music history" is displayed as "todo"
     And the "Do all parts of this activity" completion condition of "Music history" is displayed as "todo"
@@ -87,7 +87,7 @@ Feature: View activity completion in the SCORM activity
     And I press "Submit Answers"
     And I switch to the main frame
     And I follow "Exit activity"
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And the "View" completion condition of "Music history" is displayed as "done"
     # Conditions that are not possible to achieve (eg score below requirement but all attempts used) are marked as failed.
     And the "Receive a score of 3 or more" completion condition of "Music history" is displayed as "failed"
@@ -99,7 +99,7 @@ Feature: View activity completion in the SCORM activity
   Scenario: Use manual completion
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "Completion tracking" to "Students can manually mark the activity as completed"
@@ -110,7 +110,7 @@ Feature: View activity completion in the SCORM activity
     # Student view.
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     Then the manual completion button of "Music history" is displayed as "Mark as done"
     And I toggle the manual completion state of "Music history"
     And the manual completion button of "Music history" is displayed as "Done"

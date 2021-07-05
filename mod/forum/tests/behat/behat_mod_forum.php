@@ -114,7 +114,7 @@ class behat_mod_forum extends behat_base {
     public function i_reply_post_from_forum_using_an_inpage_reply_with($postsubject, $forumname, TableNode $table) {
 
         // Navigate to forum.
-        $this->execute('behat_general::click_link', $this->escape($forumname));
+        $this->execute("behat_general::i_click_on_in_the", [$this->escape($forumname), 'link', 'page', 'region']);
         $this->execute('behat_general::click_link', $this->escape($postsubject));
         $this->execute('behat_general::click_link', get_string('reply', 'forum'));
 
@@ -134,7 +134,7 @@ class behat_mod_forum extends behat_base {
     public function i_navigate_to_post_in_forum($postsubject, $forumname) {
 
         // Navigate to forum discussion.
-        $this->execute('behat_general::click_link', $this->escape($forumname));
+        $this->execute("behat_general::i_click_on_in_the", [$this->escape($forumname), 'link', 'page', 'region']);
         $this->execute('behat_general::click_link', $this->escape($postsubject));
     }
 
@@ -477,7 +477,7 @@ class behat_mod_forum extends behat_base {
     protected function add_new_discussion($forumname, TableNode $table, $buttonstr) {
 
         // Navigate to forum.
-        $this->execute('behat_general::click_link', $this->escape($forumname));
+        $this->execute("behat_general::i_click_on_in_the", [$this->escape($forumname), 'link', 'page', 'region']);
         $this->execute('behat_general::click_link', $buttonstr);
         $this->execute('behat_forms::press_button', get_string('showadvancededitor'));
 
@@ -497,7 +497,7 @@ class behat_mod_forum extends behat_base {
     protected function add_new_discussion_inline($forumname, TableNode $table, $buttonstr) {
 
         // Navigate to forum.
-        $this->execute('behat_general::click_link', $this->escape($forumname));
+        $this->execute("behat_general::i_click_on_in_the", [$this->escape($forumname), 'link', 'page', 'region']);
         $this->execute('behat_general::click_link', $buttonstr);
         $this->fill_new_discussion_form($table);
     }

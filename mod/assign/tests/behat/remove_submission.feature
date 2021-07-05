@@ -43,7 +43,7 @@ Feature: Remove a submission
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student submission |
@@ -51,7 +51,7 @@ Feature: Remove a submission
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I open the action menu in "Student 1" "table_row"
     And I follow "Remove submission"
@@ -60,7 +60,7 @@ Feature: Remove a submission
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I should not see "I'm the student submission"
 
   @javascript
@@ -76,7 +76,7 @@ Feature: Remove a submission
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student submission |
@@ -84,7 +84,7 @@ Feature: Remove a submission
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I open the action menu in "Student 1" "table_row"
     And I follow "Remove submission"
@@ -93,7 +93,7 @@ Feature: Remove a submission
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I should not see "I'm the student submission"
 
   @javascript
@@ -108,23 +108,23 @@ Feature: Remove a submission
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student submission |
     And I press "Save changes"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I click on "Remove submission" "button"
     And I click on "Continue" "button"
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     Then I should not see "I'm the student submission"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I should not see "I'm the student submission"

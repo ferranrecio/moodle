@@ -38,13 +38,13 @@ Feature: View activity completion information in the IMS content package activit
     And I click on "Save and display" "button"
     And I am on "Course 1" course homepage
     # Teacher view.
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And "Music history" should have the "View" completion condition
     And I log out
     # Student view.
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     Then the "View" completion condition of "Music history" is displayed as "done"
 
   Scenario: Use manual completion
@@ -56,14 +56,15 @@ Feature: View activity completion information in the IMS content package activit
       | Completion tracking | Students can manually mark the activity as completed |
     And I upload "mod/imscp/tests/packages/singlescobasic.zip" file to "Package file" filemanager
     And I click on "Save and display" "button"
-    And I follow "Music history"
+    And I am on "Course 1" course homepage
+    And I follow "Music history" in the course content
     # Teacher view.
     And the manual completion button for "Music history" should be disabled
     And I log out
     # Student view.
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     Then the manual completion button of "Music history" is displayed as "Mark as done"
     And I toggle the manual completion state of "Music history"
     And the manual completion button of "Music history" is displayed as "Done"

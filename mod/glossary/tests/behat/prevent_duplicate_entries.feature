@@ -21,7 +21,7 @@ Feature: A teacher can choose whether to allow duplicate entries in a glossary
       | Name | Test glossary name |
       | Description | Test glossary description |
       | Duplicate entries allowed | No |
-    And I follow "Test glossary name"
+    And I follow "Test glossary name" in the course content
     And I add a glossary entry with the following data:
       | Concept | Unique concept |
       | Definition | I'm the definition of an unique concept |

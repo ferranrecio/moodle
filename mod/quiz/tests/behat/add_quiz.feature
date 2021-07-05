@@ -25,6 +25,7 @@ Feature: Add a quiz
       | section  | 1                     |
       | grade    | 10                    |
     When I log in as "teacher1"
+    And I change window size to "large"
     And I am on "Course 1" course homepage with editing mode on
     And I add a "True/False" question to the "Test quiz name" quiz with:
       | Question name                      | First question                          |
@@ -36,7 +37,7 @@ Feature: Add a quiz
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test quiz name"
+    And I follow "Test quiz name" in the course content
     And I press "Attempt quiz now"
     Then I should see "Question 1"
     And I should see "Answer the first question"

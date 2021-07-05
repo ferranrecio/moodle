@@ -21,7 +21,7 @@ Feature: Book activity chapter visibility management
     And I add a "Book" to section "1" and I fill the form with:
       | Name | Test book |
       | Description | A book about dreams! |
-    And I follow "Test book"
+    And I follow "Test book" in the course content
     And I set the following fields to these values:
       | Chapter title | First chapter |
       | Content | First chapter |
@@ -55,7 +55,7 @@ Feature: Book activity chapter visibility management
     And I follow "Hide chapter \"2. Third chapter\""
     And I turn editing mode off
     And I am on "Course 1" course homepage
-    And I follow "Test book"
+    And I follow "Test book" in the course content
     Then the "class" attribute of "a[title='Second chapter']" "css_element" should contain "dimmed_text"
     And the "class" attribute of "a[title='Third chapter']" "css_element" should contain "dimmed_text"
     And I turn editing mode on
@@ -72,7 +72,7 @@ Feature: Book activity chapter visibility management
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test book"
+    And I follow "Test book" in the course content
     And I should not see "Second chapter" in the "Table of contents" "block"
     And I should not see "Third chapter" in the "Table of contents" "block"
     And I follow "Next"

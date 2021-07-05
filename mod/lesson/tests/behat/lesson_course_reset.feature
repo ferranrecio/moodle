@@ -27,7 +27,7 @@ Feature: Lesson reset
       | lesson   | Test lesson name | Test lesson description | C1     | lesson1  |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    And I follow "Test lesson name"
+    And I follow "Test lesson name" in the course content
     And I follow "Add a question page"
     And I set the field "Select a question type" to "True/false"
     And I press "Add a question page"
@@ -46,7 +46,7 @@ Feature: Lesson reset
     When I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test lesson name" in the course content
     And I should see "Cat is an amphibian"
     And I set the following fields to these values:
       | False | 1 |
@@ -56,7 +56,7 @@ Feature: Lesson reset
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test lesson name" in the course content
     And I navigate to "Reports > Overview" in current page administration
     And I should see "Sam1 Student1"
     And I am on "Course 1" course homepage
@@ -66,7 +66,7 @@ Feature: Lesson reset
     And I press "Reset course"
     And I press "Continue"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test lesson name" in the course content
     And I navigate to "Reports > Overview" in current page administration
     Then I should see "No attempts have been made on this lesson"
 
@@ -87,7 +87,7 @@ Feature: Lesson reset
     And I press "Reset course"
     And I press "Continue"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test lesson name" in the course content
     And I navigate to "User overrides" in current page administration
     Then I should not see "Sam1 Student1"
 
@@ -107,6 +107,6 @@ Feature: Lesson reset
     And I press "Reset course"
     And I press "Continue"
     And I am on "Course 1" course homepage
-    And I follow "Test lesson name"
+    And I follow "Test lesson name" in the course content
     And I navigate to "Group overrides" in current page administration
     Then I should not see "Group 1"

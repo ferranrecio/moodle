@@ -32,7 +32,7 @@ Feature: Set availability dates for an assignment
   Scenario: Student cannot submit an assignment prior to the 'allow submissions from' date
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Assignment name"
+    And I follow "Assignment name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I follow "Expand all"
     # Set 'Allow submissions from' to tomorrow at noon.
@@ -41,7 +41,7 @@ Feature: Set availability dates for an assignment
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    When I follow "Assignment name"
+    When I follow "Assignment name" in the course content
     Then "Add submission" "button" should not exist
     And the activity date in "Assignment name" should contain "Opens:"
     And the activity date in "Assignment name" should contain "##tomorrow noon##%A, %d %B %Y, %I:%M##"
@@ -49,7 +49,7 @@ Feature: Set availability dates for an assignment
   Scenario: Student can see the assignment's due date in the course calendar
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Assignment name"
+    And I follow "Assignment name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I follow "Expand all"
     # Set 'Allow submissions from' to the first day of this month at noon.
@@ -70,7 +70,7 @@ Feature: Set availability dates for an assignment
   Scenario: Student can submit an assignment before the due date
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Assignment name"
+    And I follow "Assignment name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I follow "Expand all"
     # Set 'Allow submissions from' to now.
@@ -81,7 +81,7 @@ Feature: Set availability dates for an assignment
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Assignment name"
+    And I follow "Assignment name" in the course content
     And the activity date in "Assignment name" should contain "Due:"
     And the activity date in "Assignment name" should contain "##+2 days 5 hours 30 minutes##%A, %d %B %Y##"
     And I should see "2 days 5 hours" in the "Time remaining" "table_row"
@@ -93,7 +93,7 @@ Feature: Set availability dates for an assignment
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Assignment name"
+    And I follow "Assignment name" in the course content
     And I should see "1" in the "Submitted" "table_row"
     And I navigate to "View all submissions" in current page administration
     And I should see "Submitted for grading" in the "Student 1" "table_row"
@@ -102,7 +102,7 @@ Feature: Set availability dates for an assignment
   Scenario: Student can submit an assignment after the due date and the submission is marked as late
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Assignment name"
+    And I follow "Assignment name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I follow "Expand all"
     # Set 'Allow submissions from' to 3 days ago.
@@ -115,7 +115,7 @@ Feature: Set availability dates for an assignment
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Assignment name"
+    And I follow "Assignment name" in the course content
     And the activity date in "Assignment name" should contain "Due:"
     And the activity date in "Assignment name" should contain "##2 days 5 hours 30 minutes ago##%A, %d %B %Y##"
     And I should see "Assignment is overdue by: 2 days 5 hours" in the "Time remaining" "table_row"
@@ -128,7 +128,7 @@ Feature: Set availability dates for an assignment
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Assignment name"
+    And I follow "Assignment name" in the course content
     And I should see "1" in the "Submitted" "table_row"
     And I navigate to "View all submissions" in current page administration
     And I should see "Submitted for grading" in the "Student 1" "table_row"
@@ -137,7 +137,7 @@ Feature: Set availability dates for an assignment
   Scenario: Student cannot submit an assignment after the cut-off date
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Assignment name"
+    And I follow "Assignment name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I follow "Expand all"
     # Set 'Allow submissions from' to 3 days ago.
@@ -150,12 +150,12 @@ Feature: Set availability dates for an assignment
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    When I follow "Assignment name"
+    When I follow "Assignment name" in the course content
     Then "Add submission" "button" should not exist
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Assignment name"
+    And I follow "Assignment name" in the course content
     And I should see "0" in the "Submitted" "table_row"
     And I navigate to "View all submissions" in current page administration
     And I should see "No submission" in the "Student 1" "table_row"

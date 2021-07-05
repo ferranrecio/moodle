@@ -27,7 +27,7 @@ Feature: In a lesson activity, a teacher can duplicate a lesson page
 
   @javascript @_file_upload
   Scenario: Duplicate content page with an image.
-    Given I follow "Test lesson name"
+    Given I follow "Test lesson name" in the course content
     And I follow "Add a content page"
     And I set the following fields to these values:
       | Page title | First page name |
@@ -57,7 +57,7 @@ Feature: In a lesson activity, a teacher can duplicate a lesson page
 
   @javascript @_file_upload
   Scenario: Duplicate question page with image in answer.
-    Given I follow "Test lesson name"
+    Given I follow "Test lesson name" in the course content
     And I follow "Add a question page"
     And I set the field "Select a question type" to "True/false"
     And I press "Add a question page"
@@ -94,7 +94,7 @@ Feature: In a lesson activity, a teacher can duplicate a lesson page
 
   @javascript @_file_upload
   Scenario: Duplicate question page with image in feedback.
-    Given I follow "Test lesson name"
+    Given I follow "Test lesson name" in the course content
     And I follow "Add a question page"
     And I set the field "Select a question type" to "True/false"
     And I press "Add a question page"

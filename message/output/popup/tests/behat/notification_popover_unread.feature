@@ -34,7 +34,7 @@ Feature: Notification popover unread notifications
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     # This should generate a notification.
     And I set the following fields to these values:

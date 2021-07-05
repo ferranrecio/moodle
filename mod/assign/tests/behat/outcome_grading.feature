@@ -51,7 +51,7 @@ Feature: Outcome grading
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | My online text |
@@ -59,14 +59,15 @@ Feature: Outcome grading
     And I log out
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Student 0" "table_row"
     And I set the following fields to these values:
       | Outcome Test: | Excellent |
     And I press "Save changes"
     And I click on "Edit settings" "link"
-    And I follow "Test assignment name"
+    And I am on "Course 1" course homepage
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     Then I should see "Outcome Test: Excellent" in the "Student 0" "table_row"
     And I should not see "Outcome Test: Excellent" in the "Student 1" "table_row"
@@ -97,7 +98,7 @@ Feature: Outcome grading
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | My online text |
@@ -105,7 +106,7 @@ Feature: Outcome grading
     And I log out
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Student 0" "table_row"
     And I set the following fields to these values:
@@ -113,7 +114,8 @@ Feature: Outcome grading
       | Apply grades and feedback to entire group | Yes |
     And I press "Save changes"
     And I click on "Edit settings" "link"
-    And I follow "Test assignment name"
+    And I am on "Course 1" course homepage
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     Then I should see "Outcome Test: Excellent" in the "Student 0" "table_row"
     And I should see "Outcome Test: Excellent" in the "Student 1" "table_row"
@@ -124,7 +126,8 @@ Feature: Outcome grading
       | Apply grades and feedback to entire group | No |
     And I press "Save changes"
     And I click on "Edit settings" "link"
-    And I follow "Test assignment name"
+    And I am on "Course 1" course homepage
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I should see "Outcome Test: Excellent" in the "Student 0" "table_row"
     And I should see "Outcome Test: Disappointing" in the "Student 1" "table_row"

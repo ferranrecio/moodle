@@ -165,6 +165,16 @@ class behat_navigation extends behat_base {
     }
 
     /**
+     * Click on an activity link in the course content.
+     * @Given /^I follow "(?P<nodetext_string>(?:[^"]|\\")*)" in the course content$/
+     *
+     * @param string $nodetext
+     */
+    public function i_follow_in_the_course_content($nodetext) {
+        $this->execute("behat_general::i_click_on_in_the", [$nodetext, 'link', 'page-content', 'region']);
+    }
+
+    /**
      * Expands the selected node of the navigation tree that matches the text.
      * @Given /^I expand "(?P<nodetext_string>(?:[^"]|\\")*)" node$/
      *

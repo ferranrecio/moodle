@@ -55,7 +55,7 @@ Feature: Award badges based on activity completion
     And I am on "Course 1" course homepage
     And the "Receive a grade" completion condition of "Test quiz name" is displayed as "failed"
     And the "Receive a pass grade or complete all available attempts" completion condition of "Test quiz name" is displayed as "todo"
-    And I follow "Test quiz name"
+    And I follow "Test quiz name" in the course content
     And I press "Re-attempt quiz"
     And I set the field "False" to "1"
     And I press "Finish attempt ..."

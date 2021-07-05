@@ -30,7 +30,7 @@ Feature: Manual completion in the choice activity
   Scenario: Toggle manual completion as a student
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "What to drink?"
+    And I follow "What to drink?" in the course content
     And the manual completion button of "What to drink?" is displayed as "Mark as done"
     When I toggle the manual completion state of "What to drink?"
     Then the manual completion button of "What to drink?" is displayed as "Done"
@@ -51,7 +51,7 @@ Feature: Manual completion in the choice activity
   Scenario: Viewing a choice activity with manual completion as a teacher
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    When I follow "What to drink?"
+    When I follow "What to drink?" in the course content
     Then the manual completion button for "What to drink?" should be disabled
 
   @javascript
@@ -64,7 +64,7 @@ Feature: Manual completion in the choice activity
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    When I follow "What to drink?"
+    When I follow "What to drink?" in the course content
     Then the manual completion button of "What to drink?" overridden by "Teacher 1" is displayed as "Done"
     And I toggle the manual completion state of "What to drink?"
     And the manual completion button of "What to drink?" is displayed as "Mark as done"
@@ -73,7 +73,7 @@ Feature: Manual completion in the choice activity
   Scenario: Overriding a manual choice completion for a user to not done
     Given  I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "What to drink?"
+    And I follow "What to drink?" in the course content
     And I press "Mark as done"
     And I wait until the page is ready
     And I log out
@@ -85,7 +85,7 @@ Feature: Manual completion in the choice activity
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    When I follow "What to drink?"
+    When I follow "What to drink?" in the course content
     Then the manual completion button of "What to drink?" overridden by "Teacher 1" is displayed as "Mark as done"
     And I toggle the manual completion state of "What to drink?"
     And the manual completion button of "What to drink?" is displayed as "Done"

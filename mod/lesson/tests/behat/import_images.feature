@@ -21,7 +21,7 @@ Feature: In a lesson activity, teacher can import embedded images in questions a
     And I add a "Lesson" to section "1" and I fill the form with:
       | Name | Test lesson name |
       | Description | Test lesson description |
-    And I follow "Test lesson name"
+    And I follow "Test lesson name" in the course content
     And I follow "Import questions"
     And I set the field "File format" to "Moodle XML format"
     And I upload "mod/lesson/tests/fixtures/multichoice.xml" file to "Upload" filemanager

@@ -25,7 +25,7 @@ Feature: Edited wiki pages may be previewed before saving
       | wikimode      | collaborative         |
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test wiki name"
+    And I follow "Test wiki name" in the course content
     When I press "Create page"
     And I set the following fields to these values:
       | HTML format | Student page contents to be previewed |

@@ -27,7 +27,7 @@ Feature: File types of the submission and feedback attachments can be limitted
     # Define workshop to accept only images as submission attachments.
     Given I log in as "teacher1"
     And I am on "Course1" course homepage
-    And I follow "TestWorkshop"
+    And I follow "TestWorkshop" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "Submission attachment allowed file types" to "image"
@@ -37,7 +37,7 @@ Feature: File types of the submission and feedback attachments can be limitted
     # As a student, attempt to attach a non-image file.
     And I log in as "student1"
     And I am on "Course1" course homepage
-    And I follow "TestWorkshop"
+    And I follow "TestWorkshop" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Title              | Submission1           |
@@ -68,7 +68,8 @@ Feature: File types of the submission and feedback attachments can be limitted
       | id_description__idx_0_editor | Aspect1 |
       | id_description__idx_1_editor | Aspect2 |
       | id_description__idx_2_editor |         |
-    And I follow "TestWorkshop"
+    And I am on "Course1" course homepage
+    And I follow "TestWorkshop" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "Maximum number of overall feedback attachments" to "2"
@@ -79,7 +80,7 @@ Feature: File types of the submission and feedback attachments can be limitted
     # As a student, attempt to attach an invalid file.
     And I log in as "student1"
     And I am on "Course1" course homepage
-    And I follow "TestWorkshop"
+    And I follow "TestWorkshop" in the course content
     And I add a submission in workshop "TestWorkshop" as:"
       | Title              | Submission1  |
       | Submission content | Some content |
@@ -87,7 +88,7 @@ Feature: File types of the submission and feedback attachments can be limitted
     # As a teacher, allocate that submission to be assessed by another student.
     And I log in as "teacher1"
     And I am on "Course1" course homepage
-    And I follow "TestWorkshop"
+    And I follow "TestWorkshop" in the course content
     And I allocate submissions in workshop "TestWorkshop" as:"
       | Participant   | Reviewer      |
       | Sam1 Student1 | Sam2 Student2 |
@@ -96,7 +97,7 @@ Feature: File types of the submission and feedback attachments can be limitted
     # As the other student, assess the assigned submission.
     And I log in as "student2"
     And I am on "Course1" course homepage
-    And I follow "TestWorkshop"
+    And I follow "TestWorkshop" in the course content
     And I follow "Submission1"
     And I press "Assess"
     And I set the following fields to these values:

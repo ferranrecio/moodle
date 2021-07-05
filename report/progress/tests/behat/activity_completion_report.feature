@@ -36,7 +36,7 @@ Feature: Teacher can view and override users' activity completion data via the p
     And the manual completion button of "my assignment" is displayed as "Mark as done"
     And I toggle the manual completion state of "my assignment"
     And the manual completion button of "my assignment" is displayed as "Done"
-    And I click on "my assignment 2" "link"
+    And I follow "my assignment 2" in the course content
     And I am on "Course 1" course homepage
     And the "View" completion condition of "my assignment 2" is displayed as "done"
     And I log out
@@ -60,7 +60,7 @@ Feature: Teacher can view and override users' activity completion data via the p
     And the "View" completion condition of "my assignment 2" overridden by "Teacher" is displayed as "todo"
     And I toggle the manual completion state of "my assignment"
     And the manual completion button of "my assignment" is displayed as "Done"
-    And I click on "my assignment 2" "link"
+    And I follow "my assignment 2" in the course content
     And I am on "Course 1" course homepage
     And the "View" completion condition of "my assignment 2" is displayed as "done"
     And I log out
@@ -93,7 +93,7 @@ Feature: Teacher can view and override users' activity completion data via the p
     Then I log in as "student1"
     And I am on "Course 1" course homepage
     And the "Receive a grade" completion condition of "my assignment 3" overridden by "Teacher" is displayed as "done"
-    And I click on "my assignment 3" "link"
+    And I follow "my assignment 3" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student first submission |

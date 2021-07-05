@@ -36,7 +36,7 @@ Feature: Using the activity grade form element
       | activity   | name            | intro                  | course | idnumber    |
       | forum      | Test forum name | Test forum description | C1     | forum1      |
     And I am on "Course 1" course homepage
-    And I follow "Test forum name"
+    And I follow "Test forum name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Forum type | Standard forum for general use |
@@ -46,7 +46,7 @@ Feature: Using the activity grade form element
       | Group mode | No groups |
     And I press "Save and return to course"
     And I am on "Course 1" course homepage
-    And I follow "Test forum name"
+    And I follow "Test forum name" in the course content
     And I navigate to "Edit settings" in current page administration
     When I expand all fieldsets
     Then I should not see "Some grades have already been awarded, so the grade type"
@@ -96,7 +96,7 @@ Feature: Using the activity grade form element
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test forum name"
+    And I follow "Test forum name" in the course content
     And I click on "Add a new discussion topic" "link"
     And I set the following fields to these values:
       | Subject  | Discussion subject |
@@ -105,10 +105,11 @@ Feature: Using the activity grade form element
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test forum name"
+    And I follow "Test forum name" in the course content
     And I follow "Discussion subject"
     And I set the field "rating" to "D"
-    And I follow "Test forum name"
+    And I am on "Course 1" course homepage
+    And I follow "Test forum name" in the course content
     And I navigate to "Edit settings" in current page administration
     When I expand all fieldsets
     Then I should see "Some grades have already been awarded, so the grade type and scale cannot be changed"
@@ -144,7 +145,7 @@ Feature: Using the activity grade form element
       | grade[modgrade_type] | Scale |
       | grade[modgrade_scale] | ABCDEF |
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the field "Grade" to "C"
@@ -166,7 +167,7 @@ Feature: Using the activity grade form element
       | activity   | name            | intro                  | course | idnumber    | section |
       | forum      | Test forum name | Test forum description | C1     | forum1      | 1       |
     And I am on "Course 1" course homepage
-    And I follow "Test forum name"
+    And I follow "Test forum name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Forum type | Standard forum for general use |
@@ -178,7 +179,7 @@ Feature: Using the activity grade form element
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test forum name"
+    And I follow "Test forum name" in the course content
     And I click on "Add a new discussion topic" "link"
     And I set the following fields to these values:
       | Subject  | Discussion subject |
@@ -187,10 +188,11 @@ Feature: Using the activity grade form element
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test forum name"
+    And I follow "Test forum name" in the course content
     And I follow "Discussion subject"
     And I set the field "rating" to "100"
-    And I follow "Test forum name"
+    And I am on "Course 1" course homepage
+    And I follow "Test forum name" in the course content
     And I navigate to "Edit settings" in current page administration
     When I expand all fieldsets
     Then I should see "You cannot change the type, as grades already exist for this item."
@@ -204,7 +206,7 @@ Feature: Using the activity grade form element
       | Assignment name | Test assignment name |
       | Description | Test assignment description |
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the field "Grade out of 100" to "50"

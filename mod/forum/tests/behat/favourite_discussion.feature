@@ -41,7 +41,8 @@ Feature: A student can favourite a discussion via the forum settings menu
     Given I reply "Discussion 1" post from "Test forum name" forum with:
       | Subject | Reply 2 to discussion 1 |
       | Message | Discussion contents 1, third message |
-    And I follow "Test forum name"
+    And I am on "Course 1" course homepage
+    And I follow "Test forum name" in the course content
     And I click on "Discussion 1" action menu
     And I click on "[title='Star this discussion']" "css_element"
     And I click on "Discussion 1" action menu

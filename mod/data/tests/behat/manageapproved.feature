@@ -44,13 +44,13 @@ Feature: Users can edit approved entries in database activities
     # Approve the student's entry as a teacher.
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test database name"
+    And I follow "Test database name" in the course content
     And I follow "Approve"
     And I log out
     # Make sure the student can still edit their entry after it's approved.
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test database name"
+    And I follow "Test database name" in the course content
     Then I should see "Student entry"
     And "Edit" "link" should exist
 
@@ -79,12 +79,12 @@ Feature: Users can edit approved entries in database activities
     # Approve the student's entry as a teacher.
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test database name"
+    And I follow "Test database name" in the course content
     And I follow "Approve"
     And I log out
     # Make sure the student isn't able to edit their entry after it's approved.
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test database name"
+    And I follow "Test database name" in the course content
     Then I should see "Student entry"
     And "Edit" "link" should not exist

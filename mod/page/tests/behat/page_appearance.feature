@@ -16,7 +16,7 @@ Feature: Configure page appearance
   @javascript
   Scenario: Hide and display the page name
     Given I am on "Course 1" course homepage
-    When I follow "PageName1"
+    When I follow "PageName1" in the course content
     Then I should see "PageName1" in the "region-main" "region"
     And I navigate to "Edit settings" in current page administration
     And I follow "Appearance"
@@ -32,7 +32,7 @@ Feature: Configure page appearance
   @javascript
   Scenario: Display and hide the page description
     Given I am on "Course 1" course homepage
-    When I follow "PageName1"
+    When I follow "PageName1" in the course content
     Then I should not see "PageDesc1" in the "region-main" "region"
     And I navigate to "Edit settings" in current page administration
     And I follow "Appearance"
@@ -48,7 +48,7 @@ Feature: Configure page appearance
   @javascript
   Scenario: Display and hide the last modified date
     Given I am on "Course 1" course homepage
-    When I follow "PageName1"
+    When I follow "PageName1" in the course content
     Then I should see "Last modified:" in the "region-main" "region"
     And I navigate to "Edit settings" in current page administration
     And I follow "Appearance"

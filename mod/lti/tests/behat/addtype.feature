@@ -70,6 +70,6 @@ Feature: Add preconfigured tools via teacher interface
     And I choose "Edit settings" in the open action menu
     And I set the field "Tool URL" to local url "/mod/lti/tests/fixtures/tool_provider.php"
     And I press "Save and return to course"
-    And I follow "Test tool activity 1"
+    And I follow "Test tool activity 1" in the course content
     And I switch to "contentframe" iframe
     And I should see "This represents a tool provider"

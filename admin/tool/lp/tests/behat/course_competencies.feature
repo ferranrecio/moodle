@@ -37,7 +37,7 @@ Feature: See the competencies for an activity on the course competencies page.
     And I select "Test-Comp2" of the competency tree
     And I click on "Add" "button" in the "Competency picker" "dialogue"
     And I am on "Course 1" course homepage
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I follow "Expand all"
     And I set the field "Course competencies" to "Test-Comp1"
@@ -67,7 +67,7 @@ Feature: See the competencies for an activity on the course competencies page.
     When I log in as "student1"
     And I am on site homepage
     And I follow "Course 1"
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     Then I should see "Test page content"
     And I am on site homepage
     And I follow "Course 1"

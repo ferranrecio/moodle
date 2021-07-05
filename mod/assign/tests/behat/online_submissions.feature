@@ -29,7 +29,7 @@ Feature: In an assignment, students can add and edit text online
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     When I press "Add submission"
     And I set the following fields to these values:
       | Online text | This is more than 10 words. 1 2 3 4 5 6 7 8 9 10. |
@@ -74,14 +74,14 @@ Feature: In an assignment, students can add and edit text online
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     When I press "Add submission"
     And I set the following fields to these values:
       | Online text | text submission |
     # Wait for the draft auto save.
     And I wait "2" seconds
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     When I press "Add submission"
     # Confirm draft was restored.
     Then I should see "text submission" in the "#id_onlinetext_editoreditable" "css_element"

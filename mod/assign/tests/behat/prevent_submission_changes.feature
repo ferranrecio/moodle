@@ -31,7 +31,7 @@ Feature: Prevent or allow assignment submission changes
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student submission |
@@ -43,7 +43,7 @@ Feature: Prevent or allow assignment submission changes
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     When I navigate to "View all submissions" in current page administration
     And I open the action menu in "Student 1" "table_row"
     And I follow "Prevent submission changes"
@@ -51,13 +51,13 @@ Feature: Prevent or allow assignment submission changes
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And "Edit submission" "button" should not exist
     And I should see "This assignment is not accepting submissions"
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I open the action menu in "Student 1" "table_row"
     And I follow "Allow submission changes"
@@ -65,7 +65,7 @@ Feature: Prevent or allow assignment submission changes
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I should not see "This assignment is not accepting submissions"
     And I press "Edit submission"
     And I set the following fields to these values:
@@ -80,7 +80,7 @@ Feature: Prevent or allow assignment submission changes
       | assign   | C1     | assign1  | Test assignment name | Test assignment description | 1                                   | 0                             |
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student submission |
@@ -88,7 +88,7 @@ Feature: Prevent or allow assignment submission changes
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student2 submission |
@@ -96,7 +96,7 @@ Feature: Prevent or allow assignment submission changes
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     When I navigate to "View all submissions" in current page administration
     And I set the field "selectall" to "1"
     And I click on "Go" "button" confirming the dialogue
@@ -105,12 +105,12 @@ Feature: Prevent or allow assignment submission changes
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I should not see "Edit submission"
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I set the field "selectall" to "1"
     And I set the field "id_operation" to "Unlock submissions"
@@ -120,7 +120,7 @@ Feature: Prevent or allow assignment submission changes
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Edit submission"
     And I set the following fields to these values:
       | Online text | I'm the student2 submission and he/she edited me |

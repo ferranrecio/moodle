@@ -31,7 +31,7 @@ Feature: Add scorm activity
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Awesome SCORM package"
+    And I follow "Awesome SCORM package" in the course content
     And I should see "Normal"
     And I press "Enter"
     And I switch to "scorm_object" iframe

@@ -23,7 +23,7 @@ Feature: Teachers can embed images into instructions and conclusion fields
     # Create and edit the workshop.
     When I add a "Workshop" to section "1" and I fill the form with:
       | Workshop name | Workshop with embedded images  |
-    And I follow "Workshop with embedded images"
+    And I follow "Workshop with embedded images" in the course content
     # Embed the image into Instructions for submission.
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets

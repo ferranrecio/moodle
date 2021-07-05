@@ -26,7 +26,7 @@ Feature: A history of each wiki page is available
       | Description | Test wiki description |
       | First page name | First page |
       | Wiki mode | Collaborative wiki |
-    And I follow "Test wiki name"
+    And I follow "Test wiki name" in the course content
     And I press "Create page"
     And I set the following fields to these values:
       | HTML format | First edition |
@@ -34,7 +34,7 @@ Feature: A history of each wiki page is available
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test wiki name"
+    And I follow "Test wiki name" in the course content
     And I follow "Edit"
     And I set the following fields to these values:
       | HTML format | Second edition |
@@ -42,7 +42,7 @@ Feature: A history of each wiki page is available
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test wiki name"
+    And I follow "Test wiki name" in the course content
     And I follow "Edit"
     And I set the following fields to these values:
       | HTML format | Third edition |

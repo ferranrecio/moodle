@@ -58,7 +58,7 @@ Feature: View activity completion in the assignment activity
     And I press "Save and display"
     # Teacher view.
     And the manual completion button for "Music history" should not exist
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And the manual completion button for "Music history" should exist
     And the manual completion button for "Music history" should be disabled
     And I log out
@@ -66,27 +66,27 @@ Feature: View activity completion in the assignment activity
     When I log in as "student1"
     And I am on "Course 1" course homepage
     Then the manual completion button for "Music history" should not exist
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And the manual completion button for "Music history" should exist
 
   @javascript
   Scenario: Use manual completion from the activity page
     Given I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     # Teacher view.
     And the manual completion button for "Music history" should be disabled
     And I log out
     # Student view.
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     Then the manual completion button of "Music history" is displayed as "Mark as done"
     And I toggle the manual completion state of "Music history"
     And the manual completion button of "Music history" is displayed as "Done"
 
   Scenario: View automatic completion items as a teacher
     Given I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the following fields to these values:
@@ -102,7 +102,7 @@ Feature: View activity completion in the assignment activity
   @javascript
   Scenario: View automatic completion items as a student
     Given I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the following fields to these values:
@@ -115,12 +115,12 @@ Feature: View activity completion in the assignment activity
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And the "View" completion condition of "Music history" is displayed as "done"
     And the "Make a submission" completion condition of "Music history" is displayed as "todo"
     And the "Receive a grade" completion condition of "Music history" is displayed as "todo"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And I press "Add submission"
     And I set the field "Online text" to "History of playing with drumsticks reversed"
     And I press "Save changes"
@@ -132,7 +132,7 @@ Feature: View activity completion in the assignment activity
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Vinnie Student1" "table_row"
     And I set the field "Grade out of 100" to "33"
@@ -142,7 +142,7 @@ Feature: View activity completion in the assignment activity
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     Then the "View" completion condition of "Music history" is displayed as "done"
     And the "Make a submission" completion condition of "Music history" is displayed as "done"
     And the "Receive a grade" completion condition of "Music history" is displayed as "done"

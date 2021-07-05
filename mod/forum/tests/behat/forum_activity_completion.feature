@@ -31,7 +31,7 @@ Feature: View activity completion in the forum activity
       | name     | Music history |
       | section  | 1             |
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the following fields to these values:
@@ -51,7 +51,7 @@ Feature: View activity completion in the forum activity
   Scenario: View automatic completion items as a teacher
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    When I follow "Music history"
+    When I follow "Music history" in the course content
     Then "Music history" should have the "View" completion condition
     And "Music history" should have the "Start discussions: 1" completion condition
     And "Music history" should have the "Make forum posts: 2" completion condition
@@ -62,7 +62,7 @@ Feature: View activity completion in the forum activity
   Scenario: View automatic completion items as a student
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And the "View" completion condition of "Music history" is displayed as "done"
     And the "Start discussions: 1" completion condition of "Music history" is displayed as "todo"
     And the "Make forum posts: 2" completion condition of "Music history" is displayed as "todo"
@@ -72,7 +72,7 @@ Feature: View activity completion in the forum activity
        | Subject | Fun instruments |
        | Message | I like drums    |
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And the "View" completion condition of "Music history" is displayed as "done"
     And the "Start discussions: 1" completion condition of "Music history" is displayed as "done"
     And the "Make forum posts: 2" completion condition of "Music history" is displayed as "todo"
@@ -82,7 +82,7 @@ Feature: View activity completion in the forum activity
       | Subject | Reply 1 to Fun instruments |
       | Message | Guitar is also Fun         |
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And the "View" completion condition of "Music history" is displayed as "done"
     And the "Start discussions: 1" completion condition of "Music history" is displayed as "done"
     And the "Make forum posts: 2" completion condition of "Music history" is displayed as "done"
@@ -92,7 +92,7 @@ Feature: View activity completion in the forum activity
     # Grade the student
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And I press "Grade users"
     And I set the field "grade" to "33"
     And I press "Save"
@@ -101,7 +101,7 @@ Feature: View activity completion in the forum activity
     # All conditions should now be completed.
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     Then the "View" completion condition of "Music history" is displayed as "done"
     And the "Start discussions: 1" completion condition of "Music history" is displayed as "done"
     And the "Make forum posts: 2" completion condition of "Music history" is displayed as "done"
@@ -112,7 +112,7 @@ Feature: View activity completion in the forum activity
   Scenario: Use manual completion
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "Completion tracking" to "Students can manually mark the activity as completed"
@@ -123,7 +123,7 @@ Feature: View activity completion in the forum activity
     # Student view.
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     Then the manual completion button of "Music history" is displayed as "Mark as done"
     And I toggle the manual completion state of "Music history"
     And the manual completion button of "Music history" is displayed as "Done"

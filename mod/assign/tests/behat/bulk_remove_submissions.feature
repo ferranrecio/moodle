@@ -39,7 +39,7 @@ Feature: Bulk remove submissions
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student1 submission |
@@ -47,7 +47,7 @@ Feature: Bulk remove submissions
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student2 submission |
@@ -55,7 +55,7 @@ Feature: Bulk remove submissions
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I should see "I'm the student1 submission"
     And I should see "I'm the student2 submission"
@@ -67,12 +67,12 @@ Feature: Bulk remove submissions
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I should not see "I'm the student1 submission"
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I should not see "I'm the student2 submission1"
 
   @javascript
@@ -87,7 +87,7 @@ Feature: Bulk remove submissions
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student1 submission |
@@ -95,7 +95,7 @@ Feature: Bulk remove submissions
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student2 submission |
@@ -103,7 +103,7 @@ Feature: Bulk remove submissions
     And I log out
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I should see "I'm the student1 submission"
     And I should see "I'm the student2 submission"
@@ -129,7 +129,7 @@ Feature: Bulk remove submissions
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student1 submission |
@@ -137,7 +137,7 @@ Feature: Bulk remove submissions
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student2 submission |
@@ -145,7 +145,7 @@ Feature: Bulk remove submissions
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I should see "I'm the student1 submission"
     And I should see "I'm the student2 submission"
@@ -180,7 +180,7 @@ Feature: Bulk remove submissions
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student1 submission |
@@ -188,7 +188,7 @@ Feature: Bulk remove submissions
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I press "Add submission"
     And I set the following fields to these values:
       | Online text | I'm the student2 submission |
@@ -196,7 +196,7 @@ Feature: Bulk remove submissions
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "View all submissions" in current page administration
     And I should see "I'm the student1 submission"
     And I should see "I'm the student2 submission"

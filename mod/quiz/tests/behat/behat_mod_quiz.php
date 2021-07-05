@@ -368,7 +368,7 @@ class behat_mod_quiz extends behat_question_base {
         $quizadmin = $this->escape(get_string('pluginadministration', 'quiz'));
         $addaquestion = $this->escape(get_string('addaquestion', 'quiz'));
 
-        $this->execute('behat_general::click_link', $quizname);
+        $this->execute("behat_general::i_click_on_in_the", [$quizname, 'link', 'page', 'region']);
 
         $this->execute("behat_navigation::i_navigate_to_in_current_page_administration",
                 $quizadmin . ' > ' . $editquiz);

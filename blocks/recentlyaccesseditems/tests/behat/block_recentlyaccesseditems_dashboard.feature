@@ -33,7 +33,7 @@ Feature: The recently accessed items block allows users to easily access their m
 
   Scenario: User has accessed some items
     Given I am on "Course 1" course homepage
-    When  I follow "Test forum name"
+    When  I follow "Test forum name" in the course content
     And I follow "Dashboard" in the user menu
     And I change window size to "large"
     Then I should see "Test forum name" in the "Recently accessed items" "block"

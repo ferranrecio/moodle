@@ -73,7 +73,7 @@ Feature: Users can add entries to database activities
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test database name"
+    And I follow "Test database name" in the course content
     And I press "Select all"
     And I press "Delete selected"
     And I press "Delete"

@@ -29,7 +29,7 @@ Feature: Course overview block show users their progress on courses
   Scenario: User complete activity and verify his progress
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    And I follow "Test choice 1"
+    And I follow "Test choice 1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Completion tracking | Show activity as complete when conditions are met |
@@ -41,7 +41,7 @@ Feature: Course overview block show users their progress on courses
     Then I should see "Course 1" in the "Course overview" "block"
     And I should see "0%" in the "Course overview" "block"
     And I am on "Course 1" course homepage
-    And I follow "Test choice 1"
+    And I follow "Test choice 1" in the course content
     And I follow "Dashboard" in the user menu
     And I click on "All (except removed from view)" "button" in the "Course overview" "block"
     And I should see "100%" in the "Course overview" "block"

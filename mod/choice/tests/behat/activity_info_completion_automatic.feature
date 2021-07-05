@@ -31,7 +31,7 @@ Feature: Automatic completion in the choice activity
   Scenario: Viewing a choice activity with automatic completion as a student
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    When I follow "What to drink?"
+    When I follow "What to drink?" in the course content
     Then the "View" completion condition of "What to drink?" is displayed as "done"
     And the "Make a choice" completion condition of "What to drink?" is displayed as "todo"
     And I set the field "Beer" to "1"
@@ -42,7 +42,7 @@ Feature: Automatic completion in the choice activity
   Scenario: Viewing a choice activity with automatic completion as a teacher
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    When I follow "What to drink?"
+    When I follow "What to drink?" in the course content
     Then "What to drink?" should have the "View" completion condition
     And "What to drink?" should have the "Make a choice" completion condition
 
@@ -56,6 +56,6 @@ Feature: Automatic completion in the choice activity
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    When I follow "What to drink?"
+    When I follow "What to drink?" in the course content
     Then the "View" completion condition of "What to drink?" overridden by "Teacher 1" is displayed as "done"
     And the "Make a choice" completion condition of "What to drink?" overridden by "Teacher 1" is displayed as "done"

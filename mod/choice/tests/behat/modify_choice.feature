@@ -28,7 +28,7 @@ Feature: Teacher can modify choices of the students
   Scenario: Delete students choice response as a teacher
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Choice name"
+    And I follow "Choice name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "Show column for unanswered" to "Yes"
@@ -43,7 +43,7 @@ Feature: Teacher can modify choices of the students
     And I log in as "teacher1"
     And I change window size to "large"
     And I am on "Course 1" course homepage
-    And I follow "Choice name"
+    And I follow "Choice name" in the course content
     And I navigate to "View 1 responses" in current page administration
     And I click on "Student 1 Option 1" "checkbox"
     And I select "Delete" from the "With selected" singleselect
@@ -55,7 +55,7 @@ Feature: Teacher can modify choices of the students
   Scenario: Teacher set answers of students who did not respond or change existing answers
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Choice name"
+    And I follow "Choice name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "Show column for unanswered" to "Yes"
@@ -70,7 +70,7 @@ Feature: Teacher can modify choices of the students
     And I log in as "teacher1"
     And I change window size to "large"
     And I am on "Course 1" course homepage
-    And I follow "Choice name"
+    And I follow "Choice name" in the course content
     And I navigate to "View 1 responses" in current page administration
     And I click on "Student 1 Option 1" "checkbox"
     And I click on "Student 2 Not answered yet" "checkbox"
@@ -88,7 +88,7 @@ Feature: Teacher can modify choices of the students
   Scenario: Teacher can delete answers in the multiple answer choice
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Choice name"
+    And I follow "Choice name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the field "Allow more than one choice to be selected" to "Yes"
     And I press "Save and return to course"
@@ -102,7 +102,7 @@ Feature: Teacher can modify choices of the students
     And I log in as "teacher1"
     And I change window size to "large"
     And I am on "Course 1" course homepage
-    And I follow "Choice name"
+    And I follow "Choice name" in the course content
     And I navigate to "View 1 responses" in current page administration
     And I click on "Student 1 Option 2" "checkbox"
     And I select "Delete" from the "With selected" singleselect
@@ -111,7 +111,7 @@ Feature: Teacher can modify choices of the students
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Choice name"
+    And I follow "Choice name" in the course content
     And I should see "Your selection: Option 1; Option 3"
     And I log out
 
@@ -126,7 +126,7 @@ Feature: Teacher can modify choices of the students
     And I log in as "teacher1"
     And I change window size to "large"
     And I am on "Course 1" course homepage
-    And I follow "Choice name"
+    And I follow "Choice name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Publish results | Always show results to students |

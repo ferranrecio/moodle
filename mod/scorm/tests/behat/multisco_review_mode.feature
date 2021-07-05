@@ -34,7 +34,7 @@ Feature: Scorm multi-sco review mode.
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Basic Multi-sco SCORM package"
+    And I follow "Basic Multi-sco SCORM package" in the course content
     And I should see "Normal"
     And I press "Enter"
     And I switch to "scorm_object" iframe
@@ -44,7 +44,7 @@ Feature: Scorm multi-sco review mode.
     And I wait until the page is ready
     And I should see "Basic Multi-sco SCORM package"
     And I am on "Course 1" course homepage
-    And I follow "Basic Multi-sco SCORM package"
+    And I follow "Basic Multi-sco SCORM package" in the course content
     And I should see "Normal"
     And I press "Enter"
     Then I should not see "Review mode"
@@ -71,7 +71,7 @@ Feature: Scorm multi-sco review mode.
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "ADV Multi-sco SCORM package"
+    And I follow "ADV Multi-sco SCORM package" in the course content
     And I should see "Normal"
     And I press "Enter"
     And I switch to "scorm_object" iframe
@@ -166,7 +166,7 @@ Feature: Scorm multi-sco review mode.
     And I wait until the page is ready
     And I should see "ADV Multi-sco SCORM package"
     And I am on "Course 1" course homepage
-    And I follow "ADV Multi-sco SCORM package"
+    And I follow "ADV Multi-sco SCORM package" in the course content
     And I should see "Normal"
     And I press "Enter"
     Then I should see "Review mode"
@@ -186,7 +186,7 @@ Feature: Scorm multi-sco review mode.
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Basic Multi-sco SCORM package"
+    And I follow "Basic Multi-sco SCORM package" in the course content
     And I should see "Normal"
     And I press "Enter"
     And I switch to "scorm_object" iframe
@@ -196,7 +196,7 @@ Feature: Scorm multi-sco review mode.
     And I wait until the page is ready
     And I should see "Basic Multi-sco SCORM package"
     And I am on "Course 1" course homepage
-    And I follow "Basic Multi-sco SCORM package"
+    And I follow "Basic Multi-sco SCORM package" in the course content
     And I should see "Normal"
     And I should not see "Start a new attempt"
     And I press "Enter"
@@ -219,7 +219,7 @@ Feature: Scorm multi-sco review mode.
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Basic Multi-sco SCORM package"
+    And I follow "Basic Multi-sco SCORM package" in the course content
     And I should see "Normal"
     And I press "Enter"
     And I switch to "scorm_object" iframe
@@ -229,7 +229,7 @@ Feature: Scorm multi-sco review mode.
     And I wait until the page is ready
     And I should see "Basic Multi-sco SCORM package"
     And I am on "Course 1" course homepage
-    And I follow "Basic Multi-sco SCORM package"
+    And I follow "Basic Multi-sco SCORM package" in the course content
     And I should see "Normal"
     And I should not see "Start a new attempt"
     And I press "Enter"
@@ -276,7 +276,7 @@ Feature: Scorm multi-sco review mode.
     And I wait until the page is ready
     And I should see "Basic Multi-sco SCORM package"
     And I am on "Course 1" course homepage
-    And I follow "Basic Multi-sco SCORM package"
+    And I follow "Basic Multi-sco SCORM package" in the course content
     And I should see "Normal"
     And I press "Enter"
     Then I should not see "Review mode"
@@ -299,7 +299,7 @@ Feature: Scorm multi-sco review mode.
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Basic Multi-sco SCORM package"
+    And I follow "Basic Multi-sco SCORM package" in the course content
     And I switch to "scorm_object" iframe
     And I should see "Play of the game"
     And I switch to the main frame
@@ -307,7 +307,7 @@ Feature: Scorm multi-sco review mode.
     And I wait until the page is ready
     And I should see "Basic Multi-sco SCORM package"
     And I am on "Course 1" course homepage
-    And I follow "Basic Multi-sco SCORM package"
+    And I follow "Basic Multi-sco SCORM package" in the course content
     Then I should not see "Review mode"
     And I switch to "scorm_object" iframe
     And I should see "Play of the game"
@@ -328,7 +328,7 @@ Feature: Scorm multi-sco review mode.
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Basic Multi-sco SCORM package"
+    And I follow "Basic Multi-sco SCORM package" in the course content
     And I switch to "scorm_object" iframe
     And I should see "Play of the game"
     And I switch to the main frame
@@ -336,7 +336,7 @@ Feature: Scorm multi-sco review mode.
     And I wait until the page is ready
     And I should see "Basic Multi-sco SCORM package"
     And I am on "Course 1" course homepage
-    And I follow "Basic Multi-sco SCORM package"
+    And I follow "Basic Multi-sco SCORM package" in the course content
     And I should not see "Review mode"
     And I switch to "scorm_object" iframe
     And I should see "Par"
@@ -380,7 +380,7 @@ Feature: Scorm multi-sco review mode.
     And I wait until the page is ready
     And I should see "Basic Multi-sco SCORM package"
     And I am on "Course 1" course homepage
-    And I follow "Basic Multi-sco SCORM package"
+    And I follow "Basic Multi-sco SCORM package" in the course content
     Then I should not see "Review mode"
     And I switch to "scorm_object" iframe
     And I should see "Play of the game"

@@ -35,7 +35,7 @@ Feature: Basic use of the Responses report
   Scenario: Report works when there are no attempts
     When I log in as "teacher"
     And I am on "Course 1" course homepage
-    And I follow "Quiz 1"
+    And I follow "Quiz 1" in the course content
     And I navigate to "Results > Responses" in current page administration
     Then I should see "Attempts: 0"
     And I should see "Nothing to display"
@@ -57,7 +57,7 @@ Feature: Basic use of the Responses report
     And user "student1" has finished an attempt at quiz "Quiz 1"
     When I log in as "teacher"
     And I am on "Course 1" course homepage
-    And I follow "Quiz 1"
+    And I follow "Quiz 1" in the course content
     And I navigate to "Results > Responses" in current page administration
     Then I should see "Attempts: 1"
     And I should see "Student One"
@@ -76,7 +76,7 @@ Feature: Basic use of the Responses report
   Scenario: Report does not allow strange combinations of options
     When I log in as "teacher"
     And I am on "Course 1" course homepage
-    And I follow "Quiz 1"
+    And I follow "Quiz 1" in the course content
     And I navigate to "Results > Responses" in current page administration
     And the "Which tries" "select" should be enabled
     And I set the field "Attempts from" to "enrolled users who have not attempted the quiz"

@@ -33,38 +33,38 @@ Feature: View activity completion information in the Page resource
 
   Scenario: View automatic completion items
     Given I am on "Course 1" course homepage with editing mode on
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Completion tracking  | Show activity as complete when conditions are met |
       | completionview       | 1                                                 |
     And I press "Save and return to course"
     # Teacher view.
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And "Music history" should have the "View" completion condition
     And I log out
     # Student view.
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     Then the "View" completion condition of "Music history" is displayed as "done"
 
   @javascript
   Scenario: Use manual completion
     Given I am on "Course 1" course homepage with editing mode on
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Completion tracking | Students can manually mark the activity as completed |
     And I press "Save and return to course"
     # Teacher view.
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And the manual completion button for "Music history" should be disabled
     And I log out
     # Student view.
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     Then the manual completion button of "Music history" is displayed as "Mark as done"
     And I toggle the manual completion state of "Music history"
     And the manual completion button of "Music history" is displayed as "Done"
@@ -77,7 +77,7 @@ Feature: View activity completion information in the Page resource
       | Enable completion tracking | Yes |
       | Show activity completion conditions | No  |
     And I press "Save and display"
-    And I follow "Music history"
+    And I follow "Music history" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Completion tracking | Students can manually mark the activity as completed |

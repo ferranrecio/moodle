@@ -37,7 +37,7 @@ Feature: Workshop submission and assessment
 # student1 submits
     And I log in as "student1"
     And I am on "Course1" course homepage
-    And I follow "TestWorkshop"
+    And I follow "TestWorkshop" in the course content
     Then I should see "Submit your work"
     And I add a submission in workshop "TestWorkshop" as:"
       | Title              | Submission1  |
@@ -61,7 +61,7 @@ Feature: Workshop submission and assessment
 # teacher1 allocates reviewers and changes the phase to assessment
     And I log in as "teacher1"
     And I am on "Course1" course homepage
-    And I follow "TestWorkshop"
+    And I follow "TestWorkshop" in the course content
     And I should see "to allocate: 3"
     And I should see "There is at least one author who has not yet submitted their work"
     Then I should see "Workshop submissions report"
@@ -76,14 +76,15 @@ Feature: Workshop submission and assessment
       | Sam2 Student2 | Sam1 Student1 |
       | Sam3 Student3 | Sam1 Student1 |
       | Sam2 Student2 | Sam4 Student4 |
-    And I follow "TestWorkshop"
+    And I am on "Course1" course homepage
+    And I follow "TestWorkshop" in the course content
     And I should see "to allocate: 0"
     And I change phase in workshop "TestWorkshop" to "Assessment phase"
     And I log out
 # student1 assesses work of student2 and student3
     And I log in as "student1"
     And I am on "Course1" course homepage
-    And I follow "TestWorkshop"
+    And I follow "TestWorkshop" in the course content
     And "//ul[@class='tasks']/li[div[@class='title' and contains(.,'Assess peers')]]/div[@class='details' and contains(.,'pending: 2') and contains(.,'total: 2')]" "xpath_element" should exist
     And I assess submission "Sam2" in workshop "TestWorkshop" as:"
       | grade__idx_0            | 5 / 10            |
@@ -104,7 +105,7 @@ Feature: Workshop submission and assessment
 # student2 assesses work of student1
     And I log in as "student2"
     And I am on "Course1" course homepage
-    And I follow "TestWorkshop"
+    And I follow "TestWorkshop" in the course content
     And "//ul[@class='tasks']/li[div[@class='title' and contains(.,'Assess peers')]]/div[@class='details' and contains(.,'pending: 1') and contains(.,'total: 1')]" "xpath_element" should exist
     And I assess submission "Sam1" in workshop "TestWorkshop" as:"
       | grade__idx_0            | 6 / 10     |
@@ -117,7 +118,7 @@ Feature: Workshop submission and assessment
 # teacher1 makes sure he can see all peer grades
     And I log in as "teacher1"
     And I am on "Course1" course homepage
-    And I follow "TestWorkshop"
+    And I follow "TestWorkshop" in the course content
     And I should see grade "52" for workshop participant "Sam1" set by peer "Sam2"
     And I should see grade "60" for workshop participant "Sam2" set by peer "Sam1"
     And I should see grade "-" for workshop participant "Sam2" set by peer "Sam4"
@@ -154,7 +155,7 @@ Feature: Workshop submission and assessment
     # student1 looks at the activity
     And I log in as "student1"
     And I am on "Course1" course homepage
-    And I follow "TestWorkshop"
+    And I follow "TestWorkshop" in the course content
     Then I should see "Your submission with assessments"
     And I log out
 

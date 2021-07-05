@@ -40,7 +40,7 @@ Feature: The forum search allows users to perform advanced searches for forum po
   Scenario: Perform an advanced search using any term
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Announcements"
+    And I follow "Announcements" in the course content
     And I press "Search forums"
     And I should see "Advanced search"
     And I set the field "words" to "subject"
@@ -51,7 +51,7 @@ Feature: The forum search allows users to perform advanced searches for forum po
   Scenario: Perform an advanced search avoiding words
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Announcements"
+    And I follow "Announcements" in the course content
     And I press "Search forums"
     And I should see "Advanced search"
     And I set the field "words" to "My"
@@ -66,7 +66,7 @@ Feature: The forum search allows users to perform advanced searches for forum po
       | postgres |
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Announcements"
+    And I follow "Announcements" in the course content
     And I press "Search forums"
     And I should see "Advanced search"
     And I set the field "fullwords" to "subject"
@@ -77,7 +77,7 @@ Feature: The forum search allows users to perform advanced searches for forum po
   Scenario: Perform an advanced search matching the subject
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Announcements"
+    And I follow "Announcements" in the course content
     And I press "Search forums"
     And I should see "Advanced search"
     And I set the field "subject" to "subjective"
@@ -94,7 +94,7 @@ Feature: The forum search allows users to perform advanced searches for forum po
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Announcements"
+    And I follow "Announcements" in the course content
     And I press "Search forums"
     And I should see "Advanced search"
     And I set the field "user" to "TWO"
@@ -105,7 +105,7 @@ Feature: The forum search allows users to perform advanced searches for forum po
   Scenario: Perform an advanced search with multiple words
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Announcements"
+    And I follow "Announcements" in the course content
     And I press "Search forums"
     And I should see "Advanced search"
     And I set the field "subject" to "your subjective"
@@ -117,7 +117,7 @@ Feature: The forum search allows users to perform advanced searches for forum po
   Scenario: Perform an advanced search using tags
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Announcements"
+    And I follow "Announcements" in the course content
     And I follow "My subject"
     And I follow "Edit"
     And I set the following fields to these values:
@@ -126,7 +126,7 @@ Feature: The forum search allows users to perform advanced searches for forum po
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Announcements"
+    And I follow "Announcements" in the course content
     And I press "Search forums"
     And I should see "Advanced search"
     And I set the field "Is tagged with" to "SearchedTag"
@@ -138,7 +138,7 @@ Feature: The forum search allows users to perform advanced searches for forum po
   Scenario: Perform an advanced search on starred discussions without text
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Announcements"
+    And I follow "Announcements" in the course content
     And I click on "Your subjective" action menu
     And I follow "Star this discussion"
     And I press "Search forums"
@@ -152,7 +152,7 @@ Feature: The forum search allows users to perform advanced searches for forum po
   Scenario: Perform an advanced search on starred discussions with text
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Announcements"
+    And I follow "Announcements" in the course content
     And I click on "Your subjective" action menu
     And I follow "Star this discussion"
     And I press "Search forums"

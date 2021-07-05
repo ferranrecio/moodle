@@ -14,7 +14,7 @@ Feature: In a book, verify log entries
     When I add a "Book" to section "1" and I fill the form with:
       | Name | Test book |
       | Description | A book about dreams! |
-    And I follow "Test book"
+    And I follow "Test book" in the course content
     And I set the following fields to these values:
       | Chapter title | First chapter |
       | Content | First chapter |

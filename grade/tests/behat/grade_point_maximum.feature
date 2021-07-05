@@ -23,7 +23,7 @@ Feature: We can change the grading type and maximum grade point values
 
   @javascript
   Scenario: Validate that switching the type of grading used correctly disables input form elements
-    When I follow "Test Assignment 1"
+    When I follow "Test Assignment 1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "grade[modgrade_type]" to "Point"
@@ -39,7 +39,7 @@ Feature: We can change the grading type and maximum grade point values
 
   @javascript
   Scenario: Create an activity with a maximum grade point value less than the system maximum
-    When I follow "Test Assignment 1"
+    When I follow "Test Assignment 1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "grade[modgrade_type]" to "point"
@@ -52,7 +52,7 @@ Feature: We can change the grading type and maximum grade point values
 
   @javascript
   Scenario: Create an activity with a scale as the grade type
-    When I follow "Test Assignment 1"
+    When I follow "Test Assignment 1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "grade[modgrade_type]" to "Scale"
@@ -65,7 +65,7 @@ Feature: We can change the grading type and maximum grade point values
 
   @javascript
   Scenario: Create an activity with no grade as the grade type
-    When I follow "Test Assignment 1"
+    When I follow "Test Assignment 1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "grade[modgrade_type]" to "None"
@@ -76,7 +76,7 @@ Feature: We can change the grading type and maximum grade point values
     And I press "Save and return to course"
 
   Scenario: Create an activity with a maximum grade point value higher than the system maximum
-    When I follow "Test Assignment 1"
+    When I follow "Test Assignment 1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "grade[modgrade_type]" to "Point"
@@ -86,7 +86,7 @@ Feature: We can change the grading type and maximum grade point values
     And I press "Cancel"
 
   Scenario: Create an activity with a valid maximum grade point and then change the system maximum to be lower
-    When I follow "Test Assignment 1"
+    When I follow "Test Assignment 1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "grade[modgrade_type]" to "point"

@@ -110,7 +110,7 @@ Feature: Non anonymous feedback
   Scenario: Non anonymous feedback in a course
     When I log in as "teacher"
     And I am on "Course 1" course homepage
-    And I follow "Course feedback"
+    And I follow "Course feedback" in the course content
     And I click on "Edit questions" "link" in the "[role=main]" "css_element"
     And I add a "Multiple choice" question to the feedback with:
       | Question                       | Do you like this course?           |
@@ -121,7 +121,7 @@ Feature: Non anonymous feedback
     And I log out
     And I log in as "user1"
     And I am on "Course 1" course homepage
-    And I follow "Course feedback"
+    And I follow "Course feedback" in the course content
     And I follow "Answer the questions"
     And I should see "Do you like this course?"
     And I set the following fields to these values:
@@ -130,7 +130,7 @@ Feature: Non anonymous feedback
     And I log out
     And I log in as "user2"
     And I am on "Course 1" course homepage
-    And I follow "Course feedback"
+    And I follow "Course feedback" in the course content
     And I follow "Answer the questions"
     And I should see "Do you like this course?"
     And I set the following fields to these values:
@@ -147,7 +147,7 @@ Feature: Non anonymous feedback
     And I log out
     And I log in as "teacher"
     And I am on "Course 1" course homepage
-    And I follow "Course feedback"
+    And I follow "Course feedback" in the course content
     And I follow "Preview"
     And I should see "Do you like this course?"
     And I press "Continue"

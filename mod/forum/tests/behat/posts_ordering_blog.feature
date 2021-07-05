@@ -33,7 +33,7 @@ Feature: Blog posts are always displayed in reverse chronological order
   Scenario: Replying to a blog post or editing it does not affect its display order
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Course blog forum"
+    And I follow "Course blog forum" in the course content
     #
     # Add three posts into the blog.
     #
@@ -60,12 +60,12 @@ Feature: Blog posts are always displayed in reverse chronological order
     #
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Course blog forum"
+    And I follow "Course blog forum" in the course content
     And I click on "Discuss this topic" "link" in the "//div[@aria-label='Blog post 1 by Student 1']" "xpath_element"
     And I reply "Blog post 1" post from "Course blog forum" forum with:
       | Message | Reply to the first post |
     And I am on "Course 1" course homepage
-    And I follow "Course blog forum"
+    And I follow "Course blog forum" in the course content
     #
     # Make sure the order of the blog posts is still reverse chronological.
     #

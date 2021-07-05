@@ -25,7 +25,7 @@ Feature: Report different types of interactions.
       | student1 | H5P package | 1       | compound        | 2        | 2        | 4        | 1          | 1       |
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "H5P package"
+    And I follow "H5P package" in the course content
     And I follow "View my attempts"
     And I follow "View report"
     Then I should see "2 out of 2"
@@ -39,7 +39,7 @@ Feature: Report different types of interactions.
       | student1 | H5P package | 1       | compound        | 0        | 2        | 4        | 1          | 0       |
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "H5P package"
+    And I follow "H5P package" in the course content
     And I follow "View my attempts"
     And I follow "View report"
     Then I should see "0 out of 2"
@@ -54,7 +54,7 @@ Feature: Report different types of interactions.
       | student1 | H5P package | 1       | compound        | 2        | 2        | 4        | 1          | 1       |
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "H5P package"
+    And I follow "H5P package" in the course content
     And I follow "View my attempts"
     And I follow "View report"
     Then I should see "Select the correct answers"
@@ -68,7 +68,7 @@ Feature: Report different types of interactions.
       | student1 | H5P package | 1       | compound        | 0        | 2        | 4        | 1          | 0       |
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "H5P package"
+    And I follow "H5P package" in the course content
     And I follow "View my attempts"
     And I follow "View report"
     Then I should see "Select the correct answers"
@@ -82,7 +82,7 @@ Feature: Report different types of interactions.
       | student1 | H5P package | 1       | compound        | 2        | 2        | 4        | 1          | 1       |
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "H5P package"
+    And I follow "H5P package" in the course content
     And I follow "View my attempts"
     And I follow "View report"
     Then I should see "Drag and Drop example 1"
@@ -96,7 +96,7 @@ Feature: Report different types of interactions.
       | student1 | H5P package | 1       | compound        | 0        | 2        | 4        | 1          | 1       |
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "H5P package"
+    And I follow "H5P package" in the course content
     And I follow "View my attempts"
     And I follow "View report"
     Then I should see "Drag and Drop example 1"
@@ -110,7 +110,7 @@ Feature: Report different types of interactions.
       | student1 | H5P package | 1       | compound        | 2        | 2        | 4        | 1          | 1       |
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "H5P package"
+    And I follow "H5P package" in the course content
     And I follow "View my attempts"
     And I follow "View report"
     Then I should see "The correct answer is true"
@@ -124,7 +124,7 @@ Feature: Report different types of interactions.
       | student1 | H5P package | 1       | compound        | 0        | 2        | 4        | 1          | 0       |
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "H5P package"
+    And I follow "H5P package" in the course content
     And I follow "View my attempts"
     And I follow "View report"
     Then I should see "The correct answer is true"
@@ -138,7 +138,7 @@ Feature: Report different types of interactions.
       | student1 | H5P package | 1       | compound        | 2        | 2        | 4        | 1          | 1       |
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "H5P package"
+    And I follow "H5P package" in the course content
     And I follow "View my attempts"
     And I follow "View report"
     Then I should see "This an example of missing word text"
@@ -155,7 +155,7 @@ Feature: Report different types of interactions.
       | student1 | H5P package | 1       | compound        | 0        | 2        | 4        | 1          | 0       |
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "H5P package"
+    And I follow "H5P package" in the course content
     And I follow "View my attempts"
     And I follow "View report"
     Then I should see "This an example of missing word text"
@@ -174,7 +174,7 @@ Feature: Report different types of interactions.
       | student1 | H5P package | 1       | compound        | 2        | 2        | 4        | 1          | 1       |
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "H5P package"
+    And I follow "H5P package" in the course content
     And I follow "View my attempts"
     And I follow "View report"
     Then I should see "Please describe the novel The Hobbit"
@@ -189,7 +189,7 @@ Feature: Report different types of interactions.
       | student1 | H5P package | 1       | compound        | 0        | 2        | 4        | 1          | 0       |
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "H5P package"
+    And I follow "H5P package" in the course content
     And I follow "View my attempts"
     And I follow "View report"
     Then I should see "Please describe the novel The Hobbit"
@@ -206,7 +206,7 @@ Feature: Report different types of interactions.
       | student1 | H5P package | 1       | compound        | 2        | 2        | 4        | 1          | 1       |
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "H5P package"
+    And I follow "H5P package" in the course content
     And I follow "View my attempts"
     And I follow "View report"
     Then I should see "This interaction (sequencing) does not provide tracking information"
@@ -222,7 +222,7 @@ Feature: Report different types of interactions.
       | student1 | H5P package | 1       | compound        | 0        | 2        | 4        | 1          | 0       |
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "H5P package"
+    And I follow "H5P package" in the course content
     And I follow "View my attempts"
     And I follow "View report"
     Then I should see "This interaction (sequencing) does not provide tracking information"
@@ -238,7 +238,7 @@ Feature: Report different types of interactions.
       | student1 | H5P package | 1       | compound        | 2        | 2        | 4        | 1          | 1       |
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "H5P package"
+    And I follow "H5P package" in the course content
     And I follow "View my attempts"
     And I follow "View report"
     Then I should see "This interaction (other) does not provide tracking information"
@@ -254,7 +254,7 @@ Feature: Report different types of interactions.
       | student1 | H5P package | 1       | compound        | 0        | 2        | 4        | 1          | 0       |
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "H5P package"
+    And I follow "H5P package" in the course content
     And I follow "View my attempts"
     And I follow "View report"
     Then I should see "This interaction (other) does not provide tracking information"

@@ -37,7 +37,7 @@ Feature: In an assignment, teachers can change filters in the grading app
   Scenario: Set filters in the grading table and see them in the grading app
     Given I log in as "teacher1"
     And I am on "Course 1 &" course homepage
-    And I follow "Test assignment name &"
+    And I follow "Test assignment name &" in the course content
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I should not see "Course 1 &amp;"
@@ -51,7 +51,7 @@ Feature: In an assignment, teachers can change filters in the grading app
     And I log out
     When I log in as "teacher1"
     And I am on "Course 1 &" course homepage
-    And I follow "Test assignment name &"
+    And I follow "Test assignment name &" in the course content
     And I navigate to "View all submissions" in current page administration
     And I set the field "filter" to "Not submitted"
     And I set the field "markerfilter" to "Marker 1"
@@ -65,7 +65,7 @@ Feature: In an assignment, teachers can change filters in the grading app
   Scenario: Set filters in the grading app and see them in the grading table
     Given I log in as "teacher1"
     And I am on "Course 1 &" course homepage
-    And I follow "Test assignment name &"
+    And I follow "Test assignment name &" in the course content
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the field "allocatedmarker" to "Marker 1"
@@ -76,7 +76,7 @@ Feature: In an assignment, teachers can change filters in the grading app
     And I log out
     When I log in as "teacher1"
     And I am on "Course 1 &" course homepage
-    And I follow "Test assignment name &"
+    And I follow "Test assignment name &" in the course content
     And I navigate to "View all submissions" in current page administration
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I click on "[data-region=user-filters]" "css_element"

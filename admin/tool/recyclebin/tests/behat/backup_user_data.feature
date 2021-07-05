@@ -44,7 +44,7 @@ Feature: Backup user data
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Quiz 1"
+    And I follow "Quiz 1" in the course content
     And I press "Attempt quiz now"
     And I click on "True" "radio" in the "First question" "question"
     And I click on "False" "radio" in the "Second question" "question"

@@ -52,7 +52,7 @@ Feature: Feedbacks in courses with groups
       | feedback   | Course anon feedback | C1              | feedback2 | 1         | 1             | 1         | 0       |
     When I log in as "manager"
     And I am on site homepage
-    And I follow "Site feedback"
+    And I follow "Site feedback" in the course content
     And I click on "Edit questions" "link" in the "[role=main]" "css_element"
     And I add a "Multiple choice" question to the feedback with:
       | Question                       | Do you like our site?              |
@@ -66,7 +66,7 @@ Feature: Feedbacks in courses with groups
   Scenario: Non anonymous feedback with groups in a course
     When I log in as "teacher"
     And I am on "Course 1" course homepage
-    And I follow "Course feedback"
+    And I follow "Course feedback" in the course content
     And I click on "Edit questions" "link" in the "[role=main]" "css_element"
     And I add a "Multiple choice" question to the feedback with:
       | Question                       | Do you like this course?           |
@@ -92,7 +92,7 @@ Feature: Feedbacks in courses with groups
     # View analysis, user1 should only see one group - group 1
     And I log in as "user1"
     And I am on "Course 1" course homepage
-    And I follow "Course feedback"
+    And I follow "Course feedback" in the course content
     And I follow "Submitted answers"
     And I should see "Separate groups: Group 1"
     And I show chart data for the "multichoice1" feedback
@@ -102,7 +102,7 @@ Feature: Feedbacks in courses with groups
     # View analysis, user3 should only see one group - group 2
     And I log in as "user3"
     And I am on "Course 1" course homepage
-    And I follow "Course feedback"
+    And I follow "Course feedback" in the course content
     And I follow "Submitted answers"
     And I should see "Separate groups: Group 2"
     And I show chart data for the "multichoice1" feedback
@@ -112,7 +112,7 @@ Feature: Feedbacks in courses with groups
     # View analysis, user2 should see a group selector and be able to change the group but not view all.
     And I log in as "user2"
     And I am on "Course 1" course homepage
-    And I follow "Course feedback"
+    And I follow "Course feedback" in the course content
     And I follow "Submitted answers"
     And the field "Separate groups" matches value "Group 1"
     And I show chart data for the "multichoice1" feedback
@@ -127,7 +127,7 @@ Feature: Feedbacks in courses with groups
     # User without group can see all participants only
     And I log in as "user7"
     And I am on "Course 1" course homepage
-    And I follow "Course feedback"
+    And I follow "Course feedback" in the course content
     And I follow "Submitted answers"
     And I should see "Separate groups: All participants"
     And I show chart data for the "multichoice1" feedback
@@ -138,7 +138,7 @@ Feature: Feedbacks in courses with groups
     # Teacher can browse everybody
     And I log in as "teacher"
     And I am on "Course 1" course homepage
-    And I follow "Course feedback"
+    And I follow "Course feedback" in the course content
     And I navigate to "Analysis" in current page administration
     And the field "Separate groups" matches value "All participants"
     And I show chart data for the "multichoice1" feedback
@@ -169,7 +169,7 @@ Feature: Feedbacks in courses with groups
   Scenario: Anonymous feedback with groups in a course
     When I log in as "teacher"
     And I am on "Course 1" course homepage
-    And I follow "Course anon feedback"
+    And I follow "Course anon feedback" in the course content
     And I click on "Edit questions" "link" in the "[role=main]" "css_element"
     And I add a "Multiple choice" question to the feedback with:
       | Question                       | Do you like this course?           |
@@ -182,7 +182,7 @@ Feature: Feedbacks in courses with groups
       | Not at all | 1 |
     And I log in as "user1"
     And I am on "Course 1" course homepage
-    And I follow "Course anon feedback"
+    And I follow "Course anon feedback" in the course content
     And I follow "Submitted answers"
     And I should see "There are insufficient responses for this group"
     And I should not see "Yes of course"
@@ -202,7 +202,7 @@ Feature: Feedbacks in courses with groups
     # View analysis, user1 should only see one group - group 1
     And I log in as "user1"
     And I am on "Course 1" course homepage
-    And I follow "Course anon feedback"
+    And I follow "Course anon feedback" in the course content
     And I follow "Submitted answers"
     And I should see "Separate groups: Group 1"
     And I show chart data for the "multichoice1" feedback
@@ -212,7 +212,7 @@ Feature: Feedbacks in courses with groups
     # View analysis, user3 should only see one group - group 2
     And I log in as "user3"
     And I am on "Course 1" course homepage
-    And I follow "Course anon feedback"
+    And I follow "Course anon feedback" in the course content
     And I follow "Submitted answers"
     And I should see "Separate groups: Group 2"
     And I show chart data for the "multichoice1" feedback
@@ -222,7 +222,7 @@ Feature: Feedbacks in courses with groups
     # View analysis, user2 should see a group selector and be able to change the group but not view all.
     And I log in as "user2"
     And I am on "Course 1" course homepage
-    And I follow "Course anon feedback"
+    And I follow "Course anon feedback" in the course content
     And I follow "Submitted answers"
     And the field "Separate groups" matches value "Group 1"
     And I show chart data for the "multichoice1" feedback
@@ -237,7 +237,7 @@ Feature: Feedbacks in courses with groups
     # User without group can see all participants only
     And I log in as "user7"
     And I am on "Course 1" course homepage
-    And I follow "Course anon feedback"
+    And I follow "Course anon feedback" in the course content
     And I follow "Submitted answers"
     And I should see "Separate groups: All participants"
     And I show chart data for the "multichoice1" feedback
@@ -248,7 +248,7 @@ Feature: Feedbacks in courses with groups
     # Teacher can browse everybody
     And I log in as "teacher"
     And I am on "Course 1" course homepage
-    And I follow "Course anon feedback"
+    And I follow "Course anon feedback" in the course content
     And I navigate to "Analysis" in current page administration
     And the field "Separate groups" matches value "All participants"
     And I show chart data for the "multichoice1" feedback

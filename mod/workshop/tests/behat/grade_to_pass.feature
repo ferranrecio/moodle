@@ -21,13 +21,13 @@ Feature: Setting grades to pass via workshop editing form
       | activity   | name             | intro                        | course | idnumber    | section |
       | workshop   | Awesome workshop | Grades to pass are set here  | c1     | workshop1   | 1       |
     And I am on "Course1" course homepage
-    And I follow "Awesome workshop"
+    And I follow "Awesome workshop" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the field "Submission grade to pass" to "45"
     And I set the field "Assessment grade to pass" to "10.5"
     And I press "Save and return to course"
     And I am on "Course1" course homepage
-    And I follow "Awesome workshop"
+    And I follow "Awesome workshop" in the course content
     And I navigate to "Edit settings" in current page administration
     And the field "Submission grade to pass" matches value "45.00"
     And the field "Assessment grade to pass" matches value "10.50"
@@ -43,7 +43,7 @@ Feature: Setting grades to pass via workshop editing form
       | Assessment grade to pass    | 10.1                        |
       | submissiontypetextavailable | 0                           |
     Then I should not see "Adding a new Workshop"
-    And I follow "Another workshop"
+    And I follow "Another workshop" in the course content
     And I navigate to "Edit settings" in current page administration
     And the field "Submission grade to pass" matches value "42.00"
     And the field "Assessment grade to pass" matches value "10.10"
@@ -54,7 +54,7 @@ Feature: Setting grades to pass via workshop editing form
       | activity   | name                     | intro                           | course | idnumber    | section |
       | workshop   | Another awesome workshop | No grades to pass are set here  | c1     | workshop1   | 1       |
     And I am on "Course1" course homepage with editing mode on
-    And I follow "Another awesome workshop"
+    And I follow "Another awesome workshop" in the course content
     And I navigate to "Edit settings" in current page administration
     And the field "Submission grade to pass" matches value "0.00"
     And the field "Assessment grade to pass" matches value "0.00"
@@ -65,7 +65,7 @@ Feature: Setting grades to pass via workshop editing form
       | activity   | name                     | intro                              | course | idnumber    | section |
       | workshop   | Another awesome workshop | Invalid grade to pass is set here  | c1     | workshop1   | 1       |
     And I am on "Course1" course homepage
-    And I follow "Another awesome workshop"
+    And I follow "Another awesome workshop" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the field "Assessment grade to pass" to "You shall not pass!"
     And I press "Save and return to course"
@@ -78,7 +78,7 @@ Feature: Setting grades to pass via workshop editing form
       | activity   | name                    | intro                              | course | idnumber   | section |
       | workshop   | Almost awesome workshop | Invalid grade to pass is set here  | c1     | workshop1  | 1       |
     And I am on "Course1" course homepage
-    And I follow "Almost awesome workshop"
+    And I follow "Almost awesome workshop" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the field "Assessment grade to pass" to "10000000"
     And I press "Save and return to course"
@@ -91,7 +91,7 @@ Feature: Setting grades to pass via workshop editing form
       | activity   | name                   | intro                                     | course | idnumber  | section |
       | workshop   | Super awesome workshop | Grade to pass are set and then unset here | c1     | workshop1 | 1       |
     And I am on "Course1" course homepage
-    And I follow "Super awesome workshop"
+    And I follow "Super awesome workshop" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the field "Submission grade to pass" to "59.99"
     And I set the field "Assessment grade to pass" to "0.000"

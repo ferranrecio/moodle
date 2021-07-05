@@ -26,7 +26,7 @@ Feature: A teacher can set a wiki to be collaborative or individual
       | Description | Collaborative wiki description |
       | First page name | Collaborative index |
       | Wiki mode | Collaborative wiki |
-    And I follow "Collaborative wiki name"
+    And I follow "Collaborative wiki name" in the course content
     And I press "Create page"
     And I set the following fields to these values:
       | HTML format | Collaborative teacher1 edition |
@@ -37,7 +37,7 @@ Feature: A teacher can set a wiki to be collaborative or individual
       | Description | Individual wiki description |
       | First page name | Individual index |
       | Wiki mode | Individual wiki |
-    And I follow "Individual wiki name"
+    And I follow "Individual wiki name" in the course content
     And I press "Create page"
     And I set the following fields to these values:
       | HTML format | Individual teacher1 edition |
@@ -45,7 +45,7 @@ Feature: A teacher can set a wiki to be collaborative or individual
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    When I follow "Collaborative wiki name"
+    When I follow "Collaborative wiki name" in the course content
     Then I should see "Collaborative teacher1 edition"
     And I follow "Edit"
     And I set the following fields to these values:
@@ -54,7 +54,7 @@ Feature: A teacher can set a wiki to be collaborative or individual
     And I should not see "Collaborative teacher1 edition"
     And I should see "Collaborative student1 edition"
     And I am on "Course 1" course homepage
-    And I follow "Individual wiki name"
+    And I follow "Individual wiki name" in the course content
     And I should not see "Individual teacher1 edition"
     And I press "Create page"
     And I set the following fields to these values:
@@ -63,7 +63,7 @@ Feature: A teacher can set a wiki to be collaborative or individual
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Individual wiki name"
+    And I follow "Individual wiki name" in the course content
     And I should not see "Individual teacher1 edition"
     And I should not see "Individual student1 edition"
     And I press "Create page"
@@ -73,10 +73,10 @@ Feature: A teacher can set a wiki to be collaborative or individual
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Collaborative wiki name"
+    And I follow "Collaborative wiki name" in the course content
     And I should see "Collaborative student1 edition"
     And I am on "Course 1" course homepage
-    And I follow "Individual wiki name"
+    And I follow "Individual wiki name" in the course content
     And I should see "Individual teacher1 edition"
     And I should not see "Individual student1 edition"
     And I set the field "uid" to "Student 1"

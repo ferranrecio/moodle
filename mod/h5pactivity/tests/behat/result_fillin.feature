@@ -32,7 +32,7 @@ Feature: View fill the blanks attempt report
     # Do an attempt.
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Awesome H5P package"
+    And I follow "Awesome H5P package" in the course content
     And I switch to "h5p-player" class iframe
     And I switch to "h5p-iframe" class iframe
     And I set the field with xpath "//input[contains(@aria-label,\"Blank input 1 of 4\")]" to "Brigadoon"

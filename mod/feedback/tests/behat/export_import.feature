@@ -23,7 +23,7 @@ Feature: Exporting and importing feedbacks
   Scenario: Export sample feedback and compare with the fixture
     When I log in as "teacher"
     And I am on "Course 1" course homepage
-    And I follow "Learning experience"
+    And I follow "Learning experience" in the course content
     And I click on "Edit questions" "link" in the "[role=main]" "css_element"
     And I add a "Information" question to the feedback with:
       | Question         | this is an information question |
@@ -75,7 +75,7 @@ Feature: Exporting and importing feedbacks
   Scenario: Import feedback deleting old items
     When I log in as "teacher"
     And I am on "Course 1" course homepage
-    And I follow "Learning experience"
+    And I follow "Learning experience" in the course content
     And I click on "Edit questions" "link" in the "[role=main]" "css_element"
     And I add a "Numeric answer" question to the feedback with:
       | Question               | Existing question |
@@ -102,7 +102,7 @@ Feature: Exporting and importing feedbacks
   Scenario: Import feedback appending new items
     When I log in as "teacher"
     And I am on "Course 1" course homepage
-    And I follow "Learning experience"
+    And I follow "Learning experience" in the course content
     And I click on "Edit questions" "link" in the "[role=main]" "css_element"
     And I add a "Numeric answer" question to the feedback with:
       | Question               | Existing question |

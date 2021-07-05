@@ -32,7 +32,7 @@ Feature: View essay attempt report
     # Do an attempt.
     Given I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Awesome H5P package"
+    And I follow "Awesome H5P package" in the course content
     And I change window size to "large"
     And I switch to "h5p-player" class iframe
     And I switch to "h5p-iframe" class iframe

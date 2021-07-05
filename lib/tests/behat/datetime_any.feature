@@ -13,7 +13,7 @@ Feature: Any day / month / year combination in date form elements works ok.
       | activity   | name          | intro                              | course | idnumber |
       | assign     | Assignment 01 | Assign activity to test some dates | C1     | assign01 |
     Given I am on the "C1" "Course" page logged in as "admin"
-    And I follow "Assignment 01"
+    And I follow "Assignment 01" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "Due date" to "<initial_date>"

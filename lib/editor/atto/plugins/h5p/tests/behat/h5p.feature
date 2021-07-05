@@ -24,7 +24,7 @@ Feature: Add h5ps to Atto
     Given I log in as "admin"
     And I change window size to "large"
     And I am on "Course 1" course homepage
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I click on "Insert H5P" "button" in the "#fitem_id_page" "css_element"
     And I set the field with xpath "//input[@data-region='h5pfile']" to "https://moodle.h5p.com/content/1290772960722742119"
@@ -43,7 +43,7 @@ Feature: Add h5ps to Atto
     And I upload "h5p/tests/fixtures/guess-the-answer.h5p" file to "Files" filemanager
     And I click on "Save changes" "button"
     And I am on "Course 1" course homepage
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I click on "Insert H5P" "button" in the "#fitem_id_page" "css_element"
     And I click on "Browse repositories..." "button" in the "Insert H5P" "dialogue"
@@ -60,7 +60,7 @@ Feature: Add h5ps to Atto
     Given I log in as "admin"
     And I change window size to "large"
     And I am on "Course 1" course homepage
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I click on "Insert H5P" "button" in the "#fitem_id_page" "css_element"
 #   This is not a real external URL, so this scenario shouldn't be labeled as external.
@@ -77,7 +77,7 @@ Feature: Add h5ps to Atto
     | moodle/h5p:deploy | Prohibit | editingteacher | Course | C1 |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     When I navigate to "Edit settings" in current page administration
     Then "Insert H5P" "button" should not exist
 
@@ -88,7 +88,7 @@ Feature: Add h5ps to Atto
     | atto/h5p:addembed | Prohibit | editingteacher | Course | C1 |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     When I navigate to "Edit settings" in current page administration
     And I click on "Insert H5P" "button"
     Then I should not see "H5P URL" in the "Insert H5P" "dialogue"
@@ -102,7 +102,7 @@ Feature: Add h5ps to Atto
     | moodle/h5p:deploy | Prohibit | editingteacher | Course | C1 |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     When I navigate to "Edit settings" in current page administration
     And I click on "Insert H5P" "button"
     Then I should not see "H5P file upload" in the "Insert H5P" "dialogue"
@@ -116,7 +116,7 @@ Feature: Add h5ps to Atto
     And I upload "lib/editor/atto/tests/fixtures/drag.h5p" file to "Files" filemanager
     And I click on "Save changes" "button"
     And I am on "Course 1" course homepage
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I click on "Insert H5P" "button" in the "#fitem_id_page" "css_element"
 #   H5P file content
@@ -152,7 +152,7 @@ Feature: Add h5ps to Atto
     And I upload "h5p/tests/fixtures/guess-the-answer.h5p" file to "Files" filemanager
     And I click on "Save changes" "button"
     And I am on "Course 1" course homepage
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I click on "Insert H5P" "button" in the "#fitem_id_page" "css_element"
     And I click on "Browse repositories..." "button" in the "Insert H5P" "dialogue"
@@ -208,7 +208,7 @@ Feature: Add h5ps to Atto
     Given I log in as "admin"
     And I change window size to "large"
     And I am on "Course 1" course homepage
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I click on "Insert H5P" "button" in the "#fitem_id_page" "css_element"
     And I set the field with xpath "//input[@data-region='h5pfile']" to "https://moodle.h5p.com/content/1290752078589054689"
@@ -242,7 +242,7 @@ Feature: Add h5ps to Atto
     And I upload "h5p/tests/fixtures/guess-the-answer.h5p" file to "Files" filemanager
     And I click on "Save changes" "button"
     And I am on "Course 1" course homepage
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     And I navigate to "Edit settings" in current page administration
     And I click on "Insert H5P" "button" in the "#fitem_id_page" "css_element"
     And I click on "Browse repositories..." "button" in the "Insert H5P" "dialogue"
@@ -255,7 +255,7 @@ Feature: Add h5ps to Atto
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "PageName1"
+    And I follow "PageName1" in the course content
     Then I switch to "h5pcontent" iframe
     And I switch to "h5p-iframe" class iframe
     And I should see "reveal"

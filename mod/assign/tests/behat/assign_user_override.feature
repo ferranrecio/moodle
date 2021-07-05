@@ -26,7 +26,7 @@ Feature: Assign user override
   Scenario: Add, modify then delete a user override
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test assignment name"
+    When I follow "Test assignment name" in the course content
     And I navigate to "User overrides" in current page administration
     And I press "Add user override"
     And I set the following fields to these values:
@@ -47,7 +47,7 @@ Feature: Assign user override
   Scenario: Duplicate a user override
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test assignment name"
+    When I follow "Test assignment name" in the course content
     And I navigate to "User overrides" in current page administration
     And I press "Add user override"
     And I set the following fields to these values:
@@ -67,7 +67,7 @@ Feature: Assign user override
   Scenario: Allow a user to have a different due date
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test assignment name"
+    When I follow "Test assignment name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Allow submissions from | disabled             |
@@ -84,19 +84,19 @@ Feature: Assign user override
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     Then the activity date in "Test assignment name" should contain "Due: Saturday, 1 January 2000, 8:00"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And the activity date in "Test assignment name" should contain "Due: Wednesday, 1 January 2020, 8:00"
 
   @javascript
   Scenario: Allow a user to have a different cut off date
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test assignment name"
+    When I follow "Test assignment name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Due date               | disabled             |
@@ -113,19 +113,19 @@ Feature: Assign user override
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     Then I should not see "You have not made a submission yet."
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I should see "You have not made a submission yet."
 
   @javascript
   Scenario: Allow a user to have a different start date
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I follow "Test assignment name"
+    When I follow "Test assignment name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
       | Due date               | disabled                 |
@@ -142,12 +142,12 @@ Feature: Assign user override
     And I log out
     And I log in as "student2"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     Then the activity date in "Test assignment name" should contain "Opens: Tuesday, 1 January 2030, 8:00"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I should not see "1 January 2030, 8:00"
 
   Scenario: Override a user when teacher is in no group, and does not have accessallgroups permission, and the activity's group mode is "separate groups"
@@ -159,7 +159,7 @@ Feature: Assign user override
       | assign   | Assignment 2 | Assignment 2 description | C1     | assign2  | 1         |
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Assignment 2"
+    And I follow "Assignment 2" in the course content
     And I navigate to "User overrides" in current page administration
     Then I should see "No groups you can access."
     And the "Add user override" "button" should be disabled
@@ -183,7 +183,7 @@ Feature: Assign user override
       | student2 | G2    |
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Assignment 2"
+    And I follow "Assignment 2" in the course content
     And I navigate to "User overrides" in current page administration
     And I press "Add user override"
     Then the "Override user" select box should contain "Sam1 Student1, student1@example.com"
@@ -209,7 +209,7 @@ Feature: Assign user override
       | student2 | G2    |
     And I log in as "admin"
     And I am on "Course 1" course homepage
-    And I follow "Assignment 2"
+    And I follow "Assignment 2" in the course content
     And I navigate to "User overrides" in current page administration
     And I press "Add user override"
     And I set the following fields to these values:
@@ -223,7 +223,7 @@ Feature: Assign user override
     And I log out
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Assignment 2"
+    And I follow "Assignment 2" in the course content
     And I navigate to "User overrides" in current page administration
     Then I should see "Student1" in the ".generaltable" "css_element"
     And I should not see "Student2" in the ".generaltable" "css_element"
@@ -232,7 +232,7 @@ Feature: Assign user override
   Scenario: Create a user override when the assignment is not available to the student
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    And I follow "Test assignment name"
+    And I follow "Test assignment name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "Availability" to "Hide from students"

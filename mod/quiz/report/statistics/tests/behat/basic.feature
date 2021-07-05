@@ -41,7 +41,7 @@ Feature: Basic use of the Statistics report
   Scenario: Report works when there are no attempts
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Quiz 1"
+    And I follow "Quiz 1" in the course content
     And I navigate to "Results > Statistics" in current page administration
     Then I should see "No attempts have been made at this quiz, or all attempts have questions that need manual grading."
     And I should not see "Statistics for question positions"

@@ -30,7 +30,7 @@ Feature: Using the database activities which support point scale
     And I follow "Templates"
     And I wait until the page is ready
     And I am on "Course 1" course homepage
-    And I follow "Test database name"
+    And I follow "Test database name" in the course content
     And I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     And I set the field "Ratings > Aggregate type" to "Count of ratings"
@@ -46,11 +46,11 @@ Feature: Using the database activities which support point scale
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I follow "Test database name"
+    And I follow "Test database name" in the course content
     And I follow "View single"
     And I set the field "rating" to "51"
     And I am on "Course 1" course homepage
-    And I follow "Test database name"
+    And I follow "Test database name" in the course content
     When I navigate to "Edit settings" in current page administration
     And I expand all fieldsets
     Then the "Maximum grade" "field" should be disabled

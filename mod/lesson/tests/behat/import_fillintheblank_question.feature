@@ -21,7 +21,7 @@ Feature: In a lesson activity, teacher can import blackboard fill in the blank q
     And I add a "Lesson" to section "1" and I fill the form with:
       | Name | Test lesson name |
       | Description | Test lesson description |
-    And I follow "Test lesson name"
+    And I follow "Test lesson name" in the course content
     And I follow "Import questions"
     And I set the field "File format" to "Blackboard"
     And I upload "mod/lesson/tests/fixtures/sample_blackboard_fib_qti.dat" file to "Upload" filemanager

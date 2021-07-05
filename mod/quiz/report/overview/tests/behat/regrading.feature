@@ -44,7 +44,7 @@ Feature: Regrading quiz attempts using the Grades report
   Scenario: Regrade all attempts
     Given I log in as "teacher"
     And I am on "Course 1" course homepage
-    And I follow "Quiz for testing regrading"
+    And I follow "Quiz for testing regrading" in the course content
     And I navigate to "Results > Grades" in current page administration
     When I press "Regrade all"
 
@@ -63,7 +63,7 @@ Feature: Regrading quiz attempts using the Grades report
   Scenario: Regrade selected attempts
     Given I log in as "teacher"
     And I am on "Course 1" course homepage
-    And I follow "Quiz for testing regrading"
+    And I follow "Quiz for testing regrading" in the course content
     And I navigate to "Results > Grades" in current page administration
     When I click on "Select attempt" "checkbox" in the "Student Two" "table_row"
 
@@ -80,7 +80,7 @@ Feature: Regrading quiz attempts using the Grades report
   Scenario: Dry-run a full regrade, then regrade the attempts that will need it.
     Given I log in as "teacher"
     And I am on "Course 1" course homepage
-    And I follow "Quiz for testing regrading"
+    And I follow "Quiz for testing regrading" in the course content
     When I navigate to "Edit quiz" in current page administration
     And I follow "Edit question SA"
     And I set the field "id_fraction_1" to "50%"
