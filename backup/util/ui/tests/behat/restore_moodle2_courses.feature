@@ -21,6 +21,7 @@ Feature: Restore Moodle 2 course backups
       | Forum name | Test forum name |
       | Description | Test forum description |
     And I add the "Activities" block
+    And I change window size to "large"
 
   @javascript
   Scenario: Restore a course in another existing course
@@ -107,7 +108,7 @@ Feature: Restore Moodle 2 course backups
     And I press "Cancel"
 
   @javascript
-  Scenario: Restore a backup in an existing course retaining the backup course settings
+  Scenario: Restore a backup in an existing course retaining the backup course settings                 |
     Given I add a "URL" to section "3" and I fill the form with:
       | Name | Test URL name |
       | Description | Test URL description |

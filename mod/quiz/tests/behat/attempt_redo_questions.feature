@@ -30,6 +30,7 @@ Feature: Allow students to redo questions in a practice quiz, without starting a
       | question | page | maxmark |
       | TF1      | 1    | 2       |
       | TF2      | 1    | 1       |
+    And I change window size to "large"
 
   @javascript
   Scenario: After completing a question, there is a redo question button that restarts the question
