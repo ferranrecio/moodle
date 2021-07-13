@@ -227,6 +227,17 @@ export default class extends BaseComponent {
     }
 
     /**
+     * Handle a move cm request.
+     *
+     * @param {Element} target the dispatch action element
+     * @param {Event} event the triggered event
+     */
+    async _requestAddSection(target, event) {
+        event.preventDefault();
+        this.reactive.dispatch('addSection', target.dataset.id ?? 0);
+    }
+
+    /**
      * Extract the DOM element from the param.
      *
      * Modals uses jQuery instead of vnailla JS. To prevent future problems, we use this method to

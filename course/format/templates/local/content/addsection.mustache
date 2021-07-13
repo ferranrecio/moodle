@@ -48,7 +48,13 @@
     </a>
     {{/decrease}}
     {{#addsections}}
-    <a href="{{{url}}}" class="add-sections" data-add-sections="{{title}}" data-new-sections="{{newsection}}">
+    <a
+        href="{{{url}}}"
+        class="add-sections"
+        data-add-sections="{{title}}"
+        data-new-sections="{{newsection}}"
+        data-action="addSection"
+    >
         {{#pix}} t/add, moodle {{/pix}} {{title}}
     </a>
     {{/addsections}}

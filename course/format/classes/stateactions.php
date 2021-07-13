@@ -164,6 +164,57 @@ class stateactions {
     }
 
     /**
+     * Create a course section to another location in the same course.
+     *
+     * This method follows a the same logic as changenumsections.php.
+     *
+     * @param stateupdates $updates the affected course elements track
+     * @param stdClass $course the course object
+     * @param int[] $ids not used
+     * @param int $targetsectionid optional target section id (if not passed section will be appended)
+     * @param int $targetcmid not used
+     */
+    public function section_add(
+        stateupdates $updates,
+        stdClass $course,
+        array $ids = [],
+        ?int $targetsectionid = null,
+        ?int $targetcmid = null
+    ): void {
+
+        $coursecontext = context_course::instance($course->id);
+        require_capability('moodle/course:update', $coursecontext);
+
+        // Get course format settings.
+        $courseformat = course_get_format($course->id);
+        $lastsectionnumber = $courseformat->get_last_section_number();
+        $maxsections = $courseformat->get_max_sections();
+
+        if ($lastsectionnumber >= $maxsections) {
+            throw new moodle_exception('maxsectionslimit', 'moodle', $maxsections);
+        }
+
+        $modinfo = get_fast_modinfo($course);
+
+        // Get target section.
+        if ($targetsectionid) {
+            $this->validate_sections($course, [$targetsectionid], __FUNCTION__);
+            $targetsection = $modinfo->get_section_info_by_id($targetsectionid, MUST_EXIST);
+            // Inserting sections at any position except in the very end requires capability to move sections.
+            require_capability('moodle/course:movesections', $coursecontext);
+            $insertposition = $targetsection->section;
+        } else {
+            // Get last section.
+            $insertposition = 0;
+        }
+
+        course_create_section($course, $insertposition);
+
+        // Adding a section affects the full course structure.
+        $this->course_state($updates, $course);
+    }
+
+    /**
      * Extract several cm_info from the course_modinfo.
      *
      * @param course_modinfo $modinfo the course modinfo.
