@@ -43,9 +43,7 @@ Feature: Post date columns data available
       | user     | forum  | name        | message         | created                 |
       | teacher1 | forum1 | discussion1 | t1 other course | ##2017-01-01 03:00:00## |
       | teacher1 | forum1 | discussion2 | t1 other course | ##2019-09-13 23:59:00## |
-    When I log in as "teacher1"
-    And I am on "Course 1" course homepage
-    And I follow "forum1"
+    When I am on the forum1 "forum activity" page logged in as teacher1
     And I navigate to "Forum summary report" in current page administration
     Then "Teacher 1" row "Earliest post" column of "forumreport_summary_table" table should contain "Tuesday, 2 January 2018, 9:00"
     Then "Teacher 1" row "Most recent post" column of "forumreport_summary_table" table should contain "Sunday, 1 September 2019, 7:00"
