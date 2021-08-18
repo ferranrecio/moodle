@@ -560,8 +560,6 @@ class core_course_renderer extends plugin_renderer_base {
      * Checks if course module has any conditions that may make it unavailable for
      * all or some of the students
      *
-     * This function is internal and is only used to create CSS classes for the module name/text
-     *
      * @param cm_info $mod
      * @return bool
      */

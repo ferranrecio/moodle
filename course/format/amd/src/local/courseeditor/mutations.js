@@ -68,8 +68,8 @@ export default class {
      * @param {array} sectionIds the list of section ids to update
      */
     async sectionState(stateManager, sectionIds) {
-        const state = stateManager.state;
-        const updates = await this._callEditWebservice('section_state', state.course.id, sectionIds);
+        const course = stateManager.get('course');
+        const updates = await this._callEditWebservice('section_state', course.id, sectionIds);
         stateManager.processUpdates(updates);
     }
 

@@ -203,7 +203,7 @@ export default class Component extends BaseComponent {
      * Fix/reorder the section or cms order.
      *
      * @param {Element} container the HTML element to reorder.
-     * @param {*} neworder an array with the ids order
+     * @param {Array} neworder an array with the ids order
      * @param {Array} allitems the list of html elements that can be placed in the container
      */
     _fixOrder(container, neworder, allitems) {
