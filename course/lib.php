@@ -3861,7 +3861,7 @@ function core_course_core_calendar_get_valid_event_timestart_range(\calendar_eve
 function core_course_drawer(): string {
     global $PAGE;
     // Only course are able to render course index.
-    if (!preg_match('/^(course).*/', $PAGE->pagetype)) {
+    if (!preg_match('/^(course-view).*/', $PAGE->pagetype)) {
         return '';
     }
 
