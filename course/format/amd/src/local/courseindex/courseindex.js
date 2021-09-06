@@ -24,6 +24,7 @@
 
 import {BaseComponent} from 'core/reactive';
 import {getCurrentCourseEditor} from 'core_courseformat/courseeditor';
+import Tree from 'core/tree';
 
 export default class Component extends BaseComponent {
 
@@ -77,6 +78,9 @@ export default class Component extends BaseComponent {
         cms.forEach((cm) => {
             this.cms[cm.dataset.id] = cm;
         });
+
+        // Setup keyboard navigation.
+        this._setupNavigation();
     }
 
     getWatchers() {
@@ -200,5 +204,71 @@ export default class Component extends BaseComponent {
      */
     _deleteCm({element}) {
         delete this.cms[element.id];
+    }
+
+    /**
+     * Setup the core/tree keyboard navigation.
+     *
+     * Node tree and bootstrap collapsibles don't use the same HTML structure. However,
+     * by overriding some scanning methods it is possible to most of the implementation.
+     *
+     */
+    _setupNavigation() {
+        const navTree = new Tree(this.element);
+
+        // The core/tree library saves the visible elements cache inside the main tree node.
+        // However, in edit mode we don't want to use internal caches as the content can change suddenly.
+        if (this.reactive.isEditing) {
+            navTree._getVisibleItems = navTree.getVisibleItems;
+            navTree.getVisibleItems = () => {
+                navTree.refreshVisibleItemsCache();
+                return navTree._getVisibleItems();
+            };
+        } else {
+            // In non-editing mode we update the tree caches using bootstrap events.
+            navTree.treeRoot.on('hidden.bs.collapse shown.bs.collapse', () => {
+                navTree.refreshVisibleItemsCache();
+            });
+        }
+
+        const getItemSection = (item) => {
+            let container = item;
+            // Normalize jQuery or DOM elements into vanilla Elements if necessary.
+            if (!(container instanceof Element) && container.get !== undefined) {
+                container = item.get(0);
+            }
+            return container.closest(this.selectors.SECTION);
+        };
+
+        // Alter some tree methods to use the current course index.
+
+        navTree.isGroupCollapsed = (item) => {
+            // Navigate to the parent note (section).
+            const container = getItemSection(item);
+            return container.querySelector(`[aria-expanded]`).getAttribute('aria-expanded') === 'false';
+        };
+
+        navTree.toggleGroup = (item) => {
+            getItemSection(item).querySelector(this.selectors.COLLAPSE).click();
+        };
+
+        navTree.expandGroup = (item) => {
+            if (navTree.isGroupCollapsed(item)) {
+                navTree.toggleGroup(item);
+            }
+        };
+
+        navTree.collapseGroup = (item) => {
+            if (!navTree.isGroupCollapsed(item)) {
+                navTree.toggleGroup(item);
+            }
+        };
+
+        navTree.expandAllGroups = () => {
+            const togglers = this.getElements(this.selectors.COLLAPSE);
+            togglers.forEach(item => navTree.expandGroup(item));
+        };
+
+        this.navTree = navTree;
     }
 }
