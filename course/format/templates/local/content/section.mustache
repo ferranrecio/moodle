@@ -77,8 +77,8 @@
         "sitehome": false
     }
 }}
-<li id="section-{{num}}"
-    class="section main {{#onlysummary}} section-summary {{/onlysummary}} clearfix
+<li id="course-section-{{num}}"
+    class="course-section main {{#onlysummary}} course-section-summary {{/onlysummary}} clearfix
             {{#ishidden}} hidden {{/ishidden}} {{#iscurrent}} current {{/iscurrent}}
             {{#isstealth}} orphaned {{/isstealth}}"
     data-sectionid="{{num}}"
@@ -87,27 +87,32 @@
     data-id="{{id}}"
     data-number="{{num}}"
 >
+    <div class="course-section-header d-flex my-3">
     {{#singleheader}} {{> core_courseformat/local/content/section/header }} {{/singleheader}}
-    <div class="left side">{{#iscurrent}} {{{currentlink}}} {{/iscurrent}}</div>
-    <div class="right side">
+    {{#header}} {{> core_courseformat/local/content/section/header }} {{/header}}
+    {{#iscurrent}}
+        <div class="ml-2 mb-1 align-self-end">
+            <span class="badge badge-pill badge-info">{{#str}}highlighted{{/str}}</span>
+        </div>
+    {{/iscurrent}}
     {{#controlmenu}}
             {{> core_courseformat/local/content/section/controlmenu }}
     {{/controlmenu}}
     </div>
-    {{#header}} {{> core_courseformat/local/content/section/header }} {{/header}}
     <div id="coursecontentcollapse{{num}}"
          class="content {{^iscoursedisplaymultipage}}
              {{^sitehome}}course-content-item-content collapse {{#isactive}}show{{/isactive}}{{/sitehome}}
          {{/iscoursedisplaymultipage}}">
-        {{#availability}}
-            {{> core_courseformat/local/content/section/availability }}
-        {{/availability}}
-        <div class="summary">
-        {{#summary}}
-            {{> core_courseformat/local/content/section/summary }}
-        {{/summary}}
+         {{#hasdescription}}
+         <div class="description mb-3">
+            {{#summary}}
+                {{> core_courseformat/local/content/section/summary }}
+            {{/summary}}
+            {{#availability}}
+                {{> core_courseformat/local/content/section/availability }}
+            {{/availability}}
         </div>
-        {{#cmsummary}} {{> core_courseformat/local/content/section/cmsummary }} {{/cmsummary}}
+        {{/hasdescription}}
         {{#cmlist}} {{> core_courseformat/local/content/section/cmlist }} {{/cmlist}}
         {{{cmcontrols}}}
     </div>
