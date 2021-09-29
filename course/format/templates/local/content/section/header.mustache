@@ -30,8 +30,7 @@
 }}
 
 {{#iscoursedisplaymultipage}}
-    <h3 class="sectionid-{{id}}-title sectionname"
-        data-for="section_title" data-id="{{id}}" data-number="{{num}}">
+    <h3 class="sectionid-{{id}}-title sectionname">
         {{#url}}
             <a href="{{{url}}}" class="{{#ishidden}} dimmed_text {{/ishidden}}">{{name}}</a>
         {{/url}}
@@ -42,8 +41,7 @@
 {{/iscoursedisplaymultipage}}
 {{^iscoursedisplaymultipage}}
     {{#sitehome}}
-        <h2 class="sectionid-{{id}}-title sectionname"
-            data-for="section_title" data-id="{{id}}" data-number="{{num}}">
+        <h2 class="sectionid-{{id}}-title sectionname">
             {{#url}}
                 <a href="{{{url}}}" class="{{#ishidden}} dimmed_text {{/ishidden}}">{{name}}</a>
             {{/url}}

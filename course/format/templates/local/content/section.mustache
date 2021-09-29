@@ -87,7 +87,11 @@
     data-id="{{id}}"
     data-number="{{num}}"
 >
-    <div class="course-section-header d-flex my-3">
+    <div class="course-section-header d-flex my-3"
+        data-for="section_title"
+        data-id="{{id}}"
+        data-number="{{num}}"
+    >
     {{#singleheader}} {{> core_courseformat/local/content/section/header }} {{/singleheader}}
     {{#header}} {{> core_courseformat/local/content/section/header }} {{/header}}
     {{#iscurrent}}
