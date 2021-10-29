@@ -153,8 +153,10 @@ class section implements renderable, templatable {
         }
 
         $coursedisplay = $course->coursedisplay ?? COURSE_DISPLAY_SINGLEPAGE;
-        if ($coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
-            $data->iscoursedisplaymultipage = true;
+        $data->iscoursedisplaymultipage = ($coursedisplay == COURSE_DISPLAY_MULTIPAGE);
+
+        if ($data->num === 0 && !$data->iscoursedisplaymultipage) {
+            $data->collapsemenu = true;
         }
 
         if ($course->id == SITEID) {
