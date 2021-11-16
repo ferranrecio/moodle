@@ -15,67 +15,82 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template core_availability/availability_multiple_messages
+    @template core_availability/availability_info
 
     Renders the availability tree for course activties
 
     Example context (json):
     {
-        "parentcontainer" : "123456",
+        "id" : "123456",
+        "header": "Not available unless:",
         "items" : [
             {
                 "showmorelink": 0,
                 "abbreviate" : 0,
-                "title": "You belong to Green Group"
+                "hidden" : 0,
+                "hasitems": 0,
+                "header": "You belong to Green Group"
             },
             {
                 "showmorelink": 0,
                 "abbreviate" : 0,
-                "title": "You belong to Red Group"
-            },
-            {
-                "showmorelink": 0,
-                "abbreviate" : 0,
-                "title": "You belong to Orange Group"
+                "hidden" : 0,
+                "hasitems": 0,
+                "header": "You belong to Red Group"
             },
             {
                 "showmorelink": 0,
                 "abbreviate" : 1,
-                "title": "You belong to Pink Group"
-            },
-            {
-                "showmorelink": 1
+                "hidden" : 0,
+                "hasitems": 0,
+                "header": "You belong to Orange Group"
             },
             {
                 "showmorelink": 0,
                 "abbreviate" : 0,
-                "title": "You belong to Red Group",
-                "class": "d-none"
+                "hidden" : 1,
+                "hasitems": 0,
+                "header": "You belong to Pink Group"
+            },
+            {
+                "showmorelink": 0,
+                "abbreviate" : 0,
+                "hidden" : 1,
+                "hasitems": 0,
+                "header": "You belong to Red Group"
             }
-        ]
+        ],
+        "hasitems": 1,
+        "showmorelink": 1
     }
 }}
 {{{header}}}
-<ul {{#parent}}id="availability-tree-{{id}}" data-region="availability-multiple"{{/parent}}>
+{{#hasitems}}
+<ul {{#id}} id="availability-tree-{{id}}" {{/id}} data-region="availability-multiple">
     {{#items}}
         <li class="{{#hidden}}d-none{{/hidden}}">
             {{#abbreviate}}
-                <span class="d-none">{{{title}}}</span><span class="d-block">...</span>
+                <span class="d-none">
+                    {{> core_availability/availability_info }}
+                </span><span class="d-block">...</span>
             {{/abbreviate}}
             {{^abbreviate}}
-                {{{title}}}
+                {{> core_availability/availability_info }}
             {{/abbreviate}}
         </li>
     {{/items}}
     {{#showmorelink}}
-        <li data-action="showmore" class="d-block showmore"><a role="button" aria-expanded="false" aria-controls="availability-tree-{{id}}" href="#" >Show more</a></li>
+        <li data-action="showmore" class="d-block showmore">
+            <a role="button" aria-expanded="false" aria-controls="availability-tree-{{id}}" href="#" >Show more</a>
+        </li>
     {{/showmorelink}}
 </ul>
+{{/hasitems}}
 
-{{^parent}}
+{{#showmorelink}}
 {{#js}}
 require(['core_availability/availability_more'], function(availabilityMore) {
         availabilityMore.init();
 });
 {{/js}}
-{{/parent}}
+{{/showmorelink}}

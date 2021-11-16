@@ -37,17 +37,11 @@ use stdClass;
  */
 class availability_info implements renderable, templatable {
 
-    /** @var availabilitymessages the course format class */
+    /** @var core_availability_multiple_messages availabilitymessages the course format class */
     protected $availabilitymessages;
 
     /** @var int counts number of conditions */
-    protected static $count = 0;
-
-    /** @var int templateid unique id for this template */
-    protected static $templateid = 0;
-
-    /** @var bool If these conditions have parent conditions, ie. are part of a subset  */
-    protected $hasparent = false;
+    protected $count = 0;
 
     /** @var int Maximum number of lines of availability info */
     protected const MAXVISIBLE = 4;
@@ -56,11 +50,10 @@ class availability_info implements renderable, templatable {
      * Constructor.
      *
      * @param core_availability_multiple_messages $renderable the availability messages
-     * @param bool $hasparent does this availability set have a parent availability set
      */
-    public function __construct(core_availability_multiple_messages $renderable, bool $hasparent = false) {
+    public function __construct(core_availability_multiple_messages $renderable) {
         $this->availabilitymessages = $renderable;
-        $this->hasparent = $hasparent;
+        $this->count = 0;
     }
 
     /**
@@ -71,52 +64,63 @@ class availability_info implements renderable, templatable {
      */
     public function export_for_template(\renderer_base $output): stdClass {
 
-        // Make the list.
-        $template = (object)[];
-        // Get initial message.
-        $template->header = get_string('list_' . ($this->availabilitymessages->root ? 'root_' : '') .
-                ($this->availabilitymessages->andoperator ? 'and' : 'or') .
-                ($this->availabilitymessages->treehidden ? '_hidden' : ''),
-                'availability');
-        $template->items = [];
+        $template = $this->get_item_template($this->availabilitymessages);
 
-        if (!$this->hasparent) {
-            $this->hasparent = true;
-            self::$count = 0;
-            self::$templateid = uniqid();
-            $template->parent = true;
+        $template->id = uniqid();
+
+        if ($this->count > self::MAXVISIBLE) {
+            $template->showmorelink = true;
         }
 
-        $template->id = self::$templateid;
+        return $template;
+    }
 
-        foreach ($this->availabilitymessages->items as $item) {
-            $message = (object)[];
+    /**
+     * Get the item base template.
+     *
+     * @return stdClass the template base
+     */
+    protected function get_item_base_template(): stdClass {
+        return (object)[
+            'hidden' => $this->count > self::MAXVISIBLE,
+            'abbreviate' => $this->count === self::MAXVISIBLE,
+            'id' => false,
+            'items' => [],
+            'hasitems' => false,
+            'showmorelink' => false,
+        ];
+    }
 
+    /**
+     * Get the item template.
+     *
+     * @param core_availability_multiple_messages $availability the availability messages
+     * @return stdClass the template
+     */
+    protected function get_item_template(core_availability_multiple_messages $availability): stdClass {
+
+        $template = $this->get_item_base_template();
+
+        $template->header = get_string(
+            'list_' . ($availability->root ? 'root_' : '') .
+                ($availability->andoperator ? 'and' : 'or') .
+                ($availability->treehidden ? '_hidden' : ''),
+            'availability'
+        );
+
+        foreach ($availability->items as $item) {
+            $this->count++;
             if (is_string($item)) {
-
-                self::$count++;
-                $message->title = $item . self::$count;
-                if (self::$count === self::MAXVISIBLE) {
-                    $message->abbreviate = true;
-                }
-                if (self::$count > self::MAXVISIBLE) {
-                    $message->hidden = true;
-                }
+                $simple_item = $this->get_item_base_template();
+                $simple_item->header = $item;
+                $template->items[] = $simple_item;
             } else {
-                if (self::$count >= self::MAXVISIBLE) {
-                    $message->hidden = true;
-                }
-                $subitem = new \core_availability\output\availability_info($item, $this->hasparent);
-                $message->title = $output->render($subitem);
-            }
-
-            $template->items[] = $message;
-
-            if (self::$count === self::MAXVISIBLE) {
-                $template->showmorelink = true;
-                self::$count += 1;
+                $template->items[] = $this->get_item_template($item);
             }
         }
+
+        $template->hasitems = !empty($template->items);
+
         return $template;
     }
 }
