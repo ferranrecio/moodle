@@ -143,14 +143,28 @@ const disableDrawerTooltips = (drawerNode) => {
         if (!button) {
             return;
         }
-        if (button.hasAttribute('data-original-title')) {
-            // The jQuery is still used in Boostrap 4. It can we removed when MDL-71979 is integrated.
-            jQuery(button).tooltip('disable');
-        } else {
-            button.dataset.disabledToggle = button.dataset.toggle;
-            button.removeAttribute('data-toggle');
-        }
+        disableButtonTooltip(button);
     });
+};
+
+/**
+ * Disable the button tooltips.
+ *
+ * @param {HTMLElement} button the button element
+ * @param {boolean} enableOnBlur if the tooltip must be re-enabled on blur.
+ * @private
+ */
+const disableButtonTooltip = (button, enableOnBlur) => {
+    if (button.hasAttribute('data-original-title')) {
+        // The jQuery is still used in Boostrap 4. It can we removed when MDL-71979 is integrated.
+        jQuery(button).tooltip('disable');
+    } else {
+        button.dataset.disabledToggle = button.dataset.toggle;
+        button.removeAttribute('data-toggle');
+    }
+    if (enableOnBlur) {
+        button.dataset.restoreTooltipOnBlur = true;
+    }
 };
 
 /**
@@ -168,14 +182,25 @@ const enableDrawerTooltips = (drawerNode) => {
         if (!button) {
             return;
         }
-        // The jQuery is still used in Boostrap 4. It can we removed when MDL-71979 is integrated.
-        if (button.hasAttribute('data-original-title')) {
-            jQuery(button).tooltip('enable');
-        } else if (button.dataset.disabledToggle) {
-            button.dataset.toggle = button.dataset.disabledToggle;
-            jQuery(button).tooltip();
-        }
+        enableButtonTooltip(button);
     });
+};
+
+/**
+ * Enable the button tooltips.
+ *
+ * @param {HTMLElement} button the button element
+ * @private
+ */
+const enableButtonTooltip = (button) => {
+    // The jQuery is still used in Boostrap 4. It can we removed when MDL-71979 is integrated.
+    if (button.hasAttribute('data-original-title')) {
+        jQuery(button).tooltip('enable');
+    } else if (button.dataset.disabledToggle) {
+        button.dataset.toggle = button.dataset.disabledToggle;
+        jQuery(button).tooltip();
+    }
+    button.dataset.restoreTooltipOnBlur = false;
 };
 
 /**
@@ -429,8 +454,11 @@ export default class Drawers {
         }
 
         // Show close button once the drawer is fully opened.
+        const closeButton = this.drawerNode.querySelector(SELECTORS.CLOSEBTN);
+        if (focusOnCloseButton && closeButton) {
+            disableButtonTooltip(closeButton, true);
+        }
         setTimeout(() => {
-            const closeButton = this.drawerNode.querySelector(SELECTORS.CLOSEBTN);
             closeButton.classList.toggle('hidden', false);
             if (focusOnCloseButton) {
                 closeButton.focus();
@@ -488,8 +516,11 @@ export default class Drawers {
         .catch();
 
         // Move focus to the open drawer (or toggler) button once the drawer is hidden.
+        let openButton = getDrawerOpenButton(this.drawerNode.id);
+        if (openButton) {
+            disableButtonTooltip(openButton, true);
+        }
         setTimeout(() => {
-            let openButton = getDrawerOpenButton(this.drawerNode.id);
             if (openButton) {
                 openButton.focus();
             }
@@ -625,6 +656,16 @@ const registerListeners = () => {
             return;
         }
         Drawers.closeOtherDrawers(e.detail.drawerInstance);
+    });
+
+    // Tooglers and openers blur listeners.
+    const btnSelector = `${SELECTORS.TOGGLEBTN}, ${SELECTORS.OPENBTN}, ${SELECTORS.CLOSEBTN}`;
+    document.querySelectorAll(btnSelector).forEach(button => {
+        button.addEventListener('blur', () => {
+            if (button.dataset.restoreTooltipOnBlur) {
+                enableButtonTooltip(button);
+            }
+        });
     });
 
     const closeOnResizeListener = () => {
