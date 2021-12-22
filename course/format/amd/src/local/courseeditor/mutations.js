@@ -183,6 +183,32 @@ export default class {
     }
 
     /**
+     * Duplicate course modules
+     * @param {StateManager} stateManager the current state manager
+     * @param {array} cmIds the list of course modules ids
+     * @param {number|undefined} targetSectionId the optional target sectionId
+     */
+    async cmDuplicate(stateManager, cmIds, targetSectionId) {
+        const course = stateManager.get('course');
+        // Lock all target sections.
+        const sectionIds = new Set();
+        if (targetSectionId) {
+            sectionIds.add(targetSectionId);
+        } else {
+            cmIds.forEach((cmId) => {
+                const cm = stateManager.get('cm', cmId);
+                sectionIds.add(cm.sectionid);
+            });
+        }
+        this.sectionLock(stateManager, Array.from(sectionIds), true);
+
+        const updates = await this._callEditWebservice('cm_duplicate', course.id, cmIds, targetSectionId);
+        stateManager.processUpdates(updates);
+
+        this.sectionLock(stateManager, Array.from(sectionIds), false);
+    }
+
+    /**
      * Mark or unmark course modules as complete.
      *
      * @param {StateManager} stateManager the current state manager

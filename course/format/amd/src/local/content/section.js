@@ -23,6 +23,7 @@
  */
 
 import Header from 'core_courseformat/local/content/section/header';
+import DndDuplicate from 'core_courseformat/local/content/section/dndduplicate';
 import DndSection from 'core_courseformat/local/courseeditor/dndsection';
 
 export default class extends DndSection {
@@ -37,6 +38,7 @@ export default class extends DndSection {
         this.selectors = {
             SECTION_ITEM: `[data-for='section_title']`,
             CM: `[data-for="cmitem"]`,
+            MODCHOOSER: `.section-modchooser`,
         };
         // Most classes will be loaded later by DndCmItem.
         this.classes = {
@@ -67,6 +69,25 @@ export default class extends DndSection {
                 });
                 this.configDragDrop(headerComponent);
             }
+            // Init add activity dropzone if any.
+            const modChooser = this.getElement(this.selectors.MODCHOOSER);
+            if (modChooser) {
+                this.modChooser = new DndDuplicate({
+                    ...this,
+                    element: modChooser,
+                    fullregion: this.element,
+                });
+            }
+        }
+    }
+
+    /**
+     * Remove all subcomponents dependencies.
+     */
+    destroy() {
+        super.destroy();
+        if (this.modChooser !== undefined) {
+            this.modChooser.unregister();
         }
     }
 

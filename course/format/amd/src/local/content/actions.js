@@ -357,6 +357,22 @@ export default class extends BaseComponent {
     }
 
     /**
+     * Handle a course module duplicate request.
+     *
+     * @param {Element} target the dispatch action element
+     * @param {Event} event the triggered event
+     */
+    async _requestDuplicateCm(target, event) {
+        const cmId = target.dataset.id;
+        if (!cmId) {
+            return;
+        }
+        const sectionId = target.dataset.sectionid ?? null;
+        event.preventDefault();
+        this.reactive.dispatch('cmDuplicate', [cmId], sectionId);
+    }
+
+    /**
      * Disable all add sections actions.
      *
      * @param {boolean} locked the new locked value.

@@ -31,6 +31,7 @@ import CmItem from 'core_courseformat/local/content/section/cmitem';
 import courseActions from 'core_course/actions';
 import DispatchActions from 'core_courseformat/local/content/actions';
 import * as CourseEvents from 'core_course/events';
+import Pending from 'core/pending';
 
 export default class Component extends BaseComponent {
 
@@ -473,11 +474,13 @@ export default class Component extends BaseComponent {
      * @param {object} param0.element the state object
      */
     _reloadCm({element}) {
+        const pendingReload = new Pending(`courseformat/content:reloadCm_${element.id}`);
         const cmitem = this.getElement(this.selectors.CM, element.id);
         if (cmitem) {
             const promise = courseActions.refreshModule(cmitem, element.id);
             promise.then(() => {
                 this._indexContents();
+                pendingReload.resolve();
                 return;
             }).catch();
         }
@@ -493,11 +496,13 @@ export default class Component extends BaseComponent {
      * @param {object} param0.element the state object
      */
     _reloadSection({element}) {
+        const pendingReload = new Pending(`courseformat/content:reloadSection_${element.id}`);
         const sectionitem = this.getElement(this.selectors.SECTION, element.id);
         if (sectionitem) {
             const promise = courseActions.refreshSection(sectionitem, element.id);
             promise.then(() => {
                 this._indexContents();
+                pendingReload.resolve();
                 return;
             }).catch();
         }
