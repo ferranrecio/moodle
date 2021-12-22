@@ -28,14 +28,35 @@ Feature: Course index depending on role
     And I change window size to "large"
 
   @javascript
-  Scenario: Course index is present on course and activities.
+  Scenario: Course index is present on course pages.
     Given I am on the "C1" "Course" page logged in as "teacher1"
     Given the "multilang" filter is "on"
     And the "multilang" filter applies to "content and headings"
+#    Course index is visible on Course main page
     When I am on the "C1" "Course" page logged in as "teacher1"
-    Then I am on the "Activity sample 1" "assign activity editing" page
+    Then I should see "General" in the "courseindex-content" "region"
+#    Course index is visible on Settings page
+    And I am on the "C1" "course editing" page
+    Then I should see "General" in the "courseindex-content" "region"
+#    Course index is visible on Participants page
+    And I am on the "C1" "enrolled users" page
+    Then I should see "General" in the "courseindex-content" "region"
+#    Course index is visible on Enrolment methods page
+    And I am on the "C1" "enrolment methods" page
+    Then I should see "General" in the "courseindex-content" "region"
+#    Course index is visible on Groups page
+    And I am on the "C1" "groups" page
+    Then I should see "General" in the "courseindex-content" "region"
+#    Course index is visible on Permissions page
+    And I am on the "C1" "permissions" page
+    Then I should see "General" in the "courseindex-content" "region"
+#    Course index is visible on Activity edition page
+    And I am on the "Activity sample 1" "assign activity editing" page
+    And I should see "General" in the "courseindex-content" "region"
     And I set the field "Assignment name" in the "General" "fieldset" to "<span lang=\"en\" class=\"multilang\">Activity</span><span lang=\"de\" class=\"multilang\">Aktivität</span> sample 1"
     And I press "Save and display"
+#    Course index is visible on Activity page
+    And I should see "General" in the "courseindex-content" "region"
     And I should see "Activity sample 1" in the "courseindex-content" "region"
 
   @javascript
