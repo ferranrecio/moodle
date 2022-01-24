@@ -135,8 +135,13 @@ class update_course extends external_api {
             throw new moodle_exception("Invalid course state action $action in ".get_class($actions));
         }
 
+        $course = $courseformat->get_course();
+
         // Execute the action.
-        $actions->$action($updates, $courseformat->get_course(), $ids, $targetsectionid, $targetcmid);
+        $actions->$action($updates, $course, $ids, $targetsectionid, $targetcmid);
+
+        // Any state action mark the state cache as dirty.
+        $actions->state_dirty($updates, $course);
 
         return json_encode($updates);
     }

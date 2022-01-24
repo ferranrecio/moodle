@@ -16,6 +16,7 @@
 
 namespace core_courseformat;
 
+use core_courseformat\base as course_format;
 use core_courseformat\stateupdates;
 use cm_info;
 use section_info;
@@ -24,6 +25,7 @@ use course_modinfo;
 use moodle_exception;
 use context_module;
 use context_course;
+use cache;
 
 /**
  * Contains the core course state actions.
@@ -284,6 +286,31 @@ class stateactions {
             $sections[$sectionid] = $modinfo->get_section_info_by_id($sectionid);
         }
         return $sections;
+    }
+
+    /**
+     * Mark the current state as dirty to refetch the state cache.
+     *
+     * State dirty action is only needed for the cases where the internal caches are not marked
+     * as dirty. Most actions like editing a course or update the activity completion also mark
+     * the state as dirty. However, some frontend actions (like collpasing a topic)
+     * usues standard moodle webservices (like the user preferences one) that cannot mark
+     * the state as dirty.
+     *
+     * @param stateupdates $updates the affected course elements track
+     * @param stdClass $course the course object
+     * @param int[] $ids not used
+     * @param int $targetsectionid not used
+     * @param int $targetcmid not used
+     */
+    public function state_dirty(
+        stateupdates $updates,
+        stdClass $course,
+        array $ids = [],
+        ?int $targetsectionid = null,
+        ?int $targetcmid = null
+    ): void {
+        course_format::session_cache_reset($course);
     }
 
     /**

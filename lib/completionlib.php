@@ -27,6 +27,7 @@
  */
 
 use core_completion\activity_custom_completion;
+use core_courseformat\base as course_format;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -634,6 +635,9 @@ class completion_info {
                 $current->completionstate == COMPLETION_COMPLETE_FAIL))) {
             return;
         }
+
+        // The activity completion alters the course state cache for this particular user.
+        course_format::session_cache_reset(get_course($cm->course));
 
         // For auto tracking, if the status is overridden to 'COMPLETION_COMPLETE', then disallow further changes,
         // unless processing another override.
