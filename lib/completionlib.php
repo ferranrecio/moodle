@@ -635,6 +635,10 @@ class completion_info {
             return;
         }
 
+        // The activity completion alters the course state cache for this particular user.
+        $statecache = cache::make('core', 'courseeditorstate');
+        $statecache->delete($cm->course);
+
         // For auto tracking, if the status is overridden to 'COMPLETION_COMPLETE', then disallow further changes,
         // unless processing another override.
         // Basically, we want those activities which have been overridden to COMPLETE to hold state, and those which have been

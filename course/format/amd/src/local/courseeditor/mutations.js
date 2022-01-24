@@ -334,6 +334,8 @@ export default class {
             });
             const jsonString = JSON.stringify(preferences);
             M.util.set_user_preference(prefKey, jsonString);
+            // Mark the state as dirty.
+            await this._callEditWebservice('state_dirty', course.id);
         }
     }
 

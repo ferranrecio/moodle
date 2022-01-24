@@ -24,6 +24,7 @@ require_once($CFG->libdir . '/externallib.php');
 use external_api;
 use external_function_parameters;
 use external_value;
+use cache;
 
 /**
  * Class for exporting a course state.
@@ -78,6 +79,17 @@ class get_state extends external_api {
 
         self::validate_context(\context_course::instance($courseid));
 
+        // Check if fast state is cached.
+        $course = get_course($courseid);
+        $statecache = cache::make('core', 'courseeditorstate');
+        $cacherev = $statecache->get($courseid);
+        if ($cacherev !== false && $cacherev == $course->cacherev) {
+            $faststate = $statecache->get("state_{$courseid}");
+            if ($faststate !== false) {
+                return $faststate;
+            }
+        }
+
         $courseformat = course_get_format($courseid);
         $modinfo = $courseformat->get_modinfo();
 
@@ -118,7 +130,17 @@ class get_state extends external_api {
             }
         }
 
-        return json_encode($result);
+        $jsonresult = json_encode($result);
+
+        $statecache->set($courseid, $course->cacherev);
+        $statecache->set("state_{$courseid}", $jsonresult);
+
+        // $statecache->set($courseid, (object)[
+        //     'state' => $jsonresult,
+        //     'cacherev' => $course->cacherev,
+        // ]);
+
+        return $jsonresult;
     }
 
     /**

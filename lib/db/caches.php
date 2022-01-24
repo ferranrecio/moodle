@@ -201,7 +201,7 @@ $definitions = array(
     'coursesectionspreferences' => [
         'mode' => cache_store::MODE_REQUEST,
         'simplekeys' => true,
-        'simpledata' => false,
+        'simpledata' => true,
         'staticacceleration' => true,
     ],
     // Cache course contacts for the courses.
@@ -211,6 +211,12 @@ $definitions = array(
         'simplekeys' => true,
         'ttl' => 3600,
     ),
+    // Course reactive state cache.
+    'courseeditorstate' => [
+        'mode' => cache_store::MODE_SESSION,
+        'simplekeys' => true,
+        'simpledata' => false,
+    ],
     // Used to store data for repositories to avoid repetitive DB queries within one request.
     'repositories' => array(
         'mode' => cache_store::MODE_REQUEST,
