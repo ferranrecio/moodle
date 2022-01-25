@@ -103,7 +103,7 @@ class renderer_base {
                 }
             }
 
-            $loader = new \core\output\mustache_filesystem_loader();
+            $loader = new \core\output\mustache_filesystem_loader($this->get_extra_mustache_locations());
             $stringhelper = new \core\output\mustache_string_helper();
             $cleanstringhelper = new \core\output\mustache_clean_string_helper();
             $quotehelper = new \core\output\mustache_quote_helper();
@@ -139,6 +139,15 @@ class renderer_base {
         }
 
         return $this->mustache;
+    }
+
+    /**
+     * Get extra mustache folders of this renderer.
+     *
+     * @return array of extra mustache locaiton directories.
+     */
+    protected function get_extra_mustache_locations(): array {
+        return [];
     }
 
 

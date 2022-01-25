@@ -44,9 +44,10 @@ class mustache_template_finder {
      *
      * @param string $component The component to search
      * @param string $themename The current theme name
+     * @param array $extrafolders Extra possible locations
      * @return string[] List of valid directories for templates for this compoonent. Directories are not checked for existence.
      */
-    public static function get_template_directories_for_component($component, $themename = '') {
+    public static function get_template_directories_for_component($component, $themename = '', array $extrafolders = []) {
         global $CFG, $PAGE;
 
         // Default the param.
@@ -58,8 +59,13 @@ class mustache_template_finder {
         $component = clean_param($component, PARAM_COMPONENT);
         $themename = clean_param($themename, PARAM_COMPONENT);
 
-        // Validate the component.
         $dirs = array();
+
+        if (!empty($extrafolders)) {
+            $dirs = $extrafolders;
+        }
+
+        // Validate the component.
         $compdirectory = core_component::get_component_directory($component);
         if (!$compdirectory) {
             throw new coding_exception("Component was not valid: " . s($component));
@@ -98,9 +104,10 @@ class mustache_template_finder {
      *
      * @param string $name - This is the componentname/templatename combined.
      * @param string $themename - This is the current theme name.
+     * @param array $extrafolders Extra possible locations
      * @return string
      */
-    public static function get_template_filepath($name, $themename = '') {
+    public static function get_template_filepath($name, $themename = '', array $extrafolders = []) {
         global $CFG, $PAGE;
 
         if (strpos($name, '/') === false) {
@@ -111,7 +118,7 @@ class mustache_template_finder {
         list($component, $templatename) = explode('/', $name, 2);
         $component = clean_param($component, PARAM_COMPONENT);
 
-        $dirs = self::get_template_directories_for_component($component, $themename);
+        $dirs = self::get_template_directories_for_component($component, $themename, $extrafolders);
 
         foreach ($dirs as $dir) {
             $candidate = $dir . $templatename . '.mustache';

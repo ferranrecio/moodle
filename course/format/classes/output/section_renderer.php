@@ -122,6 +122,21 @@ abstract class section_renderer extends core_course_renderer {
     }
 
     /**
+     * This overrides some core_courseformat templates.
+     *
+     * @return array of extra mustache locaiton directories.
+     */
+    protected function get_extra_mustache_locations(): array {
+        global $CFG;
+        // Check the component from the current format renderer namespace.
+        list($currentcomponent) = explode('\\', get_class($this), 2);
+        if (strpos($currentcomponent, 'format_') === 0) {
+            return [$CFG->dirroot . '/course/format/topics/templates/courseformat/'];
+        }
+        return [];
+    }
+
+    /**
      * Generate the section title, wraps it in a link to the section page if page is to be displayed on a separate page
      *
      * @param stdClass $section The course_section entry from DB
