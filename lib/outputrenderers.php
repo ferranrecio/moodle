@@ -103,7 +103,7 @@ class renderer_base {
                 }
             }
 
-            $loader = new \core\output\mustache_filesystem_loader();
+            $loader = new \core\output\mustache_filesystem_loader($this->extra_mustache_locations());
             $stringhelper = new \core\output\mustache_string_helper();
             $cleanstringhelper = new \core\output\mustache_clean_string_helper();
             $quotehelper = new \core\output\mustache_quote_helper();
@@ -139,6 +139,20 @@ class renderer_base {
         }
 
         return $this->mustache;
+    }
+
+    /**
+     * Returns a list of extra mustache folders of this renderer.
+     *
+     * Renderers can override this method to add extra folders to the mustache. This is specially
+     * useful for subsystems renderers to allow plugins to override templates. For example, the
+     * core_courseformat subsystem uses this to allow plugins to override the standard templates
+     * of the course.
+     *
+     * @return array of extra mustache location directories.
+     */
+    protected function extra_mustache_locations(): array {
+        return [];
     }
 
 

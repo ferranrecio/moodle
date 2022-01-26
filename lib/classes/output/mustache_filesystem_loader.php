@@ -37,9 +37,17 @@ use coding_exception;
 class mustache_filesystem_loader extends \Mustache_Loader_FilesystemLoader {
 
     /**
-     * Provide a default no-args constructor (we don't really need anything).
+     * @var array A list of extra mustache locations to search for templates.
      */
-    public function __construct() {
+    private $extrafolders;
+
+    /**
+     * Provide a default constructor.
+     *
+     * @param array $extrafolders extra folders to scan for templates.
+     */
+    public function __construct(array $extrafolders = []) {
+        $this->extrafolders = $extrafolders;
     }
 
     /**
@@ -51,6 +59,6 @@ class mustache_filesystem_loader extends \Mustache_Loader_FilesystemLoader {
      */
     protected function getFileName($name) {
         // Call the Moodle template finder.
-        return mustache_template_finder::get_template_filepath($name);
+        return mustache_template_finder::get_template_filepath($name, '', $this->extrafolders);
     }
 }

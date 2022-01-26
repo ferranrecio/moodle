@@ -44,6 +44,7 @@ use renderable;
 use section_info;
 use templatable;
 use url_select;
+use core_component;
 
 /**
  * Base class to render a course add section buttons.
@@ -120,6 +121,28 @@ abstract class section_renderer extends core_course_renderer {
         // If nothing works, let the parent class decide.
         return parent::render($widget);
     }
+
+    /**
+     * Add extra paths for templates locations.
+     *
+     * Format plugins can override individual mustaches by overriding the core_courseformat templates.
+     * To do so, they must locate the replaced templates in the subsystem folders following the same
+     * structured used in themes overrides. For example, a mustache file located in
+     * course/format/MYPLUGIN/templates/courseformat/local/content/section/cmitem.mustache.
+     *
+     * @return array of extra mustache location directories.
+     */
+    protected function extra_mustache_locations(): array {
+        global $CFG;
+        // Check the course format plugin.
+        $currentcomponent = 'format_' . $this->page->course->format;
+        $compdirectory = core_component::get_component_directory($currentcomponent);
+        if ($compdirectory) {
+            return [$compdirectory . '/templates/courseformat/'];
+        }
+        return [];
+    }
+
 
     /**
      * Generate the section title, wraps it in a link to the section page if page is to be displayed on a separate page
