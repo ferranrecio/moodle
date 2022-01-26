@@ -59,14 +59,14 @@ class mustache_template_finder {
         $themename = clean_param($themename, PARAM_COMPONENT);
 
         // Validate the component.
-        $dirs = array();
+        $dirs = [];
         $compdirectory = core_component::get_component_directory($component);
         if (!$compdirectory) {
             throw new coding_exception("Component was not valid: " . s($component));
         }
 
         // Find the parent themes.
-        $parents = array();
+        $parents = [];
         if ($themename === $PAGE->theme->name) {
             $parents = $PAGE->theme->parents;
         } else {
@@ -74,7 +74,19 @@ class mustache_template_finder {
             $parents = $themeconfig->parents;
         }
 
-        // First check the theme.
+        // Allow component renderer to add the extra folders.
+        try {
+            list($type, $plugin) = core_component::normalize_component($component);
+            $componentrender = $PAGE->get_renderer($type, $plugin);
+            $extrafolders = $componentrender->extra_mustache_locations($themename, $parents);
+            foreach ($extrafolders as $extrafolder) {
+                $dirs[] = $extrafolder;
+            }
+        } catch (moodle_exception $th) {
+            // We don't need to do anything here.
+        }
+
+        // Check the theme.
         $dirs[] = $CFG->dirroot . '/theme/' . $themename . '/templates/' . $component . '/';
         if (isset($CFG->themedir)) {
             $dirs[] = $CFG->themedir . '/' . $themename . '/templates/' . $component . '/';

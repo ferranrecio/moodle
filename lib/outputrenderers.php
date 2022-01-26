@@ -141,6 +141,21 @@ class renderer_base {
         return $this->mustache;
     }
 
+    /**
+     * Returns a list of extra mustache folders of this renderer.
+     *
+     * Renderers can override this method to add extra folders to the mustache. This is specially
+     * useful for subsystems renderers to allow plugins to override templates. For example, the
+     * core_courseformat subsystem uses this to allow plugins to override the standard templates
+     * of the course.
+     *
+     * @param string $themename The name of the current theme.
+     * @param array $parentthemes The names of the parent themes.
+     * @return array of extra mustache location directories.
+     */
+    public function extra_mustache_locations(string $themename, array $parentthemes): array {
+        return [];
+    }
 
     /**
      * Constructor
