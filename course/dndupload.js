@@ -296,6 +296,23 @@ M.course_dndupload = {
     },
 
     /**
+     * Check if the event includes only data of the given type
+     *
+     * Chrome drag page images as files. To differentiate a real file from a page
+     * image we need to check if all the dataTransfers types are files.
+     *
+     * @param e the event details
+     * @param type the data type to check for
+     * @return true if the data type is found in the event data
+     */
+    types_includes_only: function(e, type) {
+        type = type.toLowerCase();
+        return e._event.dataTransfer.types.every(function(currentType) {
+            return (currentType.toLowerCase() === type);
+        });
+    },
+
+    /**
      * Look through the event data, checking it against the registered data types
      * (in order of priority) and return details of the first matching data type
      * @param e the event details
@@ -319,7 +336,7 @@ M.course_dndupload = {
         }
 
         // Check for files first.
-        if (this.types_includes(e, 'Files')) {
+        if (this.types_includes_only(e, 'Files')) {
             if (e.type != 'drop' || e._event.dataTransfer.files.length != 0) {
                 if (this.handlers.filehandlers.length == 0) {
                     return false; // No available file handlers - ignore this drag.
