@@ -88,6 +88,71 @@ export default class {
     }
 
     /**
+     * Hides sections.
+     * @param {StateManager} stateManager the current state manager
+     * @param {array} sectionIds the list of section ids
+     */
+    async sectionHide(stateManager, sectionIds) {
+        const course = stateManager.get('course');
+        this.sectionLock(stateManager, sectionIds, true);
+        const updates = await this._callEditWebservice('section_hide', course.id, sectionIds);
+        stateManager.processUpdates(updates);
+        this.sectionLock(stateManager, sectionIds, false);
+    }
+
+    /**
+     * Show sections.
+     * @param {StateManager} stateManager the current state manager
+     * @param {array} sectionIds the list of section ids
+     */
+    async sectionShow(stateManager, sectionIds) {
+        const course = stateManager.get('course');
+        this.sectionLock(stateManager, sectionIds, true);
+        const updates = await this._callEditWebservice('section_show', course.id, sectionIds);
+        stateManager.processUpdates(updates);
+        this.sectionLock(stateManager, sectionIds, false);
+    }
+
+    /**
+     * Show cms.
+     * @param {StateManager} stateManager the current state manager
+     * @param {array} cmIds the list of section ids
+     */
+    async cmShow(stateManager, cmIds) {
+        const course = stateManager.get('course');
+        this.cmLock(stateManager, cmIds, true);
+        const updates = await this._callEditWebservice('cm_show', course.id, cmIds);
+        stateManager.processUpdates(updates);
+        this.cmLock(stateManager, cmIds, false);
+    }
+
+    /**
+     * Hide cms.
+     * @param {StateManager} stateManager the current state manager
+     * @param {array} cmIds the list of section ids
+     */
+    async cmHide(stateManager, cmIds) {
+        const course = stateManager.get('course');
+        this.cmLock(stateManager, cmIds, true);
+        const updates = await this._callEditWebservice('cm_hide', course.id, cmIds);
+        stateManager.processUpdates(updates);
+        this.cmLock(stateManager, cmIds, false);
+    }
+
+    /**
+     * Stealth cms.
+     * @param {StateManager} stateManager the current state manager
+     * @param {array} cmIds the list of section ids
+     */
+    async cmStealth(stateManager, cmIds) {
+        const course = stateManager.get('course');
+        this.cmLock(stateManager, cmIds, true);
+        const updates = await this._callEditWebservice('cm_stealth', course.id, cmIds);
+        stateManager.processUpdates(updates);
+        this.cmLock(stateManager, cmIds, false);
+    }
+
+    /**
      * Move course modules to specific course location.
      *
      * Note that one of targetSectionId or targetCmId should be provided in order to identify the
