@@ -23,12 +23,13 @@
  */
 
 import {BaseComponent} from 'core/reactive';
+import Config from 'core/config';
 import {getCurrentCourseEditor} from 'core_courseformat/courseeditor';
 import inplaceeditable from 'core/inplace_editable';
 import Section from 'core_courseformat/local/content/section';
 import CmItem from 'core_courseformat/local/content/section/cmitem';
-// Course actions is needed for actions that are not migrated to components.
-import courseActions from 'core_course/actions';
+import Fragment from 'core/fragment';
+import Templates from 'core/templates';
 import DispatchActions from 'core_courseformat/local/content/actions';
 import * as CourseEvents from 'core_course/events';
 import Pending from 'core/pending';
@@ -218,6 +219,7 @@ export default class Component extends BaseComponent {
             // State changes that require to reload some course modules.
             {watch: `cm.visible:updated`, handler: this._reloadCm},
             {watch: `cm.stealth:updated`, handler: this._reloadCm},
+            {watch: `cm.sectionid:updated`, handler: this._reloadCm},
             // Update section number and title.
             {watch: `section.number:updated`, handler: this._refreshSectionNumber},
             // Collapse and expand sections.
@@ -228,9 +230,6 @@ export default class Component extends BaseComponent {
             {watch: `section.cmlist:updated`, handler: this._refreshSectionCmlist},
             // Reindex sections and cms.
             {watch: `state:updated`, handler: this._indexContents},
-            // State changes thaty require to reload course modules.
-            {watch: `cm.visible:updated`, handler: this._reloadCm},
-            {watch: `cm.sectionid:updated`, handler: this._reloadCm},
         ];
     }
 
@@ -489,8 +488,18 @@ export default class Component extends BaseComponent {
         const pendingReload = new Pending(`courseformat/content:reloadCm_${element.id}`);
         const cmitem = this.getElement(this.selectors.CM, element.id);
         if (cmitem) {
-            const promise = courseActions.refreshModule(cmitem, element.id);
-            promise.then(() => {
+            const promise = Fragment.loadFragment(
+                'core_courseformat',
+                'cmitem',
+                Config.courseContextId,
+                {
+                    id: element.id,
+                    courseid: Config.courseId,
+                    sr: this.reactive.sectionReturn ?? 0,
+                }
+            );
+            promise.then((html, js) => {
+                Templates.replaceNode(cmitem, html, js);
                 this._indexContents();
                 pendingReload.resolve();
                 return;
@@ -511,8 +520,18 @@ export default class Component extends BaseComponent {
         const pendingReload = new Pending(`courseformat/content:reloadSection_${element.id}`);
         const sectionitem = this.getElement(this.selectors.SECTION, element.id);
         if (sectionitem) {
-            const promise = courseActions.refreshSection(sectionitem, element.id);
-            promise.then(() => {
+            const promise = Fragment.loadFragment(
+                'core_courseformat',
+                'section',
+                Config.courseContextId,
+                {
+                    id: element.id,
+                    courseid: Config.courseId,
+                    sr: this.reactive.sectionReturn ?? 0,
+                }
+            );
+            promise.then((html, js) => {
+                Templates.replaceNode(sectionitem, html, js);
                 this._indexContents();
                 pendingReload.resolve();
                 return;
