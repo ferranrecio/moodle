@@ -26,6 +26,7 @@
 
 import SectionTitle from 'core_courseformat/local/courseindex/sectiontitle';
 import DndSection from 'core_courseformat/local/courseeditor/dndsection';
+import selectors from 'core_courseformat/selectors';
 
 export default class Component extends DndSection {
 
@@ -37,17 +38,17 @@ export default class Component extends DndSection {
         this.name = 'courseindex_section';
         // Default query selectors.
         this.selectors = {
-            SECTION_ITEM: `[data-for='section_item']`,
-            SECTION_TITLE: `[data-for='section_title']`,
-            CM_LAST: `[data-for="cm"]:last-child`,
+            SECTION_ITEM: selectors.courseindex.section.item,
+            SECTION_TITLE: selectors.courseindex.section.title,
+            CM_LAST: selectors.courseindex.section.cmLast,
         };
         // Default classes to toggle on refresh.
         this.classes = {
-            SECTIONHIDDEN: 'dimmed',
-            SECTIONCURRENT: 'current',
-            LOCKED: 'editinprogress',
-            RESTRICTIONS: 'restrictions',
-            PAGEITEM: 'pageitem',
+            SECTIONHIDDEN: selectors.courseindex.classes.sectionHidden,
+            SECTIONCURRENT: selectors.courseindex.classes.sectionCurrent,
+            LOCKED: selectors.courseindex.classes.locked,
+            RESTRICTIONS: selectors.courseindex.classes.restrictions,
+            PAGEITEM: selectors.courseindex.classes.pageItem,
         };
 
         // We need our id to watch specific events.

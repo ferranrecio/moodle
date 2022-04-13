@@ -28,6 +28,7 @@ import DndCmItem from 'core_courseformat/local/courseeditor/dndcmitem';
 import Templates from 'core/templates';
 import Prefetch from 'core/prefetch';
 import Config from 'core/config';
+import selectors from 'core_courseformat/selectors';
 
 // Prefetch the completion icons template.
 const completionTemplate = 'core_courseformat/local/courseindex/cmcompletion';
@@ -43,15 +44,15 @@ export default class Component extends DndCmItem {
         this.name = 'courseindex_cm';
         // Default query selectors.
         this.selectors = {
-            CM_NAME: `[data-for='cm_name']`,
-            CM_COMPLETION: `[data-for='cm_completion']`,
+            CM_NAME: selectors.courseindex.cm.name,
+            CM_COMPLETION: selectors.courseindex.cm.completion,
         };
         // Default classes to toggle on refresh.
         this.classes = {
-            CMHIDDEN: 'dimmed',
-            LOCKED: 'editinprogress',
-            RESTRICTIONS: 'restrictions',
-            PAGEITEM: 'pageitem',
+            CMHIDDEN: selectors.courseindex.classes.cmHidden,
+            LOCKED: selectors.courseindex.classes.locked,
+            RESTRICTIONS: selectors.courseindex.classes.restrictions,
+            PAGEITEM: selectors.courseindex.classes.pageItem,
         };
         // We need our id to watch specific events.
         this.id = this.element.dataset.id;

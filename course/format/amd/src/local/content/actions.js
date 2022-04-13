@@ -35,6 +35,7 @@ import {getList} from 'core/normalise';
 import * as CourseEvents from 'core_course/events';
 import Pending from 'core/pending';
 import ContentTree from 'core_courseformat/local/courseeditor/contenttree';
+import selectors from 'core_courseformat/selectors';
 // The jQuery module is only used for interacting with Boostrap 4. It can we removed when MDL-79179 is integrated.
 import jQuery from 'jquery';
 
@@ -62,16 +63,16 @@ export default class extends BaseComponent {
         this.name = 'content_actions';
         // Default query selectors.
         this.selectors = {
-            ACTIONLINK: `[data-action]`,
+            ACTIONLINK: selectors.content.controls.actionLink,
+            ACTIONMENU: selectors.content.controls.actionMenu,
             // Move modal selectors.
-            SECTIONLINK: `[data-for='section']`,
-            CMLINK: `[data-for='cm']`,
-            SECTIONNODE: `[data-for='sectionnode']`,
-            MODALTOGGLER: `[data-toggle='collapse']`,
-            ADDSECTION: `[data-action='addSection']`,
-            CONTENTTREE: `#destination-selector`,
-            ACTIONMENU: `.action-menu`,
-            ACTIONMENUTOGGLER: `[data-toggle="dropdown"]`,
+            SECTIONLINK: selectors.content.modals.sectionLink,
+            CMLINK: selectors.content.modals.cmLink,
+            SECTIONNODE: selectors.content.modals.sectionNode,
+            MODALTOGGLER: selectors.content.modals.toggler,
+            ADDSECTION: selectors.content.modals.addSection,
+            CONTENTTREE: selectors.content.modals.contentTree,
+            ACTIONMENUTOGGLER: selectors.content.modals.menuToggler,
         };
         // Component css classes.
         this.classes = {

@@ -25,6 +25,7 @@
  */
 
 import DndCmItem from 'core_courseformat/local/courseeditor/dndcmitem';
+import selectors from 'core_courseformat/selectors';
 
 export default class extends DndCmItem {
 
@@ -36,11 +37,11 @@ export default class extends DndCmItem {
         this.name = 'content_section_cmitem';
         // Default query selectors.
         this.selectors = {
-            DRAGICON: `.editing_move`,
+            DRAGICON: selectors.content.course.dragIcon,
         };
         // Most classes will be loaded later by DndCmItem.
         this.classes = {
-            LOCKED: 'editinprogress',
+            LOCKED: selectors.content.classes.locked,
         };
         // We need our id to watch specific events.
         this.id = this.element.dataset.id;

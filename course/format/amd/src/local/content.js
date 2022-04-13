@@ -31,6 +31,7 @@ import CmItem from 'core_courseformat/local/content/section/cmitem';
 import courseActions from 'core_course/actions';
 import DispatchActions from 'core_courseformat/local/content/actions';
 import * as CourseEvents from 'core_course/events';
+import selectors from 'core_courseformat/selectors';
 
 export default class Component extends BaseComponent {
 
@@ -44,26 +45,26 @@ export default class Component extends BaseComponent {
         this.name = 'course_format';
         // Default query selectors.
         this.selectors = {
-            SECTION: `[data-for='section']`,
-            SECTION_ITEM: `[data-for='section_title']`,
-            SECTION_CMLIST: `[data-for='cmlist']`,
-            COURSE_SECTIONLIST: `[data-for='course_sectionlist']`,
-            CM: `[data-for='cmitem']`,
-            PAGE: `#page`,
-            TOGGLER: `[data-action="togglecoursecontentsection"]`,
-            COLLAPSE: `[data-toggle="collapse"]`,
-            TOGGLEALL: `[data-toggle="toggleall"]`,
-            // Formats can override the activity tag but a default one is needed to create new elements.
-            ACTIVITYTAG: 'li',
-            SECTIONTAG: 'li',
+            SECTION: selectors.content.section.section,
+            SECTION_ITEM: selectors.content.section.item,
+            SECTION_CMLIST: selectors.content.section.cmList,
+            COURSE_SECTIONLIST: selectors.content.course.sectionList,
+            CM: selectors.content.cm.item,
+            PAGE: selectors.content.course.page,
+            TOGGLER: selectors.content.controls.toggler,
+            COLLAPSE: selectors.content.controls.collapse,
+            TOGGLEALL: selectors.content.controls.toggleAll,
+            // Formats can override the activity/section tag but a default one is needed to create new elements.
+            ACTIVITYTAG: selectors.content.cm.tag,
+            SECTIONTAG: selectors.content.section.tag,
         };
         // Default classes to toggle on refresh.
         this.classes = {
-            COLLAPSED: `collapsed`,
+            COLLAPSED: selectors.content.classes.collapsed,
             // Course content classes.
-            ACTIVITY: `activity`,
-            STATEDREADY: `stateready`,
-            SECTION: `section`,
+            ACTIVITY: selectors.content.classes.activity,
+            STATEDREADY: selectors.content.classes.stateReady,
+            SECTION: selectors.content.classes.section,
         };
         // Array to save dettached elements during element resorting.
         this.dettachedCms = {};
@@ -103,16 +104,16 @@ export default class Component extends BaseComponent {
         this.addEventListener(this.element, 'click', this._sectionTogglers);
 
         // Collapse/Expand all sections button.
-        const toogleAll = this.getElement(this.selectors.TOGGLEALL);
-        if (toogleAll) {
+        const toggleAll = this.getElement(this.selectors.TOGGLEALL);
+        if (toggleAll) {
 
             // Ensure collapse menu button adds aria-controls attribute referring to each collapsible element.
             const collapseElements = this.getElements(this.selectors.COLLAPSE);
             const collapseElementIds = [...collapseElements].map(element => element.id);
-            toogleAll.setAttribute('aria-controls', collapseElementIds.join(' '));
+            toggleAll.setAttribute('aria-controls', collapseElementIds.join(' '));
 
-            this.addEventListener(toogleAll, 'click', this._allSectionToggler);
-            this.addEventListener(toogleAll, 'keydown', e => {
+            this.addEventListener(toggleAll, 'click', this._allSectionToggler);
+            this.addEventListener(toggleAll, 'keydown', e => {
                 // Collapse/expand all sections when Space key is pressed on the toggle button.
                 if (e.key === ' ') {
                     this._allSectionToggler(e);
