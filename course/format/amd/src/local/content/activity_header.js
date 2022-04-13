@@ -25,10 +25,11 @@
 import {BaseComponent} from 'core/reactive';
 import {getCurrentCourseEditor} from 'core_courseformat/courseeditor';
 import * as CourseEvents from 'core_course/events';
+import selectors from 'core_courseformat/selectors';
 
 // Global page selectors.
 const SELECTORS = {
-    ACTIVITY_HEADER: `[data-for='page-activity-header']`,
+    ACTIVITY_HEADER: selectors.content.course.activityHeader,
 };
 
 export default class Component extends BaseComponent {

@@ -26,6 +26,7 @@ import {BaseComponent} from 'core/reactive';
 import {getCurrentCourseEditor} from 'core_courseformat/courseeditor';
 import jQuery from 'jquery';
 import ContentTree from 'core_courseformat/local/courseeditor/contenttree';
+import selectors from 'core_courseformat/selectors';
 
 export default class Component extends BaseComponent {
 
@@ -37,20 +38,20 @@ export default class Component extends BaseComponent {
         this.name = 'courseindex';
         // Default query selectors.
         this.selectors = {
-            SECTION: `[data-for='section']`,
-            SECTION_CMLIST: `[data-for='cmlist']`,
-            CM: `[data-for='cm']`,
-            TOGGLER: `[data-action="togglecourseindexsection"]`,
-            COLLAPSE: `[data-toggle="collapse"]`,
-            DRAWER: `.drawer`,
+            SECTION: selectors.courseindex.section.section,
+            SECTION_CMLIST: selectors.courseindex.section.cmList,
+            CM: selectors.courseindex.cm.cm,
+            TOGGLER: selectors.courseindex.controls.toggler,
+            COLLAPSE: selectors.courseindex.controls.collapse,
+            DRAWER: selectors.courseindex.course.drawer,
         };
         // Default classes to toggle on refresh.
         this.classes = {
-            SECTIONHIDDEN: 'dimmed',
-            CMHIDDEN: 'dimmed',
-            SECTIONCURRENT: 'current',
-            COLLAPSED: `collapsed`,
-            SHOW: `show`,
+            SECTIONHIDDEN: selectors.courseindex.classes.sectionHidden,
+            CMHIDDEN: selectors.courseindex.classes.cmHidden,
+            SECTIONCURRENT: selectors.courseindex.classes.sectionCurrent,
+            COLLAPSED: selectors.courseindex.classes.collapsed,
+            SHOW: selectors.courseindex.classes.show,
         };
         // Arrays to keep cms and sections elements.
         this.sections = {};
