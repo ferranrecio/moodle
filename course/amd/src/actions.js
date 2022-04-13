@@ -60,7 +60,7 @@ define(
         // Meanwhile, we filter the migrated actions.
         const componentActions = [
             'moveSection', 'moveCm', 'addSection', 'deleteSection', 'sectionHide', 'sectionShow',
-            'cmHide', 'cmShow', 'cmStealth', 'cmDelete', 'cmDuplicate',
+            'cmHide', 'cmShow', 'cmStealth', 'cmDelete', 'cmDuplicate', 'setmarker', 'removemarker',
         ];
         // Some legacy actions are not Ajax based in the new editor.
         const componentNonAjaxActions = [
