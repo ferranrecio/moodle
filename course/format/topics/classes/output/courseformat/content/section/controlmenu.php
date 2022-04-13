@@ -67,6 +67,8 @@ class controlmenu extends controlmenu_base {
 
         $controls = [];
         if ($section->section && has_capability('moodle/course:setcurrentsection', $coursecontext)) {
+            $highlightoff = get_string('highlightoff');
+            $highlighton = get_string('highlight');
             if ($course->marker == $section->section) {  // Show the "light globe" on/off.
                 $url->param('marker', 0);
                 $highlightoff = get_string('highlightoff');
@@ -77,20 +79,26 @@ class controlmenu extends controlmenu_base {
                     'pixattr' => ['class' => ''],
                     'attr' => [
                         'class' => 'editing_highlight',
-                        'data-action' => 'removemarker'
+                        'data-action' => 'removemarker',
+                        'data-id' => $section->id,
+                        'data-swapname' => $highlighton,
+                        'data-swapicon' => 'i/marker',
                     ],
                 ];
             } else {
                 $url->param('marker', $section->section);
-                $highlight = get_string('highlight');
+                $highlighton = get_string('highlight');
                 $controls['highlight'] = [
                     'url' => $url,
                     'icon' => 'i/marker',
-                    'name' => $highlight,
+                    'name' => $highlighton,
                     'pixattr' => ['class' => ''],
                     'attr' => [
                         'class' => 'editing_highlight',
-                        'data-action' => 'setmarker'
+                        'data-action' => 'setmarker',
+                        'data-id' => $section->id,
+                        'data-swapname' => $highlightoff,
+                        'data-swapicon' => 'i/marked',
                     ],
                 ];
             }
