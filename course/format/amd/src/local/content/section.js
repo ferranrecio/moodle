@@ -25,6 +25,7 @@
 import Header from 'core_courseformat/local/content/section/header';
 import DndSection from 'core_courseformat/local/courseeditor/dndsection';
 import Templates from 'core/templates';
+import selectors from 'core_courseformat/selectors';
 
 export default class extends DndSection {
 
@@ -36,20 +37,20 @@ export default class extends DndSection {
         this.name = 'content_section';
         // Default query selectors.
         this.selectors = {
-            SECTION_ITEM: `[data-for='section_title']`,
-            CM: `[data-for="cmitem"]`,
-            SECTIONINFO: `[data-for="sectioninfo"]`,
-            SECTIONBADGES: `[data-region="sectionbadges"]`,
-            SHOWSECTION: `[data-action="sectionShow"]`,
-            HIDESECTION: `[data-action="sectionHide"]`,
-            ACTIONTEXT: `.menu-action-text`,
-            ICON: `.icon`,
+            SECTION_ITEM: selectors.content.section.item,
+            CM: selectors.content.cm.item,
+            SECTIONINFO: selectors.content.section.info,
+            SECTIONBADGES: selectors.content.section.badges,
+            SHOWSECTION: selectors.content.controls.showSection,
+            HIDESECTION: selectors.content.controls.hideSection,
+            ACTIONTEXT: selectors.content.controls.actionText,
+            ICON: selectors.content.controls.icon,
         };
         // Most classes will be loaded later by DndCmItem.
         this.classes = {
-            LOCKED: 'editinprogress',
-            HASDESCRIPTION: 'description',
-            HIDE: 'd-none',
+            LOCKED: selectors.content.classes.locked,
+            HASDESCRIPTION: selectors.content.classes.hasDescription,
+            HIDE: selectors.content.classes.hide,
         };
 
         // We need our id to watch specific events.
