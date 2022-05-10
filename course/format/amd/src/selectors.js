@@ -64,6 +64,7 @@ export default {
             sectionLink: `[data-for='section']`,
             sectionNode: `[data-for='sectionnode']`,
             toggler: `[data-toggle='collapse']`,
+            autoDelete: `[name='autodelete']`,
         },
         classes: {
             activity: `activity`,
