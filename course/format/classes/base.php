@@ -124,9 +124,11 @@ abstract class base {
             return self::$classesforformat[$format];
         }
 
-        if (PHPUNIT_TEST && class_exists('format_' . $format)) {
-            // Allow unittests to use non-existing course formats.
-            return $format;
+        // Allow unittests to use non-existing course formats.
+        if (PHPUNIT_TEST) {
+            if (class_exists("format_{$format}\courseformat\base") || class_exists('format_' . $format)) {
+                return $format;
+            }
         }
 
         // Else return default format.
@@ -152,19 +154,29 @@ abstract class base {
      */
     protected static final function get_class_name($format) {
         global $CFG;
-        static $classnames = array('site' => 'format_site');
-        if (!isset($classnames[$format])) {
-            $plugins = core_component::get_plugin_list('format');
-            $usedformat = self::get_format_or_default($format);
-            if (isset($plugins[$usedformat]) && file_exists($plugins[$usedformat].'/lib.php')) {
-                require_once($plugins[$usedformat].'/lib.php');
-            }
-            $classnames[$format] = 'format_'. $usedformat;
-            if (!class_exists($classnames[$format])) {
-                require_once($CFG->dirroot.'/course/format/formatlegacy.php');
-                $classnames[$format] = 'format_legacy';
-            }
+        static $classnames = ['site' => 'format_site'];
+        if (isset($classnames[$format])) {
+            return $classnames[$format];
         }
+        $plugins = core_component::get_plugin_list('format');
+        $usedformat = self::get_format_or_default($format);
+        if (isset($plugins[$usedformat]) && file_exists($plugins[$usedformat].'/lib.php')) {
+            require_once($plugins[$usedformat].'/lib.php');
+        }
+        // Check core_courseformat base integration.
+        $classnames[$format] = "format_{$usedformat}\courseformat\base";
+        if (class_exists($classnames[$format])) {
+            return $classnames[$format];
+        }
+        // Check the legacy format.
+        $classnames[$format] = 'format_'. $usedformat;
+        if (class_exists($classnames[$format])) {
+            debugging("Move format_{$format} class to format_{$usedformat}\courseformat\base", DEBUG_DEVELOPER);
+            return $classnames[$format];
+        }
+        // Fallback to legacy format.
+        require_once($CFG->dirroot.'/course/format/formatlegacy.php');
+        $classnames[$format] = 'format_legacy';
         return $classnames[$format];
     }
 
