@@ -31,7 +31,7 @@ import ModalEvents from 'core/modal_events';
 import Templates from 'core/templates';
 import {prefetchStrings} from 'core/prefetch';
 import {get_string as getString} from 'core/str';
-import {getList} from 'core/normalise';
+import {getFirst} from 'core/normalise';
 import * as CourseEvents from 'core_course/events';
 import Pending from 'core/pending';
 import ContentTree from 'core_courseformat/local/courseeditor/contenttree';
@@ -53,6 +53,12 @@ const directMutations = {
     cmStealth: 'cmStealth',
 };
 
+/**
+ * @var {bool} autoConfirmDeletions - Whether to automatically confirm deletions.
+ * @private
+ */
+let autoConfirmDeletions = false;
+
 export default class extends BaseComponent {
 
     /**
@@ -73,6 +79,7 @@ export default class extends BaseComponent {
             ADDSECTION: selectors.content.modals.addSection,
             CONTENTTREE: selectors.content.modals.contentTree,
             ACTIONMENUTOGGLER: selectors.content.modals.menuToggler,
+            AUTODELETE: selectors.content.modals.autoDelete,
         };
         // Component css classes.
         this.classes = {
@@ -211,7 +218,7 @@ export default class extends BaseComponent {
         // Create the modal.
         const modal = await this._modalBodyRenderedPromise(modalParams);
 
-        const modalBody = getList(modal.getBody())[0];
+        const modalBody = getFirst(modal.getBody());
 
         // Disable current element and section zero.
         const currentElement = modalBody.querySelector(`${this.selectors.SECTIONLINK}[data-id='${sectionId}']`);
@@ -281,7 +288,7 @@ export default class extends BaseComponent {
         // Create the modal.
         const modal = await this._modalBodyRenderedPromise(modalParams);
 
-        const modalBody = getList(modal.getBody())[0];
+        const modalBody = getFirst(modal.getBody());
 
         // Disable current element.
         let currentElement = modalBody.querySelector(`${this.selectors.CMLINK}[data-id='${cmId}']`);
@@ -411,11 +418,15 @@ export default class extends BaseComponent {
 
         event.preventDefault();
 
+        if (autoConfirmDeletions) {
+            this.reactive.dispatch('cmDelete', [cmId]);
+            return;
+        }
+
         const modalParams = {
             title: getString('confirm', 'core'),
-            body: getString(
-                'deletechecktypename',
-                'moodle',
+            body: Templates.render(
+                'core_courseformat/local/content/deletecm',
                 {
                     type: cmInfo.modname,
                     name: cmInfo.name,
@@ -427,6 +438,9 @@ export default class extends BaseComponent {
 
         const modal = await this._modalBodyRenderedPromise(modalParams);
 
+        // Capture auto confirm deletions checkbox.
+        const autoDeleteCheckbox = getFirst(modal.getBody())?.querySelector(this.selectors.AUTODELETE);
+
         modal.getRoot().on(
             ModalEvents.save,
             e => {
@@ -434,6 +448,10 @@ export default class extends BaseComponent {
                 e.preventDefault();
                 modal.destroy();
                 this.reactive.dispatch('cmDelete', [cmId]);
+                // Save auto-confirm.
+                if (autoDeleteCheckbox) {
+                    autoConfirmDeletions = autoDeleteCheckbox.checked;
+                }
             }
         );
     }
