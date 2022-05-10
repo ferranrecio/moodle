@@ -62,6 +62,10 @@ define(
             'moveSection', 'moveCm', 'addSection', 'deleteSection', 'sectionHide', 'sectionShow',
             'cmHide', 'cmShow', 'cmStealth', 'cmDelete', 'cmDuplicate',
         ];
+        // Some legacy actions are not Ajax based in the new editor.
+        const componentNonAjaxActions = [
+            'moveleft', 'moveright'
+        ];
 
         // The course reactive instance.
         const courseeditor = editor.getCurrentCourseEditor();
@@ -937,6 +941,10 @@ define(
                             return;
                     }
                     if (!moduleId) {
+                        return;
+                    }
+                    // Filter non Ajax actions.
+                    if (courseeditor.supportComponents && componentNonAjaxActions.includes(action)) {
                         return;
                     }
                     e.preventDefault();
