@@ -2,6 +2,14 @@ This files describes API changes for course formats
 
 Overview of this plugin type at http://docs.moodle.org/dev/Course_formats
 
+=== 4.1 ===
+* All format base classes are now core_courseformat integrations:
+    - topics_format is deprecated. Use format_topics\courseformat\base instead.
+    - weeks_format is deprecated. Use format_weeks\courseformat\base instead.
+    - social_format is deprecated. Use format_social\courseformat\base instead.
+    - singleactivity_format is deprecated. Use format_singleactivity\courseformat\base instead.
+* Base class for all plugins should be now format_PLUGINNAME\courseformat\base
+
 === 4.0 ===
 * New core_courseformat\base::uses_course_index() to define whether the course format uses course index or not.
 * New core_courseformat\base::supports_components() to specify if the format is compatible with reactive components.
