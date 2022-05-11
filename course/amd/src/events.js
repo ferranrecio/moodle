@@ -25,5 +25,6 @@ export default {
     unfavorited: 'core_course:unfavorited',
     manualCompletionToggled: 'core_course:manualcompletiontoggled',
     stateChanged: 'core_course:stateChanged',
+    uploadStateChanged: 'core_course:uploadStateChanged',
     sectionRefreshed: 'core_course:sectionRefreshed',
 };

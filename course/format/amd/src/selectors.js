@@ -65,6 +65,8 @@ export default {
             sectionNode: `[data-for='sectionnode']`,
             toggler: `[data-toggle='collapse']`,
             autoDelete: `[name='autodelete']`,
+            uploaditem: `[data-for="uploaditem"]`,
+            progressbar: `progress`,
         },
         classes: {
             activity: `activity`,

@@ -196,4 +196,9 @@ $courseindex-item-current: $primary !default;
             margin: 0.5rem 0;
         }
     }
+
+    // File drop-zones.
+    .overlay-preview-wrapper {
+        display: none;
+    }
 }

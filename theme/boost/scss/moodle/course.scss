@@ -298,6 +298,11 @@ body:not(.editing)  .sitetopic ul.section {
         border-bottom: 1px solid $dropzone-border;
     }
 
+    &.file-drop-zone {
+        margin-top: -2px;
+        margin-bottom: -2px;
+    }
+
     .course-section-header.dropready.drop-zone {
         margin-top: -2px;
     }
@@ -1340,6 +1345,7 @@ $activity-add-hover: theme-color-level('primary', -10) !default;
         display: inline-block;
     }
 
+    // Legacy dndupload classes. Can be removed in 4.4.
     &.dndupload-dropzone {
         border: 2px dashed $primary;
         padding-left: 2px;
@@ -1528,5 +1534,20 @@ $activity-add-hover: theme-color-level('primary', -10) !default;
 
     &:first-child {
         margin-top: 0;
+    }
+}
+
+.file-upload-queue-monitor {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+
+    .uploadqueue {
+        background-color: $white;
+        width: 300px;
+        @include border-radius();
+        border: $border-width solid $border-color;
+        padding: map-get($spacers, 3);
+        margin: 0 .3rem .3rem 0;
     }
 }

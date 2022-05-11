@@ -12179,6 +12179,32 @@ body.dragging .dragging {
   visibility: visible;
   cursor: move; }
 
+.overlay-preview {
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 2px dashed #0f6cbf;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%; }
+  .overlay-preview .overlay-preview-wrapper {
+    position: absolute;
+    top: 0;
+    padding: 2rem;
+    width: 100%; }
+  .overlay-preview .overlay-preview-content {
+    position: relative;
+    top: 0;
+    padding: 1rem;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 600px;
+    background-color: #0f6cbf;
+    color: #fff;
+    text-align: center;
+    font-size: 1.171875rem;
+    border-radius: 0.5rem; }
+
 .waitstate {
   display: none; }
 
@@ -13958,6 +13984,10 @@ body:not(.editing) .sitetopic ul.section {
 .course-content .section.dropready.main.drop-down {
   border-bottom: 1px solid #1d2125; }
 
+.course-content .section.dropready.file-drop-zone {
+  margin-top: -2px;
+  margin-bottom: -2px; }
+
 .course-content .section.dropready .course-section-header.dropready.drop-zone {
   margin-top: -2px; }
 
@@ -14863,6 +14893,18 @@ span.editinstructions {
     font-size: 0.7rem; }
   .automatic-completion-conditions .badge:first-child {
     margin-top: 0; }
+
+.file-upload-queue-monitor {
+  position: fixed;
+  right: 0;
+  bottom: 0; }
+  .file-upload-queue-monitor .uploadqueue {
+    background-color: #fff;
+    width: 300px;
+    border-radius: 0.5rem;
+    border: 1px solid #dee2e6;
+    padding: 1rem;
+    margin: 0 .3rem .3rem 0; }
 
 /* Anchor link offset fix. This makes hash links scroll 60px down to account for the fixed header. */
 :target {
@@ -21520,6 +21562,9 @@ div.editor_atto_toolbar button .icon {
 .courseindex .media-list .w-100 {
   height: 1rem;
   margin: 0.5rem 0; }
+
+.courseindex .overlay-preview-wrapper {
+  display: none; }
 
 .moremenu {
   opacity: 0;
