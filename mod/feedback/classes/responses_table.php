@@ -115,13 +115,7 @@ class mod_feedback_responses_table extends table_sql {
      * @param int $group retrieve only users from this group (optional)
      */
     protected function init($group = 0) {
-
-        $tablecolumns = array('userpic', 'fullname', 'groups');
-        $tableheaders = array(
-            get_string('userpic'),
-            get_string('fullnameuser'),
-            get_string('groups')
-        );
+        global $CFG;
 
         // TODO Does not support custom user profile fields (MDL-70456).
         $userfieldsapi = \core_user\fields::for_identity($this->get_context(), false)->with_userpic();
@@ -137,10 +131,31 @@ class mod_feedback_responses_table extends table_sql {
         }
 
         if ($this->is_downloading()) {
-            // When downloading data:
-            // Remove 'userpic' from downloaded data.
-            array_shift($tablecolumns);
-            array_shift($tableheaders);
+            $tablecolumns = ['fullname'];
+            $tableheaders = [get_string('fullnameuser')];
+
+            // Sourced from tablelib.php
+            if (has_capability('moodle/site:viewfullnames', $this->get_context()) && !empty($CFG->alternativefullnameformat)) {
+                $nameformat = $CFG->alternativefullnameformat;
+            } else {
+                $nameformat = $CFG->fullnamedisplay;
+            }
+
+            if (empty($nameformat) || $nameformat == 'language') {
+                $nameformat = get_string('fullnamedisplay');
+            }
+
+            $requirednames = order_in_string(\core_user\fields::get_name_fields(), $nameformat);
+            if (!empty($requirednames)) {
+                foreach ($requirednames as $name) {
+                    $fields .= ", u.{$name}";
+                    $tablecolumns[] = $name;
+                    $tableheaders[] = \core_user\fields::get_display_name($name);
+                }
+            }
+
+            $tablecolumns[] = 'groups';
+            $tableheaders[] = get_string('groups');
 
             // Add all identity fields as separate columns.
             foreach ($extrafields as $field) {
@@ -148,6 +163,13 @@ class mod_feedback_responses_table extends table_sql {
                 $tablecolumns[] = $field;
                 $tableheaders[] = \core_user\fields::get_display_name($field);
             }
+        } else {
+            $tablecolumns = ['userpic', 'fullname', 'groups'];
+            $tableheaders = [
+                get_string('userpic'),
+                get_string('fullnameuser'),
+                get_string('groups'),
+            ];
         }
 
         if ($this->feedbackstructure->get_feedback()->course == SITEID && !$this->feedbackstructure->get_courseid()) {
