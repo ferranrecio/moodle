@@ -14,7 +14,7 @@
       "content": "tour_navigation_mycourses_content,tool_usertours",
       "contentformat": "1",
       "targettype": "0",
-      "targetvalue": ".header-actions-container .btn-group",
+      "targetvalue": ".header-actions-container .btn-group.course-manage",
       "sortorder": "0",
       "configdata": "{}"
     }
