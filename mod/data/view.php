@@ -89,14 +89,6 @@ comment::init();
 $context = context_module::instance($cm->id);
 require_capability('mod/data:viewentry', $context);
 
-/// If we have an empty Database then redirect because this page is useless without data
-if (has_capability('mod/data:managetemplates', $context)) {
-    if (!$DB->record_exists('data_fields', array('dataid'=>$data->id))) {      // Brand new database!
-        redirect($CFG->wwwroot.'/mod/data/field.php?d='.$data->id);  // Redirect to field entry
-    }
-}
-
-
 /// Check further parameters that set browsing preferences
 if (!isset($SESSION->dataprefs)) {
     $SESSION->dataprefs = array();
@@ -264,6 +256,17 @@ $groupmode = groups_get_activity_groupmode($cm);
 $canmanageentries = has_capability('mod/data:manageentries', $context);
 echo $OUTPUT->header();
 
+if (!$DB->record_exists('data_fields', ['dataid' => $data->id])) {
+    // It's a brand-new database. There are no fields.
+    $renderer = $PAGE->get_renderer('mod_data');
+    $zerostateactionbar = new \mod_data\output\zero_state_action_bar($data->id);
+
+    echo $renderer->render_zero_state($zerostateactionbar);
+    echo $OUTPUT->footer();
+    // Don't check the rest of the options. There is no field, there is nothing else to work with.
+    exit;
+}
+
 // Detect entries not approved yet and show hint instead of not found error.
 if ($record and !data_can_view_record($data, $record, $currentgroup, $canmanageentries)) {
     throw new \moodle_exception('notapproved', 'data');
@@ -399,6 +402,16 @@ if ($showactivity) {
         list($records, $maxcount, $totalcount, $page, $nowperpage, $sort, $mode) =
             data_search_entries($data, $cm, $context, $mode, $currentgroup, $search, $sort, $order, $page, $perpage, $advanced, $search_array, $record);
         $hasrecords = !empty($records);
+
+        if ($maxcount == 0) {
+            $renderer = $PAGE->get_renderer('mod_data');
+            $zerostateactionbar = new \mod_data\output\empty_database_action_bar($data->id);
+
+            echo $renderer->render_empty_database($zerostateactionbar, has_capability('mod/data:manageentries', $context));
+            echo $OUTPUT->footer();
+            // There is no entry, so makes no sense to check different views, pagination, etc.
+            exit;
+        }
 
         $actionbar = new \mod_data\output\action_bar($data->id, $pageurl);
         echo $actionbar->get_view_action_bar($hasrecords);

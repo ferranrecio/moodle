@@ -21,34 +21,24 @@ use templatable;
 use renderable;
 
 /**
- * Renderable class for the action bar elements in the view pages in the database activity.
+ * Renderable class for the action bar elements for an empty database activity.
  *
  * @package    mod_data
- * @copyright  2021 Mihail Geshoski <mihail@moodle.com>
+ * @copyright  2022 Amaia Anabitarte <amaia@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class view_action_bar implements templatable, renderable {
+class empty_database_action_bar implements templatable, renderable {
 
     /** @var int $id The database module id. */
     private $id;
-
-    /** @var \url_select $urlselect The URL selector object. */
-    private $urlselect;
-
-    /** @var bool $hasentries Whether entries exist. */
-    private $hasentries;
 
     /**
      * The class constructor.
      *
      * @param int $id The database module id.
-     * @param \url_select $urlselect The URL selector object.
-     * @param bool $hasentries Whether entries exist.
      */
-    public function __construct(int $id, \url_select $urlselect, bool $hasentries) {
+    public function __construct(int $id) {
         $this->id = $id;
-        $this->urlselect = $urlselect;
-        $this->hasentries = $hasentries;
     }
 
     /**
@@ -58,31 +48,21 @@ class view_action_bar implements templatable, renderable {
      * @return array
      */
     public function export_for_template(\renderer_base $output): array {
-        global $PAGE, $DB;
+        global $PAGE;
 
-        $data = [
-            'urlselect' => $this->urlselect->export_for_template($output),
-        ];
-
-        $addentrybutton = new add_entries_action($this->id, $this->hasentries);
-        $data['addentrybutton'] = $addentrybutton->export_for_template($output);
+        $addentrybutton = new add_entries_action($this->id, false);
+        $data = ['addentrybutton' => $addentrybutton->export_for_template($output)];
 
         if (has_capability('mod/data:manageentries', $PAGE->context)) {
-            $importentrieslink = new moodle_url('/mod/data/import.php',
-                ['d' => $this->id, 'backto' => $PAGE->url->out(false)]);
+            $params = ['d' => $this->id, 'backto' => $PAGE->url->out(false)];
+
+            $importentrieslink = new moodle_url('/mod/data/import.php', $params);
             $importentriesbutton = new \single_button($importentrieslink,
                 get_string('importentries', 'mod_data'), 'get', false);
             $data['importentriesbutton'] = $importentriesbutton->export_for_template($output);
         }
 
-        if (has_capability(DATA_CAP_EXPORT, $PAGE->context) && $this->hasentries) {
-            $exportentrieslink = new moodle_url('/mod/data/export.php',
-                ['d' => $this->id, 'backto' => $PAGE->url->out(false)]);
-            $exportentriesbutton = new \single_button($exportentrieslink, get_string('exportentries', 'mod_data'),
-                'get', false);
-            $data['exportentriesbutton'] = $exportentriesbutton->export_for_template($output);
-        }
-
         return $data;
     }
 }
+
