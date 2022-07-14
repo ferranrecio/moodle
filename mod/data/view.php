@@ -468,9 +468,6 @@ if ($showactivity) {
                 ];
                 $parser = $manager->get_template('singletemplate', $options);
                 echo $parser->parse_entries($records);
-
-                echo $OUTPUT->paging_bar($totalcount, $page, $nowperpage, $baseurl);
-
             } else {                                  // List template
                 $baseurl = 'view.php?d='.$data->id.'&amp;';
                 //send the advanced flag through the URL so it is remembered while paging.
@@ -497,34 +494,18 @@ if ($showactivity) {
                 echo $parser->parse_entries($records);
 
                 echo $data->listtemplatefooter;
-
-                echo $OUTPUT->paging_bar($totalcount, $page, $nowperpage, $baseurl);
             }
 
-            if ($mode != 'single' && $canmanageentries) {
-                // Build the select/deselect all control.
-                $selectallid = 'selectall-listview-entries';
-                $togglegroup = 'listview-entries';
-                $mastercheckbox = new \core\output\checkbox_toggleall($togglegroup, true, [
-                    'id' => $selectallid,
-                    'name' => $selectallid,
-                    'value' => 1,
-                    'label' => get_string('selectall'),
-                    'classes' => 'btn-secondary mr-1',
-                ], true);
-                echo $OUTPUT->render($mastercheckbox);
-
-                $deleteselected = html_writer::empty_tag('input', array(
-                    'class' => 'btn btn-secondary',
-                    'type' => 'submit',
-                    'value' => get_string('deleteselected'),
-                    'disabled' => true,
-                    'data-action' => 'toggle',
-                    'data-togglegroup' => $togglegroup,
-                    'data-toggle' => 'action',
-                ));
-                echo $deleteselected;
-            }
+            // Sticky footer option 2:sticky footer can be extender as other outputs like inplace_editable.
+            $stickyfooter = new mod_data\output\view_footer(
+                $manager,
+                $totalcount,
+                $page,
+                $nowperpage,
+                new moodle_url($baseurl),
+                $mode
+            );
+            echo $OUTPUT->render($stickyfooter);
 
             echo html_writer::end_tag('form');
         }
