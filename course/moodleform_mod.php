@@ -1236,6 +1236,8 @@ abstract class moodleform_mod extends moodleform {
 
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $mform->setType('buttonar', PARAM_RAW);
+        // Sticky footer option 4: set a form element as sticky.
+        $mform->setStickyFooter('buttonar');
     }
 
     /**
