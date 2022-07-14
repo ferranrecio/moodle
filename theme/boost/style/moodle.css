@@ -11720,6 +11720,9 @@ ul {
   bottom: 2rem;
   right: 2rem; }
 
+.hasstickyfooter .btn-footer-popover {
+  bottom: calc(2rem + 60px); }
+
 .popover.footer .popover-body {
   padding: 0; }
   .popover.footer .popover-body .footer-section a {
@@ -19966,6 +19969,16 @@ html,
 body {
   height: 100%; }
 
+.stickyfooter {
+  height: 61px;
+  bottom: -60px;
+  transition: bottom .5s;
+  z-index: 1000;
+  overflow: hidden; }
+
+.hasstickyfooter .stickyfooter {
+  bottom: 0; }
+
 @media (min-width: 576px) {
   #page-wrapper {
     height: 100%;
@@ -20613,7 +20626,9 @@ span[data-flexitour="container"][x-placement="right"], span[data-flexitour="cont
         right: calc(315px + 2rem); }
     #page.drawers.show-drawer-left.show-drawer-right {
       margin-left: 285px;
-      margin-right: 315px; } }
+      margin-right: 315px; }
+    #page.drawers.hasstickyfooter {
+      height: calc(100vh - 60px - 60px); } }
 
 .drawercontrolbuttons {
   margin-top: 92px; }
