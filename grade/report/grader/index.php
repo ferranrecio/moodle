@@ -152,12 +152,6 @@ foreach ($warnings as $warning) {
     echo $OUTPUT->notification($warning);
 }
 
-$studentsperpage = $report->get_students_per_page();
-// Don't use paging if studentsperpage is empty or 0 at course AND site levels
-if (!empty($studentsperpage)) {
-    echo $OUTPUT->paging_bar($numusers, $report->page, $studentsperpage, $report->pbarurl);
-}
-
 $displayaverages = true;
 if ($numusers == 0) {
     $displayaverages = false;
@@ -165,8 +159,9 @@ if ($numusers == 0) {
 
 $reporthtml = $report->get_grade_table($displayaverages);
 
-// print submit button
-if (!empty($USER->editing) && ($report->get_pref('showquickfeedback') || $report->get_pref('quickgrading'))) {
+// start report form
+$editing = !empty($USER->editing) && ($report->get_pref('showquickfeedback') || $report->get_pref('quickgrading'));
+if ($editing) {
     echo '<form action="index.php" enctype="application/x-www-form-urlencoded" method="post" id="gradereport_grader">'; // Enforce compatibility with our max_input_vars hack.
     echo '<div>';
     echo '<input type="hidden" value="'.s($courseid).'" name="id" />';
@@ -175,17 +170,22 @@ if (!empty($USER->editing) && ($report->get_pref('showquickfeedback') || $report
     echo '<input type="hidden" value="grader" name="report"/>';
     echo '<input type="hidden" value="'.$page.'" name="page"/>';
     echo $gpr->get_form_fields();
-    echo $reporthtml;
-    echo '<div class="submit"><input type="submit" id="gradersubmit" class="btn btn-primary"
-        value="'.s(get_string('savechanges')).'" /></div>';
-    echo '</div></form>';
-} else {
-    echo $reporthtml;
 }
 
-// prints paging bar at bottom for large pages
-if (!empty($studentsperpage) && $studentsperpage >= 20) {
-    echo $OUTPUT->paging_bar($numusers, $report->page, $studentsperpage, $report->pbarurl);
+echo $reporthtml;
+
+// Sticky footer option 1: can be created as a regular output element by passing the rendered content
+// and the css classes directly ad creation params.
+$footer = new \gradereport_grader\output\footer($report, $numusers);
+$stickyfooter = new core\output\sticky_footer(
+    $OUTPUT->render($footer),
+    'd-flex align-items-center'
+);
+echo $OUTPUT->render($stickyfooter);
+
+// End report form.
+if ($editing) {
+    echo '</div></form>';
 }
 
 $event = \gradereport_grader\event\grade_report_viewed::create(
