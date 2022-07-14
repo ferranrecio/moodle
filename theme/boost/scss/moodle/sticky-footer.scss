@@ -7,6 +7,18 @@ body {
     height: 100%;
 }
 
+.stickyfooter {
+    height: $navbar-height + 1px;
+    bottom: -$navbar-height;
+    transition: bottom .5s;
+    z-index: $zindex-dropdown;
+    overflow: hidden;
+}
+
+.hasstickyfooter .stickyfooter {
+    bottom: 0;
+}
+
 @include media-breakpoint-up(sm) {
     #page-wrapper {
         height: 100%;

@@ -2312,6 +2312,10 @@ $footer-link-color: $bg-inverse-link-color !default;
     @include box-shadow($popover-box-shadow);
 }
 
+.hasstickyfooter .btn-footer-popover {
+    bottom: calc(2rem + #{$navbar-height});
+}
+
 .popover.footer {
     .popover-body {
         padding: 0;
