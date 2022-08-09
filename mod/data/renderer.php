@@ -1,5 +1,9 @@
 <?php
 
+use mod_data\manager;
+use mod_data\output\zero_state_action_bar;
+use mod_data\output\empty_database_action_bar;
+
 defined('MOODLE_INTERNAL') || die();
 
 class mod_data_renderer extends plugin_renderer_base {
@@ -143,13 +147,13 @@ class mod_data_renderer extends plugin_renderer_base {
     /**
      * Renders the action bar for the zero state (no fields created) page.
      *
-     * @param \mod_data\output\zero_state_action_bar $actionbar
+     * @param manager $manager the manager instance
      *
      * @return string The HTML output
      */
-    public function render_zero_state(\mod_data\output\zero_state_action_bar $actionbar): string {
+    public function render_zero_state(manager $manager): string {
+        $actionbar = new zero_state_action_bar($manager);
         $data = $actionbar->export_for_template($this);
-
         if (empty($data)) {
             // No actions for the user.
             $data['title'] = get_string('activitynotready');
@@ -159,31 +163,21 @@ class mod_data_renderer extends plugin_renderer_base {
             $data['intro'] = get_string('createfields', 'mod_data');
         }
         $data['noitemsimgurl'] = $this->output->image_url('nofields', 'mod_data')->out();
-
         return $this->render_from_template('mod_data/zero_state', $data);
     }
 
     /**
      * Renders the action bar for an empty database view page.
      *
-     * @param \mod_data\output\empty_database_action_bar $actionbar
+     * @param manager $manager the manager instance
      * @param bool  $canmanage Whether the user has management permission or not
      *
      * @return string The HTML output
      */
-    public function render_empty_database(\mod_data\output\empty_database_action_bar $actionbar, bool $canmanage = false): string {
+    public function render_empty_database(manager $manager): string {
+        $actionbar = new empty_database_action_bar($manager);
         $data = $actionbar->export_for_template($this);
-
-        if (empty($data)) {
-            // No actions for the user.
-            $data['title'] = get_string('activitynotready');
-            $data['intro'] = get_string('comebacklater');
-        } else {
-            $data['title'] = get_string('startbuilding', 'mod_data');
-            $data['intro'] = get_string('createfields', 'mod_data');
-        }
         $data['noitemsimgurl'] = $this->output->image_url('nofields', 'mod_data')->out();
-
         return $this->render_from_template('mod_data/view_noentries', $data);
     }
 }

@@ -237,6 +237,19 @@ class manager {
     }
 
     /**
+     * Return if the databse has fields.
+     *
+     * @return bool true if the database has fields
+     */
+    public function has_fields(): bool {
+        global $DB;
+        if ($this->_fieldrecords === null) {
+            return $DB->record_exists('data_fields', ['dataid' => $this->instance->id]);
+        }
+        return !empty($this->_fieldrecords);
+    }
+
+    /**
      * Return a specific template.
      *
      * NOTE: this method returns a default template if the module template is empty.

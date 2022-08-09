@@ -239,12 +239,10 @@ $groupmode = groups_get_activity_groupmode($cm);
 $canmanageentries = has_capability('mod/data:manageentries', $context);
 echo $OUTPUT->header();
 
-if (!$DB->record_exists('data_fields', ['dataid' => $data->id])) {
+if (!$manager->has_fields()) {
     // It's a brand-new database. There are no fields.
     $renderer = $PAGE->get_renderer('mod_data');
-    $zerostateactionbar = new \mod_data\output\zero_state_action_bar($data->id);
-
-    echo $renderer->render_zero_state($zerostateactionbar);
+    echo $renderer->render_zero_state($manager);
     echo $OUTPUT->footer();
     // Don't check the rest of the options. There is no field, there is nothing else to work with.
     exit;
@@ -390,9 +388,7 @@ if ($showactivity) {
 
         if ($maxcount == 0) {
             $renderer = $PAGE->get_renderer('mod_data');
-            $zerostateactionbar = new \mod_data\output\empty_database_action_bar($data->id);
-
-            echo $renderer->render_empty_database($zerostateactionbar, has_capability('mod/data:manageentries', $context));
+            echo $renderer->render_empty_database($manager);
             echo $OUTPUT->footer();
             // There is no entry, so makes no sense to check different views, pagination, etc.
             exit;

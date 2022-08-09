@@ -19,6 +19,8 @@ namespace mod_data\output;
 use moodle_url;
 use templatable;
 use renderable;
+use single_button;
+use mod_data\manager;
 
 /**
  * Renderable class for the action bar elements for an empty database activity.
@@ -29,16 +31,16 @@ use renderable;
  */
 class empty_database_action_bar implements templatable, renderable {
 
-    /** @var int $id The database module id. */
-    private $id;
+    /** @var manager The manager instance. */
+    protected $manager;
 
     /**
      * The class constructor.
      *
-     * @param int $id The database module id.
+     * @param manager $manager The manager instance.
      */
-    public function __construct(int $id) {
-        $this->id = $id;
+    public function __construct(manager $manager) {
+        $this->manager = $manager;
     }
 
     /**
@@ -50,14 +52,26 @@ class empty_database_action_bar implements templatable, renderable {
     public function export_for_template(\renderer_base $output): array {
         global $PAGE;
 
-        $addentrybutton = new add_entries_action($this->id, false);
-        $data = ['addentrybutton' => $addentrybutton->export_for_template($output)];
+        $manager = $this->manager;
+        $instance = $manager->get_instance();
+        $cm = $manager->get_coursemodule();
+        $currentgroup = groups_get_activity_group($cm);
+        $groupmode = groups_get_activity_groupmode($cm);
+
+        if (!data_user_can_add_entry($instance, $currentgroup, $groupmode, $manager->get_context())) {
+            return [];
+        }
+
+        $data = [];
+
+        $addentrybutton = new add_entries_action($instance->id, false);
+        $data['addentrybutton'] = $addentrybutton->export_for_template($output);
 
         if (has_capability('mod/data:manageentries', $PAGE->context)) {
-            $params = ['d' => $this->id, 'backto' => $PAGE->url->out(false)];
+            $params = ['d' => $instance->id, 'backto' => $PAGE->url->out(false)];
 
             $importentrieslink = new moodle_url('/mod/data/import.php', $params);
-            $importentriesbutton = new \single_button($importentrieslink,
+            $importentriesbutton = new single_button($importentrieslink,
                 get_string('importentries', 'mod_data'), 'get', false);
             $data['importentriesbutton'] = $importentriesbutton->export_for_template($output);
         }
@@ -65,4 +79,3 @@ class empty_database_action_bar implements templatable, renderable {
         return $data;
     }
 }
-

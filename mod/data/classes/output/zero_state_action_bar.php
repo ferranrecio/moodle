@@ -19,6 +19,8 @@ namespace mod_data\output;
 use moodle_url;
 use templatable;
 use renderable;
+use single_button;
+use mod_data\manager;
 
 /**
  * Renderable class for the action bar elements in the zero state (no fields created) pages in the database activity.
@@ -29,16 +31,16 @@ use renderable;
  */
 class zero_state_action_bar implements templatable, renderable {
 
-    /** @var int $id The database module id. */
-    private $id;
+    /** @var manager The manager instance. */
+    protected $manager;
 
     /**
      * The class constructor.
      *
-     * @param int $id The database module id.
+     * @param manager $manager The manager instance.
      */
-    public function __construct(int $id) {
-        $this->id = $id;
+    public function __construct(manager $manager) {
+        $this->manager = $manager;
     }
 
     /**
@@ -50,29 +52,32 @@ class zero_state_action_bar implements templatable, renderable {
     public function export_for_template(\renderer_base $output): array {
         global $PAGE;
 
+        $instance = $this->manager->get_instance();
+
+        if (!has_capability('mod/data:managetemplates', $PAGE->context)) {
+            return [];
+        }
+
         $data = [];
 
-        if (has_capability('mod/data:managetemplates', $PAGE->context)) {
-            $params = ['d' => $this->id, 'backto' => $PAGE->url->out(false)];
+        $params = ['d' => $instance->id, 'backto' => $PAGE->url->out(false)];
 
-            $usepresetlink = new moodle_url('/mod/data/preset.php', $params);
-            $usepresetbutton = new \single_button($usepresetlink,
-                get_string('usepreset', 'mod_data'), 'get', true);
-            $data['usepresetbutton'] = $usepresetbutton->export_for_template($output);
+        $usepresetlink = new moodle_url('/mod/data/preset.php', $params);
+        $usepresetbutton = new single_button($usepresetlink,
+            get_string('usepreset', 'mod_data'), 'get', true);
+        $data['usepresetbutton'] = $usepresetbutton->export_for_template($output);
 
-            $createfieldlink = new moodle_url('/mod/data/field.php', $params);
-            $createfieldbutton = new \single_button($createfieldlink,
-                get_string('newfield', 'mod_data'), 'get', false);
-            $data['createfieldbutton'] = $createfieldbutton->export_for_template($output);
+        $createfieldlink = new moodle_url('/mod/data/field.php', $params);
+        $createfieldbutton = new single_button($createfieldlink,
+            get_string('newfield', 'mod_data'), 'get', false);
+        $data['createfieldbutton'] = $createfieldbutton->export_for_template($output);
 
-            $params['action'] = 'import';
-            $importpresetlink = new moodle_url('/mod/data/preset.php', $params);
-            $importpresetbutton = new \single_button($importpresetlink,
-                get_string('importpreset', 'mod_data'), 'get', false);
-            $data['importpresetbutton'] = $importpresetbutton->export_for_template($output);
-        }
+        $params['action'] = 'import';
+        $importpresetlink = new moodle_url('/mod/data/preset.php', $params);
+        $importpresetbutton = new single_button($importpresetlink,
+            get_string('importpreset', 'mod_data'), 'get', false);
+        $data['importpresetbutton'] = $importpresetbutton->export_for_template($output);
 
         return $data;
     }
 }
-
