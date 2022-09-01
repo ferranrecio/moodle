@@ -38,8 +38,6 @@ export const init = () => {
     prefetchStrings('mod_data', [
         'deleteconfirm',
         'deletewarning',
-        'presetdeleted',
-        'failedpresetdelete',
     ]);
     prefetchStrings('core', [
         'delete',
@@ -75,15 +73,7 @@ const deletePresetConfirm = (deleteOption) => {
         getString('deletewarning', 'mod_data'),
         getString('delete', 'core'),
     ).then(() => {
-        return deletePreset(dataId, presetName)
-            .then(function() {
-                var params = {
-                    d: dataId,
-                };
-                window.location.href = Url.relativeUrl('mod/data/preset.php', params, false);
-                return;
-            })
-            .catch(Notification.exception);
+        return deletePreset(dataId, presetName);
     }).catch(() => {
         return;
     });
@@ -92,18 +82,28 @@ const deletePresetConfirm = (deleteOption) => {
 /**
  * Delete site user preset.
  *
- * @param {int} dataid The id of the current database activity.
- * @param {string} presetname The preset name to delete.
+ * @param {int} dataId The id of the current database activity.
+ * @param {string} presetName The preset name to delete.
  * @return {promise} Resolved with the result and warnings of deleting a preset.
  */
-function deletePreset(dataid, presetname) {
+async function deletePreset(dataId, presetName) {
     var request = {
         methodname: 'mod_data_delete_saved_preset',
         args: {
-            dataid: dataid,
-            presetnames: {presetname},
+            dataid: dataId,
+            presetnames: {presetname: presetName},
         }
     };
-    return Ajax.call([request])[0];
+    try {
+        await Ajax.call([request])[0];
+        window.location.href = Url.relativeUrl(
+            'mod/data/preset.php',
+            {
+                d: dataId,
+            },
+            false
+        );
+    } catch (error) {
+        Notification.exception(error);
+    }
 }
-
