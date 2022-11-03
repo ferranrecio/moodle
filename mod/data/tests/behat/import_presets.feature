@@ -17,10 +17,6 @@ Feature: Users can import presets
     And the following "activities" exist:
       | activity | name                | intro | course | idnumber |
       | data     | Mountain landscapes | n     | C1     | data1    |
-    And the following "mod_data > presets" exist:
-      | database | name            | description                   |
-      | data1    | Saved preset 1  | The preset1 has description   |
-      | data1    | Saved preset 2  |                               |
 
   Scenario: Teacher can import from preset page on an empty database
     Given I am on the "Mountain landscapes" "data activity" page logged in as teacher1
@@ -101,3 +97,92 @@ Feature: Users can import presets
     When I click on "Import preset and apply" "button"
     Then I should not see "Field mappings"
     And I should see "Image" in the "image" "table_row"
+
+  Scenario: Teacher can import from presets on a database with fields and previous fields will be
+  removed
+    Given the following "mod_data > fields" exist:
+      | database | type | name              | description              |
+      | data1    | text | Test field name   | Test field description   |
+    And I am on the "Mountain landscapes" "data activity" page logged in as teacher1
+    And I follow "Presets"
+    And I click on "Actions" "button"
+    And I choose "Import preset" in the open action menu
+    And I upload "mod/data/tests/fixtures/image_gallery_preset.zip" file to "Preset file" filemanager
+    When I click on "Import preset and apply" "button"
+    And I click on "Continue" "button"
+    Then I should see "The preset has been successfully applied."
+    And I follow "Fields"
+    And I should see "image"
+    And I should see "title"
+    And I should not see "Test field name"
+
+  Scenario: Importing a preset could create new fields
+    Given the following "mod_data > fields" exist:
+      | database | type | name    |
+      | data1    | text | title   |
+    And I am on the "Mountain landscapes" "data activity" page logged in as teacher1
+    And I follow "Fields"
+    And I should see "title"
+    And I should not see "Description"
+    And I should not see "image"
+    And I follow "Presets"
+    And I click on "Actions" "button"
+    And I choose "Import preset" in the open action menu
+    And I upload "mod/data/tests/fixtures/image_gallery_preset.zip" file to "Preset file" filemanager
+    When I click on "Import preset and apply" "button"
+    And I click on "Continue" "button"
+    And I should see "The preset has been successfully applied"
+    And I click on "Continue" "button"
+    And I follow "Fields"
+    Then I should see "title"
+    And I should see "description" in the "description" "table_row"
+    And I should see "image" in the "image" "table_row"
+
+  Scenario: Importing a preset could create map fields
+    Given the following "mod_data > fields" exist:
+      | database | type | name            |
+      | data1    | text | oldtitle        |
+    And I am on the "Mountain landscapes" "data activity" page logged in as teacher1
+    And I follow "Fields"
+    And I should see "oldtitle"
+    And I should not see "Description"
+    And I should not see "image"
+    And I follow "Presets"
+    And I click on "Actions" "button"
+    And I choose "Import preset" in the open action menu
+    And I upload "mod/data/tests/fixtures/image_gallery_preset.zip" file to "Preset file" filemanager
+    When I click on "Import preset and apply" "button"
+#    Let's map a field that is not mapped by default
+    And I should see "Create a new field" in the "oldtitle" "table_row"
+    And I set the field "id_title" to "Map to oldtitle"
+    And I click on "Continue" "button"
+    And I should see "The preset has been successfully applied"
+    And I click on "Continue" "button"
+    And I follow "Fields"
+    Then I should not see "oldtitle"
+    And I should see "title"
+    And I should see "description" in the "description" "table_row"
+    And I should see "image" in the "image" "table_row"
+
+  Scenario: Importing same preset twice doesn't show mapping dialogue
+    Given the following "mod_data > fields" exist:
+      | database | type | name    |
+      | data1    | text | title   |
+    And I am on the "Mountain landscapes" "data activity" page logged in as teacher1
+    And I follow "Presets"
+    And I click on "Actions" "button"
+    And I choose "Import preset" in the open action menu
+    And I upload "mod/data/tests/fixtures/image_gallery_preset.zip" file to "Preset file" filemanager
+    When I click on "Import preset and apply" "button"
+    And I should see "Field mappings"
+    And I click on "Continue" "button"
+    And I should see "The preset has been successfully applied"
+    And I click on "Continue" "button"
+    And I follow "Fields"
+    And I follow "Presets"
+    And I click on "Actions" "button"
+    And I choose "Import preset" in the open action menu
+    And I upload "mod/data/tests/fixtures/image_gallery_preset.zip" file to "Preset file" filemanager
+    And I click on "Import preset and apply" "button"
+    Then I should not see "Field mappings"
+    And I should see "The preset has been successfully applied"

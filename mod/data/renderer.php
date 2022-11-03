@@ -59,7 +59,7 @@ class mod_data_renderer extends plugin_renderer_base {
         $strwarning = get_string('mappingwarning', 'data');
         $strfieldmappings = get_string('fieldmappings', 'data');
 
-        $params = $importer->get_preset_settings();
+        $params = $importer->settings;
         $newfields = $params->importfields;
         $currentfields = $params->currentfields;
 
