@@ -97,7 +97,7 @@ H5PEmbedCommunicator = (function() {
     return (window.postMessage && window.addEventListener ? new Communicator() : undefined);
 })();
 
-document.onreadystatechange = function() {
+document.onreadystatechange = async() => {
     // Wait for instances to be initialize.
     if (document.readyState !== 'complete') {
         return;
@@ -109,6 +109,16 @@ document.onreadystatechange = function() {
         return;
     }
     var H5P = iFrame.contentWindow.H5P;
+    const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
+    while (!H5P) {
+      // In some cases, the H5P takes a while to be initialized (which causes some random behat failures).
+      await sleep(100);
+      H5P = iFrame.contentWindow.H5P;
+    }
+    while (!H5P.instances[0]) {
+      // In some cases, the H5P takes a while to be initialized (which causes some random behat failures).
+      await sleep(100);
+    }
 
     // Check for H5P instances.
     if (!H5P || !H5P.instances || !H5P.instances[0]) {
