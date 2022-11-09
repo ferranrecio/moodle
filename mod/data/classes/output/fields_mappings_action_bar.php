@@ -26,34 +26,18 @@ use renderable;
  * @copyright  2021 Mihail Geshoski <mihail@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class fields_action_bar implements templatable, renderable {
+class fields_mappings_action_bar implements templatable, renderable {
 
     /** @var int $id The database module id. */
     private $id;
-
-    /** @var \action_menu|null $fieldselect The field selector object or null. */
-    private $fieldselect;
 
     /**
      * The class constructor.
      *
      * @param int $id The database module id
-     * @param null $unused1 This parameter has been deprecated since 4.1 and should not be used anymore.
-     * @param null $unused2 This parameter has been deprecated since 4.1 and should not be used anymore.
-     * @param null $unused3 This parameter has been deprecated since 4.1 and should not be used anymore.
-     * @param null $unused4 This parameter has been deprecated since 4.1 and should not be used anymore.
-     * @param \action_menu|null $fieldselect The field selector object or null
      */
-    public function __construct(int $id, $unused1 = null, $unused2 = null,
-            $unused3 = null, $unused4 = null,
-            ?\action_menu $fieldselect = null) {
-
-        if ($unused1 !== null || $unused2 !== null || $unused3 !== null || $unused4 !== null) {
-            debugging('Deprecated argument passed to fields_action_bar constructor', DEBUG_DEVELOPER);
-        }
-
+    public function __construct(int $id) {
         $this->id = $id;
-        $this->fieldselect = $fieldselect;
     }
 
     /**
@@ -66,12 +50,11 @@ class fields_action_bar implements templatable, renderable {
 
         $data = [
             'd' => $this->id,
-            'tertiarytitle' => get_string('managefields', 'mod_data'),
+            'tertiarytitle' => get_string('fieldmappings', 'mod_data'),
+            'hasback' => true,
+            'backtitle' => get_string('back'),
+            'backurl' => new \moodle_url('/mod/data/preset.php', ['d' => $this->id]),
         ];
-
-        if ($this->fieldselect) {
-            $data['fieldselect'] = $this->fieldselect->export_for_template($output);
-        }
 
         return $data;
     }
