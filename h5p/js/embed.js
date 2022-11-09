@@ -97,6 +97,22 @@ H5PEmbedCommunicator = (function() {
     return (window.postMessage && window.addEventListener ? new Communicator() : undefined);
 })();
 
+var getH5PObject = async (iFrame) => {
+    var H5P = iFrame.contentWindow.H5P;
+    if (H5P?.instances?.[0]) {
+        return H5P;
+    }
+    // In some cases, the H5P takes a while to be initialized (which causes some random behat failures).
+    const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
+    let remainingAttemps = 10;
+    while (!H5P?.instances?.[0] && remainingAttemps > 0) {
+        await sleep(100);
+        H5P = iFrame.contentWindow.H5P;
+        remainingAttemps--;
+    }
+    return H5P;
+};
+
 document.onreadystatechange = async() => {
     // Wait for instances to be initialize.
     if (document.readyState !== 'complete') {
@@ -108,20 +124,8 @@ document.onreadystatechange = async() => {
     if (!iFrame || !iFrame.contentWindow) {
         return;
     }
-    var H5P = iFrame.contentWindow.H5P;
-    const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
-    while (!H5P) {
-      // In some cases, the H5P takes a while to be initialized (which causes some random behat failures).
-      await sleep(100);
-      H5P = iFrame.contentWindow.H5P;
-    }
-    while (!H5P.instances[0]) {
-      // In some cases, the H5P takes a while to be initialized (which causes some random behat failures).
-      await sleep(100);
-    }
-
-    // Check for H5P instances.
-    if (!H5P || !H5P.instances || !H5P.instances[0]) {
+    var H5P = await getH5PObject(iFrame);
+    if (!H5P?.instances?.[0]) {
         return;
     }
 
