@@ -105,6 +105,7 @@ const buildModal = (params) => {
     }).then(modal => {
         modal.show();
         modal.showFooter();
+        modal.registerCloseOnCancel();
         return modal;
     }).catch(Notification.exception);
 };
@@ -118,14 +119,6 @@ const buildModal = (params) => {
  */
 const getMappingButtons = (cmId, presetName) => {
     const data = {};
-    const cancelButton = Url.relativeUrl(
-       'mod/data/preset.php',
-       {
-           id: cmId,
-       },
-       false
-    );
-    data.cancel = cancelButton;
 
     const mapButton = Url.relativeUrl(
        'mod/data/field.php',
