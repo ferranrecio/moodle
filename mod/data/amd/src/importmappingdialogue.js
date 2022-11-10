@@ -25,7 +25,13 @@ import Notification from 'core/notification';
 import Ajax from 'core/ajax';
 import Url from 'core/url';
 import Templates from 'core/templates';
-import Modal from 'core/modal';
+// D: import Modal from 'core/modal';
+import ModalFactory from 'core/modal_factory';
+import {prefetchStrings} from 'core/prefetch';
+import {get_string as getString} from 'core/str';
+
+// Load global strings.
+prefetchStrings('mod_data', ['mapping:dialogtitle:usepreset']);
 
 const selectors = {
     selectPresetButton: 'input[name="selectpreset"]',
@@ -62,16 +68,11 @@ const mappingusepreset = (usepreset) => {
 
     showMappingDialogue(cmId, presetName).then((result) => {
         if (result.data && result.data.needsmapping) {
-            result.data = addMappingButtons(result.data, cmId, presetName);
-            let modalPromise = Templates.render('mod_data/fields_mapping_modal', result.data);
-            modalPromise.then(function(html) {
-                return new Modal(html);
-            }).fail(Notification.exception)
-                .then((modal) => {
-                    modal.show();
-                    return modal;
-                }).fail(Notification.exception);
-                return result;
+            buildModal({
+                title: getString('mapping:dialogtitle:usepreset', 'mod_data', presetName),
+                body: Templates.render('mod_data/fields_mapping_modal', result.data),
+                footer: Templates.render('mod_data/fields_mapping_footer', getMappingButtons(cmId, presetName)),
+            });
         } else {
             window.location.href = Url.relativeUrl(
                 'mod/data/field.php',
@@ -83,18 +84,40 @@ const mappingusepreset = (usepreset) => {
                 false
             );
         }
-    });
+        return true;
+    }).catch(Notification.exception);
+};
+
+/**
+ * Given an object we want to build a modal ready to show
+ *
+ * @method buildModal
+ * @param {Object} params the modal params
+ * @param {Promise} params.title
+ * @param {Promise} params.body
+ * @param {Promise} params.footer
+ * @return {Object} The modal ready to display immediately and render body in later.
+ */
+const buildModal = (params) => {
+    return ModalFactory.create({
+        ...params,
+        type: ModalFactory.types.DEFAULT,
+    }).then(modal => {
+        modal.show();
+        modal.showFooter();
+        return modal;
+    }).catch(Notification.exception);
 };
 
 /**
  * Add buttons to render on mapping modal.
  *
- * @param {array} data Current data to add buttons to.
  * @param {int} cmId The id of the current database activity.
  * @param {string} presetName The preset name to delete.
  * @return {array} Same data with buttons.
  */
-const addMappingButtons = (data, cmId, presetName) => {
+const getMappingButtons = (cmId, presetName) => {
+    const data = {};
     const cancelButton = Url.relativeUrl(
        'mod/data/preset.php',
        {
@@ -102,7 +125,7 @@ const addMappingButtons = (data, cmId, presetName) => {
        },
        false
     );
-    data['cancel'] = cancelButton;
+    data.cancel = cancelButton;
 
     const mapButton = Url.relativeUrl(
        'mod/data/field.php',
@@ -114,7 +137,7 @@ const addMappingButtons = (data, cmId, presetName) => {
        },
        false
     );
-    data['mapfieldsbutton'] = mapButton;
+    data.mapfieldsbutton = mapButton;
 
     const applyButton = Url.relativeUrl(
        'mod/data/field.php',
@@ -126,7 +149,7 @@ const addMappingButtons = (data, cmId, presetName) => {
        },
        false
     );
-    data['applybutton'] = applyButton;
+    data.applybutton = applyButton;
 
     return data;
 };
@@ -143,7 +166,7 @@ async function showMappingDialogue(cmId, presetName) {
         methodname: 'mod_data_get_mapping_information',
         args: {
             cmid: cmId,
-            import: presetName,
+            "import": presetName,
         }
     };
     return Ajax.call([request])[0];
