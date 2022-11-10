@@ -52,7 +52,7 @@ const registerEventListeners = () => {
         const usepreset = event.target.closest(selectors.selectPresetButton);
         if (usepreset) {
             event.preventDefault();
-            mappingusepreset(usepreset);
+            showMappingDialogue(usepreset);
         }
     });
 };
@@ -62,17 +62,19 @@ const registerEventListeners = () => {
  *
  * @param {HTMLElement} usepreset the preset to import.
  */
-const mappingusepreset = (usepreset) => {
+const showMappingDialogue = async(usepreset) => {
     const presetName = usepreset.dataset.presetname;
     const cmId = usepreset.dataset.cmid;
 
-    showMappingDialogue(cmId, presetName).then((result) => {
-        if (result.data && result.data.needsmapping) {
+    try {
+        const result = await getMappingInformation(cmId, presetName);
+        if (result?.data?.needsmapping) {
             buildModal({
                 title: getString('mapping:dialogtitle:usepreset', 'mod_data', presetName),
                 body: Templates.render('mod_data/fields_mapping_modal', result.data),
                 footer: Templates.render('mod_data/fields_mapping_footer', getMappingButtons(cmId, presetName)),
             });
+            return;
         } else {
             window.location.href = Url.relativeUrl(
                 'mod/data/field.php',
@@ -84,8 +86,9 @@ const mappingusepreset = (usepreset) => {
                 false
             );
         }
-        return true;
-    }).catch(Notification.exception);
+    } catch (error) {
+        Notification.exception(error);
+    }
 };
 
 /**
@@ -154,7 +157,7 @@ const getMappingButtons = (cmId, presetName) => {
  * @param {string} presetName The preset name to delete.
  * @return {promise} Resolved with the result and warnings of deleting a preset.
  */
-async function showMappingDialogue(cmId, presetName) {
+async function getMappingInformation(cmId, presetName) {
     var request = {
         methodname: 'mod_data_get_mapping_information',
         args: {
