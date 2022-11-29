@@ -520,6 +520,7 @@ $string['divertallemailsto'] = 'Divert all emails';
 $string['divertallemailsto_desc'] = 'If set then all emails will be diverted to this single email address instead.';
 $string['dndallowtextandlinks'] = 'Drag and drop upload of text/links';
 $string['doclang'] = 'Language for docs';
+$string['docquickstart'] = 'Moodle Quickstart guide URL';
 $string['docroot'] = 'Moodle Docs document root';
 $string['doctonewwindow'] = 'Open in new window';
 $string['doesnotfit'] = 'Email display settings';
