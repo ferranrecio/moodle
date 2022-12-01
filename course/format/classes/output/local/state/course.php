@@ -50,8 +50,11 @@ class course implements renderable {
      * @return stdClass data context for a mustache template
      */
     public function export_for_template(\renderer_base $output): stdClass {
+        global $CFG;
+
         $format = $this->format;
         $course = $format->get_course();
+        $context = $format->get_context();
         // State must represent always the most updated version of the course.
         $modinfo = course_modinfo::instance($course);
 
@@ -66,6 +69,7 @@ class course implements renderable {
             'maxsections' => $format->get_max_sections(),
             'baseurl' => $url->out(),
             'statekey' => course_format::session_cache($course),
+            'maxbytes' => get_user_max_upload_file_size($context, $CFG->maxbytes, $course->maxbytes),
         ];
 
         $sections = $modinfo->get_section_info_all();

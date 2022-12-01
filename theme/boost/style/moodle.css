@@ -14092,6 +14092,10 @@ body:not(.editing) .sitetopic ul.section {
 .course-content .section.dropready.main.drop-down {
   border-bottom: 1px solid #1d2125; }
 
+.course-content .section.dropready.file-drop-zone {
+  margin-top: -2px;
+  margin-bottom: -2px; }
+
 .course-content .section.dropready .course-section-header.dropready.drop-zone {
   margin-top: -2px; }
 
@@ -21775,6 +21779,9 @@ div.editor_atto_toolbar button .icon {
 .courseindex .media-list .w-100 {
   height: 1rem;
   margin: 0.5rem 0; }
+
+.courseindex .overlay-preview-wrapper {
+  display: none; }
 
 .moremenu {
   opacity: 0;
