@@ -485,37 +485,17 @@ class main implements renderable, templatable {
      * @param \renderer_base $output
      * @return array Context variables for the template
      * @throws \coding_exception
-     *
      */
     public function export_for_zero_state_template(renderer_base $output) {
         global $CFG, $DB;
 
-        $nocoursesimg = $output->image_url('courses', 'block_myoverview')->out();
-        $titlestr = 'zero_nopermission_title';
-        $introstr = 'zero_nopermission_intro';
+        $scenario = 'nopermission';
         $buttons = [];
 
         $coursecat = \core_course_category::user_top();
         if (!$coursecat) {
-            return [
-                'nocoursesimg' => $nocoursesimg,
-                'title' => get_string($titlestr, 'block_myoverview'),
-                'intro' => get_string($introstr, 'block_myoverview'),
-                'buttons' => $buttons,
-            ];
+            return $this->generate_zero_state_data($output, $buttons, $scenario);
         }
-
-        // Documentation data.
-        $dochref = new \moodle_url($CFG->docroot, ['lang' => current_language()]);
-        $quickstart = new \moodle_url($CFG->docquickstart, ['lang' => current_language()]);
-        $docparams = [
-            'quickhref' => $quickstart->out(),
-            'quicktitle' => get_string('viewquickstart', 'block_myoverview'),
-            'quicktarget' => '_blank',
-            'dochref' => $dochref->out(),
-            'doctitle' => get_string('documentation'),
-            'doctarget' => $CFG->doctonewwindow ? '_blank' : '_self',
-        ];
 
         $categorytocreate = \core_course_category::get_nearest_editable_subcategory($coursecat, ['create']);
         if (!$categorytocreate) {
@@ -528,15 +508,9 @@ class main implements renderable, templatable {
                     'post',
                     true
                 );
-                $titlestr = 'zero_request_title';
-                $introstr = 'zero_request_intro';
+                $scenario = 'request';
             }
-            return [
-                'nocoursesimg' => $nocoursesimg,
-                'title' => get_string($titlestr, 'block_myoverview'),
-                'intro' => get_string($introstr, 'block_myoverview', $docparams),
-                'buttons' => $buttons,
-            ];
+            return $this->generate_zero_state_data($output, $buttons, $scenario);
         }
 
         $createbutton = new \single_button(
@@ -547,27 +521,20 @@ class main implements renderable, templatable {
         );
         $buttons[] = $createbutton->export_for_template($output);
 
-        $titlestr = 'zero_nomanagecourses_title';
-        $introstr = 'zero_nomanagecourses_intro';
+        $scenario = 'nomanagecourses';
 
         $totalcourses = $DB->count_records_select('course', 'category > 0');
         if (!$totalcourses) {
             if (!empty($CFG->docquickstart)) {
                 $quickstartbutton = new \single_button(
-                    $dochref,
+                    new \moodle_url($CFG->docroot, ['lang' => current_language()]),
                     get_string('viewquickstart', 'block_myoverview'),
                 );
                 array_unshift($buttons, $quickstartbutton->export_for_template($output));
             }
-            $titlestr = 'zero_nocourses_title';
-            $introstr = 'zero_nocourses_intro';
+            $scenario = 'nocourses';
 
-            return [
-                'nocoursesimg' => $nocoursesimg,
-                'title' => get_string($titlestr, 'block_myoverview'),
-                'intro' => get_string($introstr, 'block_myoverview', $docparams),
-                'buttons' => $buttons,
-            ];
+            return $this->generate_zero_state_data($output, $buttons, $scenario);
         }
 
         $categorytomanage = \core_course_category::get_nearest_editable_subcategory($coursecat, ['manage']);
@@ -579,14 +546,37 @@ class main implements renderable, templatable {
             );
             array_unshift($buttons, $managebutton->export_for_template($output));
 
-            $titlestr = 'zero_createcourses_title';
-            $introstr = 'zero_createcourses_intro';
+            $scenario = 'createcourses';
         }
 
+        return $this->generate_zero_state_data($output, $buttons, $scenario);
+    }
+
+    /**
+     * Generate the state zero data.
+     *
+     * @param \renderer_base $output
+     * @param \single_button[] $buttons
+     * @param string $scenario the scenario name (used to fins the correct strings)
+     * @return array Context variables for the template
+     */
+    private function generate_zero_state_data(renderer_base $output, array $buttons, string $scenario) {
+        global $CFG;
+        // Documentation data.
+        $dochref = new \moodle_url($CFG->docroot, ['lang' => current_language()]);
+        $quickstart = new \moodle_url($CFG->docquickstart, ['lang' => current_language()]);
+        $docparams = [
+            'quickhref' => $quickstart->out(),
+            'quicktitle' => get_string('viewquickstart', 'block_myoverview'),
+            'quicktarget' => '_blank',
+            'dochref' => $dochref->out(),
+            'doctitle' => get_string('documentation'),
+            'doctarget' => $CFG->doctonewwindow ? '_blank' : '_self',
+        ];
         return [
-            'nocoursesimg' => $nocoursesimg,
-            'title' => get_string($titlestr, 'block_myoverview'),
-            'intro' => get_string($introstr, 'block_myoverview', $docparams),
+            'nocoursesimg' => $output->image_url('courses', 'block_myoverview')->out(),
+            'title' => get_string("zero_{$scenario}_title", 'block_myoverview'),
+            'intro' => get_string("zero_{$scenario}_intro", 'block_myoverview', $docparams),
             'buttons' => $buttons,
         ];
     }
