@@ -257,6 +257,13 @@ reports,core_reportbuilder|/reportbuilder/index.php',
     $ltemp += get_string_manager()->get_list_of_translations(true);
     $temp->add(new admin_setting_configselect('doclang', get_string('doclang', 'admin'), get_string('configdoclang', 'admin'), '', $ltemp));
     $temp->add(new admin_setting_configcheckbox('doctonewwindow', new lang_string('doctonewwindow', 'admin'), new lang_string('configdoctonewwindow', 'admin'), 0));
+    $temp->add(new admin_setting_configtext(
+        'docquickstart',
+        new lang_string('docquickstart', 'admin'),
+        new lang_string('docquickstart', 'admin'),
+        'https://moodle.academy/mod/page/view.php?id=1695',
+        PARAM_URL
+    ));
     $ADMIN->add('appearance', $temp);
 
     if (!empty($CFG->enabledashboard)) {
