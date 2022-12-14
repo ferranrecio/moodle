@@ -491,107 +491,103 @@ class main implements renderable, templatable {
         global $CFG, $DB;
 
         $nocoursesimg = $output->image_url('courses', 'block_myoverview')->out();
+        $titlestr = 'zero_nopermission_title';
+        $introstr = 'zero_nopermission_intro';
+        $buttons = [];
 
         $coursecat = \core_course_category::user_top();
-        if ($coursecat) {
-            $category = \core_course_category::get_nearest_editable_subcategory($coursecat, ['moodle/course:request']);
-            if ($category && $category->can_request_course()) {
+        if (!$coursecat) {
+            return [
+                'nocoursesimg' => $nocoursesimg,
+                'title' => get_string($titlestr, 'block_myoverview'),
+                'intro' => get_string($introstr, 'block_myoverview'),
+                'buttons' => $buttons,
+            ];
+        }
+
+        // Documentation data.
+        $dochref = new \moodle_url($CFG->docroot, ['lang' => current_language()]);
+        $quickstart = new \moodle_url($CFG->docquickstart, ['lang' => current_language()]);
+        $docparams = [
+            'quickhref' => $quickstart->out(),
+            'quicktitle' => get_string('viewquickstart', 'block_myoverview'),
+            'quicktarget' => '_blank',
+            'dochref' => $dochref->out(),
+            'doctitle' => get_string('documentation'),
+            'doctarget' => $CFG->doctonewwindow ? '_blank' : '_self',
+        ];
+
+        $categorytocreate = \core_course_category::get_nearest_editable_subcategory($coursecat, ['create']);
+        if (!$categorytocreate) {
+            $categorytorequest = \core_course_category::get_nearest_editable_subcategory($coursecat, ['moodle/course:request']);
+            if ($categorytorequest && $categorytorequest->can_request_course()) {
                 // Add Request a course button.
-                $button = new \single_button(
-                    new \moodle_url('/course/request.php', ['category' => $category->id]),
+                $buttons[] = new \single_button(
+                    new \moodle_url('/course/request.php', ['category' => $categorytorequest->id]),
                     get_string('requestcourse'),
                     'post',
                     true
                 );
-                $dochref = new \moodle_url($CFG->docroot, ['lang' => current_language()]);
-                $quickstart = new \moodle_url($CFG->docquickstart, ['lang' => current_language()]);
-                $docparams = [
-                    'quickhref' => $quickstart->out(),
-                    'quicktitle' => get_string('viewquickstart', 'block_myoverview'),
-                    'quicktarget' => '_blank',
-                    'dochref' => $dochref->out(),
-                    'doctitle' => get_string('documentation'),
-                    'doctarget' => $CFG->doctonewwindow ? '_blank' : '_self',
-                ];
-
-                return [
-                    'nocoursesimg' => $nocoursesimg,
-                    'title' => get_string('zero_request_title', 'block_myoverview'),
-                    'intro' => get_string('zero_request_intro', 'block_myoverview', $docparams),
-                    'buttons' => [$button->export_for_template($output)],
-                ];
+                $titlestr = 'zero_request_title';
+                $introstr = 'zero_request_intro';
             }
+            return [
+                'nocoursesimg' => $nocoursesimg,
+                'title' => get_string($titlestr, 'block_myoverview'),
+                'intro' => get_string($introstr, 'block_myoverview', $docparams),
+                'buttons' => $buttons,
+            ];
+        }
 
-            $totalcourses = $DB->count_records_select('course', 'category > 0');
-            if (!$totalcourses && ($category = \core_course_category::get_nearest_editable_subcategory($coursecat, ['create']))) {
-                // Add Quickstart guide and Create course buttons.
-                $quickstarturl = $CFG->docquickstart;
-                if ($quickstarturl) {
-                    $quickstartbutton = new \single_button(
-                        new \moodle_url($quickstarturl, ['lang' => current_language()]),
-                        get_string('viewquickstart', 'block_myoverview'),
-                    );
-                }
-                $buttons = [$quickstartbutton->export_for_template($output)];
+        $createbutton = new \single_button(
+            new \moodle_url('/course/edit.php', ['category' => $categorytocreate->id]),
+            get_string('createcourse', 'block_myoverview'),
+            'post',
+            true
+        );
+        $buttons[] = $createbutton->export_for_template($output);
 
-                $createbutton = new \single_button(
-                    new \moodle_url('/course/edit.php', ['category' => $category->id]),
-                    get_string('createcourse', 'block_myoverview'),
-                    'post',
-                    true
+        $titlestr = 'zero_nomanagecourses_title';
+        $introstr = 'zero_nomanagecourses_intro';
+
+        $totalcourses = $DB->count_records_select('course', 'category > 0');
+        if (!$totalcourses) {
+            if (!empty($CFG->docquickstart)) {
+                $quickstartbutton = new \single_button(
+                    $dochref,
+                    get_string('viewquickstart', 'block_myoverview'),
                 );
-                $buttons[] = $createbutton->export_for_template($output);
-                $dochref = new \moodle_url($CFG->docroot, ['lang' => current_language()]);
-                $docparams = [
-                    'dochref' => $dochref->out(),
-                    'doctitle' => get_string('documentation'),
-                    'doctarget' => $CFG->doctonewwindow ? '_blank' : '_self',
-                ];
-                return [
-                    'nocoursesimg' => $nocoursesimg,
-                    'title' => get_string('zero_nocourses_title', 'block_myoverview'),
-                    'intro' => get_string('zero_nocourses_intro', 'block_myoverview', $docparams),
-                    'buttons' => $buttons,
-                ];
+                array_unshift($buttons, $quickstartbutton->export_for_template($output));
             }
+            $titlestr = 'zero_nocourses_title';
+            $introstr = 'zero_nocourses_intro';
 
-            if ($categorytocreate = \core_course_category::get_nearest_editable_subcategory($coursecat, ['create'])) {
-                $title = get_string('zero_nomanagecourses_title', 'block_myoverview');
-                $intro = get_string('zero_nomanagecourses_intro', 'block_myoverview');
-                if ($categorytomanage = \core_course_category::get_nearest_editable_subcategory($coursecat, ['manage'])) {
-                    // Add a Manage course button.
-                    $managebutton = new \single_button(
-                        new \moodle_url('/course/management.php', ['category' => $categorytomanage->id]),
-                        get_string('managecourses')
-                    );
-                    $buttons = [$managebutton->export_for_template($output)];
+            return [
+                'nocoursesimg' => $nocoursesimg,
+                'title' => get_string($titlestr, 'block_myoverview'),
+                'intro' => get_string($introstr, 'block_myoverview', $docparams),
+                'buttons' => $buttons,
+            ];
+        }
 
-                    $title = get_string('zero_createcourses_title', 'block_myoverview');
-                    $intro = get_string('zero_createcourses_intro', 'block_myoverview');
-                }
+        $categorytomanage = \core_course_category::get_nearest_editable_subcategory($coursecat, ['manage']);
+        if ($categorytomanage) {
+            // Add a Manage course button.
+            $managebutton = new \single_button(
+                new \moodle_url('/course/management.php', ['category' => $categorytomanage->id]),
+                get_string('managecourses')
+            );
+            array_unshift($buttons, $managebutton->export_for_template($output));
 
-                $createbutton = new \single_button(
-                    new \moodle_url('/course/edit.php', ['category' => $categorytocreate->id]),
-                    get_string('createcourse', 'block_myoverview'),
-                    'post',
-                    true
-                );
-                $buttons[] = $createbutton->export_for_template($output);
-
-                return [
-                    'nocoursesimg' => $nocoursesimg,
-                    'title' => $title,
-                    'intro' => $intro,
-                    'buttons' => $buttons,
-                ];
-            }
+            $titlestr = 'zero_createcourses_title';
+            $introstr = 'zero_createcourses_intro';
         }
 
         return [
             'nocoursesimg' => $nocoursesimg,
-            'title' => get_string('zero_nopermission_title', 'block_myoverview'),
-            'intro' => get_string('zero_nopermission_intro', 'block_myoverview'),
-            'buttons' => [],
+            'title' => get_string($titlestr, 'block_myoverview'),
+            'intro' => get_string($introstr, 'block_myoverview', $docparams),
+            'buttons' => $buttons,
         ];
     }
 }
