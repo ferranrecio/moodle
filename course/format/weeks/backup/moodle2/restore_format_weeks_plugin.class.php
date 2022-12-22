@@ -78,7 +78,7 @@ class restore_format_weeks_plugin extends restore_format_plugin {
             $DB->update_record('course_format_options', $update);
 
             // Now, let's update the course end date.
-            format_weeks::update_end_date($this->step->get_task()->get_courseid());
+            format_weeks\courseformat\format::update_end_date($this->step->get_task()->get_courseid());
         } else {
             $update->value = 0;
             $DB->update_record('course_format_options', $update);

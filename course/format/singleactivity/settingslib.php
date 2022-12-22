@@ -42,11 +42,10 @@ class format_singleactivity_admin_setting_activitytype extends admin_setting_con
      */
     public function load_choices() {
         global $CFG;
-        require_once($CFG->dirroot. '/course/format/singleactivity/lib.php');
         if (is_array($this->choices)) {
             return true;
         }
-        $this->choices = format_singleactivity::get_supported_activities();
+        $this->choices = format_singleactivity\courseformat\format::get_supported_activities();
         return true;
     }
 }

@@ -14,13 +14,28 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * This file contains any format plugin global function.
- *
- * @since     Moodle 2.0
- * @package   format_social
- * @copyright 2009 Sam Hemelryk
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+namespace format_testlegacy\courseformat;
 
-// This file is kept for backwards compatibility only.
+use core_courseformat\base as format_base;
+
+/**
+ * Class format_testlegacyformat.
+ *
+ * A test class that simulates old course formats that define 'news_items' in default blocks.
+ *
+ * @copyright 2016 Jun Pataleta <jun@moodle.com>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class format extends format_base {
+    /**
+     * Returns the list of blocks to be automatically added for the newly created course.
+     *
+     * @return array
+     */
+    public function get_default_blocks() {
+        return [
+            BLOCK_POS_RIGHT => ['news_items'],
+            BLOCK_POS_LEFT => []
+        ];
+    }
+}

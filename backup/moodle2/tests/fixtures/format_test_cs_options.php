@@ -25,13 +25,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-require_once($CFG->dirroot . '/course/format/topics/lib.php');
-
 /**
  * Fixture course format with one option.
  */
-class format_test_cs_options extends format_topics {
+class format_test_cs_options extends format_topics\courseformat\format {
     /**
      * Override method format_topics::get_default_section_name to prevent PHPUnit errors related to the nonexistent
      * format_test_cs_options lang file.

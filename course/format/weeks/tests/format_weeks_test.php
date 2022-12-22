@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/course/lib.php');
 class format_weeks_test extends \advanced_testcase {
 
     /**
-     * Tests for format_weeks::get_section_name method with default section names.
+     * Tests for format_weeks\courseformat\format::get_section_name method with default section names.
      */
     public function test_get_section_name() {
         global $DB;
@@ -55,7 +55,7 @@ class format_weeks_test extends \advanced_testcase {
     }
 
     /**
-     * Tests for format_weeks::get_section_name method with modified section names.
+     * Tests for format_weeks\courseformat\format::get_section_name method with modified section names.
      */
     public function test_get_section_name_customised() {
         global $DB;
@@ -87,7 +87,7 @@ class format_weeks_test extends \advanced_testcase {
     }
 
     /**
-     * Tests for format_weeks::get_default_section_name.
+     * Tests for format_weeks\courseformat\format::get_default_section_name.
      */
     public function test_get_default_section_name() {
         global $DB;
@@ -219,7 +219,7 @@ class format_weeks_test extends \advanced_testcase {
         $courseform = new \testable_course_edit_form(null, $args);
         $courseform->definition_after_data();
 
-        // format_weeks::get_section_dates is adding 2h to avoid DST problems, we need to replicate it here.
+        // format_weeks\courseformat\format::get_section_dates is adding 2h to avoid DST problems, we need to replicate it here.
         $enddate = $params['startdate'] + (WEEKSECS * $params['numsections']) + 7200;
 
         $weeksformat = course_get_format($course->id);

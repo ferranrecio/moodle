@@ -34,6 +34,8 @@ class base_test extends advanced_testcase {
         require_once($CFG->dirroot . '/course/format/tests/fixtures/format_theunittest.php');
         require_once($CFG->dirroot . '/course/format/tests/fixtures/format_theunittest_output_course_format_state.php');
         require_once($CFG->dirroot . '/course/format/tests/fixtures/format_theunittest_output_course_format_invalidoutput.php');
+        require_once($CFG->dirroot . '/course/format/tests/fixtures/format_testlegacy.php');
+        require_once($CFG->dirroot . '/course/format/tests/fixtures/format_testformat.php');
     }
 
     /**
@@ -414,50 +416,6 @@ class base_test extends advanced_testcase {
             'use hook' => [
                 'usehook' => true,
             ]
-        ];
-    }
-}
-
-/**
- * Class format_testformat.
- *
- * A test class that simulates a course format that doesn't define 'news_items' in default blocks.
- *
- * @copyright 2016 Jun Pataleta <jun@moodle.com>
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class format_testformat extends core_courseformat\base {
-    /**
-     * Returns the list of blocks to be automatically added for the newly created course.
-     *
-     * @return array
-     */
-    public function get_default_blocks() {
-        return [
-            BLOCK_POS_RIGHT => [],
-            BLOCK_POS_LEFT => []
-        ];
-    }
-}
-
-/**
- * Class format_testlegacy.
- *
- * A test class that simulates old course formats that define 'news_items' in default blocks.
- *
- * @copyright 2016 Jun Pataleta <jun@moodle.com>
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class format_testlegacy extends core_courseformat\base {
-    /**
-     * Returns the list of blocks to be automatically added for the newly created course.
-     *
-     * @return array
-     */
-    public function get_default_blocks() {
-        return [
-            BLOCK_POS_RIGHT => ['news_items'],
-            BLOCK_POS_LEFT => []
         ];
     }
 }

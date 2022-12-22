@@ -14,6 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace format_theunittest\courseformat;
+
+use core_courseformat\base as format_base;
+use section_info;
 /**
  * Fixture for fake course format testing course format API.
  *
@@ -21,7 +25,7 @@
  * @copyright  2014 Marina Glancy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class format_theunittest extends core_courseformat\base {
+class format extends format_base {
 
     /**
      * Definitions of the additional options that format uses
