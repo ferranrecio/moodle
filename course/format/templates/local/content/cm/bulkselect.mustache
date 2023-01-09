@@ -15,9 +15,9 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template core_courseformat/local/content/cm
+    @template core_courseformat/local/content/cm/bulkselect
 
-    Displays a course module instance inside a course section.
+    Displays an activity bulk selector.
 
     Example context (json):
     {
@@ -56,22 +56,14 @@
         "modstealth": true
     }
 }}
-{{#editing}}
-    <div class="divider divider-plus" data-action="insert-before-{{activityname}}">
-        {{> core_course/activitychooserbuttonactivity}}
-    </div>
-{{/editing}}
-<div class="activity-item {{#modstealth}}hiddenactivity{{/modstealth}}{{!
-        }}{{#modhiddenfromstudents}}hiddenactivity{{/modhiddenfromstudents}}{{!
-        }}{{#modinline}}activityinline{{/modinline}}" data-activityname="{{activityname}}">
-    {{$ core_courseformat/local/content/cm/bulkselect }}
-        {{> core_courseformat/local/content/cm/bulkselect }}
-    {{/ core_courseformat/local/content/cm/bulkselect }}
-    {{!
-      Place the actual content of the activity-item in a separate template to make it easier for other formats to add
-      additional content to the activity wrapper.
-    }}
-    {{$ core_courseformat/local/content/cm/activity }}
-        {{> core_courseformat/local/content/cm/activity }}
-    {{/ core_courseformat/local/content/cm/activity }}
+<div class="bulkselect d-none" data-for="cmBulkSelect">
+    <input
+        id="cmCheckbox{{cmid}}"
+        type="checkbox"
+        data-id="{{cmid}}"
+        data-action="toggleSelectionCm"
+    />
+    <label class="sr-only" for="cmCheckbox{{cmid}}">
+        {{#str}} select, core, {{activityname}}{{/str}}
+    </label>
 </div>

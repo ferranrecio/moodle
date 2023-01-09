@@ -36,8 +36,14 @@ export default class extends DndSectionItem {
     create(descriptor) {
         // Optional component name for debugging.
         this.name = 'content_section_header';
-        // We need our id to watch specific events.
-
+        // Default query selectors.
+        this.selectors = {
+            BULKSELECT: `[data-for='sectionBulkSelect']`,
+            BULKCHECKBOX: `[data-for='sectionBulkSelect'] input`,
+        };
+        this.classes = {
+            HIDDEN: 'd-none',
+        };
         // Get main info from the descriptor.
         this.id = descriptor.id;
         this.section = descriptor.section;
@@ -52,5 +58,70 @@ export default class extends DndSectionItem {
      */
     stateReady(state) {
         this.configDragDrop(this.id, state, this.fullregion);
+        this._refreshBulk({state});
+    }
+
+    /**
+     * Component watchers.
+     *
+     * @returns {Array} of watchers
+     */
+    getWatchers() {
+        return [
+            {watch: `bulk:updated`, handler: this._refreshBulk},
+        ];
+    }
+
+    /**
+     * Update a course index cm using the state information.
+     *
+     * @param {object} param
+     * @param {Object} param.state the state data
+     */
+    _refreshBulk({state}) {
+        const bulk = state.bulk;
+        this.getElement(this.selectors.BULKSELECT)?.classList.toggle(this.classes.HIDDEN, !bulk.enabled);
+
+        const disabled = !this._isSectionBulkEnabled(bulk);
+        const newValue = this._isSelected(bulk);
+        this._setCheckboxValue(newValue, disabled);
+    }
+
+    /**
+     * Modify the checkbox element.
+     * @param {Boolean} checked the new checked value
+     * @param {Boolean} disabled the new disabled value
+     */
+    _setCheckboxValue(checked, disabled) {
+        const checkbox = this.getElement(this.selectors.BULKCHECKBOX);
+        if (!checkbox) {
+            return;
+        }
+        checkbox.checked = checked;
+        checkbox.disabled = disabled;
+    }
+
+    /**
+     * Check if cm bulk selection is available.
+     * @param {Object} bulk the current state bulk attribute
+     * @returns {Boolean}
+     */
+    _isSectionBulkEnabled(bulk) {
+        if (!bulk.enabled) {
+            return false;
+        }
+        return (bulk.selectedType === '' || bulk.selectedType === 'section');
+    }
+
+    /**
+     * Check if the cm id is part of the current bulk selection.
+     * @param {Object} bulk the current state bulk attribute
+     * @returns {Boolean}
+     */
+    _isSelected(bulk) {
+        if (bulk.selectedType !== 'section') {
+            return false;
+        }
+        return bulk.selection.includes(this.id);
     }
 }

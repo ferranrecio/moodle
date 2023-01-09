@@ -15003,6 +15003,15 @@ span.editinstructions {
   opacity: 1;
   visibility: visible; }
 
+.activity-item .bulkselect {
+  position: absolute;
+  left: -2rem; }
+
+.course-section-header .bulkselect {
+  left: -2rem;
+  position: relative;
+  width: 0; }
+
 /* Anchor link offset fix. This makes hash links scroll 60px down to account for the fixed header. */
 :target {
   scroll-margin-top: 70px; }

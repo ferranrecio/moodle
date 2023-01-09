@@ -1574,3 +1574,14 @@ $activity-add-hover: theme-color-level('primary', -10) !default;
         }
     }
 }
+
+.activity-item .bulkselect {
+    position: absolute;
+    left: -2rem;
+}
+
+.course-section-header .bulkselect {
+    left: -2rem;
+    position: relative;
+    width: 0;
+}

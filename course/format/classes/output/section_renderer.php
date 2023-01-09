@@ -207,6 +207,15 @@ abstract class section_renderer extends core_course_renderer {
         return '';
     }
 
+    public function bulk_editing_button(course_format $format): ?string {
+        if (!$format->show_editor() || !$format->supports_components()) {
+            return null;
+        }
+        $widgetclass = $format->get_output_classname('content\\bulkedittoggler');
+        $widget = new $widgetclass($format);
+        return $this->render($widget);
+    }
+
     /**
      * Generate the edit control action menu
      *
