@@ -38,11 +38,13 @@ export default class extends DndSectionItem {
         this.name = 'content_section_header';
         // Default query selectors.
         this.selectors = {
+            ACTIONSMENU: `.section_action_menu`,
             BULKSELECT: `[data-for='sectionBulkSelect']`,
             BULKCHECKBOX: `[data-for='sectionBulkSelect'] input`,
         };
         this.classes = {
-            HIDDEN: 'd-none',
+            HIDE: 'd-none',
+            SELECTED: 'selected',
         };
         // Get main info from the descriptor.
         this.id = descriptor.id;
@@ -80,10 +82,12 @@ export default class extends DndSectionItem {
      */
     _refreshBulk({state}) {
         const bulk = state.bulk;
-        this.getElement(this.selectors.BULKSELECT)?.classList.toggle(this.classes.HIDDEN, !bulk.enabled);
+        this.getElement(this.selectors.BULKSELECT)?.classList.toggle(this.classes.HIDE, !bulk.enabled);
+        this.getElement(this.selectors.ACTIONSMENU)?.classList.toggle(this.classes.HIDE, bulk.enabled);
 
         const disabled = !this._isSectionBulkEnabled(bulk);
         const newValue = this._isSelected(bulk);
+        this.element.classList.toggle(this.classes.SELECTED, newValue);
         this._setCheckboxValue(newValue, disabled);
     }
 

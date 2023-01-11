@@ -36,6 +36,8 @@ export default class extends DndCmItem {
         this.name = 'content_section_cmitem';
         // Default query selectors.
         this.selectors = {
+            ACTIONSMENU: `.activity-actions`,
+            CARD: `.activity-item`,
             DRAGICON: `.editing_move`,
             BULKSELECT: `[data-for='cmBulkSelect']`,
             BULKCHECKBOX: `[data-for='cmBulkSelect'] input`,
@@ -43,7 +45,8 @@ export default class extends DndCmItem {
         // Most classes will be loaded later by DndCmItem.
         this.classes = {
             LOCKED: 'editinprogress',
-            HIDDEN: 'd-none',
+            HIDE: 'd-none',
+            SELECTED: 'selected',
         };
         // We need our id to watch specific events.
         this.id = this.element.dataset.id;
@@ -94,10 +97,13 @@ export default class extends DndCmItem {
      */
     _refreshBulk({state}) {
         const bulk = state.bulk;
-        this.getElement(this.selectors.BULKSELECT)?.classList.toggle(this.classes.HIDDEN, !bulk.enabled);
+        this.getElement(this.selectors.BULKSELECT)?.classList.toggle(this.classes.HIDE, !bulk.enabled);
+        this.getElement(this.selectors.ACTIONSMENU)?.classList.toggle(this.classes.HIDE, bulk.enabled);
 
         const disabled = !this._isCmBulkEnabled(bulk);
         const newValue = this._isSelected(bulk);
+        this.getElement(this.selectors.CARD)?.classList.toggle(this.classes.SELECTED, newValue);
+        this.element.classList.toggle(this.classes.SELECTED, newValue);
         this._setCheckboxValue(newValue, disabled);
     }
 

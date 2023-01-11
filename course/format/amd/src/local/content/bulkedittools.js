@@ -27,6 +27,7 @@ import {disableStickyFooter, enableStickyFooter} from 'core/sticky-footer';
 import {getCurrentCourseEditor} from 'core_courseformat/courseeditor';
 import {get_string as getString} from 'core/str';
 import {prefetchStrings} from 'core/prefetch';
+import actions from './actions';
 
 // Load global strings.
 prefetchStrings(
@@ -44,13 +45,16 @@ export default class Component extends BaseComponent {
         this.name = 'bulk_editor_tools';
         // Default query selectors.
         this.selectors = {
-            COUNT: `[data-for='bulkcount']`,
+            ACTIONS: `[data-for="bulkaction"]`,
+            ACTIONTOOL: `[data-for="bulkactions"] li`,
             CANCEL: `[data-for="bulkcancel"]`,
+            COUNT: `[data-for='bulkcount']`,
             SELECTALL: `[data-for="selectall"]`,
         };
         // Most classes will be loaded later by DndCmItem.
         this.classes = {
             HIDE: 'd-none',
+            DISABLED: 'disabled',
         };
     }
 
@@ -119,6 +123,7 @@ export default class Component extends BaseComponent {
     _refreshTools(param) {
         this._refreshSelectCount(param);
         this._refreshSelectAll(param);
+        this._refreshActions(param);
     }
 
     /**
@@ -155,6 +160,26 @@ export default class Component extends BaseComponent {
         selectall.disabled = false;
         const maxSelection = (bulk.selectedType === 'cm') ? state.cm.size : state.section.size;
         selectall.checked = (bulk.selection.length == maxSelection);
+    }
+
+    /**
+     * Refresh the visible action buttons depending on the selection type.
+     *
+     * @param {object} param
+     * @param {Object} param.element the affected element (bulk in this case).
+     */
+    _refreshActions({element: bulk}) {
+        // By default, we show the section options.
+        const displayType = (bulk.selectedType == 'cm') ? 'cm' : 'section';
+        const enabled = (bulk.selectedType !== '');
+        this.getElements(this.selectors.ACTIONS).forEach(action => {
+            window.console.log();
+            action.classList.toggle(this.classes.DISABLED, !enabled);
+
+            const actionTool = action.closest(this.selectors.ACTIONTOOL);
+            const isHidden = (action.dataset.bulk != displayType);
+            actionTool?.classList.toggle(this.classes.HIDE, isHidden);
+        });
     }
 
     _cancelBulk() {

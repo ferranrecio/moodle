@@ -1500,7 +1500,8 @@ $activity-add-hover: theme-color-level('primary', -10) !default;
         cursor: pointer;
     }
 
-    &:hover {
+    &:hover,
+    &.selected {
         @include alert-variant($activity-item-hover, $activity-item-border, $activity-item-color);
 
         .description .course-description-item,

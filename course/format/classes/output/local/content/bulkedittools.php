@@ -63,8 +63,91 @@ class bulkedittools implements named_templatable, renderable {
 
         $data = (object)[
             'id' => $course->id,
+            'actions' => $this->get_toolbar_actions(),
         ];
-
+        $data->hasactions = !empty($data->actions);
         return $data;
+    }
+
+    /**
+     * Get the toolbar actions.
+     * @return array the array of buttons
+     */
+    protected function get_toolbar_actions(): array {
+        return array_merge(
+            array_values($this->section_control_items()),
+            array_values($this->cm_control_items()),
+        );
+    }
+
+    /**
+     * Generate the bulk edit control items of a course module.
+     *
+     * Format plugins can override the method to add or remove elements
+     * from the toolbar.
+     *
+     * @return array of edit control items
+     */
+    protected function cm_control_items(): array {
+        global $USER;
+
+        $format = $this->format;
+        $context = $format->get_context();
+        $user = $USER;
+
+        $controls = [];
+
+        $hasmanageactivities = has_capability('moodle/course:manageactivities', $context, $user);
+
+        $duplicatecapabilities = ['moodle/backup:backuptargetimport', 'moodle/restore:restoretargetimport'];
+        if (has_all_capabilities($duplicatecapabilities, $context, $user)) {
+            $controls['duplicate'] = [
+                'icon' => 't/copy',
+                'action' => 'cmDuplicate',
+                'name' => get_string('duplicate'),
+                'bulk' => 'cm',
+            ];
+        }
+
+        if ($hasmanageactivities) {
+            $controls['delete'] = [
+                'icon' => 'i/delete',
+                'action' => 'cmDelete',
+                'name' => get_string('delete'),
+                'bulk' => 'cm',
+            ];
+        }
+
+        return $controls;
+    }
+
+    /**
+     * Generate the bulk edit control items of a section.
+     *
+     * Format plugins can override the method to add or remove elements
+     * from the toolbar.
+     *
+     * @return array of edit control items
+     */
+    protected function section_control_items(): array {
+        global $USER;
+
+        $format = $this->format;
+        $context = $format->get_context();
+        $user = $USER;
+
+        $controls = [];
+
+        $deletecapabilities = ['moodle/course:movesections', 'moodle/course:update'];
+        if (has_all_capabilities($deletecapabilities, $context, $user)) {
+            $controls['delete'] = [
+                'icon' => 'i/delete',
+                'action' => 'deleteSection',
+                'name' => get_string('delete'),
+                'bulk' => 'section',
+            ];
+        }
+
+        return $controls;
     }
 }

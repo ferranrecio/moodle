@@ -14940,17 +14940,19 @@ span.editinstructions {
   cursor: move; }
   .editing .activity-item .a {
     cursor: pointer; }
-  .editing .activity-item:hover {
+  .editing .activity-item:hover, .editing .activity-item.selected {
     color: #1d2125;
     background-color: #f5f9fc;
     border-color: #3584c9; }
-    .editing .activity-item:hover hr {
+    .editing .activity-item:hover hr, .editing .activity-item.selected hr {
       border-top-color: #3077b5; }
-    .editing .activity-item:hover .alert-link {
+    .editing .activity-item:hover .alert-link, .editing .activity-item.selected .alert-link {
       color: #070808; }
     .editing .activity-item:hover .description .course-description-item,
     .editing .activity-item:hover .activityiconcontainer,
-    .editing .activity-item:hover .badge {
+    .editing .activity-item:hover .badge, .editing .activity-item.selected .description .course-description-item,
+    .editing .activity-item.selected .activityiconcontainer,
+    .editing .activity-item.selected .badge {
       mix-blend-mode: multiply; }
 
 .section .draggable .activity-item .dragicon {

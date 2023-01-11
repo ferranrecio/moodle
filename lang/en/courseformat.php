@@ -25,6 +25,9 @@
 $string['bulkedit'] = 'Bulk edit';
 $string['bulkcancel'] = 'Close bulk editing';
 $string['bulkselection'] = '{$a} selected';
+$string['confirmbulkdeletesections'] = 'Are you absolutely sure you want to completely the selected sections and all their activities?';
+$string['confirmbulkdeletecms'] = 'Are you sure that you want to delete the selected activities?';
 $string['courseindex'] = 'Course index';
+$string['nobulkaction'] = 'No bulk actions available';
 $string['preference:coursesectionspreferences'] = 'Section user preferences for course {$a}';
 $string['privacy:metadata:preference:coursesectionspreferences'] = 'Section user preferences like collapsed and expanded.';

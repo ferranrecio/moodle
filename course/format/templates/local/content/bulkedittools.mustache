@@ -21,6 +21,15 @@
 
     Example context (json):
     {
+        "id": 42,
+        "action": [
+            {
+                "icon" => "i/delete",
+                "action" => "cmDelete",
+                "name" => "delete",
+                "bulk" => "cm"
+            }
+        ]
     }
 }}
 {{< core/sticky_footer }}
@@ -35,7 +44,26 @@
         </label>
     </div>
     <div data-for="bulktools">
-        {{! All bulk actions buttons goes here }}
+        {{^hasactions}}
+        {{#str}} nobulkaction, core_courseformat {{/str}}
+        {{/hasactions}}
+        {{#hasactions}}
+        <ul class="actions nav" data-for="bulkactions">
+            {{#actions}}
+            <li class="nav-item">
+                <button
+                    class="btn py-0 d-flex flex-column"
+                    data-action="{{action}}"
+                    data-bulk="{{bulk}}"
+                    data-for="bulkaction"
+                >
+                    <div class="w-100 pl-2">{{#pix}}{{icon}}{{/pix}}</div>
+                    <div>{{name}}</div>
+                </button>
+            </li>
+            {{/actions}}
+        </ul>
+        {{/hasactions}}
     </div>
     <div class="d-flex flex-column">
         <div class="ml-auto">

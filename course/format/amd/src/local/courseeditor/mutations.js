@@ -197,6 +197,7 @@ export default class {
         this.sectionLock(stateManager, Array.from(sectionIds), true);
 
         const updates = await this._callEditWebservice('cm_duplicate', course.id, cmIds, targetSectionId, targetCmId);
+        this.bulkReset(stateManager);
         stateManager.processUpdates(updates);
 
         this.sectionLock(stateManager, Array.from(sectionIds), false);
@@ -270,6 +271,7 @@ export default class {
     async sectionDelete(stateManager, sectionIds) {
         const course = stateManager.get('course');
         const updates = await this._callEditWebservice('section_delete', course.id, sectionIds);
+        this.bulkReset(stateManager);
         stateManager.processUpdates(updates);
     }
 
@@ -282,6 +284,7 @@ export default class {
         const course = stateManager.get('course');
         this.cmLock(stateManager, cmIds, true);
         const updates = await this._callEditWebservice('cm_delete', course.id, cmIds);
+        this.bulkReset(stateManager);
         this.cmLock(stateManager, cmIds, false);
         stateManager.processUpdates(updates);
     }
@@ -491,6 +494,19 @@ export default class {
         const state = stateManager.state;
         stateManager.setReadOnly(false);
         state.bulk.enabled = enabled;
+        state.bulk.selectedType = '';
+        state.bulk.selection = [];
+        stateManager.setReadOnly(true);
+    }
+
+    /**
+     * Reset the current selection.
+     *
+     * @param {StateManager} stateManager the current state manager
+     */
+    bulkReset(stateManager) {
+        const state = stateManager.state;
+        stateManager.setReadOnly(false);
         state.bulk.selectedType = '';
         state.bulk.selection = [];
         stateManager.setReadOnly(true);
