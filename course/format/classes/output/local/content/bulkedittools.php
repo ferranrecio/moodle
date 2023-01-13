@@ -89,6 +89,17 @@ class bulkedittools implements named_templatable, renderable {
 
         $controls = [];
 
+        $duplicatecapabilities = ['moodle/backup:backuptargetimport', 'moodle/restore:restoretargetimport'];
+        if (has_all_capabilities($duplicatecapabilities, $context, $user)) {
+            $controls['duplicate'] = [
+                'icon' => 't/copy',
+                'action' => 'cmDuplicate',
+                'name' => get_string('duplicate'),
+                'bulk' => 'cm',
+            ];
+        }
+
+
         if (has_capability('moodle/course:activityvisibility', $context, $user)) {
             $controls['availability'] = [
                 'icon' => 't/show',
