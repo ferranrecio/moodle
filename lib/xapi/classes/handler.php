@@ -25,11 +25,10 @@
 
 namespace core_xapi;
 
+use core_xapi\local\state;
 use core_xapi\local\statement;
 use core_xapi\xapi_exception;
 use stdClass;
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Class handler handles basic xapi statements.
@@ -42,6 +41,9 @@ abstract class handler {
     /** @var string component name in frankenstyle. */
     protected $component;
 
+    /** @var state_store the state_store instance. */
+    protected $statestore;
+
     /**
      * Constructor for a xAPI handler base class.
      *
@@ -49,6 +51,7 @@ abstract class handler {
      */
     final protected function __construct(string $component) {
         $this->component = $component;
+        $this->state_store = $this->get_state_store();
     }
 
     /**
@@ -114,5 +117,72 @@ abstract class handler {
             }
         }
         return $result;
+    }
+
+    /**
+     * Validate a xAPI state.
+     *
+     * Check if the state is valid for this handler.
+     *
+     * This method is used also for the state get requests so the validation
+     * cannot rely on having state data.
+     *
+     * Note: this method must be overridden by the plugins which want to use xAPI states.
+     *
+     * @param state $state
+     * @return bool if the state is valid or not
+     */
+    abstract protected function validate_state(state $state): bool;
+
+    /**
+     * Process a state save request.
+     *
+     * @param state $state the state object
+     * @return bool if the state can be saved
+     */
+    public function state_save(state $state): bool {
+        global $DB;
+        if (!$this->validate_state($state)) {
+            throw new xapi_exception('The state is not accepted');
+        }
+        return $this->statestore->put($state);
+    }
+
+    /**
+     * Process a state save request.
+     *
+     * @param state $state the state object
+     * @return state|null the resulting loaded state
+     */
+    public function state_load(state $state): ?state {
+        global $DB;
+        if (!$this->validate_state($state)) {
+            throw new xapi_exception('The state cannot be loaded');
+        }
+        $state = $this->statestore->get($state);
+        return $state;
+    }
+
+    /**
+     * Process a state delete request.
+     *
+     * @param state $state the state object
+     * @return bool if the deletion is successful
+     */
+    public function state_delete(state $state): bool {
+        if (!$this->validate_state($state)) {
+            throw new xapi_exception('The state cannot be loaded');
+        }
+        return $this->statestore->delete($state);
+    }
+
+    /**
+     * Return a valor state store for this component.
+     *
+     * Plugins may override this method is they want to use a different
+     * state store class.
+     */
+    public function get_state_store(): state_store {
+        return new state_store($this->component);
     }
 }
