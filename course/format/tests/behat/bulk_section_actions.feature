@@ -1,4 +1,4 @@
-@core @core_courseformat @show_editor @javascript
+@core @core_courseformat @core_course @show_editor @javascript
 Feature: Bulk course section actions.
   In order to edit the course section
   As a teacher
@@ -22,6 +22,8 @@ Feature: Bulk course section actions.
     And the following "course enrolments" exist:
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
+    And the following config values are set as admin:
+      | allowstealth | 1 |
     And I am on the "C1" "Course" page logged in as "teacher1"
     And I turn editing mode on
     And I click on "Bulk edit" "button"
@@ -153,3 +155,58 @@ Feature: Bulk course section actions.
     And "Topic 2" "section" should appear after "Topic 1" "section"
     And "Move me" "section" should appear after "Topic 2" "section"
     And "Topic 4" "section" should appear after "Move me" "section"
+
+  Scenario: Bulk hide sections
+    Given I should not see "Hidden from students" in the "Activity sample 1" "activity"
+    And I should not see "Hidden from students" in the "Activity sample 2" "activity"
+    And I should not see "Hidden from students" in the "Activity sample 3" "activity"
+    And I should not see "Hidden from students" in the "Activity sample 4" "activity"
+    And I should not see "Hidden from students" in the "Topic 1" "section"
+    And I should not see "Hidden from students" in the "Topic 2" "section"
+    And I should not see "Hidden from students" in the "Topic 3" "section"
+    And I should not see "Hidden from students" in the "Topic 4" "section"
+    When I click on "Select section Topic 1" "checkbox"
+    And I click on "Select section Topic 2" "checkbox"
+    And I should see "2 selected" in the "sticky-footer" "region"
+    And I click on "Section availability" "button" in the "sticky-footer" "region"
+    And I click on "Hide on course page" "radio" in the "Availability" "dialogue"
+    And I click on "Apply" "button" in the "Availability" "dialogue"
+    Then I should see "Hidden from students" in the "Activity sample 1" "activity"
+    And I should see "Hidden from students" in the "Activity sample 2" "activity"
+    And I should see "Hidden from students" in the "Activity sample 3" "activity"
+    And I should see "Hidden from students" in the "Activity sample 4" "activity"
+    And I should see "Hidden from students" in the "Topic 1" "section"
+    And I should see "Hidden from students" in the "Topic 2" "section"
+    And I should not see "Hidden from students" in the "Topic 3" "section"
+    And I should not see "Hidden from students" in the "Topic 4" "section"
+    And I should see "0 selected" in the "sticky-footer" "region"
+
+  Scenario: Bulk show sections
+    Given I click on "Select section Topic 1" "checkbox"
+    Given I click on "Select section Topic 3" "checkbox"
+    And I click on "Section availability" "button" in the "sticky-footer" "region"
+    And I click on "Hide on course page" "radio" in the "Availability" "dialogue"
+    And I click on "Apply" "button" in the "Availability" "dialogue"
+    And I should see "Hidden from students" in the "Activity sample 1" "activity"
+    And I should see "Hidden from students" in the "Activity sample 2" "activity"
+    And I should not see "Hidden from students" in the "Activity sample 3" "activity"
+    And I should not see "Hidden from students" in the "Activity sample 4" "activity"
+    And I should see "Hidden from students" in the "Topic 1" "section"
+    And I should not see "Hidden from students" in the "Topic 2" "section"
+    And I should see "Hidden from students" in the "Topic 3" "section"
+    And I should not see "Hidden from students" in the "Topic 4" "section"
+    When I click on "Select section Topic 1" "checkbox"
+    And I click on "Select section Topic 2" "checkbox"
+    And I should see "2 selected" in the "sticky-footer" "region"
+    And I click on "Section availability" "button" in the "sticky-footer" "region"
+    And I click on "Show on course page" "radio" in the "Availability" "dialogue"
+    And I click on "Apply" "button" in the "Availability" "dialogue"
+    Then I should not see "Hidden from students" in the "Activity sample 1" "activity"
+    And I should not see "Hidden from students" in the "Activity sample 2" "activity"
+    And I should not see "Hidden from students" in the "Activity sample 3" "activity"
+    And I should not see "Hidden from students" in the "Activity sample 4" "activity"
+    And I should not see "Hidden from students" in the "Topic 1" "section"
+    And I should not see "Hidden from students" in the "Topic 2" "section"
+    And I should see "Hidden from students" in the "Topic 3" "section"
+    And I should not see "Hidden from students" in the "Topic 4" "section"
+    And I should see "0 selected" in the "sticky-footer" "region"

@@ -89,6 +89,17 @@ class bulkedittools implements named_templatable, renderable {
 
         $controls = [];
 
+        if (has_capability('moodle/course:activityvisibility', $context, $user)) {
+            $controls['availability'] = [
+                'icon' => 't/show',
+                'action' => 'cmAvailability',
+                'name' => get_string('availability'),
+                'title' => get_string('cmavailability', 'core_courseformat'),
+                'bulk' => 'cm',
+            ];
+        }
+
+
         $hasmanageactivities = has_capability('moodle/course:manageactivities', $context, $user);
         if ($hasmanageactivities) {
             $controls['delete'] = [
@@ -127,6 +138,17 @@ class bulkedittools implements named_templatable, renderable {
         $user = $USER;
 
         $controls = [];
+
+        if (has_capability('moodle/course:sectionvisibility', $context, $user)) {
+            $controls['availability'] = [
+                'icon' => 't/show',
+                'action' => 'sectionAvailability',
+                'name' => get_string('availability'),
+                'title' => get_string('sectionavailability', 'core_courseformat'),
+                'bulk' => 'section',
+            ];
+        }
+
 
         $deletecapabilities = ['moodle/course:movesections', 'moodle/course:update'];
         if (has_all_capabilities($deletecapabilities, $context, $user)) {

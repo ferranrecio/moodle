@@ -22,10 +22,17 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['availability_show'] = 'Show on course page';
+$string['availability_show_help'] = 'Available to students (subject to any access restrictions which may be set).';
+$string['availability_hide'] = 'Hide on course page';
+$string['availability_hide_help'] = 'Not available to students.';
+$string['availability_stealth'] = 'Make available but don\'t show on course page';
+$string['availability_stealth_help'] = 'Available to students if you provide a link. Activities will still appear in the gradebook and other reports.';
 $string['bulkedit'] = 'Bulk edit';
 $string['bulkeditoff'] = 'Close bulk edit';
 $string['bulkcancel'] = 'Close bulk editing';
 $string['bulkselection'] = '{$a} selected';
+$string['cmavailability'] = 'Activity availability';
 $string['cmdelete_info'] = 'This will delete "{$a->name}" and any user data it contains';
 $string['cmdelete_title'] = 'Delete activity?';
 $string['cmsdelete'] = 'Delete activities';
@@ -40,6 +47,7 @@ $string['courseindex'] = 'Course index';
 $string['nobulkaction'] = 'No bulk actions available';
 $string['preference:coursesectionspreferences'] = 'Section user preferences for course {$a}';
 $string['privacy:metadata:preference:coursesectionspreferences'] = 'Section user preferences like collapsed and expanded.';
+$string['sectionavailability'] = 'Section availability';
 $string['sectiondelete_info'] = 'This will delete "{$a->name}" and all the activities it contains.';
 $string['sectiondelete_title'] = 'Delete section?';
 $string['sectionsdelete'] = 'Delete sections';
