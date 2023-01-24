@@ -115,6 +115,7 @@ class bulkedittools implements named_templatable, renderable {
         global $USER;
         $format = $this->format;
         $context = $format->get_context();
+        $sectionreturn = $format->get_section_number();
         $user = $USER;
 
         $controls = [];
@@ -126,6 +127,16 @@ class bulkedittools implements named_templatable, renderable {
                 'action' => 'deleteSection',
                 'name' => get_string('delete'),
                 'title' => $this->format->get_format_string('sectionsdelete'),
+                'bulk' => 'section',
+            ];
+        }
+
+        if (!$sectionreturn && has_capability('moodle/course:movesections', $context, $user)) {
+            $controls['move'] = [
+                'icon' => 'i/dragdrop',
+                'action' => 'moveSection',
+                'name' => get_string('move', 'moodle'),
+                'title' => $this->format->get_format_string('sectionsmove'),
                 'bulk' => 'section',
             ];
         }
