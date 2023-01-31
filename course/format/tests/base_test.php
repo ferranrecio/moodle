@@ -416,6 +416,59 @@ class base_test extends advanced_testcase {
             ]
         ];
     }
+
+    /**
+     * Test for the default delete format data behaviour.
+     *
+     * @covers ::get_format_string
+     * @dataProvider get_format_string_provider
+     * @param string $key the string key
+     * @param string|null $data any string data
+     * @param array $expectedstring the expected string
+     */
+    public function test_get_format_string(string $key, ?string $data, array $expectedstring) {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course(['format' => 'topics']);
+
+        $expected = get_string($expectedstring[0], $expectedstring[1], $expectedstring[2]);
+        $format = course_get_format($course);
+        $result = $format->get_format_string($key, $data);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Data provider for test_get_format_string.
+     *
+     * @return array the testing scenarios
+     */
+    public function get_format_string_provider(): array {
+        return [
+            'Existing in format lang' => [
+                'key' => 'sectionsdelete',
+                'data' => null,
+                'expectedstring' => ['sectionsdelete', 'format_topics', null],
+            ],
+            'Not existing in format lang' => [
+                'key' => 'bulkedit',
+                'data' => null,
+                'expectedstring' => ['bulkedit', 'core_courseformat', null],
+            ],
+            'Existing in format lang with data' => [
+                'key' => 'selectsection',
+                'data' => 'Example',
+                'expectedstring' => ['selectsection', 'format_topics', 'Example'],
+            ],
+            'Not existing in format lang with data' => [
+                'key' => 'bulkselection',
+                'data' => 'X',
+                'expectedstring' => ['bulkselection', 'core_courseformat', 'X'],
+            ],
+        ];
+    }
 }
 
 /**
