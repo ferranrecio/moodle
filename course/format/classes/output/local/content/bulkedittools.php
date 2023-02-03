@@ -82,7 +82,24 @@ class bulkedittools implements named_templatable, renderable {
      * @return array of edit control items
      */
     protected function cm_control_items(): array {
+        global $USER;
+        $format = $this->format;
+        $context = $format->get_context();
+        $user = $USER;
+
         $controls = [];
+
+        $hasmanageactivities = has_capability('moodle/course:manageactivities', $context, $user);
+        if ($hasmanageactivities) {
+            $controls['delete'] = [
+                'icon' => 'i/delete',
+                'action' => 'cmDelete',
+                'name' => get_string('delete'),
+                'title' => get_string('cmsdelete', 'core_courseformat'),
+                'bulk' => 'cm',
+            ];
+        }
+
         return $controls;
     }
 
@@ -95,7 +112,24 @@ class bulkedittools implements named_templatable, renderable {
      * @return array of edit control items
      */
     protected function section_control_items(): array {
+        global $USER;
+        $format = $this->format;
+        $context = $format->get_context();
+        $user = $USER;
+
         $controls = [];
+
+        $deletecapabilities = ['moodle/course:movesections', 'moodle/course:update'];
+        if (has_all_capabilities($deletecapabilities, $context, $user)) {
+            $controls['delete'] = [
+                'icon' => 'i/delete',
+                'action' => 'deleteSection',
+                'name' => get_string('delete'),
+                'title' => get_string('sectionsdelete', 'core_courseformat'),
+                'bulk' => 'section',
+            ];
+        }
+
         return $controls;
     }
 }
