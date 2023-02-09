@@ -98,6 +98,14 @@ class bulkedittools implements named_templatable, renderable {
                 'title' => get_string('cmsdelete', 'core_courseformat'),
                 'bulk' => 'cm',
             ];
+
+            $controls['move'] = [
+                'icon' => 'i/dragdrop',
+                'action' => 'moveCm',
+                'name' => get_string('move'),
+                'title' => get_string('cmsmove', 'core_courseformat'),
+                'bulk' => 'cm',
+            ];
         }
 
         return $controls;
