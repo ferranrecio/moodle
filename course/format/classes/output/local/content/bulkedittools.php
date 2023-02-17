@@ -89,17 +89,6 @@ class bulkedittools implements named_templatable, renderable {
 
         $controls = [];
 
-        $duplicatecapabilities = ['moodle/backup:backuptargetimport', 'moodle/restore:restoretargetimport'];
-        if (has_all_capabilities($duplicatecapabilities, $context, $user)) {
-            $controls['duplicate'] = [
-                'icon' => 't/copy',
-                'action' => 'cmDuplicate',
-                'name' => get_string('duplicate'),
-                'bulk' => 'cm',
-            ];
-        }
-
-
         if (has_capability('moodle/course:activityvisibility', $context, $user)) {
             $controls['availability'] = [
                 'icon' => 't/show',
@@ -110,22 +99,31 @@ class bulkedittools implements named_templatable, renderable {
             ];
         }
 
+        $duplicatecapabilities = ['moodle/backup:backuptargetimport', 'moodle/restore:restoretargetimport'];
+        if (has_all_capabilities($duplicatecapabilities, $context, $user)) {
+            $controls['duplicate'] = [
+                'icon' => 't/copy',
+                'action' => 'cmDuplicate',
+                'name' => get_string('duplicate'),
+                'bulk' => 'cm',
+            ];
+        }
 
         $hasmanageactivities = has_capability('moodle/course:manageactivities', $context, $user);
         if ($hasmanageactivities) {
-            $controls['delete'] = [
-                'icon' => 'i/delete',
-                'action' => 'cmDelete',
-                'name' => get_string('delete'),
-                'title' => get_string('cmsdelete', 'core_courseformat'),
-                'bulk' => 'cm',
-            ];
-
             $controls['move'] = [
                 'icon' => 'i/dragdrop',
                 'action' => 'moveCm',
                 'name' => get_string('move'),
                 'title' => get_string('cmsmove', 'core_courseformat'),
+                'bulk' => 'cm',
+            ];
+
+            $controls['delete'] = [
+                'icon' => 'i/delete',
+                'action' => 'cmDelete',
+                'name' => get_string('delete'),
+                'title' => get_string('cmsdelete', 'core_courseformat'),
                 'bulk' => 'cm',
             ];
         }
@@ -161,6 +159,16 @@ class bulkedittools implements named_templatable, renderable {
         }
 
 
+        if (!$sectionreturn && has_capability('moodle/course:movesections', $context, $user)) {
+            $controls['move'] = [
+                'icon' => 'i/dragdrop',
+                'action' => 'moveSection',
+                'name' => get_string('move', 'moodle'),
+                'title' => $this->format->get_format_string('sectionsmove'),
+                'bulk' => 'section',
+            ];
+        }
+
         $deletecapabilities = ['moodle/course:movesections', 'moodle/course:update'];
         if (has_all_capabilities($deletecapabilities, $context, $user)) {
             $controls['delete'] = [
@@ -168,16 +176,6 @@ class bulkedittools implements named_templatable, renderable {
                 'action' => 'deleteSection',
                 'name' => get_string('delete'),
                 'title' => $this->format->get_format_string('sectionsdelete'),
-                'bulk' => 'section',
-            ];
-        }
-
-        if (!$sectionreturn && has_capability('moodle/course:movesections', $context, $user)) {
-            $controls['move'] = [
-                'icon' => 'i/dragdrop',
-                'action' => 'moveSection',
-                'name' => get_string('move', 'moodle'),
-                'title' => $this->format->get_format_string('sectionsmove'),
                 'bulk' => 'section',
             ];
         }
