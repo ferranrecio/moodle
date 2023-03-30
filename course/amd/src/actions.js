@@ -992,7 +992,7 @@ define(
 
                 // The section and activity names are edited using inplace editable.
                 // The "update" jQuery event must be captured in order to update the course state.
-                $('body').on('updated', `${SELECTOR.SECTIONLI} [data-inplaceeditable]`, function(e) {
+                $('body').on('updated', `${SELECTOR.SECTIONLI} [data-inplaceeditable][data-itemtype="sectionnamenl"]`, function(e) {
                     if (e.ajaxreturn && e.ajaxreturn.itemid) {
                         const state = courseeditor.state;
                         const section = state.section.get(e.ajaxreturn.itemid);
@@ -1001,7 +1001,7 @@ define(
                         }
                     }
                 });
-                $('body').on('updated', `${SELECTOR.ACTIVITYLI} [data-inplaceeditable]`, function(e) {
+                $('body').on('updated', `${SELECTOR.ACTIVITYLI} [data-inplaceeditable][data-itemtype="activityname"]`, function(e) {
                     if (e.ajaxreturn && e.ajaxreturn.itemid) {
                         courseeditor.dispatch('cmState', [e.ajaxreturn.itemid]);
                     }
