@@ -24,6 +24,7 @@ M.availability_date.form = Y.Object(M.core_availability.plugin);
 M.availability_date.form.initInner = function(html, defaultTime) {
     this.html = html;
     this.defaultTime = defaultTime;
+    this.nodeIndex = 0;
 };
 
 M.availability_date.form.getNode = function(json) {
@@ -63,6 +64,8 @@ M.availability_date.form.getNode = function(json) {
         // Set default time that corresponds to the HTML selectors.
         node.setData('time', this.defaultTime);
     }
+    node.setData('dateelementindex', this.nodeIndex);
+    this.nodeIndex++;
     if (json.d !== undefined) {
         node.one('select[name=direction]').set('value', json.d);
     }
@@ -141,36 +144,46 @@ M.availability_date.form.fillValue = function(value, node) {
 };
 
 /**
- * List out Date node value in an array node.
+ * List out Date node value in the same branch.
  *
- * This will go through all array node and list from earlier date node to current date node.
+ * This will go through all array node and list nodes that are sibling of the current node.
  *
  * @method convertTreeDateValue
  * @param {array} tree Tree node to convert
- * @param {array} arrayDateNode
- * @param {array} currentNode current node.
+ * @param {number} nodeIndexToFind node index to find.
+ * @param {number} dateNodeCount current index in the tree.
  *
- * @return {array} arrayDateNode
+ * return {array|null} arrayDateNode
  */
-M.availability_date.form.convertTreeDateValue = function(tree, arrayDateNode, currentNode) {
-    var shouldSkip = false;
-    tree.forEach(function(node) {
-        if (shouldSkip) {
-            return;
-        }
-        if (node.type === 'date') {
-            // We go through all tree node, if we meet the current node then return.
-            if (node.t === parseInt(currentNode.getData('time'), 10)
-                && currentNode.one('select[name=direction]').get('value') == node.d) {
-                shouldSkip = true;
-                return;
+M.availability_date.form.findAllNodesSurrounding = function(tree, nodeIndexToFind) {
+    var node = null;
+    var dateNodeCount = 0;
+    var nodeFinder = function(tree) {
+        var surroundingNodes = [];
+        var nodeFound = false;
+        for (var index = 0; index < tree.length; index++) {
+            node = tree.at(index);
+            if (node.type === 'date') {
+                // We go through all tree node, if we meet the current node then we add all nodes in the current branch.
+                if (nodeIndexToFind === dateNodeCount) {
+                    nodeFound = true;
+                } else {
+                    surroundingNodes.push(node);
+                }
+                dateNodeCount++;
+            } else if (node.type === undefined) {
+                var nodes = nodeFinder(node.c);
+                if (nodes) {
+                    return nodes;
+                }
             }
-            arrayDateNode.push(node);
-        } else if (node.type === undefined) {
-            M.availability_date.form.convertTreeDateValue(node.c, arrayDateNode, currentNode);
         }
-    });
-    return arrayDateNode;
+        if (nodeFound) {
+            return surroundingNodes;
+        }
+        return null;
+    };
+    return nodeFinder(tree);
 };
 
 /**
@@ -187,22 +200,25 @@ M.availability_date.form.checkConditionDate = function(currentNode) {
     var error = false;
     if (M.core_availability.form.rootList.getValue().op === '&') {
         var jsValue = M.core_availability.form.rootList.getValue().c;
-        var arrayDateNode = M.availability_date.form.convertTreeDateValue(jsValue, [], currentNode);
+        var currentNodeIndex = currentNode.getData('dateelementindex');
         var currentNodeDirection = currentNode.one('select[name=direction]').get('value');
         var currentNodeTime = parseInt(currentNode.getData('time'), 10);
-        arrayDateNode.forEach(function(checkNode) {
-            // Validate if the date is conflict.
-            if (checkNode.d === '<') {
-                if (currentNodeDirection === '>=' && currentNodeTime >= checkNode.t) {
-                    error = true;
+        var arrayDateNode = M.availability_date.form.findAllNodesSurrounding(jsValue, currentNodeIndex, 0);
+        if (arrayDateNode) {
+            arrayDateNode.forEach(function(checkNode) {
+                // Validate if the date is conflict.
+                if (checkNode.d === '<') {
+                    if (currentNodeDirection === '>=' && currentNodeTime >= checkNode.t) {
+                        error = true;
+                    }
+                } else {
+                    if (currentNodeDirection === '<' && currentNodeTime <= checkNode.t) {
+                        error = true;
+                    }
                 }
-            } else {
-                if (currentNodeDirection === '<' && currentNodeTime <= checkNode.t) {
-                    error = true;
-                }
-            }
-            return error;
-        });
+                return error;
+            });
+        }
         return error;
     } else {
         if (currentNode.one('div > .badge-warning')) {
