@@ -409,6 +409,7 @@ class icon_system_fontawesome extends icon_system_font {
             'core:t/left' => 'fa-arrow-left',
             'core:t/less' => 'fa-caret-up',
             'core:t/life-ring' => 'fa-life-ring',
+            'core:t/list' => 'fa-list',
             'core:t/locked' => 'fa-lock',
             'core:t/lock' => 'fa-unlock',
             'core:t/locktime' => 'fa-lock',

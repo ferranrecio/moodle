@@ -2426,6 +2426,10 @@ $footer-link-color: $bg-inverse-link-color !default;
     cursor: pointer;
 }
 
+.not-clickable {
+    cursor: not-allowed;
+}
+
 .overlay-icon-container {
     position: absolute;
     top: 0;

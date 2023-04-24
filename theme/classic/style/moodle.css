@@ -25245,6 +25245,10 @@ ul {
   cursor: pointer;
 }
 
+.not-clickable {
+  cursor: not-allowed;
+}
+
 .overlay-icon-container {
   position: absolute;
   top: 0;
