@@ -1,6 +1,11 @@
 This files describes API changes in core libraries and APIs,
 information provided here is intended especially for developers.
 
+=== 4.3 ===
+
+* Now the modal factory can generate radio modals. This new kind of modal shows a list
+  of options the user can select from.
+
 === 4.2 ===
 
 * All context classes were moved to \core\context namespace while keeping full backwards compatibility.
