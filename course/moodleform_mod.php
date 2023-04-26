@@ -661,10 +661,19 @@ abstract class moodleform_mod extends moodleform {
         }
 
         if ($this->_features->groups) {
-            $options = array(NOGROUPS       => get_string('groupsnone'),
-                             SEPARATEGROUPS => get_string('groupsseparate'),
-                             VISIBLEGROUPS  => get_string('groupsvisible'));
-            $mform->addElement('select', 'groupmode', get_string('groupmode', 'group'), $options, NOGROUPS);
+            $groupmode = $mform->addElement('choicedialog', 'groupmode', get_string('groupmode', 'group'));
+            $groupmode->addOption(get_string('groupsnone'), NOGROUPS, [
+                'icon' => ['t/groupn', 'core'],
+            ]);
+            $groupmode->addOption(get_string('groupsseparate'), SEPARATEGROUPS, [
+                'description' => get_string('groupmode_help_separate', 'group'),
+                'icon' => ['t/groups', 'core'],
+            ]);
+            $groupmode->addOption(get_string('groupsvisible'), VISIBLEGROUPS, [
+                'description' => get_string('groupmode_help_visible', 'group'),
+                'icon' => ['t/groupv', 'core'],
+            ]);
+            $mform->setDefault('groupmode', NOGROUPS);
             $mform->addHelpButton('groupmode', 'groupmode', 'group');
         }
 
