@@ -34,7 +34,7 @@ Feature: Change grading options in an H5P activity
   Scenario: Default grading is max attempt grade
     Given I am on the "Awesome H5P package" "h5pactivity activity editing" page logged in as teacher1
     And I expand all fieldsets
-    And the field "Grading method" matches value "Highest grade"
+    And the field "Grading method" matches value "Highest grade of all attempts"
     And I click on "Save and return to course" "button"
     When I navigate to "View > User report" in the course gradebook
     And I click on "Student 1" in the "user" search widget
@@ -70,7 +70,7 @@ Feature: Change grading options in an H5P activity
   Scenario: Change setting to average attempt
     Given I am on the "Awesome H5P package" "h5pactivity activity editing" page logged in as teacher1
     When I set the following fields to these values:
-      | Grading method | Average grade |
+      | Grading method | Average (mean) grade of all attempts |
     And I click on "Save and return to course" "button"
     And I navigate to "View > User report" in the course gradebook
     And I click on "Student 1" in the "user" search widget
@@ -82,7 +82,7 @@ Feature: Change grading options in an H5P activity
   Scenario: Change setting to manual grading
     Given I am on the "Awesome H5P package" "h5pactivity activity editing" page logged in as teacher1
     When I set the following fields to these values:
-      | Grading method | Don't calculate a grade |
+      | Grading method | Manual grading |
     And I click on "Save and return to course" "button"
     And I navigate to "View > User report" in the course gradebook
     And I click on "Student 1" in the "user" search widget
@@ -107,7 +107,7 @@ Feature: Change grading options in an H5P activity
     # First we set to average and recalculate grades.
     Given I am on the "Awesome H5P package" "h5pactivity activity editing" page logged in as teacher1
     When I set the following fields to these values:
-      | Grading method | Average grade |
+      | Grading method | Average (mean) grade of all attempts |
     And I click on "Save and return to course" "button"
     And I navigate to "View > User report" in the course gradebook
     And I click on "Student 1" in the "user" search widget
@@ -132,7 +132,7 @@ Feature: Change grading options in an H5P activity
     # First we set to average and recalculate grades.
     Given I am on the "Awesome H5P package" "h5pactivity activity editing" page logged in as teacher1
     When I set the following fields to these values:
-      | Grading method | Average grade |
+      | Grading method | Average (mean) grade of all attempts |
     And I click on "Save and return to course" "button"
     And I navigate to "View > User report" in the course gradebook
     And I click on "Student 1" in the "user" search widget

@@ -118,15 +118,48 @@ class manager {
 
     /**
      * Return the available grading methods.
+     * @deprecated since Moodle 4.3 MDL-???? - please do not use this function any more.
      * @return string[] an array "option value" => "option description"
      */
     public static function get_grading_methods(): array {
+        debugging(
+            'get_grading_methods is deprecated. Use get_grading_methods_choices instead.',
+            DEBUG_DEVELOPER
+        );
         return [
             self::GRADEHIGHESTATTEMPT => get_string('grade_highest_attempt', 'mod_h5pactivity'),
             self::GRADEAVERAGEATTEMPT => get_string('grade_average_attempt', 'mod_h5pactivity'),
             self::GRADELASTATTEMPT => get_string('grade_last_attempt', 'mod_h5pactivity'),
             self::GRADEFIRSTATTEMPT => get_string('grade_first_attempt', 'mod_h5pactivity'),
             self::GRADEMANUAL => get_string('grade_manual', 'mod_h5pactivity'),
+        ];
+    }
+
+    /**
+     * Return the available grading methods with name and description.
+     * @return array[] an array with value  => [name, description]
+     */
+    public static function get_grading_methods_choices(): array {
+        return [
+            self::GRADEHIGHESTATTEMPT => [
+                'text' => get_string('grade_highest_attempt', 'mod_h5pactivity'),
+                'description' => get_string('grade_other_ignored', 'mod_h5pactivity'),
+            ],
+            self::GRADEAVERAGEATTEMPT => [
+                'text' => get_string('grade_average_attempt', 'mod_h5pactivity'),
+            ],
+            self::GRADELASTATTEMPT => [
+                'text' => get_string('grade_last_attempt', 'mod_h5pactivity'),
+                'description' => get_string('grade_other_ignored', 'mod_h5pactivity'),
+            ],
+            self::GRADEFIRSTATTEMPT => [
+                'text' => get_string('grade_first_attempt', 'mod_h5pactivity'),
+                'description' => get_string('grade_other_ignored', 'mod_h5pactivity'),
+            ],
+            self::GRADEMANUAL => [
+                'text' => get_string('grade_manual', 'mod_h5pactivity'),
+                'description' => get_string('grade_manual_info', 'mod_h5pactivity'),
+            ],
         ];
     }
 

@@ -130,8 +130,8 @@ class mod_h5pactivity_mod_form extends moodleform_mod {
         $mform->addElement('select', 'enabletracking', get_string('enabletracking', 'mod_h5pactivity'), $options);
         $mform->setDefault('enabletracking', 1);
 
-        $options = manager::get_grading_methods();
-        $mform->addElement('select', 'grademethod', get_string('grade_grademethod', 'mod_h5pactivity'), $options);
+        $options = manager::get_grading_methods_choices();
+        $mform->addElement('choicedialog', 'grademethod', get_string('grade_grademethod', 'mod_h5pactivity'), $options);
         $mform->setType('grademethod', PARAM_INT);
         $mform->hideIf('grademethod', 'enabletracking', 'neq', 1);
         $mform->disabledIf('grademethod', 'grade[modgrade_type]', 'neq', 'point');

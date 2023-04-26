@@ -245,10 +245,10 @@ class manager_test extends \advanced_testcase {
     }
 
     /**
-     * Test static get_grading_methods.
+     * Test static get_grading_methods_choices.
      */
-    public function test_get_grading_methods() {
-        $methods = manager::get_grading_methods();
+    public function test_get_grading_methods_choices() {
+        $methods = manager::get_grading_methods_choices();
         $this->assertCount(5, $methods);
         $this->assertNotEmpty($methods[manager::GRADEHIGHESTATTEMPT]);
         $this->assertNotEmpty($methods[manager::GRADEAVERAGEATTEMPT]);

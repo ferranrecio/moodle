@@ -67,19 +67,15 @@ $string['enablesavestate_help'] = 'Automatically save the user\'s current state.
 $string['enabletracking'] = 'Enable attempt tracking';
 $string['false'] = 'False';
 $string['grade_grademethod'] = 'Grading method';
-$string['grade_grademethod_help'] = 'When using point grading, the following methods are available for calculating the final grade:
-
-* Highest grade of all attempts
-* Average (mean) grade of all attempts
-* First attempt (all other attempts are ignored)
-* Last attempt (all other attempts are ignored)
-* Don\'t use attempts for grading (disable grading calculation)';
-$string['grade_manual'] = 'Don\'t calculate a grade';
-$string['grade_highest_attempt'] = 'Highest grade';
-$string['grade_average_attempt'] = 'Average grade';
+$string['grade_grademethod_help'] = 'The formula used to calculate the final grade when point grading is used.';
+$string['grade_manual'] = 'Manual grading';
+$string['grade_manual_info'] = 'Don\'t use attempts for grading (disable automatic grading calculation)';
+$string['grade_highest_attempt'] = 'Highest grade of all attempts';
+$string['grade_average_attempt'] = 'Average (mean) grade of all attempts';
 $string['grade_last_attempt'] = 'Last attempt';
 $string['grade_first_attempt'] = 'First attempt';
 $string['grade_h5p'] = 'Grade: {$a}';
+$string['grade_other_ignored'] = 'All other attempts are ignored';
 $string['h5pactivity:addinstance'] = 'Add a new H5P';
 $string['h5pactivity:reviewattempts'] = 'Review H5P attempts';
 $string['h5pactivity:submit'] = 'Submit H5P attempts';
