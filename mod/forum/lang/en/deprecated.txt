@@ -1,1 +1,2 @@
 postmailinfolink,mod_forum
+forumtype_help,mod_forum

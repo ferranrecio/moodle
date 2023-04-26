@@ -50,10 +50,8 @@ class mod_forum_mod_form extends moodleform_mod {
 
         $this->standard_intro_elements(get_string('forumintro', 'forum'));
 
-        $forumtypes = forum_get_forum_types();
-        core_collator::asort($forumtypes, core_collator::SORT_STRING);
-        $mform->addElement('select', 'type', get_string('forumtype', 'forum'), $forumtypes);
-        $mform->addHelpButton('type', 'forumtype', 'forum');
+        $forumtypes = forum_get_forum_types_description();
+        $mform->addElement('choicedialog', 'type', get_string('forumtype', 'forum'), $forumtypes);
         $mform->setDefault('type', 'general');
 
         $mform->addElement('header', 'availability', get_string('availability', 'forum'));

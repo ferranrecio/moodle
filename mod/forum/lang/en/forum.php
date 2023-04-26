@@ -61,6 +61,7 @@ $string['blockperiod'] = 'Time period for blocking';
 $string['blockperiod_help'] = 'Students can be blocked from posting more than a given number of posts in a given time period. Users with the capability mod/forum:postwithoutthrottling are exempt from post limits.';
 $string['blockperioddisabled'] = 'Don\'t block';
 $string['blogforum'] = 'Standard forum displayed in a blog-like format';
+$string['blogdescription'] = 'An open forum where anyone can start a new discussion at any time, and in which discussion topics are displayed on one page with "Discuss this topic" links';
 $string['bynameondate'] = 'by {$a->name} - {$a->date}';
 $string['cachedef_forum_is_tracked'] = 'Forum tracking status for user';
 $string['calendardue'] = '{$a} is due';
@@ -226,6 +227,7 @@ $string['duedate'] = 'Due date';
 $string['duedate_help'] = 'This is when posting in the forum is due. Although this date is displayed in the calendar as the due date for the forum, posting will still be allowed after this date. Set a forum cut-off date to prevent posting to the forum after a certain date.';
 $string['duedatetodisplayincalendar'] = 'Due date to display in calendar';
 $string['eachuserforum'] = 'Each person posts one discussion';
+$string['eachuserdescription'] = 'Each student can post exactly one new discussion topic, which everyone can then reply to';
 $string['edit'] = 'Edit';
 $string['editdiscussion'] = 'Edit discussion';
 $string['editdiscussiontopic'] = 'Edit discussion topic';
@@ -335,13 +337,6 @@ $string['forumsubjecthidden'] = 'Subject (hidden)';
 $string['forumtracked'] = 'Unread posts are being tracked';
 $string['forumtrackednot'] = 'Unread posts are not being tracked';
 $string['forumtype'] = 'Forum type';
-$string['forumtype_help'] = 'There are 5 forum types:
-
-* A single simple discussion - A single discussion topic which everyone can reply to (cannot be used with separate groups)
-* Each person posts one discussion - Each student can post exactly one new discussion topic, which everyone can then reply to
-* Q and A forum - A student must first post their reply to a question posted by the teacher, before viewing other students\' posts
-* Standard forum displayed in a blog-like format - An open forum where anyone can start a new discussion at any time, and in which discussion topics are displayed on one page with "Discuss this topic" links
-* Standard forum for general use - An open forum where anyone can start a new discussion at any time';
 $string['forum:viewallratings'] = 'View all raw ratings given by individuals';
 $string['forum:viewanyrating'] = 'View total ratings that anyone received';
 $string['forum:viewdiscussion'] = 'View discussions';
@@ -350,6 +345,7 @@ $string['forum:viewqandawithoutposting'] = 'Always see Q and A posts';
 $string['forum:viewrating'] = 'View the total rating you received';
 $string['forum:viewsubscribers'] = 'View subscribers';
 $string['generalforum'] = 'Standard forum for general use';
+$string['generaldescription'] = 'An open forum where anyone can start a new discussion at any time';
 $string['generalforums'] = 'General forums';
 $string['gradeitem:forum'] = 'Forum';
 $string['hiddenforumpost'] = 'Hidden forum post';
@@ -611,6 +607,7 @@ $string['prunediscussion'] = 'Split discussion';
 $string['prunedpost'] = 'A new discussion has been created from that post';
 $string['pruneheading'] = 'Split the discussion and move this post to a new discussion';
 $string['qandaforum'] = 'Q and A forum';
+$string['qandadescription'] = 'A student must first post their reply to a question posted by the teacher, before viewing other students\' posts';
 $string['qandanotify'] = 'This is a question and answer forum. To see other replies, you must first post your reply.';
 $string['re'] = 'Re:';
 $string['readtherest'] = 'Read the rest of this topic';
@@ -672,6 +669,7 @@ $string['showpreviousrepliescount'] = 'Show previous replies ({$a})';
 $string['showsubscribers'] = 'Show/edit current subscribers';
 $string['showusersearch'] = 'Show user search';
 $string['singleforum'] = 'A single simple discussion';
+$string['singledescription'] = 'A single discussion topic which everyone can reply to (cannot be used with separate groups)';
 $string['smallmessage'] = '{$a->user} posted in {$a->forumname}';
 $string['smallmessagedigest'] = 'Forum digest containing {$a} messages';
 $string['startedby'] = 'Started by';
@@ -792,3 +790,12 @@ $string['viewgrades'] = 'View grades';
 $string['postmailinfolink'] = 'This is a copy of a message posted in {$a->coursename}.
 
 To reply click on this link: {$a->replylink}';
+
+// Deprecated since Moodle 4.3.
+$string['forumtype_help'] = 'There are 5 forum types:
+
+* A single simple discussion - A single discussion topic which everyone can reply to (cannot be used with separate groups)
+* Each person posts one discussion - Each student can post exactly one new discussion topic, which everyone can then reply to
+* Q and A forum - A student must first post their reply to a question posted by the teacher, before viewing other students\' posts
+* Standard forum displayed in a blog-like format - An open forum where anyone can start a new discussion at any time, and in which discussion topics are displayed on one page with "Discuss this topic" links
+* Standard forum for general use - An open forum where anyone can start a new discussion at any time';

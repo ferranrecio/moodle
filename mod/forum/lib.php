@@ -5423,12 +5423,30 @@ function forum_get_layout_modes(bool $useexperimentalui = false) {
  *
  * @return array
  */
-function forum_get_forum_types() {
-    return array ('general'  => get_string('generalforum', 'forum'),
-                  'eachuser' => get_string('eachuserforum', 'forum'),
-                  'single'   => get_string('singleforum', 'forum'),
-                  'qanda'    => get_string('qandaforum', 'forum'),
-                  'blog'     => get_string('blogforum', 'forum'));
+function forum_get_forum_types(): array {
+    return [
+        'general' => get_string('generalforum', 'forum'),
+        'eachuser' => get_string('eachuserforum', 'forum'),
+        'single' => get_string('singleforum', 'forum'),
+        'qanda' => get_string('qandaforum', 'forum'),
+        'blog' => get_string('blogforum', 'forum'),
+    ];
+}
+
+/**
+ * Returns array of forum types with an extra description.
+ *
+ * @return array
+ */
+function forum_get_forum_types_description(): array {
+    $result = [];
+    foreach (forum_get_forum_types() as $type => $typename) {
+        $result[$type] = [
+            'text' => $typename,
+            'description' => get_string("{$type}description", 'forum'),
+        ];
+    }
+    return $result;
 }
 
 /**
