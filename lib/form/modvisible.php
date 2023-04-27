@@ -26,7 +26,7 @@
  */
 
 global $CFG;
-require_once "$CFG->libdir/form/select.php";
+require_once "$CFG->libdir/form/choicedialog.php";
 
 /**
  * Drop down form element to select visibility in an activity mod update form
@@ -38,7 +38,7 @@ require_once "$CFG->libdir/form/select.php";
  * @copyright 2006 Jamie Pratt <me@jamiep.org>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class MoodleQuickForm_modvisible extends MoodleQuickForm_select{
+class MoodleQuickForm_modvisible extends MoodleQuickForm_choicedialog {
 
     /** @var int activity state: visible=0, visibleoncoursepage=any */
     const HIDE = 0;
@@ -86,20 +86,20 @@ class MoodleQuickForm_modvisible extends MoodleQuickForm_select{
                 $options = is_array($arg[3]) ? $arg[3] : [];
                 $sectionvisible = array_key_exists('sectionvisible', $options) ? $options['sectionvisible'] : 1;
                 $cm = !empty($options['cm']) ? cm_info::create($options['cm']) : null;
-                $choices = array();
+                $choices = [];
                 if (!$sectionvisible) {
                     // If section is not visible the activity is hidden by default but it can also be made available.
-                    $choices[self::HIDE] = get_string('hidefromstudents');
+                    $choices[self::HIDE] = $this->generateAvailabilityChoice('hide', 't/show');
                     if (!$cm || $cm->has_view()) {
-                        $choices[self::SHOW] = get_string('hideoncoursepage');
+                        $choices[self::SHOW] = $this->generateAvailabilityChoice('stealth', 't/stealth');
                     }
                 } else {
-                    $choices[self::SHOW] = get_string('showoncoursepage');
-                    $choices[self::HIDE] = get_string('hidefromstudents');
+                    $choices[self::SHOW] = $this->generateAvailabilityChoice('show', 't/hide');
+                    $choices[self::HIDE] = $this->generateAvailabilityChoice('hide', 't/show');
                     if (!empty($options['allowstealth']) && (!$cm || $cm->has_view())) {
                         // If allowed in this course/section, add a third visibility option
                         // "Available but not displayed on course page".
-                        $choices[self::STEALTH] = get_string('hideoncoursepage');
+                        $choices[self::STEALTH] = $this->generateAvailabilityChoice('stealth', 't/stealth');
                     }
                 }
                 $this->load($choices);
@@ -130,6 +130,20 @@ class MoodleQuickForm_modvisible extends MoodleQuickForm_select{
 
         }
         return parent::onQuickFormEvent($event, $arg, $caller);
+    }
+
+    /**
+     * Generate the choice structure.
+     * @param string $name the choice name
+     * @param string $icon the core icon location
+     * @return array
+     */
+    private function generateAvailabilityChoice(string $name, string $icon): array {
+        return [
+            'text' => get_string("availability_{$name}", 'core_courseformat'),
+            'description' => get_string("availability_{$name}_help", 'core_courseformat'),
+            'icon' => [$icon, 'core'],
+        ];
     }
 
     /**
