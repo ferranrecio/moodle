@@ -31,6 +31,7 @@ $string['hidefromothers'] = 'Hide topic';
 $string['newsectionname'] = 'New name for topic {$a}';
 $string['page-course-view-topics'] = 'Any course main page in topics format';
 $string['page-course-view-topics-x'] = 'Any course page in topics format';
+$string['plugindescription'] = 'The course page is organised into topic sections';
 $string['pluginname'] = 'Topics format';
 $string['privacy:metadata'] = 'The Topics format plugin does not store any personal data.';
 $string['indentation'] = 'Allow indentation on course page';

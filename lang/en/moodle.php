@@ -922,12 +922,6 @@ $string['forgotten'] = 'Forgotten your username or password?';
 $string['forgottenduplicate'] = 'The email address is shared by several accounts, please enter username instead';
 $string['forgotteninvalidurl'] = 'Invalid password reset URL';
 $string['format'] = 'Format';
-$string['format_help'] = 'The course format determines the layout of the course page.
-
-* Single activity format - For displaying a single activity or resource (such as a Quiz or SCORM package) on the course page
-* Social format - A forum is displayed on the course page
-* Topics format - The course page is organised into topic sections
-* Weekly format - The course page is organised into weekly sections, with the first week starting on the course start date';
 $string['formathtml'] = 'HTML format';
 $string['formatmarkdown'] = 'Markdown format';
 $string['formatplain'] = 'Plain text format';
@@ -2435,3 +2429,11 @@ $string['registrationno'] = 'No, I do not wish to receive any emails';
 $string['createuserandpass'] = 'Choose your username and password';
 $string['descriptiona'] = 'Description: {$a}';
 $string['supplyinfo'] = 'More details';
+
+// Deprecated since Moodle 4.3.
+$string['format_help'] = 'The course format determines the layout of the course page.
+
+* Single activity format - For displaying a single activity or resource (such as a Quiz or SCORM package) on the course page
+* Social format - A forum is displayed on the course page
+* Topics format - The course page is organised into topic sections
+* Weekly format - The course page is organised into weekly sections, with the first week starting on the course start date';

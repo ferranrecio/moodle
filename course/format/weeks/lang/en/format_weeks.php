@@ -33,6 +33,7 @@ $string['hidefromothers'] = 'Hide week';
 $string['newsectionname'] = 'New name for week {$a}';
 $string['page-course-view-weeks'] = 'Any course main page in weeks format';
 $string['page-course-view-weeks-x'] = 'Any course page in weeks format';
+$string['plugindescription'] = 'The course page is organised into weekly sections, with the first week starting on the course start date';
 $string['pluginname'] = 'Weekly format';
 $string['privacy:metadata'] = 'The Weekly format plugin does not store any personal data.';
 $string['indentation'] = 'Allow indentation on course page';

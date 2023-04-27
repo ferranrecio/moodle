@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -8,6 +22,10 @@ require_once($CFG->libdir . '/pdflib.php');
 
 /**
  * The form for handling editing a course.
+ *
+ * @package core_course
+ * @copyright 1999 Martin Dougiamas  http://dougiamas.com
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class course_edit_form extends moodleform {
     protected $course;
@@ -206,24 +224,10 @@ class course_edit_form extends moodleform {
         // Course format.
         $mform->addElement('header', 'courseformathdr', get_string('type_format', 'plugin'));
 
-        $courseformats = get_sorted_course_formats(true);
-        $formcourseformats = array();
-        foreach ($courseformats as $courseformat) {
-            $formcourseformats[$courseformat] = get_string('pluginname', "format_$courseformat");
-        }
-        if (isset($course->format)) {
-            $course->format = course_get_format($course)->get_format(); // replace with default if not found
-            if (!in_array($course->format, $courseformats)) {
-                // this format is disabled. Still display it in the dropdown
-                $formcourseformats[$course->format] = get_string('withdisablednote', 'moodle',
-                        get_string('pluginname', 'format_'.$course->format));
-            }
-        }
-
-        $mform->addElement('select', 'format', get_string('format'), $formcourseformats, [
+        $formcourseformats = $this->format_selection_choices($course);
+        $mform->addElement('choicedialog', 'format', get_string('format'), $formcourseformats, [
             'data-formatchooser-field' => 'selector',
         ]);
-        $mform->addHelpButton('format', 'format');
         $mform->setDefault('format', $courseconfig->format);
 
         // Button to update format-specific options on format change (will be hidden by JavaScript).
@@ -428,6 +432,38 @@ class course_edit_form extends moodleform {
         $handler->instance_form_before_set_data($course);
         // Finally set the current form data
         $this->set_data($course);
+    }
+
+    /**
+     * Generate the choices for the format seleciton field.
+     * @param stdClass|null the current course data if any
+     * @return array of choice dialog options
+     */
+    protected function format_selection_choices(?stdClass $course): array {
+        $courseformats = get_sorted_course_formats(true);
+        $choices = [];
+        foreach ($courseformats as $courseformat) {
+            $choices[$courseformat] = [
+                'text' => get_string('pluginname', "format_$courseformat"),
+            ];
+        }
+        if (isset($course->format)) {
+            // replace with default if not found.
+            $course->format = course_get_format($course)->get_format();
+            if (!in_array($course->format, $courseformats)) {
+                // This format is disabled. Still display it in the dropdown.
+                $formatname = get_string('pluginname', 'format_' . $course->format);
+                $choices[$course->format] = [
+                    'text' => get_string('withdisablednote', 'moodle', $formatname),
+                ];
+            }
+        }
+        foreach ($choices as $courseformat => $unused) {
+            if (get_string_manager()->string_exists('plugindescription', "format_$courseformat")) {
+                $choices[$courseformat]['description'] = get_string('plugindescription', "format_$courseformat");
+            }
+        }
+        return $choices;
     }
 
     /**
