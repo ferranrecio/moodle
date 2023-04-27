@@ -42,6 +42,49 @@ function book_get_numbering_types() {
 }
 
 /**
+ * Returns array of numbering types with an extra description.
+ *
+ * @return array
+ */
+function book_get_numbering_types_description(): array {
+    require_once(__DIR__ . '/locallib.php');
+    $chapterlabel = get_string('chaptertitle', 'mod_book');
+
+    $generatesample = function (bool $numbers, bool $subchapter, bool $bullets) use ($chapterlabel): string {
+        $numeration = ($numbers) ? ['1. ', '1.1 ', '2. '] : ['', '', ''];
+        $listyle = ($bullets) ? '' : ' style="list-style:none"';
+        $ulstyle = ($bullets) ? '' : ' style="padding-left: 0;"';
+        $chapters = [];
+        foreach ($numeration as $numeration) {
+            $chapters[] = "<li $listyle>{$numeration}{$chapterlabel}</li>";
+        }
+        if ($subchapter) {
+            $chapters[1] = "<ul>{$chapters[1]}</ul>";
+        }
+        return '<ul' . $ulstyle . '>' . implode('', $chapters) . '</ul>';
+    };
+
+    return [
+        BOOK_NUM_NONE => [
+            'text' => get_string('numbering0', 'mod_book'),
+            'description' => $generatesample(false, false, false),
+        ],
+        BOOK_NUM_NUMBERS => [
+            'text' => get_string('numbering1', 'mod_book'),
+            'description' => $generatesample(true, true, false),
+        ],
+        BOOK_NUM_BULLETS => [
+            'text' => get_string('numbering2', 'mod_book'),
+            'description' => $generatesample(false, true, true),
+        ],
+        BOOK_NUM_INDENTED => [
+            'text' => get_string('numbering3', 'mod_book'),
+            'description' => $generatesample(false, true, false),
+        ],
+    ];
+}
+
+/**
  * Returns list of available navigation link types.
  *
  * @deprecated since Moodle 4.0. MDL-72376.

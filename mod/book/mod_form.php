@@ -51,7 +51,7 @@ class mod_book_mod_form extends moodleform_mod {
         // Appearance.
         $mform->addElement('header', 'appearancehdr', get_string('appearance'));
 
-        $alloptions = book_get_numbering_types();
+        $alloptions = book_get_numbering_types_description();
         $allowed = explode(',', $config->numberingoptions);
         $options = array();
         foreach ($allowed as $type) {
@@ -66,8 +66,7 @@ class mod_book_mod_form extends moodleform_mod {
                 }
             }
         }
-        $mform->addElement('select', 'numbering', get_string('numbering', 'book'), $options);
-        $mform->addHelpButton('numbering', 'numbering', 'mod_book');
+        $mform->addElement('choicedialog', 'numbering', get_string('numbering', 'book'), $options);
         $mform->setDefault('numbering', $config->numbering);
 
         $mform->addElement('static', 'customtitlestext', get_string('customtitles', 'mod_book'));

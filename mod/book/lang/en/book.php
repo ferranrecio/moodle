@@ -82,13 +82,9 @@ $string['navtext'] = 'Text';
 $string['navtoc'] = 'TOC Only';
 $string['nocontent'] = 'No content has been added to this book yet.';
 $string['numbering'] = 'Chapter formatting';
-$string['numbering_help'] = '* None - Chapter and subchapter titles have no formatting
-* Numbers - Chapters and subchapter titles are numbered 1, 1.1, 1.2, 2, ...
-* Bullets - Subchapters are indented and displayed with bullets in the table of contents
-* Indented - Subchapters are indented in the table of contents';
 $string['numbering0'] = 'None';
 $string['numbering1'] = 'Numbers';
-$string['numbering2'] = 'Bullets';
+$string['numbering2'] = 'Bullet points';
 $string['numbering3'] = 'Indented';
 $string['numberingoptions'] = 'Available options for chapter formatting';
 $string['numberingoptions_desc'] = 'Options for displaying chapters and subchapters in the table of contents';
@@ -117,3 +113,9 @@ $string['subplugintype_booktool_plural'] = 'Book tools';
 $string['removeallbooktags'] = 'Remove all book tags';
 $string['tagarea_book_chapters'] = 'Book chapters';
 $string['tagsdeleted'] = 'Book tags have been deleted';
+
+// Deprecated since Moodle 4.3.
+$string['numbering_help'] = '* None - Chapter and subchapter titles have no formatting
+* Numbers - Chapters and subchapter titles are numbered 1, 1.1, 1.2, 2, ...
+* Bullets - Subchapters are indented and displayed with bullets in the table of contents
+* Indented - Subchapters are indented in the table of contents';
