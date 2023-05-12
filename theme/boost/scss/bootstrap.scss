@@ -1,2 +1,14 @@
 // Import Bootstrap.
+
+@import "bootstrapmigration";
 @import "bootstrap/bootstrap";
+
+/** Bootstrap temporal backward compatibility: mixins and variable alias */
+
+@mixin sr-only {
+    @include visually-hidden();
+}
+
+@mixin sr-only-focusable {
+    @include visually-hidden-focusable();
+}

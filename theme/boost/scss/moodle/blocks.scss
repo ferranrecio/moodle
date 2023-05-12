@@ -25,7 +25,7 @@
     }
 }
 
-$blocks-column-width: 360px !default;
+$blocks-column-width: 22.5rem !default;
 
 [data-region="blocks-column"] {
     width: $blocks-column-width;
@@ -98,7 +98,7 @@ $blocks-plus-gutter: $blocks-column-width + ( $grid-gutter-width * 0.5 );
     }
 }
 
-$card-gutter : $card-deck-margin * 2;
+$card-gutter : .5rem;
 
 .block .empty-placeholder-image-lg {
     height: 5rem;

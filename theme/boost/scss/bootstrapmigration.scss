@@ -1,0 +1,275 @@
+// stylelint-disable declaration-no-important
+
+// Bootstrap temporal backward compatibility: deleted variables.
+
+$custom-control-indicator-size: 1.25rem !default;
+$custom-switch-width: $custom-control-indicator-size * 1.75 !default;
+$alert-color-level: 6 !default;
+$theme-color-interval: 8% !default;
+$alert-bg-level: -10 !default;
+$alert-border-level: -9 !default;
+
+@function theme-color($key: "primary") {
+    @return map-get($theme-colors, $key);
+}
+
+@function theme-color-level($color-name: "primary", $level: 0) {
+    $color: theme-color($color-name);
+    $color-base: if($level > 0, $black, $white);
+    $level: abs($level);
+
+    @return mix($color-base, $color, $level * $theme-color-interval);
+}
+
+$yiq-text-dark: $gray-900 !default;
+$yiq-text-light: $white !default;
+$yiq-contrasted-threshold: 150 !default;
+
+@function color-yiq($color, $dark: $yiq-text-dark, $light: $yiq-text-light) {
+    $r: red($color);
+    $g: green($color);
+    $b: blue($color);
+
+    $yiq: (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
+
+    @if ($yiq >=$yiq-contrasted-threshold) {
+        @return $dark;
+    }
+
+    @else {
+        @return $light;
+    }
+}
+
+$badge-focus-width: .2rem !default;
+$input-line-height-lg: 1.5 !default;
+$table-cell-padding-sm: .3rem !default;
+$table-cell-padding: .75rem !default;
+$card-columns-gap: 1.25rem !default;
+$user-selects: all, auto, none !default;
+
+@mixin badge-variant($bg) {
+    color: color-yiq($bg);
+    background-color: $bg;
+
+    @at-root a#{&} {
+        @include hover-focus() {
+            color: color-yiq($bg);
+            background-color: darken($bg, 10%);
+        }
+
+        &:focus,
+        &.focus {
+            outline: 0;
+            box-shadow: 0 0 0 $badge-focus-width rgba($bg, .5);
+        }
+    }
+}
+
+@mixin hover-focus() {
+
+    &:hover,
+    &:focus {
+        @content;
+    }
+}
+
+@mixin hover() {
+    &:hover {
+        @content;
+    }
+}
+
+@mixin plain-hover-focus() {
+
+    &,
+    &:hover,
+    &:focus {
+        @content;
+    }
+}
+
+@mixin bg-variant($parent, $color, $ignore-warning: false) {
+    #{$parent} {
+        background-color: $color;
+    }
+
+    a#{$parent},
+    button#{$parent} {
+        @include hover-focus() {
+            background-color: darken($color, 10%);
+        }
+    }
+
+    @include deprecate("The `bg-variant` mixin", "v4.4.0", "v5", $ignore-warning);
+}
+
+@mixin border-radius($radius: $border-radius, $fallback-border-radius: false) {
+    @if $enable-rounded {
+        border-radius: valid-radius($radius);
+    }
+
+    @else if $fallback-border-radius !=false {
+        border-radius: $fallback-border-radius;
+    }
+}
+
+@mixin border-top-radius($radius) {
+    @if $enable-rounded {
+        border-top-left-radius: valid-radius($radius);
+        border-top-right-radius: valid-radius($radius);
+    }
+}
+
+@mixin border-right-radius($radius) {
+    @if $enable-rounded {
+        border-top-right-radius: valid-radius($radius);
+        border-bottom-right-radius: valid-radius($radius);
+    }
+}
+
+@mixin border-bottom-radius($radius) {
+    @if $enable-rounded {
+        border-bottom-right-radius: valid-radius($radius);
+        border-bottom-left-radius: valid-radius($radius);
+    }
+}
+
+@mixin border-left-radius($radius) {
+    @if $enable-rounded {
+        border-top-left-radius: valid-radius($radius);
+        border-bottom-left-radius: valid-radius($radius);
+    }
+}
+
+@mixin border-top-left-radius($radius) {
+    @if $enable-rounded {
+        border-top-left-radius: valid-radius($radius);
+    }
+}
+
+@mixin border-top-right-radius($radius) {
+    @if $enable-rounded {
+        border-top-right-radius: valid-radius($radius);
+    }
+}
+
+@mixin border-bottom-right-radius($radius) {
+    @if $enable-rounded {
+        border-bottom-right-radius: valid-radius($radius);
+    }
+}
+
+@mixin border-bottom-left-radius($radius) {
+    @if $enable-rounded {
+        border-bottom-left-radius: valid-radius($radius);
+    }
+}
+
+// Margin and Padding. In Bootstrap 4, the margin and padding utilities for the
+// left and right sides have changed to use the `*s-` and `*e-` suffixes.
+// Since our templates use the old `*l-` and `*r-` suffixes, we need to
+// add the old suffixes to our css.
+@each $breakpoint in map-keys($grid-breakpoints) {
+    @include media-breakpoint-up($breakpoint) {
+        $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+        @each $prop, $abbrev in (margin: m, padding: p) {
+
+            @each $size, $length in $spacers {
+                .#{$abbrev}#{$infix}-#{$size} {
+                    #{$prop}: $length !important;
+                }
+
+                .#{$abbrev}r#{$infix}-#{$size} {
+                    #{$prop}-right: $length !important;
+                }
+
+                .#{$abbrev}l#{$infix}-#{$size} {
+                    #{$prop}-left: $length !important;
+                }
+            }
+        }
+
+        // Negative margins (e.g., where `.ml-n1` is negative version of `.ml-1`)
+        @each $size, $length in $spacers {
+            @if $size !=0 {
+
+                .mr#{$infix}-n#{$size} {
+                    margin-right: -$length !important;
+                }
+
+                .ml#{$infix}-n#{$size} {
+                    margin-left: -$length !important;
+                }
+            }
+        }
+
+        .mr#{$infix}-auto {
+            margin-right: auto !important;
+        }
+
+        .ml#{$infix}-auto {
+            margin-left: auto !important;
+        }
+    }
+}
+
+.text-right {
+    text-align: right !important;
+}
+
+.text-left {
+    text-align: left !important;
+}
+
+
+// The media component has been removed in Bootstrap 4. We need to add it back
+.media {
+    display: flex;
+    align-items: flex-start;
+}
+
+.media-body {
+    flex: 1;
+}
+
+// Forms used to have a .form-group class, but it has been removed in Bootstrap 4.
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-inline {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+
+    @include media-breakpoint-up(sm) {
+        .form-control {
+            width: auto;
+            display: inline-block;
+            vertical-align: middle;
+        }
+    }
+}
+
+// Card deck
+.card-deck {
+    .card {
+        margin-bottom: $card-deck-margin;
+    }
+
+    @include media-breakpoint-up(sm) {
+        display: flex;
+        flex-flow: row wrap;
+        margin-right: -$card-deck-margin;
+        margin-left: -$card-deck-margin;
+
+        .card {
+            flex: 1 0 0%;
+            margin-right: $card-deck-margin;
+            margin-bottom: 0; // Override the default
+            margin-left: $card-deck-margin;
+        }
+    }
+}
