@@ -37,14 +37,16 @@ export const init = () => {
     const footerButton = document.querySelector(SELECTORS.FOOTERBUTTON);
 
     // All jQuery in this code can be replaced when MDL-71979 is integrated.
-    $(footerButton).popover({
-        content: getFooterContent,
-        container: container,
-        html: true,
-        placement: 'top',
-        customClass: 'footer',
-        trigger: 'click'
-    });
+    if ($(footerButton).popover === undefined) {
+        $(footerButton).popover({
+            content: getFooterContent,
+            container: container,
+            html: true,
+            placement: 'top',
+            customClass: 'footer',
+            trigger: 'click'
+        });
+    }
 
     document.addEventListener('click', e => {
         if (footerIsShown && !e.target.closest(SELECTORS.FOOTERCONTAINER)) {
