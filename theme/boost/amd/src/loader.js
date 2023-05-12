@@ -25,8 +25,8 @@
 import $ from 'jquery';
 import * as Aria from './aria';
 import Bootstrap from './index';
+import log from 'core/log';
 import Pending from 'core/pending';
-import {DefaultWhitelist} from './bootstrap/tools/sanitizer';
 import setupBootstrapPendingChecks from './pending';
 
 /**
@@ -55,20 +55,7 @@ const rememberTabs = () => {
  *
  */
 const enablePopovers = () => {
-    $('body').popover({
-        container: 'body',
-        selector: '[data-toggle="popover"]',
-        trigger: 'focus',
-        whitelist: Object.assign(DefaultWhitelist, {
-            table: [],
-            thead: [],
-            tbody: [],
-            tr: [],
-            th: [],
-            td: [],
-        }),
-    });
-
+    enableTooltips();
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape' && e.target.closest('[data-toggle="popover"]')) {
             $(e.target).popover('hide');
@@ -81,10 +68,20 @@ const enablePopovers = () => {
  *
  */
 const enableTooltips = () => {
-    $('body').tooltip({
-        container: 'body',
-        selector: '[data-toggle="tooltip"]',
-    });
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    for (var tooltipTriggerEl of tooltipTriggerList) {
+        if (!Bootstrap.Tooltip.getInstance(tooltipTriggerEl)) {
+            new Bootstrap.Tooltip(tooltipTriggerEl);
+        }
+    }
+    // All Bootstrap 4 minimal backward compatibility will be removed when MDL-XXXXX is integrated.
+    const legacyBs4Tooltips = document.querySelectorAll('[data-toggle="tooltip"]');
+    for (var legacyBs4Tooltip of legacyBs4Tooltips) {
+        if (!Bootstrap.Tooltip.getInstance(legacyBs4Tooltip)) {
+            log.debug('data-toggle="tooltip" is deprecated, use data-bs-toggle instead.');
+            new Bootstrap.Tooltip(legacyBs4Tooltip);
+        }
+    }
 };
 
 const pendingPromise = new Pending('theme_boost/loader:init');
