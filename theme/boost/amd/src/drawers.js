@@ -39,7 +39,6 @@ const SELECTORS = {
     OPENBTN: '[data-toggler="drawers"][data-action="opendrawer"]',
     TOGGLEBTN: '[data-toggler="drawers"][data-action="toggle"]',
     DRAWERS: '[data-region="fixed-drawer"]',
-    CONTAINER: '#page.drawers',
     DRAWERCONTENT: '.drawercontent',
 };
 
@@ -47,7 +46,6 @@ const CLASSES = {
     SCROLLED: 'scrolled',
     SHOW: 'show',
     NOTINITIALISED: 'not-initialized',
-    TOGGLERIGHT: '.drawer-right-toggle',
 };
 
 /**
@@ -95,6 +93,20 @@ const isLarge = () => {
 };
 
 /**
+ * Try to get the drawer z-index from the page content.
+ *
+ * @returns {Number|null} the z-index of the drawer.
+ * @private
+ */
+const getDrawerZIndex = () => {
+    const drawer = document.querySelector(SELECTORS.DRAWERS);
+    if (!drawer) {
+        return null;
+    }
+    return parseInt(window.getComputedStyle(drawer).zIndex, 10);
+};
+
+/**
  * Add a backdrop to the page.
  *
  * @returns {Promise} rendering of modal backdrop.
@@ -105,6 +117,10 @@ const getBackdrop = () => {
         backdropPromise = Templates.render('core/modal_backdrop', {})
         .then(html => new ModalBackdrop(html))
         .then(modalBackdrop => {
+            const drawerZindex = getDrawerZIndex();
+            if (drawerZindex) {
+                modalBackdrop.setZIndex(getDrawerZIndex() - 1);
+            }
             modalBackdrop.getAttachmentPoint().get(0).addEventListener('click', e => {
                 e.preventDefault();
                 Drawers.closeAllDrawers();
@@ -566,6 +582,35 @@ export default class Drawers {
     }
 
     /**
+     * Displaces the drawer outsite the page.
+     *
+     * @param {Number} displace the number of pixels to displace the drawer
+     */
+    displace(displace) {
+        let openButton = getDrawerOpenButton(this.drawerNode.id);
+        if (displace === 0) {
+            this.drawerNode.style.transform = '';
+            if (openButton) {
+                openButton.style.transform = '';
+            }
+            return;
+        }
+        const drawrWidth = this.drawerNode.offsetWidth;
+        if (displace > drawrWidth) {
+            displace = drawrWidth;
+        }
+        const state = this.drawerNode.dataset?.state;
+        if (state === 'show-drawer-left') {
+            displace = -displace;
+        }
+        const transform = `translateX(${displace}px)`;
+        if (openButton) {
+            openButton.style.transform = transform;
+        }
+        this.drawerNode.style.transform = transform;
+    }
+
+    /**
      * Close all drawers except for the specified drawer.
      *
      * @param {module:theme_boost/drawers} comparisonInstance
@@ -579,41 +624,18 @@ export default class Drawers {
             drawerInstance.closeDrawer();
         });
     }
-}
 
-/**
- * Activate the scroller helper for the drawer layout.
- *
- * @private
- */
-const scroller = () => {
-    const body = document.querySelector('body');
-    const drawerLayout = document.querySelector(SELECTORS.CONTAINER);
-    if (drawerLayout) {
-        // If there is not visible scrollbar then remove extra margin from right drawer.
-        const drawerRight = document.querySelector(SELECTORS.CONTAINER + ' ' + CLASSES.TOGGLERIGHT);
-        if (!scrollbarVisible(drawerLayout) && drawerRight) {
-            drawerRight.style.marginRight = '0';
-        }
-        drawerLayout.addEventListener("scroll", () => {
-            if (drawerLayout.scrollTop >= window.innerHeight) {
-                body.classList.add(CLASSES.SCROLLED);
-            } else {
-                body.classList.remove(CLASSES.SCROLLED);
-            }
+    /**
+     * Prevent drawer from covering the content when the page content covers the full page.
+     *
+     * @param {Number} displace
+     */
+    static displaceDrawers(displace) {
+        drawerMap.forEach(drawerInstance => {
+            drawerInstance.displace(displace);
         });
     }
-};
-
-/**
- * Check if there is a visible scrollbar in the given html element.
- *
- * @param {object} htmlNode The html element.
- * @returns {boolean} true if the scroll height is greater than client height.
- */
-const scrollbarVisible = (htmlNode) => {
-   return htmlNode.scrollHeight > htmlNode.clientHeight;
-};
+}
 
 /**
  * Set the last used attribute for the last used toggle button for a drawer.
@@ -722,10 +744,21 @@ const registerListeners = () => {
         }
     };
 
+    document.addEventListener('scroll', () => {
+        const body = document.querySelector('body');
+        if (window.scrollY >= window.innerHeight) {
+            body.classList.add(CLASSES.SCROLLED);
+        } else {
+            body.classList.remove(CLASSES.SCROLLED);
+        }
+        // Horizontal scroll listener to displace the drawers to prevent covering
+        // any possible sticky content.
+        Drawers.displaceDrawers(window.scrollX);
+    });
+
     window.addEventListener('resize', debounce(closeOnResizeListener, 400));
 };
 
-scroller();
 registerListeners();
 
 const drawers = document.querySelectorAll(SELECTORS.DRAWERS);

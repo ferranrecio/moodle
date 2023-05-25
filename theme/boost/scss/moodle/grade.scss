@@ -521,7 +521,7 @@
 
         tr.heading {
             position: sticky;
-            top: 0;
+            top: $navbar-height;
             z-index: 1;
         }
 
@@ -536,12 +536,7 @@
         }
 
         th.header {
-            @include media-breakpoint-down(sm) {
-                left: 0;
-            }
-            @include media-breakpoint-up(md) {
-                left: -3rem;
-            }
+            left: 0;
             position: sticky;
             z-index: 1;
         }
@@ -549,10 +544,6 @@
         td.noborder {
             border-right: transparent;
         }
-    }
-
-    .show-drawer-left .gradeparent th.header {
-        left: -1rem;
     }
 }
 
