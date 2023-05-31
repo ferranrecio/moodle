@@ -29351,26 +29351,26 @@ body.drawer-ease {
 }
 
 .drawer {
-  transition: left 0.2s ease, right 0.2s ease, top 0.2s ease, bottom 0.2s ease, visibility 0.2s ease;
   background-color: #f8f9fa;
   z-index: 1020;
   position: fixed;
   height: 100vh;
   top: 0;
 }
-@media (prefers-reduced-motion: reduce) {
-  .drawer {
-    transition: none;
-  }
-}
 .drawer.not-initialized {
   display: none;
 }
 .drawer.drawer-right {
+  transition: right 0.2s ease, top 0.2s ease, bottom 0.2s ease, visibility 0.2s ease, transform 0.5s ease;
   width: 315px;
   max-width: 315px;
   right: calc(-315px + -10px);
   visibility: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  .drawer.drawer-right {
+    transition: none;
+  }
 }
 .drawer.drawer-right.show {
   right: 0;
@@ -29381,10 +29381,16 @@ body.drawer-ease {
   margin-right: 5px;
 }
 .drawer.drawer-left {
+  transition: left 0.2s ease, top 0.2s ease, bottom 0.2s ease, visibility 0.2s ease;
   width: 285px;
   max-width: 285px;
   left: calc(-285px + -10px);
   visibility: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  .drawer.drawer-left {
+    transition: none;
+  }
 }
 .drawer.drawer-left.show {
   left: 0;
@@ -29428,35 +29434,35 @@ body.drawer-ease {
 @media (max-width: 991.98px) {
   .drawer-md {
     display: block;
-    transition: left 0.2s ease, right 0.2s ease, top 0.2s ease, bottom 0.2s ease, visibility 0.2s ease;
     background-color: #f8f9fa;
     z-index: 1020;
     position: fixed;
     height: 100vh;
     top: 0;
   }
-}
-@media (max-width: 991.98px) and (prefers-reduced-motion: reduce) {
-  .drawer-md {
-    transition: none;
-  }
-}
-@media (max-width: 991.98px) {
   .drawer-md.not-initialized {
     display: none;
   }
-}
-@media (max-width: 991.98px) {
   .drawer-md.drawer-right {
+    transition: right 0.2s ease, top 0.2s ease, bottom 0.2s ease, visibility 0.2s ease, transform 0.5s ease;
     width: 315px;
     max-width: 315px;
     right: calc(-315px + -10px);
     visibility: hidden;
   }
+}
+@media (max-width: 991.98px) and (prefers-reduced-motion: reduce) {
+  .drawer-md.drawer-right {
+    transition: none;
+  }
+}
+@media (max-width: 991.98px) {
   .drawer-md.drawer-right.show {
     right: 0;
     visibility: visible;
   }
+}
+@media (max-width: 991.98px) {
   .drawer-md.drawer-right .drawertoggle {
     margin-left: auto;
     margin-right: 5px;
@@ -29464,15 +29470,25 @@ body.drawer-ease {
 }
 @media (max-width: 991.98px) {
   .drawer-md.drawer-left {
+    transition: left 0.2s ease, top 0.2s ease, bottom 0.2s ease, visibility 0.2s ease;
     width: 285px;
     max-width: 285px;
     left: calc(-285px + -10px);
     visibility: hidden;
   }
+}
+@media (max-width: 991.98px) and (prefers-reduced-motion: reduce) {
+  .drawer-md.drawer-left {
+    transition: none;
+  }
+}
+@media (max-width: 991.98px) {
   .drawer-md.drawer-left.show {
     left: 0;
     visibility: visible;
   }
+}
+@media (max-width: 991.98px) {
   .drawer-md.drawer-left .drawertoggle {
     margin-right: auto;
     margin-left: 5px;
@@ -29489,35 +29505,35 @@ body.drawer-ease {
 @media (max-width: 767.98px) {
   .drawer-sm {
     display: block;
-    transition: left 0.2s ease, right 0.2s ease, top 0.2s ease, bottom 0.2s ease, visibility 0.2s ease;
     background-color: #f8f9fa;
     z-index: 1020;
     position: fixed;
     height: 100vh;
     top: 0;
   }
-}
-@media (max-width: 767.98px) and (prefers-reduced-motion: reduce) {
-  .drawer-sm {
-    transition: none;
-  }
-}
-@media (max-width: 767.98px) {
   .drawer-sm.not-initialized {
     display: none;
   }
-}
-@media (max-width: 767.98px) {
   .drawer-sm.drawer-right {
+    transition: right 0.2s ease, top 0.2s ease, bottom 0.2s ease, visibility 0.2s ease, transform 0.5s ease;
     width: 315px;
     max-width: 315px;
     right: calc(-315px + -10px);
     visibility: hidden;
   }
+}
+@media (max-width: 767.98px) and (prefers-reduced-motion: reduce) {
+  .drawer-sm.drawer-right {
+    transition: none;
+  }
+}
+@media (max-width: 767.98px) {
   .drawer-sm.drawer-right.show {
     right: 0;
     visibility: visible;
   }
+}
+@media (max-width: 767.98px) {
   .drawer-sm.drawer-right .drawertoggle {
     margin-left: auto;
     margin-right: 5px;
@@ -29525,15 +29541,25 @@ body.drawer-ease {
 }
 @media (max-width: 767.98px) {
   .drawer-sm.drawer-left {
+    transition: left 0.2s ease, top 0.2s ease, bottom 0.2s ease, visibility 0.2s ease;
     width: 285px;
     max-width: 285px;
     left: calc(-285px + -10px);
     visibility: hidden;
   }
+}
+@media (max-width: 767.98px) and (prefers-reduced-motion: reduce) {
+  .drawer-sm.drawer-left {
+    transition: none;
+  }
+}
+@media (max-width: 767.98px) {
   .drawer-sm.drawer-left.show {
     left: 0;
     visibility: visible;
   }
+}
+@media (max-width: 767.98px) {
   .drawer-sm.drawer-left .drawertoggle {
     margin-right: auto;
     margin-left: 5px;
