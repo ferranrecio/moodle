@@ -37,3 +37,8 @@
         <span class="badge badge-pill badge-warning">{{#str}}hiddenoncoursepage{{/str}}</span>
     </div>
 {{/modstealth}}
+{{#availabilitycontrol}}
+    {{< core/local/dropdown/status}}
+        {{$ buttonclasses }} badge badge-pill badge-warning dropdown-toggle border-0 {{/ buttonclasses }}
+    {{/ core/local/dropdown/status}}
+{{/availabilitycontrol}}

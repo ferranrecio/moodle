@@ -2607,6 +2607,15 @@ input[disabled] {
     visibility: hidden;
 }
 
+// Any dialog (modal or dropdown) forced max-widths limits.
+.dialog-big {
+    max-width: $modal-md;
+}
+
+.dialog-small {
+    max-width: $modal-sm;
+}
+
 // Emoji picker.
 $picker-width: 350px !default;
 $picker-width-xs: 320px !default;

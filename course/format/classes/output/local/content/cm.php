@@ -294,6 +294,59 @@ class cm implements named_templatable, renderable {
             // Add the legacy YUI move link.
             $data->moveicon = course_get_cm_move($this->mod, $returnsection);
         }
+        $availability = new \core\output\choice();
+        $availability->add_option(
+            'show',
+            get_string('availability_show', 'core_courseformat'),
+            [
+                'description' => get_string('availability_show_help', 'core_courseformat'),
+                'icon' => new \pix_icon('t/hide', 'Eye icon'),
+                'extras' => [
+                    'data-id' => $this->mod->id,
+                    'data-action' => 'cmShow',
+                ]
+            ]
+        );
+        $availability->add_option(
+            'hide',
+            get_string('availability_hide', 'core_courseformat'),
+            [
+                'description' => get_string('availability_hide_help', 'core_courseformat'),
+                'icon' => new \pix_icon('t/show', 'Eye icon'),
+                'extras' => [
+                    'data-id' => $this->mod->id,
+                    'data-action' => 'cmHide',
+                ]
+            ]
+        );
+        $availability->add_option(
+            'stealth',
+            get_string('availability_stealth', 'core_courseformat'),
+            [
+                'description' => get_string('availability_stealth_help', 'core_courseformat'),
+                'icon' => new \pix_icon('t/stealth', 'Eye icon'),
+                'extras' => [
+                    'data-id' => $this->mod->id,
+                    'data-action' => 'cmStealth',
+                ]
+            ]
+        );
+        if (!$this->mod->visible) {
+            $selected = 'hide';
+        } else if ($this->mod->is_stealth()) {
+            $selected = 'stealth';
+        } else {
+            $selected = 'show';
+        }
+        $availability->set_selected_value($selected);
+        $dropdown = new \core\output\local\dropdown\status(
+            get_string("availability_{$selected}", 'core_courseformat'),
+            $availability,
+            [
+                'dialogwidth' => \core\output\local\dropdown\status::WIDTH['BIG'],
+            ],
+        );
+        $data->availabilitycontrol = $dropdown->export_for_template($output);
         return true;
     }
 
