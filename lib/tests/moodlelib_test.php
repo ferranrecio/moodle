@@ -3592,6 +3592,84 @@ EOF;
     }
 
     /**
+     * Test remove_course_content delete plugins correctly
+     *
+     * @param string $activitytype
+     * @return void
+     * @dataProvider activity_type_provider
+     * @covers \remove_course_contents
+     */
+    public function test_remove_course_contents_for_activity(string $activitytype) {
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_and_enrol($course, 'teacher');
+        $this->setUser($user);
+        $activity = $this->getDataGenerator()->create_module($activitytype, ['course' => $course]);
+        remove_course_contents($course->id, false);
+        $this->assertFalse(get_coursemodule_from_id($activitytype, $activity->cmid));
+    }
+
+    /**
+     * Test remove_course_content when an activity type has been disabled
+     *
+     * @param string $activitytype
+     * @return void
+     * @dataProvider activity_type_provider
+     * @covers \remove_course_contents
+     */
+    public function test_remove_course_contents_for_disabled_activity(string $activitytype) {
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $user = $this->getDataGenerator()->create_and_enrol($course, 'teacher');
+        $this->setUser($user);
+        $activity = $this->getDataGenerator()->create_module($activitytype, ['course' => $course]);
+        $pluginman = \core_plugin_manager::instance();
+        $plugininfo = $pluginman->get_plugin_info($activitytype);
+        $plugininfo::enable_plugin($activitytype, false);
+        remove_course_contents($course->id, false);
+        $this->resetDebugging();
+        $this->assertFalse(get_coursemodule_from_id($activitytype, $activity->cmid));
+    }
+
+    /**
+     * List all activities types
+     * @return string[]
+     */
+    public function activity_type_provider() {
+        $modules = [
+            'assign',
+            'bigbluebuttonbn',
+            'book',
+            'chat',
+            'choice',
+            'data',
+            'feedback',
+            'folder',
+            'forum',
+            'glossary',
+            'imscp',
+            'label',
+            'lesson',
+            'lti',
+            'page',
+            'quiz',
+            'resource',
+            'scorm',
+            'survey',
+            'url',
+            'wiki',
+            'workshop'
+        ];
+        return array_combine($modules,
+            array_map(function($modname) {
+                return [$modname];
+            }, $modules)
+        );
+    }
+
+    /**
      * Test function username_load_fields_from_object().
      */
     public function test_username_load_fields_from_object() {

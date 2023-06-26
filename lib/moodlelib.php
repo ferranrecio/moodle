@@ -5150,7 +5150,23 @@ function remove_course_contents($courseid, $showfeedback = true, array $options 
                     }
                     if (function_exists($moddelete)) {
                         // This purges all module data in related tables, extra user prefs, settings, etc.
-                        $moddelete($cm->modinstance);
+                        try {
+                            $moddelete($cm->modinstance);
+                        } catch (moodle_exception $exception) {
+                            // Deletion on a disabled plugin displays a warning without interrupting the deletion process.
+                            $pluginman = \core_plugin_manager::instance();
+                            $plugininfo = $pluginman->get_plugin_info($cm->modname);
+                            if (!$plugininfo->is_enabled()) {
+                                $message = get_string('cannotdeletedisabledactivity', 'error', $cm->modname);
+                                if ($showfeedback) {
+                                    echo $OUTPUT->notification($message, 'notifywarning');
+                                } else {
+                                    debugging($message);
+                                }
+                            } else {
+                                throw $exception; // Rethrow the error if it is not an invalidcoursemoduleid.
+                            }
+                        }
                     } else {
                         // NOTE: we should not allow installation of modules with missing delete support!
                         debugging("Defective module '$modname' detected when deleting course contents: missing function $moddelete()!");
