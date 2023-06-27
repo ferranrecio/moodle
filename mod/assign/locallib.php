@@ -861,11 +861,12 @@ class assign {
         $this->delete_all_overrides();
 
         // Delete_records will throw an exception if it fails - so no need for error checking here.
-        $DB->delete_records('assign_submission', array('assignment' => $this->get_instance()->id));
-        $DB->delete_records('assign_grades', array('assignment' => $this->get_instance()->id));
-        $DB->delete_records('assign_plugin_config', array('assignment' => $this->get_instance()->id));
-        $DB->delete_records('assign_user_flags', array('assignment' => $this->get_instance()->id));
-        $DB->delete_records('assign_user_mapping', array('assignment' => $this->get_instance()->id));
+        $id = $this->get_id();
+        $DB->delete_records('assign_submission', ['assignment' => $id]);
+        $DB->delete_records('assign_grades', ['assignment' => $id]);
+        $DB->delete_records('assign_plugin_config', ['assignment' => $id]);
+        $DB->delete_records('assign_user_flags', ['assignment' => $id]);
+        $DB->delete_records('assign_user_mapping', ['assignment' => $id]);
 
         // Delete items from the gradebook.
         if (! $this->delete_grades()) {
@@ -874,7 +875,7 @@ class assign {
 
         // Delete the instance.
         // We must delete the module record after we delete the grade item.
-        $DB->delete_records('assign', array('id'=>$this->get_instance()->id));
+        $DB->delete_records('assign', ['id' => $id]);
 
         return $result;
     }
@@ -1775,6 +1776,19 @@ class assign {
         // Calculate properties which vary per user.
         $this->userinstances[$userid] = $this->calculate_properties($this->instance, $userid);
         return $this->userinstances[$userid];
+    }
+
+    /**
+     * Get Instance ID.
+     *
+     * This can be used when the module is disabled and we cannot get
+     * the course module info via get_fast_modinfo.
+     *
+     * @return int
+     */
+    public function get_id(): int {
+        $coursemodule = get_coursemodule_from_id('assign', $this->get_context()->instanceid);
+        return $coursemodule->instance;
     }
 
     /**

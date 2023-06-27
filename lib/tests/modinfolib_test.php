@@ -1143,11 +1143,11 @@ class modinfolib_test extends advanced_testcase {
         $this->resetAfterTest();
 
         $course = $this->getDataGenerator()->create_course();
-        $forum0 = $this->getDataGenerator()->create_module('assign', ['course' => $course->id], ['section' => 0]);
-        $forum1 = $this->getDataGenerator()->create_module('assign', ['course' => $course->id], ['section' => 0]);
-        $forum2 = $this->getDataGenerator()->create_module('assign', ['course' => $course->id], ['section' => 0]);
+        $forum0 = $this->getDataGenerator()->create_module('forum', ['course' => $course->id], ['section' => 0]);
+        $forum1 = $this->getDataGenerator()->create_module('forum', ['course' => $course->id], ['section' => 0]);
+        $forum2 = $this->getDataGenerator()->create_module('forum', ['course' => $course->id], ['section' => 0]);
 
-        // Break section sequence.
+        // Break section sequence and remove the forum1 from the list.
         $modinfo = get_fast_modinfo($course->id);
         $sectionid = $modinfo->get_section_info(0)->id;
         $section = $DB->get_record('course_sections', ['id' => $sectionid]);
@@ -1159,7 +1159,10 @@ class modinfolib_test extends advanced_testcase {
         // Assert exception text.
         $this->expectException(\moodle_exception::class);
         $this->expectExceptionMessage('Invalid course module ID: ' . $forum1->cmid);
-        delete_course($course, false);
+        get_fast_modinfo($course->id, 0,  true);
+        purge_other_caches(); // Needed as get_fast_modinfo reset process does not purge section caches.
+        $modinfo = get_fast_modinfo($course->id);
+        $modinfo->get_cm($forum1->cmid);
     }
 
     /**
