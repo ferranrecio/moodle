@@ -27,7 +27,9 @@ namespace core_courseformat\output\local\content\cm;
 use action_menu;
 use action_menu_link;
 use cm_info;
+use core\output\choicelist;
 use core\output\named_templatable;
+use core\output\local\action_menu\subpanel;
 use core_courseformat\base as course_format;
 use core_courseformat\output\local\courseformat_named_templatable;
 use renderable;
@@ -110,7 +112,7 @@ class controlmenu implements named_templatable, renderable {
      *
      * This method is public in case some block needs to modify the menu before output it.
      * @param \renderer_base $output typically, the renderer that's calling this function
-     * @return aciton_menu the activity action menu
+     * @return action_menu the activity action menu
      */
     public function get_action_menu(\renderer_base $output): ?action_menu {
 
@@ -167,6 +169,17 @@ class controlmenu implements named_templatable, renderable {
         } else {
             $indent = $mod->indent;
         }
-        return course_get_cm_edit_actions($mod, $indent, $sectionreturn);
+        $menu = course_get_cm_edit_actions($mod, $indent, $sectionreturn);
+        $url = new \moodle_url('/course/view.php', ['id' => $mod->course, 'patata' => 'nope']);
+        $choice = new choicelist('patata');
+        $choice->add_option("prova1", "prova 1", [
+            'url' => new \moodle_url($url, ['patata' => 'brava']),
+            'description' => 'prova 1 description weith long text to see what happens',
+            'icon' => new \pix_icon('t/up', get_string('up'), ''),
+        ]);
+        $choice->add_option("prova2", "prova 2", ['url' => $url]);
+        $menu['test'] = new subpanel("test", $choice);
+        $menu['test2'] = new subpanel("test", $choice);
+        return $menu;
     }
 }
