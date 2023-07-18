@@ -108,6 +108,7 @@ class instance {
         $coursefrom = $coursetable->get_from_sql();
 
         $cmtable = new \core\dml\table('course_modules', 'cm', 'cm');
+        $cmselect = $cmtable->get_field_select();
         $cmfrom = $cmtable->get_from_sql();
 
         $bbbtable = new \core\dml\table('bigbluebuttonbn', 'bbb', 'b');
@@ -115,7 +116,7 @@ class instance {
         $bbbfrom = $bbbtable->get_from_sql();
 
         $sql = <<<EOF
-    SELECT {$courseselect}, {$bbbselect}
+    SELECT {$courseselect}, {$bbbselect}, {$cmselect}
       FROM {$cmfrom}
 INNER JOIN {$coursefrom} ON c.id = cm.course
 INNER JOIN {modules} m ON m.id = cm.module AND m.name = :modname
@@ -134,7 +135,9 @@ EOF;
 
         $course = $coursetable->extract_from_result($result);
         $instancedata = $bbbtable->extract_from_result($result);
-        $cm = get_fast_modinfo($course)->instances['bigbluebuttonbn'][$instancedata->id];
+        $cmdata = $cmtable->extract_from_result($result);
+        $cminfo = get_fast_modinfo($course);
+        $cm = $cminfo->get_cm($cmdata->id);
 
         return new self($cm, $course, $instancedata);
     }
