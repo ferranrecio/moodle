@@ -1274,6 +1274,7 @@ $activity-add-hover: theme-color-level('primary', -10) !default;
 // Activity completion button custom styling mixin.
 @mixin completion-button() {
     &.btn {
+        min-height: map-get($iconsizes, 5);
         border: $border-width solid $gray-400;
         font-weight: bold;
         @include border-radius();
@@ -1536,8 +1537,8 @@ $activity-add-hover: theme-color-level('primary', -10) !default;
         }
         // Override '.btn.btn-icon' styles from buttons.scss to make action menu buttons smaller.
         .action-menu .btn.btn-icon {
-            height: ($icon-width + 15px);
-            width: ($icon-width + 15px);
+            height: map-get($iconsizes, 5);
+            width: map-get($iconsizes, 5);
         }
     }
 

@@ -29263,8 +29263,8 @@ span.editinstructions .alert-link {
   position: relative;
 }
 .activity-item .activity-actions .action-menu .btn.btn-icon {
-  height: 31px;
-  width: 31px;
+  height: 32px;
+  width: 32px;
 }
 .activity-item .activity-icon {
   grid-area: icon;
@@ -29303,6 +29303,7 @@ span.editinstructions .alert-link {
 }
 .activity-item .activity-completion button.btn,
 .activity-item .activity-completion a[role=button].btn {
+  min-height: 32px;
   border: 1px solid #ced4da;
   font-weight: bold;
   border-radius: 0.25rem;
