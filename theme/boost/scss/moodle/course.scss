@@ -1298,6 +1298,9 @@ $activity-add-hover: theme-color-level('primary', -10) !default;
     border-width: $border-width;
     .pluscontainer {
         border: $border-width solid $primary-light-border;
+        border-radius: 50%;
+        width: map-get($iconsizes, 5);
+        height: map-get($iconsizes, 5);
     }
     &:hover {
         cursor: pointer;

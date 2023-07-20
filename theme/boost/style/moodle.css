@@ -29086,6 +29086,9 @@ span.editinstructions .alert-link {
 .activity-add .pluscontainer,
 .block-add .pluscontainer {
   border: 1px solid #3584c9;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
 }
 .activity-add:hover,
 .block-add:hover {
