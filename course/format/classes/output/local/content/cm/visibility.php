@@ -152,7 +152,7 @@ class visibility implements named_templatable, renderable {
      * Get the availability choice list.
      * @return choicelist
      */
-    protected function get_choice_list(): choicelist {
+    public function get_choice_list(): choicelist {
         $choice = $this->create_choice_list();
         if (!$this->mod->visible) {
             $selected = 'hide';

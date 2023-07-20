@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die;
 
 use core_course\external\course_summary_exporter;
 use core_courseformat\base as course_format;
+use core\output\local\action_menu\subpanel as action_menu_subpanel;
 
 require_once($CFG->libdir.'/completionlib.php');
 require_once($CFG->libdir.'/filelib.php');
@@ -1645,6 +1646,7 @@ function course_get_cm_edit_actions(cm_info $mod, $indent = -1, $sr = null) {
     $modcontext = context_module::instance($mod->id);
     $courseformat = course_get_format($mod->get_course());
     $usecomponents = $courseformat->supports_components();
+    $sectioninfo = $mod->get_section_info();
 
     $editcaps = array('moodle/course:manageactivities', 'moodle/course:activityvisibility', 'moodle/role:assign');
     $dupecaps = array('moodle/backup:backuptargetimport', 'moodle/restore:restoretargetimport');
@@ -1659,8 +1661,8 @@ function course_get_cm_edit_actions(cm_info $mod, $indent = -1, $sr = null) {
     if (!isset($str)) {
         $str = get_strings(
             [
-                'delete', 'move', 'moveright', 'moveleft', 'editsettings', 'duplicate', 'modhide',
-                'makeavailable', 'makeunavailable', 'modshow', 'modshowcmtitle', 'makeavailablecmtitle',
+                'delete', 'move', 'moveright', 'moveleft', 'editsettings', 'duplicate',
+                'modshow', 'modshowcmtitle', 'availability'
             ],
             'moodle'
         );
@@ -1759,78 +1761,15 @@ function course_get_cm_edit_actions(cm_info $mod, $indent = -1, $sr = null) {
 
     // Hide/Show/Available/Unavailable.
     if (has_capability('moodle/course:activityvisibility', $modcontext)) {
-        $allowstealth = !empty($CFG->allowstealth) && $courseformat->allow_stealth_module_visibility($mod, $mod->get_section_info());
-
-        $sectionvisible = $mod->get_section_info()->visible;
-        // The module on the course page may be in one of the following states:
-        // - Available and displayed on the course page ($displayedoncoursepage);
-        // - Not available and not displayed on the course page ($unavailable);
-        // - Available but not displayed on the course page ($stealth) - this can also be a visible activity in a hidden section.
-        $displayedoncoursepage = $mod->visible && $mod->visibleoncoursepage && $sectionvisible;
-        $unavailable = !$mod->visible;
-        $stealth = $mod->visible && (!$mod->visibleoncoursepage || !$sectionvisible);
-        if ($displayedoncoursepage) {
-            $actions['hide'] = new action_menu_link_secondary(
-                new moodle_url($baseurl, array('hide' => $mod->id)),
-                new pix_icon('t/hide', '', 'moodle', array('class' => 'iconsmall')),
-                $str->modhide,
-                [
-                    'class' => 'editing_hide',
-                    'data-action' => ($usecomponents) ? 'cmHide' : 'hide',
-                    'data-id' => $mod->id,
-                ]
-            );
-        } else if (!$displayedoncoursepage && $sectionvisible) {
-            // Offer to "show" only if the section is visible.
-            $actions['show'] = new action_menu_link_secondary(
-                new moodle_url($baseurl, array('show' => $mod->id)),
-                new pix_icon('t/show', '', 'moodle', array('class' => 'iconsmall')),
-                $str->modshow,
-                [
-                    'class' => 'editing_show',
-                    'data-action' => ($usecomponents) ? 'cmShow' : 'show',
-                    'data-id' => $mod->id,
-                    // Title is needed mostly for behat tests. Otherwise it will follow any link with "show".
-                    'title' => $str->modshowcmtitle,
-                ]
-            );
-        }
-
-        if ($stealth) {
-            // When making the "stealth" module unavailable we perform the same action as hiding the visible module.
-            $actions['hide'] = new action_menu_link_secondary(
-                new moodle_url($baseurl, array('hide' => $mod->id)),
-                new pix_icon('t/unblock', '', 'moodle', array('class' => 'iconsmall')),
-                $str->makeunavailable,
-                [
-                    'class' => 'editing_makeunavailable',
-                    'data-action' => ($usecomponents) ? 'cmHide' : 'hide',
-                    'data-sectionreturn' => $sr,
-                    'data-id' => $mod->id,
-                ]
-            );
-        } else if ($unavailable && (!$sectionvisible || $allowstealth) && $mod->has_view()) {
-            // Allow to make visually hidden module available in gradebook and other reports by making it a "stealth" module.
-            // When the section is hidden it is an equivalent of "showing" the module.
-            // Activities without the link (i.e. labels) can not be made available but hidden on course page.
-            $action = $sectionvisible ? 'stealth' : 'show';
-            if ($usecomponents) {
-                $action = 'cm' . ucfirst($action);
-            }
-            $actions[$action] = new action_menu_link_secondary(
-                new moodle_url($baseurl, array('stealth' => $mod->id)),
-                new pix_icon('t/block', '', 'moodle', array('class' => 'iconsmall')),
-                $str->makeavailable,
-                [
-                    'class' => 'editing_makeavailable',
-                    'data-action' => $action,
-                    'data-sectionreturn' => $sr,
-                    'data-id' => $mod->id,
-                    // Title is needed mostly for behat tests. Otherwise it will follow any link with "make available".
-                    'title' => $str->makeavailablecmtitle,
-                ]
-            );
-        }
+        $groupmodeclass = $courseformat->get_output_classname('content\\cm\\visibility');
+        /** @var core_courseformat\output\local\content\cm\visibility */
+        $groupmode = new $groupmodeclass($courseformat, $sectioninfo, $mod);
+        $actions['availability'] = new action_menu_subpanel(
+            $str->availability,
+            $groupmode->get_choice_list(),
+            ['class' => 'editing_availability'],
+            new pix_icon('t/hide', '', 'moodle', array('class' => 'iconsmall'))
+        );
     }
 
     // Duplicate (require both target import caps to be able to duplicate and backup2 support, see modduplicate.php)
