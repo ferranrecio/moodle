@@ -104,7 +104,7 @@ class core_completion_defaultedit_form extends core_completion_edit_base_form {
      * Form definition,
      */
     public function definition() {
-        $this->course = $this->_customdata['course'];
+        $this->course = get_course($this->_customdata['course']);
         $this->modules = $this->_customdata['modules'];
 
         $mform = $this->_form;

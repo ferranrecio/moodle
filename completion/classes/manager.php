@@ -57,6 +57,20 @@ class manager {
     }
 
     /**
+     * Returns current course context or system level for $SITE courseid.
+     *
+     * @return \context The course based on current courseid or system context.
+     */
+    protected function get_context(): \context {
+        global $SITE;
+
+        if ($this->courseid && $this->courseid != $SITE->id) {
+            return context_course::instance($this->courseid);
+        }
+        return \context_system::instance();
+    }
+
+    /**
      * Gets the data (context) to be used with the bulkactivitycompletion template.
      *
      * @return stdClass data for use with the bulkactivitycompletion template.
@@ -220,13 +234,13 @@ class manager {
         $data->helpicon = $OUTPUT->help_icon('bulkcompletiontracking', 'core_completion');
         // Add icon information.
         $data->modules = array_values($modules);
-        $coursecontext = context_course::instance($this->courseid);
-        $canmanage = has_capability('moodle/course:manageactivities', $coursecontext);
+        $context = $this->get_context();
+        $canmanage = has_capability('moodle/course:manageactivities', $context);
         $course = get_course($this->courseid);
         foreach ($data->modules as $module) {
             $module->icon = $OUTPUT->image_url('monologo', $module->name)->out();
             $module->formattedname = format_string(get_string('modulename', 'mod_' . $module->name),
-                true, ['context' => $coursecontext]);
+                true, ['context' => $context]);
             $module->canmanage = $canmanage && course_allowed_module($course, $module->name);
             if ($includedefaults) {
                 $defaults = self::get_default_completion($course, $module, false);
@@ -236,6 +250,26 @@ class manager {
         }
 
         return $data;
+    }
+
+    /**
+     * Gets all the modules for the current course and the modules can be managed by the user from the given list.
+     *
+     * @param array $modids A list of module ids to check.
+     * @param bool $includedefaults Whether the default values should be included or not.
+     * @return array A list of all modules and a list of modules can be managed by the user from the list.
+     */
+    public function get_manageable_activities_and_resources(array $modids = [], bool $includedefaults = true): array {
+        $allmodules = $this->get_activities_and_resources($includedefaults);
+        $modules = [];
+        if (!empty($allmodules) && property_exists($allmodules, 'modules')) {
+            foreach ($allmodules->modules as $module) {
+                if ($module->canmanage && in_array($module->id, $modids)) {
+                    $modules[$module->id] = $module;
+                }
+            }
+        }
+        return [$allmodules, $modules];
     }
 
     /**

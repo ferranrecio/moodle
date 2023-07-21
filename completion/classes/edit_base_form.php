@@ -95,6 +95,17 @@ abstract class core_completion_edit_base_form extends moodleform {
     abstract protected function get_module_form();
 
     /**
+     * Get the course associated to this class.
+     * This method must be overriden by the class using this trait if it doesn't include a _course property.
+     *
+     * @return stdClass Course object.
+     * @throws \coding_exception If the class does not have a _course property.
+     */
+    protected function get_course(): stdClass {
+        return $this->course;
+    }
+
+    /**
      * If all selected modules are of the same module type, adds custom completion rules from this module type
      *
      * @return array
