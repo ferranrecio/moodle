@@ -84,3 +84,5 @@ backpackemail,core_badges
 backpackemail_help,core_badges
 editcoursecompletionsettings,core_completion
 clicktochangeinbrackets,core
+completiondefault,core_completion
+configcompletiondefault,core_completion
