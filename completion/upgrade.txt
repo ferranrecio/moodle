@@ -11,6 +11,8 @@ information provided here is intended especially for developers.
   to be added to the name of the completion rules.
 * The method manager::defaultcompletion() now has the $modules and $form parameters, to specify the modules that have been set
   through the form and the current form that has been sent.
+* $CFG->completiondefault setting has been removed.
+* $defaultcompletion parameter has been deprecated for add_completion_elements() protected function.
 
 === 4.0 ===
 * New method mark_course_completions_activity_criteria() has been added to mark course completions instantly. It is
