@@ -25237,6 +25237,14 @@ h3.sectionname .inplaceeditable.inplaceeditingon .editinstructions {
   font-size: 0.7rem;
 }
 
+.dropdown-item-outline:focus, .dropdown-item-outline:focus-within {
+  outline: solid #0f6cbf;
+}
+.dropdown-item-outline a:focus,
+.dropdown-item-outline a:focus-visible {
+  outline: 0;
+}
+
 .competency-tree ul {
   padding-left: 1.5rem;
 }

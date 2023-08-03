@@ -2423,6 +2423,18 @@ $footer-link-color: $bg-inverse-link-color !default;
     }
 }
 
+.dropdown-item-outline {
+    &:focus,
+    &:focus-within {
+        outline: solid $dropdown-link-active-bg;
+    }
+
+    a:focus,
+    a:focus-visible {
+        outline: 0;
+    }
+}
+
 .competency-tree {
     ul {
         padding-left: 1.5rem;
