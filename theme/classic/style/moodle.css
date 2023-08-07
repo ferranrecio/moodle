@@ -29267,6 +29267,7 @@ span.editinstructions .alert-link {
 .activity-item .activity-actions .action-menu .btn.btn-icon {
   height: 32px;
   width: 32px;
+  border-radius: 0.25rem;
 }
 .activity-item .activity-icon {
   grid-area: icon;
@@ -29460,9 +29461,11 @@ span.editinstructions .alert-link {
   justify-self: end;
 }
 .activity-item .activity-groupmode-info .groupmode-information {
-  height: 31px;
+  height: 32px;
+  width: 32px;
+  border-radius: 0.25rem;
 }
-.activity-item .activity-groupmode-info .groupmode-information .groupmode-icon-info {
+.activity-item .activity-groupmode-info .groupmode-icon-info {
   display: none;
 }
 @media (max-width: 575.98px) {
@@ -29472,8 +29475,17 @@ span.editinstructions .alert-link {
     padding-top: 0.5rem;
     border-top: 1px solid #dee2e6;
   }
-  .activity-item .activity-groupmode-info .groupmode-information .groupmode-icon-info {
+  .activity-item .activity-groupmode-info .groupmode-information {
+    width: auto;
+    font-size: inherit;
+    padding: 0 0.5rem;
+  }
+  .activity-item .activity-groupmode-info .groupmode-icon-info {
     display: inline;
+  }
+  .activity-item .activity-groupmode-info .v-parent-focus {
+    opacity: 1;
+    visibility: visible;
   }
 }
 .activity-item .activity-badges {
