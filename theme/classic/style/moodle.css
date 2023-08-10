@@ -29144,10 +29144,6 @@ span.editinstructions .alert-link {
 .course-section .section_action_menu .dropdown-toggle::after {
   display: none;
 }
-.course-section .inplaceeditable {
-  display: flex;
-  align-items: center;
-}
 .course-section .summarytext img {
   border-radius: 1rem;
 }
@@ -29292,6 +29288,7 @@ span.editinstructions .alert-link {
   margin-left: 0.5rem;
 }
 .activity-item .activity-name-area .activityname .inplaceeditable .quickeditlink {
+  position: relative;
   z-index: 2;
   margin-left: 0.5rem;
 }
@@ -29813,11 +29810,6 @@ span.editinstructions .alert-link {
   margin-top: 0.5rem;
   padding-top: 0.5rem;
   border-top: 1px solid #dee2e6;
-}
-.activity-item .inplaceeditable {
-  display: flex;
-  flex: 0 1 auto;
-  max-width: 100%;
 }
 .activity-item .no-overflow {
   width: 100%;

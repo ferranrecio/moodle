@@ -1375,11 +1375,6 @@ $activity-add-hover: theme-color-level('primary', -10) !default;
         }
     }
 
-    .inplaceeditable {
-        display: flex;
-        align-items: center;
-    }
-
     .summarytext {
         // Add rounded borders to images.
         img {
@@ -1563,7 +1558,6 @@ $activity-add-hover: theme-color-level('primary', -10) !default;
             margin-top: map-get($spacers, 2);
         }
     }
-
     .activity-name-area {
         grid-area: name;
         // Prevent bootstrap strech-link from covering the inplace editable button using z-index.
@@ -1572,6 +1566,7 @@ $activity-add-hover: theme-color-level('primary', -10) !default;
                 margin-left: 0.5rem;
             }
             .inplaceeditable .quickeditlink {
+                position: relative;
                 z-index: 2;
                 margin-left: 0.5rem;
             }
@@ -1690,12 +1685,6 @@ $activity-add-hover: theme-color-level('primary', -10) !default;
         margin-top: map-get($spacers, 2);
         padding-top: map-get($spacers, 2);
         border-top: $border-width solid $border-color;
-    }
-
-    .inplaceeditable {
-        display: flex;
-        flex: 0 1 auto;
-        max-width: 100%;
     }
 
     .no-overflow {
