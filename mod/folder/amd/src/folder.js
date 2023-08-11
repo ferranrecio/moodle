@@ -14,22 +14,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Javascript helper function for Folder module
+ * Javascript module for folder display.
  *
- * @package    mod
- * @subpackage folder
- * @copyright  2009 Petr Skoda  {@link http://skodak.org}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @module      mod_folder/folder
+ * @copyright   2022 Sara Arjona <sara@moodle.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-M.mod_folder = {};
+import YUI from 'core/yui';
 
-M.mod_folder.init_tree = function(Y, id, expand_all) {
-    Y.use('yui2-treeview', 'node-event-simulate', function(Y) {
+export const init = (id, expandAll) => {
+    YUI.use('yui2-treeview', 'node-event-simulate', function(Y) {
         var tree = new Y.YUI2.widget.TreeView(id);
 
-        tree.subscribe("clickEvent", function(node, event) {
-            // we want normal clicking which redirects to url
+        tree.subscribe("clickEvent", function() {
+            // We want normal clicking which redirects to url.
             return false;
         });
 
@@ -39,7 +38,7 @@ M.mod_folder.init_tree = function(Y, id, expand_all) {
             return false;
         });
 
-        if (expand_all) {
+        if (expandAll) {
             tree.expandAll();
         } else {
             // Else just expand the top node.
@@ -48,4 +47,4 @@ M.mod_folder.init_tree = function(Y, id, expand_all) {
 
         tree.render();
     });
-}
+};

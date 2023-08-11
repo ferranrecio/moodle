@@ -27,6 +27,8 @@
 
     Example context (json):
     {
+        "id": 42,
+        "showexpanded": true,
         "buttons": [
             "edit_button": [
                 "id": "edit_button",
@@ -52,7 +54,7 @@
                         "icon": "<img src='icon'>",
                         "hassubdirs": false,
                         "subdirs": null
-                     }
+                    }
                 ]
             },
             {
@@ -89,3 +91,9 @@
         </div>
     </div>
 </div>
+{{#js}}
+// Initialise the JS.
+require(['mod_folder/folder'], function(Folder) {
+    Folder.init('{{id}}', '{{showexpanded}}');
+});
+{{/js}}

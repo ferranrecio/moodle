@@ -84,11 +84,9 @@ class mod_folder_renderer extends plugin_renderer_base {
         }
 
         $id = 'folder_tree'. ($treecounter++);
-        $showexpanded = !empty($foldertree->folder->showexpanded);
         $data['id'] = $id;
+        $data['showexpanded'] = !empty($foldertree->folder->showexpanded);
         $data['dir'] = $this->htmllize_tree($foldertree, ['files' => [], 'subdirs' => [$foldertree->dir]]);
-
-        $this->page->requires->js_init_call('M.mod_folder.init_tree', [$id, $showexpanded]);
 
         return $this->render_from_template('mod_folder/folder', $data);
     }
