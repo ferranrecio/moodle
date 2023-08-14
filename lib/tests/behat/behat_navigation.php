@@ -988,6 +988,25 @@ class behat_navigation extends behat_base {
     }
 
     /**
+     * Open a add activity form page.
+     *
+     * @Given I am adding a :activity to section :sectionnum of the :coursefullname course
+     * @Given I am adding an :activity to section :sectionnum of the :coursefullname course
+     * @throws coding_exception
+     * @param string $activity The activity name.
+     * @param int $sectionnum The section number.
+     * @param string $coursefullname The course full name of the course.
+     */
+    public function i_am_adding_activity_to_section_of_the_course(string $activity, string $sectionnum, string $coursefullname): void {
+        $addurl = new moodle_url('/course/modedit.php', [
+            'add' => $activity,
+            'course' => $this->get_course_id($coursefullname),
+            'section' => intval($sectionnum),
+        ]);
+        $this->execute('behat_general::i_visit', [$addurl]);
+    }
+
+    /**
      * Opens the flat navigation drawer if it is not already open
      *
      * @When /^I open flat navigation drawer$/
