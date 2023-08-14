@@ -103,7 +103,7 @@ trait form_trait {
      * @param bool $supportviews True if the module supports views and false otherwise.
      * @param bool $supportgrades True if the module supports grades and false otherwise.
      * @param bool $rating True if the rating feature is enabled and false otherwise.
-     * @param bool $defaultcompletion True if the default completion is enabled and false otherwise. To review in MDL-78531.
+     * @param null $unused This parameter has been deprecated since 4.3 and should not be used anymore.
      * @throws \coding_exception If the form is not moodleform_mod and $modname is null.
      */
     protected function add_completion_elements(
@@ -111,9 +111,12 @@ trait form_trait {
         bool $supportviews = false,
         bool $supportgrades = false,
         bool $rating = false,
-        bool $defaultcompletion = true
+        $unused = null
     ): void {
-        global $CFG;
+
+        if ($unused !== null) {
+            debugging('Deprecated argument passed to ' . __FUNCTION__, DEBUG_DEVELOPER);
+        }
 
         $mform = $this->get_form();
         if ($modname === null) {
@@ -123,7 +126,6 @@ trait form_trait {
                 $supportviews = plugin_supports('mod', $modname, FEATURE_COMPLETION_TRACKS_VIEWS, false);
                 $supportgrades = plugin_supports('mod', $modname, FEATURE_GRADE_HAS_GRADE, false);
                 $rating = $this->_features->rating;
-                $defaultcompletion = $CFG->completiondefault && $this->_features->defaultcompletion;
             } else {
                 throw new \coding_exception('You must specify the modname parameter if you are not using a moodleform_mod.');
             }
@@ -137,15 +139,6 @@ trait form_trait {
         $mform->setType('completionunlocked', PARAM_INT);
 
         $trackingdefault = COMPLETION_TRACKING_NONE;
-        // If system and activity default completion is on, set it.
-        if ($defaultcompletion) {
-            $hasrules = plugin_supports('mod', $modname, FEATURE_COMPLETION_HAS_RULES, true);
-            if ($hasrules || $supportviews) {
-                $trackingdefault = COMPLETION_TRACKING_AUTOMATIC;
-            } else {
-                $trackingdefault = COMPLETION_TRACKING_MANUAL;
-            }
-        }
 
         // Get the sufix to add to the completion elements name.
         $suffix = $this->get_suffix();
