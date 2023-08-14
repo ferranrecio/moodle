@@ -36,9 +36,7 @@ Feature: Allow teachers to edit the default activity completion rules in a cours
     And I should not see "Cancel" in the "[data-region='activitycompletion-forum']" "css_element"
     And I click on "Save changes" "button" in the "[data-region='activitycompletion-assign']" "css_element"
     Then I should see "Changes saved"
-    And I am on "Course 1" course homepage with editing mode on
-    And I press "Add an activity or resource"
-    And I click on "Add a new Assignment" "link" in the "Add an activity or resource" "dialogue"
+    And I am adding an assign to section 0 of the "Course 1" course
     And I expand all fieldsets
     # Completion tracking 2 = Show activity as complete when conditions are met.
     And the field "Completion tracking" matches value "2"
@@ -73,9 +71,7 @@ Feature: Allow teachers to edit the default activity completion rules in a cours
       | completionreplies_forum         | 3                                                 |
     And I click on "Save changes" "button" in the "[data-region='activitycompletion-forum']" "css_element"
     Then I should see "Changes saved"
-    And I am on "Course 1" course homepage with editing mode on
-    And I press "Add an activity or resource"
-    And I click on "Add a new Forum" "link" in the "Add an activity or resource" "dialogue"
+    And I am adding a forum to section 0 of the "Course 1" course
     And I expand all fieldsets
     # Completion tracking 2 = Show activity as complete when conditions are met.
     And the field "Completion tracking" matches value "2"
@@ -111,9 +107,7 @@ Feature: Allow teachers to edit the default activity completion rules in a cours
       | completionentries_glossary         | 2                                                 |
     And I click on "Save changes" "button" in the "[data-region='activitycompletion-glossary']" "css_element"
     Then I should see "Changes saved"
-    And I am on "Course 1" course homepage with editing mode on
-    And I press "Add an activity or resource"
-    And I click on "Add a new Glossary" "link" in the "Add an activity or resource" "dialogue"
+    And I am adding a glossary to section 0 of the "Course 1" course
     And I expand all fieldsets
     # Completion tracking 2 = Show activity as complete when conditions are met.
     And the field "Completion tracking" matches value "2"
