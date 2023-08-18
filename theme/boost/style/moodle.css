@@ -23132,6 +23132,10 @@ button.close:focus:hover,
   color: #008196;
 }
 
+.bg-primary-light {
+  background-color: #f5f9fc;
+}
+
 .fitem.advanced .text-info {
   font-weight: bold;
 }
@@ -26027,18 +26031,12 @@ blockquote {
 
 /* Choice list component. */
 .choicelist {
-  min-width: 300px;
-}
-
-[data-region=fixed-drawer] .choicelist {
   min-width: calc(300px - 25px);
 }
-
-@media (max-width: 575.98px) {
-  .choicelist {
-    min-width: calc(300px - 25px);
-  }
+.choicelist .option-select-indicator .icon {
+  vertical-align: middle;
 }
+
 .icon {
   font-size: 16px;
   width: 16px;
