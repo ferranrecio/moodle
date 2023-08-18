@@ -23144,6 +23144,10 @@ button.close:focus:hover,
   color: #008196;
 }
 
+.bg-primary-light {
+  background-color: #f5f9fc;
+}
+
 .fitem.advanced .text-info {
   font-weight: bold;
 }
@@ -25991,18 +25995,12 @@ blockquote {
 
 /* Choice list component. */
 .choicelist {
-  min-width: 300px;
-}
-
-[data-region=fixed-drawer] .choicelist {
   min-width: calc(300px - 25px);
 }
-
-@media (max-width: 575.98px) {
-  .choicelist {
-    min-width: calc(300px - 25px);
-  }
+.choicelist .option-select-indicator .icon {
+  vertical-align: middle;
 }
+
 .action-menu .dropdown-toggle {
   text-decoration: none;
   display: inline-block;
@@ -26028,9 +26026,6 @@ blockquote {
 .action-menu .dropdown-subpanel-content {
   max-width: 300px;
   box-shadow: 0 0 1rem rgba(0, 0, 0, 0.15);
-}
-.action-menu .dropdown-subpanel-content a:focus {
-  outline: solid #0f6cbf;
 }
 .action-menu .dropdown-subpanel-content.show {
   animation: 0.15s animate-pop;
