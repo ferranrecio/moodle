@@ -18,14 +18,12 @@ Feature: Allow admins to edit the default activity completion rules at site leve
       | name       | Test assignment one  |
       | completion | 1                    |
     And I am on "Course 1" course homepage with editing mode on
-    And I press "Add an activity or resource"
-    When I click on "Add a new Assignment" "link" in the "Add an activity or resource" "dialogue"
+    When I add a "Assignment" to section "0"
     And I expand all fieldsets
     # Completion tracking 0 = Do not indicate activity completion.
     Then the field "Completion tracking" matches value "0"
     # Default values don't affect existing activities.
-    But I am on the "Test assignment one" Activity page
-    And I navigate to "Settings" in current page administration
+    But I am on the "Test assignment one" "assign activity editing" page
     And I expand all fieldsets
     And the field "Completion tracking" matches value "1"
 
@@ -40,16 +38,14 @@ Feature: Allow admins to edit the default activity completion rules at site leve
       | course               | module | completion | completionview | completionusegrade | completionsubmit |
       | Acceptance test site | assign | 2          | 0              | 1                  | 1                |
     And I am on "Course 1" course homepage with editing mode on
-    And I press "Add an activity or resource"
-    When I click on "Add a new Assignment" "link" in the "Add an activity or resource" "dialogue"
+    When I add a "Assignment" to section "0"
     And I expand all fieldsets
     Then the field "Completion tracking" matches value "2"
     And the field "completionview" matches value "0"
     And the field "completionusegrade" matches value "1"
     And the field "completionsubmit" matches value "1"
     # Default values don't affect existing activities.
-    But I am on the "Test assignment one" Activity page
-    And I navigate to "Settings" in current page administration
+    But I am on the "Test assignment one" "assign activity editing" page
     And I expand all fieldsets
     And the field "Completion tracking" matches value "0"
 
@@ -65,15 +61,13 @@ Feature: Allow admins to edit the default activity completion rules at site leve
       | Acceptance test site | assign | 2          | 0              | 1                  | 1                |
       | C1                   | assign | 2          | 1              | 0                  | 1                |
     And I am on "Course 1" course homepage with editing mode on
-    And I press "Add an activity or resource"
-    When I click on "Add a new Assignment" "link" in the "Add an activity or resource" "dialogue"
+    When I add a "Assignment" to section "0"
     And I expand all fieldsets
     Then the field "Completion tracking" matches value "2"
     And the field "completionview" matches value "1"
     And the field "completionusegrade" matches value "0"
     And the field "completionsubmit" matches value "1"
     # Default values don't affect existing activities.
-    But I am on the "Test assignment one" Activity page
-    And I navigate to "Settings" in current page administration
+    But I am on the "Test assignment one" "assign activity editing" page
     And I expand all fieldsets
     And the field "Completion tracking" matches value "0"
