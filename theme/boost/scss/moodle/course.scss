@@ -1387,17 +1387,20 @@ $activity-add-hover: theme-color-level('primary', -10) !default;
         margin-top: map-get($spacers, 2);
         padding: map-get($spacers, 1) map-get($spacers, 3);
         background-color: $gray-200;
+        @include font-size($small-font-size);
         @include border-radius($activity-item-border-radius);
         .editavailability {
             a {
                 @include border-radius(0.5rem);
                 color: $body-color;
                 text-decoration: none;
+                font-weight: bold;
                 &:hover {
                     background-color: $gray-400;
                 }
                 .icon {
                     font-size: inherit;
+                    margin-right: map-get($spacers, 1);
                 }
             }
         }
