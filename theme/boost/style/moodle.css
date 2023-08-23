@@ -29108,8 +29108,14 @@ span.editinstructions .alert-link {
   border-radius: 1rem;
 }
 
+/* Add section */
 .changenumsections {
   border-top: 1px solid #3584c9;
+}
+
+.add-sections .icon {
+  margin-right: 0.25rem;
+  font-size: inherit;
 }
 
 /* Section Expand all/Collapse all */
@@ -29151,18 +29157,21 @@ span.editinstructions .alert-link {
   margin-top: 0.5rem;
   padding: 0.25rem 1rem;
   background-color: #e9ecef;
+  font-size: 0.875em;
   border-radius: 1rem;
 }
 .course-section .availabilityinfo .editavailability a {
   border-radius: 0.5rem;
   color: #1d2125;
   text-decoration: none;
+  font-weight: bold;
 }
 .course-section .availabilityinfo .editavailability a:hover {
   background-color: #ced4da;
 }
 .course-section .availabilityinfo .editavailability a .icon {
   font-size: inherit;
+  margin-right: 0.25rem;
 }
 .course-section.section-summary {
   padding-left: 1rem;

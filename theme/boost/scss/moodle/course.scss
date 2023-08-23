@@ -1324,8 +1324,17 @@ $activity-add-hover: theme-color-level('primary', -10) !default;
     @include border-radius($activity-item-border-radius);
 }
 
+/* Add section */
+
 .changenumsections {
     border-top: $border-width solid $primary-light-border;
+}
+
+.add-sections {
+    .icon {
+        margin-right: map-get($spacers, 1);
+        font-size: inherit;
+    }
 }
 
 /* Section Expand all/Collapse all */
