@@ -84,7 +84,7 @@ class core_course_bulk_activity_completion_renderer extends plugin_renderer_base
                 $modform = $form;
                 if (empty($form) || !in_array($module->id, array_keys($modules))) {
                     $modform = new \core_completion_defaultedit_form(null, [
-                        'course' => $course,
+                        'course' => $course->id,
                         'modules' => [
                             $module->id => $module,
                         ],

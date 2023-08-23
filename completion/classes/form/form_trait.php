@@ -96,6 +96,23 @@ trait form_trait {
     }
 
     /**
+     * Get the course associated to this class.
+     * This method must be overriden by the class using this trait if it doesn't include a _course property.
+     *
+     * @return \stdClass Course object.
+     * @throws \coding_exception If the class does not have a _course property.
+     */
+    protected function get_course(): \stdClass {
+        if (property_exists($this, '_course')) {
+            return $this->_course;
+        }
+
+        throw new \coding_exception(
+            'This class does not have a _course property. Please, add it or override the get_course() method.'
+        );
+    }
+
+    /**
      * Add completion elements to the form.
      *
      * @param string|null $modname The module name (for example, 'assign'). If null and form is moodleform_mod, the parameters are
@@ -103,7 +120,7 @@ trait form_trait {
      * @param bool $supportviews True if the module supports views and false otherwise.
      * @param bool $supportgrades True if the module supports grades and false otherwise.
      * @param bool $rating True if the rating feature is enabled and false otherwise.
-     * @param bool $defaultcompletion True if the default completion is enabled and false otherwise. To review in MDL-78531.
+     * @param null $unused This parameter has been deprecated since 4.3 and should not be used anymore.
      * @throws \coding_exception If the form is not moodleform_mod and $modname is null.
      */
     protected function add_completion_elements(
@@ -111,9 +128,13 @@ trait form_trait {
         bool $supportviews = false,
         bool $supportgrades = false,
         bool $rating = false,
-        bool $defaultcompletion = true
+        $unused = null
     ): void {
-        global $CFG;
+        global $SITE;
+
+        if ($unused !== null) {
+            debugging('Deprecated argument passed to ' . __FUNCTION__, DEBUG_DEVELOPER);
+        }
 
         $mform = $this->get_form();
         if ($modname === null) {
@@ -123,7 +144,6 @@ trait form_trait {
                 $supportviews = plugin_supports('mod', $modname, FEATURE_COMPLETION_TRACKS_VIEWS, false);
                 $supportgrades = plugin_supports('mod', $modname, FEATURE_GRADE_HAS_GRADE, false);
                 $rating = $this->_features->rating;
-                $defaultcompletion = $CFG->completiondefault && $this->_features->defaultcompletion;
             } else {
                 throw new \coding_exception('You must specify the modname parameter if you are not using a moodleform_mod.');
             }
@@ -137,15 +157,6 @@ trait form_trait {
         $mform->setType('completionunlocked', PARAM_INT);
 
         $trackingdefault = COMPLETION_TRACKING_NONE;
-        // If system and activity default completion is on, set it.
-        if ($defaultcompletion) {
-            $hasrules = plugin_supports('mod', $modname, FEATURE_COMPLETION_HAS_RULES, true);
-            if ($hasrules || $supportviews) {
-                $trackingdefault = COMPLETION_TRACKING_AUTOMATIC;
-            } else {
-                $trackingdefault = COMPLETION_TRACKING_MANUAL;
-            }
-        }
 
         // Get the sufix to add to the completion elements name.
         $suffix = $this->get_suffix();
@@ -204,12 +215,15 @@ trait form_trait {
         }
 
         // Completion expected at particular date? (For progress tracking).
-        $completionexpectedel = 'completionexpected' . $suffix;
-        $mform->addElement('date_time_selector', $completionexpectedel, get_string('completionexpected', 'completion'),
+        // We don't show completion expected at site level default completion.
+        if ($this->get_course()->id != $SITE->id) {
+            $completionexpectedel = 'completionexpected' . $suffix;
+            $mform->addElement('date_time_selector', $completionexpectedel, get_string('completionexpected', 'completion'),
                 ['optional' => true]);
-        $a = get_string('pluginname', $modname);
-        $mform->addHelpButton($completionexpectedel, 'completionexpected', 'completion', '', false, $a);
-        $mform->hideIf($completionexpectedel, 'completion', 'eq', COMPLETION_TRACKING_NONE);
+            $a = get_string('pluginname', $modname);
+            $mform->addHelpButton($completionexpectedel, 'completionexpected', 'completion', '', false, $a);
+            $mform->hideIf($completionexpectedel, 'completion', 'eq', COMPLETION_TRACKING_NONE);
+        }
     }
 
     /**
@@ -356,16 +370,19 @@ trait form_trait {
      * It should be called from the definition_after_data() to setup the completion settings in the form.
      */
     protected function definition_after_data_completion(): void {
-        global $COURSE;
+        global $COURSE, $SITE;
         $mform = $this->get_form();
 
         $completion = new \completion_info($COURSE);
-        if ($completion->is_enabled()) {
+        // We use $SITE course for site default activity completion,
+        // so users could set default values regardless of whether completion is enabled or not.".
+        if ($completion->is_enabled() || $COURSE->id == $SITE->id) {
             $suffix = $this->get_suffix();
 
             // If anybody has completed the activity, these options will be 'locked'.
             $cm = $this->get_cm();
-            $completedcount = empty($cm) ? 0 : $completion->count_user_data($cm);
+            // We use $SITE course for site default activity completion, so we don't need any unlock button.
+            $completedcount = (empty($cm) || $COURSE->id == $SITE->id) ? 0 : $completion->count_user_data($cm);
             $freeze = false;
             if (!$completedcount) {
                 // The unlock buttons don't need suffix because they are only displayed in the module settings page.
@@ -374,7 +391,9 @@ trait form_trait {
                 }
                 // Automatically set to unlocked. Note: this is necessary in order to make it recalculate completion once
                 // the option is changed, maybe someone has completed it now.
-                $mform->getElement('completionunlocked')->setValue(1);
+                if ($mform->elementExists('completionunlocked')) {
+                    $mform->getElement('completionunlocked')->setValue(1);
+                }
             } else {
                 // Has the element been unlocked, either by the button being pressed in this request, or the field already
                 // being set from a previous one?

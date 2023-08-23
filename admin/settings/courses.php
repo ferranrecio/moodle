@@ -265,6 +265,12 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
 
     $ADMIN->add('coursedefaultsettings', $temp);
     $ADMIN->add('coursedefaultsettings', new admin_externalpage(
+        'sitedefaultcompletion',
+        new lang_string('defaultcompletion', 'completion'),
+        new moodle_url('/course/sitedefaultcompletion.php'),
+        ['moodle/course:manageactivities'])
+    );
+    $ADMIN->add('coursedefaultsettings', new admin_externalpage(
         'course_customfield',
         new lang_string('course_customfield', 'admin'),
         $CFG->wwwroot . '/course/customfield.php',
