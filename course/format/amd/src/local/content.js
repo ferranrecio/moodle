@@ -527,13 +527,13 @@ export default class Component extends BaseComponent {
         if (debouncedReload) {
             return debouncedReload;
         }
-        const pendingReload = new Pending(pendingKey);
         const reload = () => {
+            const pendingReload = new Pending(pendingKey);
             this.debouncedReloads.delete(pendingKey);
             const cmitem = this.getElement(this.selectors.CM, cmId);
             if (!cmitem) {
                 pendingReload.resolve();
-                return;
+                return pendingReload;
             }
             const promise = Fragment.loadFragment(
                 'core_courseformat',
@@ -558,12 +558,13 @@ export default class Component extends BaseComponent {
             }).catch(() => {
                 pendingReload.resolve();
             });
+            return pendingReload;
         };
         debouncedReload = debounce(
             reload,
             200,
             {
-                cancel: true, pending: pendingReload
+                cancel: true, pending: true
             }
         );
         this.debouncedReloads.set(pendingKey, debouncedReload);
