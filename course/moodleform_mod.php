@@ -21,6 +21,7 @@ require_once($CFG->libdir.'/gradelib.php');
 require_once($CFG->libdir.'/plagiarismlib.php');
 
 use core_grades\component_gradeitems;
+use core\output\choicelist;
 
 /**
  * This class adds extra methods to form wrapper specific to be used for module add / update forms
@@ -579,11 +580,7 @@ abstract class moodleform_mod extends moodleform {
         }
 
         if ($this->_features->groups) {
-            $options = array(NOGROUPS       => get_string('groupsnone'),
-                             SEPARATEGROUPS => get_string('groupsseparate'),
-                             VISIBLEGROUPS  => get_string('groupsvisible'));
-            $mform->addElement('select', 'groupmode', get_string('groupmode', 'group'), $options, NOGROUPS);
-            $mform->addHelpButton('groupmode', 'groupmode', 'group');
+            $this->add_groupmode_field($mform);
         }
 
         if ($this->_features->groupings) {
@@ -675,6 +672,40 @@ abstract class moodleform_mod extends moodleform {
         $this->standard_hidden_coursemodule_elements();
 
         $this->plugin_extend_coursemodule_standard_elements();
+    }
+
+    /**
+     * Adds the group mode field to the form.
+     * @param MoodleQuickForm $mform
+     */
+    protected function add_groupmode_field($mform) {
+        $choice = new choicelist();
+        $choice->add_option(
+            NOGROUPS,
+            get_string('groupsnone', 'group'),
+            [
+                'icon' => new pix_icon('i/groupn', ''),
+            ]
+        );
+        $choice->add_option(
+            SEPARATEGROUPS,
+            get_string('groupsseparate', 'group'),
+            [
+                'description' => get_string("groupmode_groupsseparate_help", 'group'),
+                'icon' => new pix_icon('i/groups', ''),
+            ]
+        );
+        $choice->add_option(
+            VISIBLEGROUPS,
+            get_string('groupsvisible', 'group'),
+            [
+                'description' => get_string("groupmode_groupsvisible_help", 'group'),
+                'icon' => new pix_icon('i/groupv', ''),
+            ]
+        );
+        $choice->set_selected_value(NOGROUPS);
+        $mform->addElement('choicedropdown', 'groupmode', get_string('groupmode', 'group'), $choice);
+        $mform->addHelpButton('groupmode', 'groupmode', 'group');
     }
 
     /**

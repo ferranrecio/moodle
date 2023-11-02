@@ -6,6 +6,8 @@ require_once($CFG->libdir.'/formslib.php');
 require_once($CFG->libdir.'/completionlib.php');
 require_once($CFG->libdir . '/pdflib.php');
 
+use core\output\choicelist;
+
 /**
  * The form for handling editing a course.
  */
@@ -371,13 +373,7 @@ class course_edit_form extends moodleform {
 
         $mform->addElement('header','groups', get_string('groupsettingsheader', 'group'));
 
-        $choices = array();
-        $choices[NOGROUPS] = get_string('groupsnone', 'group');
-        $choices[SEPARATEGROUPS] = get_string('groupsseparate', 'group');
-        $choices[VISIBLEGROUPS] = get_string('groupsvisible', 'group');
-        $mform->addElement('select', 'groupmode', get_string('groupmode', 'group'), $choices);
-        $mform->addHelpButton('groupmode', 'groupmode', 'group');
-        $mform->setDefault('groupmode', $courseconfig->groupmode);
+        $this->add_groupmode_field($mform, $courseconfig);
 
         $mform->addElement('selectyesno', 'groupmodeforce', get_string('groupmodeforce', 'group'));
         $mform->addHelpButton('groupmodeforce', 'groupmodeforce', 'group');
@@ -420,6 +416,41 @@ class course_edit_form extends moodleform {
         $handler->instance_form_before_set_data($course);
         // Finally set the current form data
         $this->set_data($course);
+    }
+
+    /**
+     * Adds the group mode field to the form.
+     * @param MoodleQuickForm $mform
+     * @param stdClass $courseconfig the default course configuration
+     */
+    protected function add_groupmode_field($mform, $courseconfig) {
+        $choice = new choicelist();
+        $choice->add_option(
+            NOGROUPS,
+            get_string('groupsnone', 'group'),
+            [
+                'icon' => new pix_icon('i/groupn', ''),
+            ]
+        );
+        $choice->add_option(
+            SEPARATEGROUPS,
+            get_string('groupsseparate', 'group'),
+            [
+                'description' => get_string("groupmode_groupsseparate_help", 'group'),
+                'icon' => new pix_icon('i/groups', ''),
+            ]
+        );
+        $choice->add_option(
+            VISIBLEGROUPS,
+            get_string('groupsvisible', 'group'),
+            [
+                'description' => get_string("groupmode_groupsvisible_help", 'group'),
+                'icon' => new pix_icon('i/groupv', ''),
+            ]
+        );
+        $choice->set_selected_value($courseconfig->groupmode);
+        $mform->addElement('choicedropdown', 'groupmode', get_string('groupmode', 'group'), $choice);
+        $mform->addHelpButton('groupmode', 'groupmode', 'group');
     }
 
     /**
