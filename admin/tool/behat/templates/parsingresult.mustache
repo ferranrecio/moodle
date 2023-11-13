@@ -22,22 +22,23 @@
     Example context (json):
     {
         "isvalid": true,
-        "generalerror": "Some general error",
+        "generalerror": "Error message",
         "haslines": true,
-        "lines": [
+        "scenarios": [
             {
-                "text": "Some text",
-                "hasarguments": true,
-                "arguments": "Some arguments",
-                "isvalid": true,
-                "error": "Some error",
-                "isexecuted": true,
-            },
-            {
-                "text": "Some text",
-                "isvalid": false,
-                "error": "Some error",
-                "isexecuted": false,
+                "type": "Scenario",
+                "title": "Scenario title",
+                "hassteps": true,
+                "steps": [
+                    {
+                        "text": "Step text",
+                        "isvalid": true,
+                        "isexecuted": true,
+                        "hasarguments": true,
+                        "arguments": "Argument text",
+                        "error": "Error message"
+                    }
+                ]
             }
         ]
     }
@@ -51,36 +52,49 @@
 {{#haslines}}
     <p>{{#str}} runner_steps, tool_behat {{/str}}</p>
 {{/haslines}}
-<ul class="list-group mb-3">
-{{#lines}}
-    <li class="list-group-item">
-        <div>
-            {{text}}
-            {{^isvalid}}
-            <span class="badge badge-pill badge-danger">
-                <span class="fa fa-times"></span>
-                {{#str}} error {{/str}}
-            </span>
-            {{/isvalid}}
-            {{#isvalid}}
-                {{#isexecuted}}
-                <span class="badge badge-pill badge-success">
-                    <span class="fa fa-check "></span>
-                    {{#str}} success {{/str}}
+{{#scenarios}}
+<h3>{{type}}: {{name}}</h3>
+<div>
+    {{^hassteps}}
+    <div class="alert alert-info mb-3" role="alert">
+        <span class="fa fa-info-circle"></span>
+        {{#str}} runner_scenatio_nosteps, tool_behat {{/str}}
+    </div>
+    {{/hassteps}}
+    {{#hassteps}}
+    <ul class="list-group mb-3">
+        {{#steps}}
+        <li class="list-group-item">
+            <div>
+                {{text}}
+                {{^isvalid}}
+                <span class="badge badge-pill badge-danger">
+                    <span class="fa fa-times"></span>
+                    {{#str}} error {{/str}}
                 </span>
-                {{/isexecuted}}
+                {{/isvalid}}
+                {{#isvalid}}
+                    {{#isexecuted}}
+                    <span class="badge badge-pill badge-success">
+                        <span class="fa fa-check "></span>
+                        {{#str}} success {{/str}}
+                    </span>
+                    {{/isexecuted}}
+                {{/isvalid}}
+            </div>
+            {{#hasarguments}}
+            <div class="alert alert-info mb-0 mt-2" role="alert" style="overflow: auto;">
+                <pre class="mb-0">{{arguments}}</pre>
+            </div>
+            {{/hasarguments}}
+            {{^isvalid}}
+            <div class="alert alert-danger mb-0 mt-2" role="alert" style="overflow: auto;">
+                {{error}}
+            </div>
             {{/isvalid}}
-        </div>
-        {{#hasarguments}}
-        <div class="alert alert-info mb-0 mt-2" role="alert" style="overflow: auto;">
-            <pre class="mb-0">{{arguments}}</pre>
-        </div>
-        {{/hasarguments}}
-        {{^isvalid}}
-        <div class="alert alert-danger mb-0 mt-2" role="alert" style="overflow: auto;">
-            {{error}}
-        </div>
-        {{/isvalid}}
-    </li>
-{{/lines}}
-</ul>
+        </li>
+        {{/steps}}
+    </ul>
+    {{/hassteps}}
+</div>
+{{/scenarios}}

@@ -18,7 +18,7 @@
  * Web interface to list and filter steps
  *
  * @package    tool_behat
- * @copyright  2012 David Monllaó
+ * @copyright  2023 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -63,9 +63,6 @@ if (!$mform->is_cancelled()) {
     $data = $mform->get_data();
 };
 
-// For now all behat scenarios steps are executen, even the background ones. However, it will
-// be great if, in the future, we can select which scenarios to execute.
-
 if (empty($data)) {
     $mform->display();
     echo $OUTPUT->footer();
@@ -91,11 +88,7 @@ try {
     die;
 }
 
-if ($parsedfeature->is_valid()) {
-    foreach ($parsedfeature as $step) {
-        $step->execute();
-    }
-}
+$runner->execute($parsedfeature);
 
 echo $output->render(new parsingresult($parsedfeature));
 echo $output->continue_button($currenturl);

@@ -18,7 +18,7 @@
  * Run a test scenario generator feature file.
  *
  * @package    tool_behat
- * @copyright  2014 NetSpot Pty Ltd
+ * @copyright  2023 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -119,7 +119,7 @@ if (!$parsedfeature->is_valid()) {
 $total = 0;
 $success = 0;
 
-foreach ($parsedfeature as $step) {
+foreach ($parsedfeature->get_all_steps() as $step) {
     if($step->execute()) {
         echo "\nOK: {$step->get_text()}\n";
         echo "{$step->get_arguments_string()}\n";

@@ -17,7 +17,6 @@
 namespace tool_behat\local;
 
 use stdClass;
-use Iterator;
 
 /**
  * Class with a scenario feature parsed.
@@ -26,15 +25,21 @@ use Iterator;
  * @copyright  2023 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class parsedfeature implements Iterator {
-    /** @var stdClass[] each line information. */
-    private array $lines = [];
+class parsedfeature {
+    /** @var int the number of steps. */
+    private int $stepcount = 0;
 
     /** @var bool if the parser is ok or fail. */
     private bool $isvalid = true;
 
     /** @var int the current line. */
     private int $currentline = 0;
+
+    /** @var stdClass[] the list of scenarios with all the steps.
+     *
+     * scenarionum => {type: string, title: string, steps: steprunner[]}.
+     */
+    private array $scenarios = [];
 
     /**
      * Get the general error, if any.
@@ -44,7 +49,7 @@ class parsedfeature implements Iterator {
         if (!$this->isvalid) {
             return get_string('runner_invalidfile', 'tool_behat');
         }
-        if (empty($this->lines)) {
+        if ($this->stepcount == 0) {
             return get_string('runner_nosteps', 'tool_behat');
         }
         return '';
@@ -55,37 +60,57 @@ class parsedfeature implements Iterator {
      * @return bool
      */
     public function is_valid(): bool {
-        return $this->isvalid && count($this->lines) > 0;
+        return $this->isvalid && $this->stepcount > 0;
     }
 
     /**
-     * Add a line to the parsed feature.
+     * Add a line to the current scenario.
      * @param steprunner $step the step to add.
      */
-    public function add_line(steprunner $step) {
-        $this->lines[] = $step;
+    public function add_step(steprunner $step) {
+        if (empty($this->scenarios)) {
+            $this->add_scenario('scenario', null);
+        }
+        $currentscenario = count($this->scenarios) - 1;
+        $this->scenarios[$currentscenario]->steps[] = $step;
+        $this->stepcount++;
         if (!$step->is_valid()) {
             $this->isvalid = false;
         }
     }
 
-    public function rewind(): void {
-        $this->currentline = 0;
+    /**
+     * Insert a new scenario.
+     * @param string $type the type of the scenario.
+     * @param string|null $name the name of the scenario.
+     */
+    public function add_scenario(string $type, ?string $name) {
+        $this->scenarios[] = (object) [
+            'type' => $type,
+            'name' => $name ?? '',
+            'steps' => [],
+        ];
     }
 
-    public function valid(): bool {
-        return $this->currentline < count($this->lines);
+    /**
+     * Get the list of scenarios.
+     * @return stdClass[] array of scenarionum => {type: string, title: string, steps: steprunner[]}
+     */
+    public function get_scenarios(): array {
+        return $this->scenarios;
     }
 
-    public function key(): int {
-        return $this->currentline;
-    }
-
-    public function current(): steprunner {
-        return $this->lines[$this->currentline];
-    }
-
-    public function next(): void {
-        $this->currentline++;
+    /**
+     * Get all the steps form all scenarios.
+     * @return steprunner[]
+     */
+    public function get_all_steps(): array {
+        $result = [];
+        foreach ($this->scenarios as $scenario) {
+            foreach ($scenario->steps as $step) {
+                $result[] = $step;
+            }
+        }
+        return $result;
     }
 }

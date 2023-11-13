@@ -144,6 +144,10 @@ class steprunner {
         return $this->error;
     }
 
+    /**
+     * Return the step arguments as string.
+     * @return string
+     */
     public function get_arguments_string(): string {
         $result = '';
         foreach ($this->stepNode->getArguments() as $argument) {
@@ -176,7 +180,6 @@ class steprunner {
         $elementmatches = [];
         preg_match_all('/:([^ ]+)/', $pattern, $elementmatches, PREG_SET_ORDER, 0);
 
-        // $pattern = preg_quote($pattern, '/');
         $pattern = preg_replace('/:([^ ]+)/', '(?P<$1>"[^"]+"|[^" ]+)', $pattern);
         $pattern = '/^' . $pattern . '$/';
         $result = preg_match($pattern, $text, $internalmatcher);

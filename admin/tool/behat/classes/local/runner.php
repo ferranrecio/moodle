@@ -20,7 +20,6 @@ use behat_data_generators;
 use Behat\Gherkin\Parser;
 use Behat\Gherkin\Lexer;
 use Behat\Gherkin\Keywords\ArrayKeywords;
-use Behat\Gherkin\Node\FeatureNode;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -119,20 +118,16 @@ class runner {
         $parser = $this->get_parser();
         $feature = $parser->parse($content);
 
-        if ($feature->hasBackground()) {
-            $background = $feature->getBackground();
-            $steps = $background->getSteps();
-            foreach ($steps as $step) {
-                $result->add_line(new steprunner($this->generator, $this->validsteps, $step));
-            }
-        }
-
+        // No need for background in testing scenarios because scenarios can only contain generators.
+        // In the future the background can be used to define clean up steps (when clean up methods
+        // are implemented).
         if ($feature->hasScenarios()) {
             $scenarios = $feature->getScenarios();
             foreach ($scenarios as $scenario) {
+                $result->add_scenario($scenario->getNodeType(), $scenario->getTitle());
                 $steps = $scenario->getSteps();
                 foreach ($steps as $step) {
-                    $result->add_line(new steprunner($this->generator, $this->validsteps, $step));
+                    $result->add_step(new steprunner($this->generator, $this->validsteps, $step));
                 }
             }
         }
@@ -147,6 +142,7 @@ class runner {
         $keywords = new ArrayKeywords(array(
             'en' => array(
                 'feature' => 'Feature',
+                // If in the future we have clean up steps, background will be renamed to "Clean up".
                 'background' => 'Background',
                 'scenario' => 'Scenario',
                 'scenario_outline' => 'Scenario Outline|Scenario Template',
@@ -161,5 +157,22 @@ class runner {
         $lexer = new Lexer($keywords);
         $parser = new Parser($lexer);
         return $parser;
+    }
+
+    /**
+     * Execute a parsed feature.
+     * @param parsedfeature $parsedfeature the parsed feature to execute.
+     * @return bool true if all steps were executed successfully.
+     */
+    public function execute(parsedfeature $parsedfeature): bool {
+        if (!$parsedfeature->is_valid()) {
+            return false;
+        }
+        $result = true;
+        $steps = $parsedfeature->get_all_steps();
+        foreach ($steps as $step) {
+            $result = $step->execute() && $result;
+        }
+        return $result;
     }
 }

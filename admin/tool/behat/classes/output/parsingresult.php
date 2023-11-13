@@ -50,23 +50,36 @@ class parsingresult implements renderable, templatable {
      */
     public function export_for_template(renderer_base $output): array {
         $data = [
-            'lines' => [],
+            'scenarios' => [],
             'isvalid' => $this->parsedfeature->is_valid(),
             'generalerror' => $this->parsedfeature->get_general_error(),
         ];
-        foreach ($this->parsedfeature as $line) {
-            $linearguments = $line->get_arguments_string();
-            $data['lines'][] = [
-                'text' => $line->get_text(),
-                'arguments' => $linearguments,
-                'hasarguments' => !empty($linearguments),
-                'isvalid' => $line->is_valid(),
-                'error' => $line->get_error(),
-                'isexecuted' => $line->is_executed(),
+        $haslines = false;
+        foreach ($this->parsedfeature->get_scenarios() as $scenario) {
+            $scenariodata = [
+                'type' => $scenario->type,
+                'name' => $scenario->name,
+                'steps' => [],
             ];
-
+            foreach ($scenario->steps as $step) {
+                $scenariodata['steps'][] = [
+                    'text' => $step->get_text(),
+                    'arguments' => $step->get_arguments_string(),
+                    'hasarguments' => !empty($step->get_arguments_string()),
+                    'isvalid' => $step->is_valid(),
+                    'error' => $step->get_error(),
+                    'isexecuted' => $step->is_executed(),
+                ];
+                $haslines = true;
+            }
+            if (!empty($scenariodata['steps'])) {
+                $scenariodata['hassteps'] = true;
+            }
+            $data['scenarios'][] = $scenariodata;
         }
-        $data['haslines'] = !empty($data['lines']);
+        if ($haslines) {
+            $data['haslines'] = $haslines;
+        }
         return $data;
     }
 }
