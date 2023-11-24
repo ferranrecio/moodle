@@ -360,61 +360,82 @@ class helper {
      * @param \core_course_list_element $course
      * @return array
      */
-    public static function get_course_listitem_actions(\core_course_category $category, \core_course_list_element $course) {
+    public static function get_course_listitem_actions(
+        \core_course_category $category,
+        \core_course_list_element $course,
+    ) {
+        global $PAGE;
+
         $baseurl = new \moodle_url(
             '/course/management.php',
             array('courseid' => $course->id, 'categoryid' => $course->category, 'sesskey' => \sesskey())
         );
         $actions = array();
+        // View course details.
+        $actions[] = [
+            'url' => new \moodle_url($PAGE->url, ['courseid' => $course->id]),
+            'icon' => new \pix_icon('t/viewdetails', ''),
+            'attributes' => ['class' => 'action-details'],
+            'text' => get_string('details'),
+        ];
         // Edit.
         if ($course->can_edit()) {
-            $actions[] = array(
+            $actions[] = [
                 'url' => new \moodle_url('/course/edit.php', array('id' => $course->id, 'returnto' => 'catmanage')),
-                'icon' => new \pix_icon('t/edit', \get_string('edit')),
-                'attributes' => array('class' => 'action-edit')
-            );
+                'icon' => new \pix_icon('t/edit', ''),
+                'attributes' => ['class' => 'action-edit'],
+                'text' => get_string('edit'),
+            ];
         }
         // Copy.
         if (self::can_copy_course($course->id)) {
-            $actions[] = array(
+            $actions[] = [
                 'url' => new \moodle_url('/backup/copy.php', array('id' => $course->id, 'returnto' => 'catmanage')),
-                'icon' => new \pix_icon('t/copy', \get_string('copycourse')),
-                'attributes' => array('class' => 'action-copy')
-            );
+                'icon' => new \pix_icon('t/copy', ''),
+                'attributes' => ['class' => 'action-copy'],
+                'text' => get_string('copycourse'),
+            ];
         }
         // Delete.
         if ($course->can_delete()) {
-            $actions[] = array(
+            $actions[] = [
                 'url' => new \moodle_url('/course/delete.php', array('id' => $course->id)),
-                'icon' => new \pix_icon('t/delete', \get_string('delete')),
-                'attributes' => array('class' => 'action-delete')
-            );
+                'icon' => new \pix_icon('t/delete', ''),
+                'attributes' => ['class' => 'action-delete'],
+                'text' => get_string('delete'),
+            ];
         }
         // Show/Hide.
         if ($course->can_change_visibility()) {
-            $actions[] = array(
+            $actions[] = [
                 'url' => new \moodle_url($baseurl, array('action' => 'hidecourse')),
-                'icon' => new \pix_icon('t/hide', \get_string('hide')),
-                'attributes' => array('data-action' => 'hide', 'class' => 'action-hide')
-            );
-            $actions[] = array(
+                'icon' => new \pix_icon('t/hide', ''),
+                'attributes' => ['data-action' => 'hide', 'class' => 'action-hide'],
+                'text' => get_string('hide'),
+            ];
+            $actions[] = [
                 'url' => new \moodle_url($baseurl, array('action' => 'showcourse')),
-                'icon' => new \pix_icon('t/show', \get_string('show')),
-                'attributes' => array('data-action' => 'show', 'class' => 'action-show')
-            );
+                'icon' => new \pix_icon('t/show', ''),
+                'attributes' => ['data-action' => 'show', 'class' => 'action-show'],
+                'text' => get_string('show'),
+            ];
         }
         // Move up/down.
         if ($category->can_resort_courses()) {
-            $actions[] = array(
+            $actions[] = [
                 'url' => new \moodle_url($baseurl, array('action' => 'movecourseup')),
-                'icon' => new \pix_icon('t/up', \get_string('moveup')),
-                'attributes' => array('data-action' => 'moveup', 'class' => 'action-moveup')
-            );
-            $actions[] = array(
+                'icon' => new \pix_icon('t/up', ''),
+                'attributes' => ['data-action' => 'moveup', 'class' => 'action-moveup'],
+                'text' => get_string('moveup'),
+                'primary' => true,
+            ];
+            $actions[] = [
                 'url' => new \moodle_url($baseurl, array('action' => 'movecoursedown')),
-                'icon' => new \pix_icon('t/down', \get_string('movedown')),
-                'attributes' => array('data-action' => 'movedown', 'class' => 'action-movedown')
-            );
+                'icon' => new \pix_icon('t/down', ''),
+                'attributes' => ['data-action' => 'movedown', 'class' => 'action-movedown'],
+                'text' => get_string('movedown'),
+                'primary' => true,
+            ];
         }
         return $actions;
     }

@@ -1,5 +1,5 @@
 @core @core_course
-Feature: Test we can both create and delete a course.
+Feature: Test we can both create and delete a course
   As a Moodle admin
   I need to test I can create a course
   I need to test I can delete a course
@@ -84,7 +84,7 @@ Feature: Test we can both create and delete a course.
     And I should see "Cat 1" in the "#category-listing" "css_element"
     And I should see "Test course: create a course" in the "#course-listing" "css_element"
     And I should see "Test course 2: create another course" in the "#course-listing" "css_element"
-    And I click on course "Test course: create a course" in the management interface
+    And I click on "details" action for "Test course: create a course" in management course listing
     # Redirect
     And I should see the "Course categories and courses" management page with a course selected
     And I should see "Cat 1" in the "#category-listing" "css_element"

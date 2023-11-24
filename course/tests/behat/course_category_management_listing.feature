@@ -61,7 +61,7 @@ Feature: Course category management interface performs as expected
     And I should see the "Courses" management page
     And I should see "Cat 1" in the "#course-listing h3" "css_element"
     And I should see "Course 1" in the "#course-listing" "css_element"
-    And I click on course "Course 1" in the management interface
+    And I click on "details" action for "Course 1" in management course listing
     And a new page should have loaded since I started watching
     And I should see the "Courses" management page with a course selected
     And I should see "Cat 1" in the "#course-listing h3" "css_element"

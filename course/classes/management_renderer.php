@@ -637,7 +637,7 @@ class core_course_management_renderer extends plugin_renderer_base {
             $checkboxclass = 'd-none';
         }
 
-        $viewcourseurl = new moodle_url($this->page->url, array('courseid' => $course->id));
+        $viewcourseurl = new moodle_url('/course/view.php', ['id' => $course->id]);
 
         $html  = html_writer::start_tag('li', $attributes);
         $html .= html_writer::start_div('d-flex flex-wrap');
@@ -659,9 +659,9 @@ class core_course_management_renderer extends plugin_renderer_base {
         $html .= html_writer::link(
             $viewcourseurl, $text, array('class' => 'text-break col pl-0 mb-2 coursename aalink')
         );
-        $html .= html_writer::start_div('flex-shrink-0 ml-auto');
+        $html .= html_writer::start_div('d-flex flex-shrink-0 ml-auto');
         if ($course->idnumber) {
-            $html .= html_writer::tag('span', s($course->idnumber), array('class' => 'text-muted idnumber'));
+            $html .= html_writer::tag('div', s($course->idnumber), ['class' => 'text-muted idnumber']);
         }
         $html .= $this->course_listitem_actions($category, $course);
         $html .= html_writer::end_div();
@@ -763,12 +763,31 @@ class core_course_management_renderer extends plugin_renderer_base {
         if (empty($actions)) {
             return '';
         }
-        $actionshtml = array();
+
+        $actionsmenu = new action_menu();
+
         foreach ($actions as $action) {
-            $action['attributes']['role'] = 'button';
-            $actionshtml[] = $this->output->action_icon($action['url'], $action['icon'], null, $action['attributes']);
+            if (!empty($action['primary'])) {
+                $actionsmenu->add(new action_menu_link_primary(
+                    $action['url'],
+                    $action['icon'],
+                    $action['text'],
+                    $action['attributes']
+                ));
+            } else {
+                $actionsmenu->add(new action_menu_link_secondary(
+                    $action['url'],
+                    $action['icon'],
+                    $action['text'],
+                    $action['attributes']
+                ));
+            }
         }
-        return html_writer::span(join('', $actionshtml), 'course-item-actions item-actions mr-0');
+        return html_writer::tag(
+            'div',
+            $this->render($actionsmenu),
+            ['class' => 'course-item-actions item-actions']
+        );
     }
 
     /**

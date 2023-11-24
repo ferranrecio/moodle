@@ -1621,6 +1621,7 @@ class behat_course extends behat_base {
      */
     public function i_toggle_visibility_of_course_in_management_listing($idnumber) {
         $id = $this->get_course_id($idnumber);
+        $this->execute("behat_action_menu::i_open_the_action_menu_in", [$idnumber, 'list_item']);
         $selector = sprintf('#course-listing .listitem-course[data-id="%d"][data-visible]', $id);
         $node = $this->find('css', $selector);
         $exception = new ExpectationException('Course listing "' . $idnumber . '" does not contain a show or hide toggle.', $this->getSession());
