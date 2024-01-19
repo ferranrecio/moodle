@@ -60,7 +60,9 @@ export default class Component extends BaseComponent {
             // Formats can override the activity tag but a default one is needed to create new elements.
             ACTIVITYTAG: 'li',
             SECTIONTAG: 'li',
-            CM_NAME_FOR: `[data-cm-name-for]`,
+        };
+        this.selectorGenerators = {
+            cmNameFor: (id) => `[data-cm-name-for='${id}']`,
         };
         // Default classes to toggle on refresh.
         this.classes = {
@@ -256,7 +258,9 @@ export default class Component extends BaseComponent {
     _refreshCmName({element}) {
         // Update classes.
         // Replace the text content of the cm name.
-        const allCmNamesFor = this.getElements(this.selectors.CM_NAME_FOR);
+        const allCmNamesFor = this.getElements(
+            this.selectorGenerators.cmNameFor(element.id)
+        );
         allCmNamesFor.forEach((cmNameFor) => {
             cmNameFor.textContent = element.name;
         });
