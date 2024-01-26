@@ -158,11 +158,13 @@ class player {
      * @param bool $preventredirect Set to true in scripts that can not redirect (CLI, RSS feeds, etc.), throws exceptions
      * @param string $component optional moodle component to sent xAPI tracking
      * @param bool $displayedit Whether the edit button should be displayed below the H5P content.
+     * @param int|null $attempts Number of attempts for this H5P content or null if this information shouldn't be displayed.
+     * @param int|null $instanceid The instance id of the H5P activity.
      *
      * @return string The embedable code to display a H5P file.
      */
     public static function display(string $url, \stdClass $config, bool $preventredirect = true,
-            string $component = '', bool $displayedit = false): string {
+            string $component = '', bool $displayedit = false, ?int $attempts = null, ?int $instanceid = null): string {
         global $OUTPUT, $CFG;
 
         $params = [
@@ -190,6 +192,14 @@ class player {
                     $template->editurl = $CFG->wwwroot . '/h5p/edit.php?url=' . $url;
                 }
             }
+        }
+        if ($attempts !== null) {
+            $attemptsreporturl = new \moodle_url(
+                '/mod/h5pactivity/report.php',
+                ['a' => $instanceid],
+            );
+            $template->attemptsreporturl = $attemptsreporturl->out(false);
+            $template->attempts = $attempts;
         }
 
         $result = $OUTPUT->render_from_template('core_h5p/h5pembed', $template);

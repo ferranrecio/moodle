@@ -288,6 +288,7 @@ $string['updatedlibrary'] = 'Updated {$a->%old} H5P library.';
 $string['uploadlibraries'] = 'Upload H5P content types';
 $string['updateRegistrationOnHub'] = 'Save account settings';
 $string['uploadsuccess'] = 'H5P content types uploaded successfully';
+$string['viewattempts'] = 'View attempts ({$a})';
 $string['width'] = 'width';
 $string['wrongversion'] = 'The version of the H5P library {$a->%machineName} used in this content is not valid. Content contains {$a->%contentLibrary}, but it should be {$a->%semanticsLibrary}.';
 $string['year'] = 'Year';

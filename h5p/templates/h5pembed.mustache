@@ -28,18 +28,27 @@
 
     Example context (json):
     {
-        "embedurl": "http://example.com/h5p/embed.php?url=testurl"
+        "embedurl": "http://example.com/h5p/embed.php?url=testurl",
+        "editurl": "http://example.com/h5p/embed.php?url=testurl&edit=1",
+        "attemptsreporturl": "http://example.com/mod/h5pactivity/report.php?a=1",
+        "attempts": 0
     }
 
 }}
-{{#editurl}}
 <div class="d-flex justify-content-end mb-3">
-    <a href="{{editurl}}" class="btn text-primary">
-        {{#pix}}i/edit, core{{/pix}}
-        {{#str}}editcontent, core_h5p{{/str}}
+    {{#attemptsreporturl}}
+    <a href="{{.}}" class="btn text-primary">
+        {{#pix}}i/chartbar, core{{/pix}}
+        {{#str}}viewattempts, core_h5p, {{attempts}}{{/str}}
     </a>
+    {{/attemptsreporturl}}
+    {{#editurl}}
+        <a href="{{editurl}}" class="btn text-primary">
+            {{#pix}}i/edit, core{{/pix}}
+            {{#str}}editcontent, core_h5p{{/str}}
+        </a>
+    {{/editurl}}
 </div>
-{{/editurl}}
 
 <iframe src="{{embedurl}}" name="h5player" width=":w" height=":h"
    allowfullscreen="allowfullscreen" class="h5p-player w-100 border-0"
