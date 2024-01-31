@@ -38,7 +38,7 @@ export default class extends DndCmItem {
         this.selectors = {
             BULKSELECT: `[data-for='cmBulkSelect']`,
             BULKCHECKBOX: `[data-bulkcheckbox]`,
-            CARD: `.activity-item`,
+            CARD: `[data-region='activity-card']`,
             DRAGICON: `.editing_move`,
             INPLACEEDITABLE: `[data-inplaceeditablelink]`,
         };
@@ -60,6 +60,17 @@ export default class extends DndCmItem {
         this.configDragDrop(this.id);
         this.getElement(this.selectors.DRAGICON)?.classList.add(this.classes.DRAGICON);
         this._refreshBulk({state});
+    }
+
+    /**
+     * Return the custom activity card drag shadow image.
+     *
+     * The element returned will be used when the user drags the card.
+     *
+     * @returns {HTMLElement}
+     */
+    setDragImage() {
+        return this.getElement(this.selectors.CARD);
     }
 
     /**
