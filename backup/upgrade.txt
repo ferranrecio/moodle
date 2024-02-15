@@ -8,6 +8,8 @@ information provided here is intended especially for developers.
 * During restore the function create_included_users has been updated to convert backups containing
   legacy MD5 hashed passwords to the new password hashing scheme (See MDL-79134).
 * New get_excluded_events hook for excluding events from automated backup has been implemented (See MDL-73926).
+* The core_backup/backupselectall YUI module has been replaced by a new core_backup/schema_backup_form
+  AMD module (See MDL-80951).
 
 === 4.1 ===
 
