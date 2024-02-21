@@ -87,6 +87,7 @@ class cmicon implements named_templatable, renderable {
             'pluginname' => get_string('pluginname', 'mod_' . $mod->modname),
             'showtooltip' => $this->format->show_editor(),
             'purpose' => plugin_supports('mod', $mod->modname, FEATURE_MOD_PURPOSE, MOD_PURPOSE_OTHER),
+            'cmid' => $mod->id,
         ];
 
         return $data;

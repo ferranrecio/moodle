@@ -26,19 +26,43 @@
         "purpose": "content",
         "modname": "resource",
         "pluginname": "File",
-        "showtooltip": 1
+        "showtooltip": 1,
+        "cmid": 2,
     }
 }}
 {{#showtooltip}}
-<button class="btn btn-link activity-icon activityiconcontainer smaller {{purpose}} courseicon align-self-start mr-2"
-        data-toggle="tooltip" title="{{{pluginname}}}" data-placement="top">
-    <img src="{{{icon}}}" class="activityicon {{iconclass}}" data-region="activity-icon"
-         alt="{{#cleanstr}} activityicon, moodle, {{{pluginname}}} {{/cleanstr}}">
+<button
+    class="btn btn-link activity-icon activityiconcontainer smaller {{purpose}} courseicon align-self-start mr-2"
+    data-toggle="tooltip"
+    title="{{{pluginname}}}"
+    data-placement="top"
+    data-region="content-cm-icon"
+    data-id="{{cmid}}"
+>
+    <img
+        src="{{{icon}}}"
+        class="activityicon {{iconclass}}"
+        data-region="activity-icon"
+        alt="{{#cleanstr}} activityicon, moodle, {{{pluginname}}} {{/cleanstr}}"
+    >
 </button>
 {{/showtooltip}}
 {{^showtooltip}}
-<div class="activity-icon activityiconcontainer smaller {{purpose}} courseicon align-self-start mr-2">
-    <img src="{{{icon}}}" class="activityicon {{iconclass}}" data-region="activity-icon"
-         alt="{{#cleanstr}} activityicon, moodle, {{{pluginname}}} {{/cleanstr}}">
+<div
+    class="activity-icon activityiconcontainer smaller {{purpose}} courseicon align-self-start mr-2"
+    data-region="content-cm-icon"
+    data-id="{{cmid}}"
+>
+    <img
+        src="{{{icon}}}"
+        class="activityicon {{iconclass}}"
+        data-region="activity-icon"
+        alt="{{#cleanstr}} activityicon, moodle, {{{pluginname}}} {{/cleanstr}}"
+    >
 </div>
 {{/showtooltip}}
+{{#js}}
+require(['core_courseformat/local/content/cm/cmicon'], function(component) {
+    component.init('[data-region="content-cm-icon"][data-id="{{cmid}}"]');
+});
+{{/js}}
