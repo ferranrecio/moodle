@@ -87,9 +87,14 @@ if (!$manager->can_submit()) {
         }
         echo $OUTPUT->notification($message, \core\output\notification::NOTIFY_WARNING);
     }
-
 }
 
-echo player::display($fileurl, $config, true, 'mod_h5pactivity', true);
+// Show view attempts link to users with permission to view all attempts, only when tracking is enabled.
+$totalattempts = null;
+if ($manager->can_view_all_attempts() && $manager->is_tracking_enabled()) {
+    $totalattempts = $manager->count_attempts();
+}
+
+echo player::display($fileurl, $config, true, 'mod_h5pactivity', true, $totalattempts, $instance->id);
 
 echo $OUTPUT->footer();
