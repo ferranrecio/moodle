@@ -30,18 +30,27 @@
     {
         "embedurl": "http://example.com/h5p/embed.php?url=testurl",
         "editurl": "http://example.com/h5p/embed.php?url=testurl&edit=1",
-        "attemptsreporturl": "http://example.com/mod/h5pactivity/report.php?a=1",
-        "attempts": 0
+        "extraactions": [
+            {
+                "text": "View attempts (2)",
+                "url": "http://example.com/mod/h5pactivity/report.php?a=1",
+                "icon": {
+                    "key": "i\/chartbar",
+                    "component": "core",
+                    "title": ""
+                }
+            }
+        ]
     }
 
 }}
 <div class="d-flex justify-content-end mb-3">
-    {{#attemptsreporturl}}
-    <a href="{{.}}" class="btn text-primary">
-        {{#pix}}i/chartbar, core{{/pix}}
-        {{#str}}viewattempts, core_h5p, {{attempts}}{{/str}}
-    </a>
-    {{/attemptsreporturl}}
+    {{#extraactions}}
+        <a href="{{url}}" class="btn text-primary">
+            {{#icon}}{{#pix}}{{key}}, {{component}}, {{title}}{{/pix}}{{/icon}}
+            {{text}}
+        </a>
+    {{/extraactions}}
     {{#editurl}}
         <a href="{{editurl}}" class="btn text-primary">
             {{#pix}}i/edit, core{{/pix}}
@@ -50,7 +59,13 @@
     {{/editurl}}
 </div>
 
-<iframe src="{{embedurl}}" name="h5player" width=":w" height=":h"
-   allowfullscreen="allowfullscreen" class="h5p-player w-100 border-0"
-   style="height: 0px;" id="{{uniqid}}-h5player">
-</iframe>
+<iframe
+    src="{{embedurl}}"
+    name="h5player"
+    width=":w"
+    height=":h"
+    allowfullscreen="allowfullscreen"
+    class="h5p-player w-100 border-0"
+    style="height: 0px;"
+    id="{{uniqid}}-h5player"
+></iframe>

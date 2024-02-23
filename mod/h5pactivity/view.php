@@ -89,12 +89,18 @@ if (!$manager->can_submit()) {
     }
 }
 
-// Show view attempts link to users with permission to view all attempts, only when tracking is enabled.
-$totalattempts = null;
+$extraactions = [];
+
 if ($manager->can_view_all_attempts() && $manager->is_tracking_enabled()) {
-    $totalattempts = $manager->count_attempts();
+    $extraactions[] = new action_link(
+        new moodle_url('/mod/h5pactivity/report.php', ['id' => $cm->id]),
+        get_string('viewattempts', 'mod_h5pactivity', $manager->count_attempts()),
+        null,
+        null,
+        new pix_icon('i/chartbar', '', 'core')
+    );
 }
 
-echo player::display($fileurl, $config, true, 'mod_h5pactivity', true, $totalattempts, $instance->id);
+echo player::display($fileurl, $config, true, 'mod_h5pactivity', true, $extraactions);
 
 echo $OUTPUT->footer();
