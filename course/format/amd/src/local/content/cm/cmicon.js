@@ -34,6 +34,10 @@ export default class extends BaseComponent {
         // Optional component name for debugging.
         this.name = 'cmicon';
         this.id = this.element.dataset.id;
+
+        this.classes = {
+            CLICKABLE: 'clickable',
+        };
     }
 
     /**
@@ -62,7 +66,7 @@ export default class extends BaseComponent {
             this._dispatchClick
         );
         if (state.cm.get(this.id)?.url) {
-            this.element.style.cursor = 'pointer';
+            this.element.classList.add(this.classes.CLICKABLE);
         }
     }
 
