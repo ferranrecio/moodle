@@ -21,33 +21,27 @@
 
     Example context (json):
     {
-        "uservisible": true,
-        "url": "#",
         "icon": "../../../pix/help.svg",
         "iconclass": "",
         "purpose": "content",
         "branded": 0,
         "modname": "resource",
         "pluginname": "File",
+        "cmid": 1,
         "showtooltip": 1
     }
 }}
-{{#url}}
-    {{#uservisible}}
-        <a href="{{url}}"
-            class="activity-icon activityiconcontainer smaller {{purpose}} {{#branded}}isbranded{{/branded}} btn btn-link courseicon align-self-start mr-2"
-            {{#showtooltip}}data-toggle="tooltip" title="{{{pluginname}}}" data-placement="top"{{/showtooltip}}
-        >
-            <img src="{{{icon}}}" class="activityicon {{iconclass}}"
-                 alt="{{#cleanstr}} activityicon, moodle, {{{pluginname}}} {{/cleanstr}}"
-            >
-        </a>
-    {{/uservisible}}
-    {{^uservisible}}
-        <div class="activity-icon activityiconcontainer smaller {{purpose}} {{#branded}}isbranded{{/branded}} courseicon align-self-start mr-2">
-            <img src="{{{icon}}}" class="activityicon {{iconclass}}"
-                 alt="{{#cleanstr}} activityicon, moodle, {{{pluginname}}} {{/cleanstr}}"
-            >
-        </div>
-    {{/uservisible}}
-{{/url}}
+<div class="activity-icon activityiconcontainer smaller {{purpose}} {{#branded}}isbranded{{/branded}} courseicon align-self-start mr-2">
+    <img src="{{{icon}}}"
+         class="activityicon {{iconclass}}"
+         data-region="activity-icon"
+         data-id="{{cmid}}"
+        {{#showtooltip}}data-toggle="tooltip" title="{{{pluginname}}}" data-placement="top" tabindex="0" alt="{{#cleanstr}} activityicon, moodle, {{{pluginname}}} {{/cleanstr}}"{{/showtooltip}}
+        {{^showtooltip}}alt="" role="presentation"{{/showtooltip}}
+    >
+</div>
+{{#js}}
+    require(['core_courseformat/local/content/cm/cmicon'], function(component) {
+        component.init('[data-region="activity-icon"][data-id="{{cmid}}"]');
+    });
+{{/js}}
