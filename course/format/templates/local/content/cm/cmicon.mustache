@@ -32,12 +32,19 @@
     }
 }}
 <div class="activity-icon activityiconcontainer smaller {{purpose}} {{#branded}}isbranded{{/branded}} courseicon align-self-start mr-2">
-    <img src="{{{icon}}}"
-         class="activityicon {{iconclass}}"
-         data-region="activity-icon"
-         data-id="{{cmid}}"
-        {{#showtooltip}}data-toggle="tooltip" title="{{{pluginname}}}" data-placement="top" tabindex="0" alt="{{#cleanstr}} activityicon, moodle, {{{pluginname}}} {{/cleanstr}}"{{/showtooltip}}
-        {{^showtooltip}}alt="" role="presentation"{{/showtooltip}}
+    <img
+        src="{{{icon}}}"
+        class="activityicon {{iconclass}}"
+        data-region="activity-icon"
+        data-id="{{cmid}}"
+        {{#showtooltip}}
+        data-toggle="tooltip"
+        title="{{{pluginname}}}"
+        data-placement="top"
+        tabindex="0"
+        alt="{{#cleanstr}} activityicon, moodle, {{{pluginname}}} {{/cleanstr}}"
+        {{/showtooltip}}
+        {{^showtooltip}} alt="" {{/showtooltip}}
     >
 </div>
 {{#js}}
