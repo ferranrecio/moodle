@@ -43,12 +43,12 @@ class mod_feedback_responses_anon_table extends mod_feedback_responses_table {
      * Initialises table
      * @param int $group retrieve only users from this group (optional)
      */
-    public function init($group = 0) {
+    public function init(int $group = 0): void {
 
         $cm = $this->feedbackstructure->get_cm();
         $this->uniqueid = 'feedback-showentry-anon-list-' . $cm->instance;
 
-        // There potentially can be both tables with anonymouns and non-anonymous responses on
+        // There potentially can be both tables with anonymous and non-anonymous responses on
         // the same page (for example when feedback anonymity was changed after some people
         // already responded). In this case we need to distinguish tables' pagination parameters.
         $this->request[TABLE_VAR_PAGE] = 'apage';

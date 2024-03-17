@@ -114,7 +114,7 @@ class mod_feedback_responses_table extends table_sql {
      * Initialises table
      * @param int $group retrieve only users from this group (optional)
      */
-    protected function init($group = 0) {
+    protected function init(int $group = 0): void {
         global $CFG;
 
         // TODO Does not support custom user profile fields (MDL-70456).
