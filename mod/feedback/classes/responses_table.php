@@ -134,18 +134,7 @@ class mod_feedback_responses_table extends table_sql {
             $tablecolumns = ['fullname'];
             $tableheaders = [get_string('fullnameuser')];
 
-            // Sourced from tablelib.php
-            if (has_capability('moodle/site:viewfullnames', $this->get_context()) && !empty($CFG->alternativefullnameformat)) {
-                $nameformat = $CFG->alternativefullnameformat;
-            } else {
-                $nameformat = $CFG->fullnamedisplay;
-            }
-
-            if (empty($nameformat) || $nameformat == 'language') {
-                $nameformat = get_string('fullnamedisplay');
-            }
-
-            $requirednames = order_in_string(\core_user\fields::get_name_fields(), $nameformat);
+            $requirednames = $this->get_user_fullname_display_fields();
             if (!empty($requirednames)) {
                 foreach ($requirednames as $name) {
                     $fields .= ", u.{$name}";

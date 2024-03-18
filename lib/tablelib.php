@@ -1319,17 +1319,7 @@ class flexible_table {
 
                     if (array_search($column, $this->userfullnamecolumns) !== false) {
                         // Check the full name display for sortable fields.
-                        if (has_capability('moodle/site:viewfullnames', $this->get_context())) {
-                            $nameformat = $CFG->alternativefullnameformat;
-                        } else {
-                            $nameformat = $CFG->fullnamedisplay;
-                        }
-
-                        if ($nameformat == 'language') {
-                            $nameformat = get_string('fullnamedisplay');
-                        }
-
-                        $requirednames = order_in_string(\core_user\fields::get_name_fields(), $nameformat);
+                        $requirednames = $this->get_user_fullname_display_fields();
 
                         if (!empty($requirednames)) {
                             if ($this->is_sortable($column)) {
@@ -1381,6 +1371,30 @@ class flexible_table {
 
         echo html_writer::end_tag('tr');
         echo html_writer::end_tag('thead');
+    }
+
+    /**
+     * Retrieves the display fields for the user's full name.
+     *
+     * This method returns an array of display fields for the user's full name based on the current
+     * configuration settings and language.
+     *
+     * @return string[] An array of display fields for the user's full name.
+     */
+    protected function get_user_fullname_display_fields(): array {
+        global $CFG;
+
+        if (has_capability('moodle/site:viewfullnames', $this->get_context())) {
+            $nameformat = $CFG->alternativefullnameformat;
+        } else {
+            $nameformat = $CFG->fullnamedisplay;
+        }
+
+        if ($nameformat == 'language') {
+            $nameformat = get_string('fullnamedisplay');
+        }
+
+        return order_in_string(\core_user\fields::get_name_fields(), $nameformat);
     }
 
     /**
