@@ -1443,7 +1443,7 @@ function course_get_cm_edit_actions(cm_info $mod, $indent = -1, $sr = null) {
         $str = get_strings(
             [
                 'delete', 'move', 'moveright', 'moveleft', 'editsettings',
-                'duplicate', 'availability'
+                'duplicate', 'availability', 'modhide', 'modshow',
             ],
             'moodle'
         );
@@ -1540,17 +1540,46 @@ function course_get_cm_edit_actions(cm_info $mod, $indent = -1, $sr = null) {
 
     // Hide/Show/Available/Unavailable.
     if (has_capability('moodle/course:activityvisibility', $modcontext)) {
-        $availabilityclass = $courseformat->get_output_classname('content\\cm\\visibility');
-        /** @var core_courseformat\output\local\content\cm\visibility */
-        $availability = new $availabilityclass($courseformat, $sectioninfo, $mod);
-        $availabilitychoice = $availability->get_choice_list();
-        if ($availabilitychoice->count_options() > 1) {
-            $actions['availability'] = new action_menu_subpanel(
-                $str->availability,
-                $availabilitychoice,
-                ['class' => 'editing_availability'],
-                new pix_icon('t/hide', '', 'moodle', array('class' => 'iconsmall'))
-            );
+        // If the 'allowstealth' setting is disabled and the section is visible, just add show|hide option.
+        // Otherwise, show the full subpanel.
+        $allowstealth = !empty($CFG->allowstealth) && $courseformat->allow_stealth_module_visibility($mod, $sectioninfo);
+        if (!$allowstealth && $sectioninfo->visible) {
+            if ($mod->visible) {
+                $actions['hide'] = new action_menu_link_secondary(
+                    new moodle_url($baseurl, ['hide' => $mod->id]),
+                    new pix_icon('t/hide', '', 'moodle', ['class' => 'iconsmall']),
+                    $str->modhide,
+                    [
+                        'class' => 'editing_hide',
+                        'data-action' => ($usecomponents) ? 'cmHide' : 'hide',
+                        'data-id' => $mod->id,
+                    ]
+                );
+            } else {
+                $actions['show'] = new action_menu_link_secondary(
+                    new moodle_url($baseurl, ['show' => $mod->id]),
+                    new pix_icon('t/show', '', 'moodle', ['class' => 'iconsmall']),
+                    $str->modshow,
+                    [
+                        'class' => 'editing_show',
+                        'data-action' => ($usecomponents) ? 'cmShow' : 'show',
+                        'data-id' => $mod->id,
+                    ]
+                );
+            }
+        } else {
+            $availabilityclass = $courseformat->get_output_classname('content\\cm\\visibility');
+            /** @var core_courseformat\output\local\content\cm\visibility */
+            $availability = new $availabilityclass($courseformat, $sectioninfo, $mod);
+            $availabilitychoice = $availability->get_choice_list();
+            if ($availabilitychoice->count_options() > 1) {
+                $actions['availability'] = new action_menu_subpanel(
+                    $str->availability,
+                    $availabilitychoice,
+                    ['class' => 'editing_availability'],
+                    new pix_icon('t/hide', '', 'moodle', ['class' => 'iconsmall'])
+                );
+            }
         }
     }
 
