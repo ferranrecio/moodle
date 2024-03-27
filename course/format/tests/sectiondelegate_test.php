@@ -16,6 +16,8 @@
 
 namespace core_courseformat;
 
+use test_component\courseformat\sectiondelegate as testsectiondelegate;
+
 /**
  * Section delegate tests.
  *
@@ -95,22 +97,16 @@ class sectiondelegate_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         $course = $this->getDataGenerator()->create_course(['format' => 'topics', 'numsections' => 1]);
-        // Section 1 has an existing delegate class.
-        course_update_section(
-            $course,
-            $DB->get_record('course_sections', ['course' => $course->id, 'section' => 1]),
-            [
-                'component' => 'test_component',
-                'itemid' => 1,
-            ]
-        );
-        $modinfo = get_fast_modinfo($course->id);
-        $sectioninfos = $modinfo->get_section_info_all();
-        $sectioninfo = $sectioninfos[1];
-        $delegated = sectiondelegate::instance($sectioninfo);
+
+        $sectioninfo = formatactions::section($course)->create_delegated('test_component', 1);
+
+        /** @var testsectiondelegate */
+        $delegated = $sectioninfo->get_component_instance();
+
         $format = course_get_format($course);
 
         $outputclass = $format->get_output_classname('content\\section\\controlmenu');
+        /** @var \core_courseformat\output\local\content\section\controlmenu */
         $controlmenu = new $outputclass($format, $sectioninfo);
         $renderer = $PAGE->get_renderer('format_' . $course->format);
         $sectionmenu = $controlmenu->get_action_menu($renderer);
@@ -132,7 +128,7 @@ class sectiondelegate_test extends \advanced_testcase {
         );
 
         // When the delegated class returns an empty action menu.
-        $delegated->set_section_action_menu('empty');
+        $delegated->set_section_action_menu(testsectiondelegate::MENUEMPTY);
         $result = $delegated->get_section_action_menu($format, $controlmenu, $renderer);
         // The $result and $sectionmenu are different.
         $this->assertNotEquals(

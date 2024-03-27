@@ -122,6 +122,6 @@ abstract class sectiondelegate {
         controlmenu $controlmenu,
         renderer_base $output,
     ): ?action_menu {
-        return $controlmenu->get_action_menu($output);
+        return $controlmenu->get_default_action_menu($output);
     }
 }

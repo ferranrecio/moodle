@@ -33,11 +33,20 @@ use action_menu;
  */
 class sectiondelegate extends sectiondelegatebase {
 
+    /** @var string force the default parent action menu. */
+    public const MENUPARENT = 'parent';
+
+    /** @var string force an empty action menu. */
+    public const MENUEMPTY = 'empty';
+
+    /** @var string force a null action menu. */
+    public const MENUNULL = 'null';
+
     /**
      * @var string|null Status to define which action menu to return when calling get_section_action_menu().
      * Alternatively, different testing classes could be created, but it wasn't worth it for this case.
      */
-    protected ?string $actionmenustatus = 'parent';
+    protected ?string $actionmenustatus = self::MENUPARENT;
 
     /**
      * Test method to fake preprocesses the section name by appending a suffix to it.
@@ -94,13 +103,13 @@ class sectiondelegate extends sectiondelegatebase {
         renderer_base $output,
     ): ?action_menu {
         switch ($this->actionmenustatus) {
-            case 'parent':
+            case self::MENUPARENT:
                 return parent::get_section_action_menu($format, $controlmenu, $output);
 
-            case 'empty':
+            case self::MENUEMPTY:
                 return new action_menu();
 
-            case 'null':
+            case self::MENUNULL:
             default:
                 return null;
         }
