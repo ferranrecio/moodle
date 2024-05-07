@@ -38,6 +38,17 @@ class parsedfeature {
      */
     private array $scenarios = [];
 
+    /** @var int the last course id used. */
+    private int $lastcourseid = 0;
+
+    /**
+     * Constructor.
+     */
+    public function __construct() {
+        global $DB;
+        $this->lastcourseid = $DB->get_field_sql('SELECT max(id) from {course}');
+    }
+
     /**
      * Get the general error, if any.
      * @return string
