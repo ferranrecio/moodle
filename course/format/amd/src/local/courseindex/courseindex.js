@@ -87,8 +87,21 @@ export default class Component extends BaseComponent {
             this.sections[section.dataset.id] = section;
         });
         const cms = this.getElements(this.selectors.CM);
+        const url = new URL(window.location.href);
+        const anchor = url.hash.replace('#', '');
+        const course = state.course;
         cms.forEach((cm) => {
             this.cms[cm.dataset.id] = cm;
+            const cmInfo = state.cm.get(cm.dataset.id);
+            if (window.location.href == cmInfo.url
+                || (window.location.href.includes(course.baseurl) && anchor == cmInfo.anchor)
+            ) {
+                // Make sure the section is expanded.
+                this.reactive.dispatch('sectionIndexCollapsed', [cmInfo.sectionid], false);
+                setTimeout(() => {
+                    this.reactive.dispatch('setPageItem', 'cm', cm.id);
+                }, 50);
+            }
         });
 
         // Set the page item if any.
