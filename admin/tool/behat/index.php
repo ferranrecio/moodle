@@ -59,4 +59,3 @@ $form = new steps_definitions_form(null, array('components' => $componentswithst
 $PAGE->requires->js_call_amd('tool_behat/steps', 'init');
 $renderer = $PAGE->get_renderer('tool_behat');
 echo $renderer->render_stepsdefinitions($steps, $form);
-
