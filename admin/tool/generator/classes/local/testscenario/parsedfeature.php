@@ -82,6 +82,10 @@ class parsedfeature {
      * @param string|null $name the name of the scenario.
      */
     public function add_scenario(string $type, ?string $name) {
+        // We allow the use of background as alias of cleanup because most people are used to.
+        if (strtolower($type) == 'background') {
+            $type = 'Cleanup';
+        }
         $this->scenarios[] = (object) [
             'type' => $type,
             'name' => $name ?? '',
