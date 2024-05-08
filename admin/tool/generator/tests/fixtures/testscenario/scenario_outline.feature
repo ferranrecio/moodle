@@ -1,5 +1,10 @@
 Feature: Fixture to prepare scenario for testing from an outline
 
+  Cleanup:
+    Given the course "Course 1" is deleted
+    And the course "Course 2" is deleted
+    And the course "Course 3" is deleted
+
   Scenario Outline: creating test scenarios using an outline
     Given the following "course" exists:
       | fullname    | <name>      |
