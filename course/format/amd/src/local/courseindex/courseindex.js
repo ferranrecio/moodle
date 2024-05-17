@@ -87,24 +87,11 @@ export default class Component extends BaseComponent {
             this.sections[section.dataset.id] = section;
         });
         const cms = this.getElements(this.selectors.CM);
-        const url = new URL(window.location.href);
-        const anchor = url.hash.replace('#', '');
-        const course = state.course;
         cms.forEach((cm) => {
             this.cms[cm.dataset.id] = cm;
-            const cmInfo = state.cm.get(cm.dataset.id);
-            if (window.location.href == cmInfo.url
-                || (window.location.href.includes(course.baseurl) && anchor == cmInfo.anchor)
-            ) {
-                // Make sure the section is expanded.
-                this.reactive.dispatch('sectionIndexCollapsed', [cmInfo.sectionid], false);
-                setTimeout(() => {
-                    this.reactive.dispatch('setPageItem', 'cm', cm.id);
-                }, 50);
-            }
         });
 
-        // Set the page item if any.
+        this._expandPageCmSectionIfNecessary(state);
         this._refreshPageItem({element: state.course, state});
 
         // Configure Aria Tree.
@@ -230,6 +217,20 @@ export default class Component extends BaseComponent {
                 250
             );
         }
+    }
+
+    /**
+     * Expand a section if the current page is a section's cm.
+     *
+     * @private
+     * @param {Object} state the course state.
+     */
+    _expandPageCmSectionIfNecessary(state) {
+        const pageCmInfo = this.reactive.getPageAnchorCmInfo();
+        if (!pageCmInfo) {
+            return;
+        }
+        this._expandSectionNode(state.section.get(pageCmInfo.sectionid), true);
     }
 
     /**

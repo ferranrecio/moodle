@@ -92,12 +92,7 @@ export default class Component extends DndCmItem {
         if (window.location.href == cm.url
             || (window.location.href.includes(course.baseurl) && anchor == cm.anchor)
         ) {
-            // Make sure the section is expanded.
-            this.reactive.dispatch('sectionContentCollapsed', [cm.sectionid], false);
-            setTimeout(() => {
-                this.reactive.dispatch('setPageItem', 'cm', cm.id);
-                this.element.scrollIntoView({block: "center"});
-            }, 50);
+            this.element.scrollIntoView({block: "center"});
         }
         // Check if this we are displaying this activity page.
         if (Config.contextid != Config.courseContextId && Config.contextInstanceId == this.id) {

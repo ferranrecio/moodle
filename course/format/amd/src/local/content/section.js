@@ -79,6 +79,22 @@ export default class extends DndSection {
                 this.configDragDrop(headerComponent);
             }
         }
+        this._openSectionIfNecessary();
+    }
+
+    /**
+     * Open the section if the anchored activity is inside.
+     */
+    async _openSectionIfNecessary() {
+        const pageCmInfo = this.reactive.getPageAnchorCmInfo();
+        if (!pageCmInfo || pageCmInfo.sectionid != this.id) {
+            return;
+        }
+        await this.reactive.dispatch('sectionContentCollapsed', [this.id], false);
+        setTimeout(() => {
+            this.reactive.dispatch('setPageItem', 'cm', pageCmInfo.id);
+            this.element.scrollIntoView({block: "center"});
+        }, 50);
     }
 
     /**
