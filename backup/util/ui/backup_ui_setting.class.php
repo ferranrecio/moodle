@@ -195,6 +195,16 @@ class base_setting_ui {
     }
 
     /**
+     * Sets the parent ID for the backup UI setting.
+     *
+     * @param string $parentname The parent name to set.
+     * @return void
+     */
+    public function set_parent_id(string $parentname): void {
+        $this->attributes['data-form-parent'] = $parentname;
+    }
+
+    /**
      * Disables the UI for this element
      */
     public function disable() {

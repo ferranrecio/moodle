@@ -170,7 +170,54 @@ class backup_section_task extends backup_task {
         // Look for "users" root setting.
         $users = $this->plan->get_setting('users');
         $users->add_dependency($sectionuserinfo);
+
+        // Delegate section dependencies.
+        $this->define_delegated_section_dependencies($section, $sectionincluded, $sectionuserinfo);
+
         // Look for "section_included" section setting.
         $sectionincluded->add_dependency($sectionuserinfo);
+    }
+
+    private function define_delegated_section_dependencies(
+        stdClass $section,
+        backup_section_included_setting $sectionincluded,
+        backup_section_userinfo_setting $sectionuserinfo
+    ) {
+        if (empty($section->component)) {
+            return;
+        }
+
+        // backup cannot rely on section_info to get the sectiondelegate instance and interact with it.
+        $sectiondelegateclass = core_courseformat\sectiondelegate::get_delegate_class_name($section->component);
+        if ($sectiondelegateclass === null) {
+            return;
+        }
+
+        $cm = $sectiondelegateclass::get_section_parent_cm_record($section);
+        if (!$cm) {
+            return;
+        }
+
+        $settingname = $cm->modname . '_' . $cm->id . '_' . 'included';
+        if (!$this->plan->setting_exists($settingname)) {
+            return;
+        }
+
+        $cmincluded = $this->plan->get_setting($settingname);
+        $cmincluded->add_dependency(
+            $sectionincluded,
+            null,
+            ['skiplevelcheck' => true]
+        );
+
+        $sectionincluded->set_ui_parent($cmincluded);
+
+
+        // $sectiondelegateclass::reuse_step_define_dependencies(
+        //     $section,
+        //     $this->plan,
+        //     $sectionincluded,
+        //     $sectionuserinfo
+        // );
     }
 }

@@ -45,6 +45,8 @@ class BackupFormController {
             allUserdata: '#backup-all-userdata',
             noneUserdata: '#backup-none-userdata',
             modsToggler: '#mod_select_links_toggler',
+            parentingFields: '[data-form-parent]',
+            parentingRegion: '[data-region="structure_element"]',
         };
         this.selectorGenerators = {
             cmAll: (modName) => `#backup-all-mod_${modName}`,
@@ -331,6 +333,43 @@ class BackupFormController {
         firstSection.parentNode.insertBefore(this.generateSelectorsElement(), firstSection);
     }
 
+    moveChildrenToParent() {
+        window.console.log('moveChildrenToParent');
+        const parentingFields = document.querySelectorAll(this.selectors.parentingFields);
+        for (const field of parentingFields) {
+            window.console.log('field', field);
+            const parentName = field.getAttribute('data-form-parent');
+            const fieldRegion = field.closest(this.selectors.parentingRegion);
+            const parentElement = document.querySelector(`[name='${parentName}']`)?.closest(this.selectors.parentingRegion);
+            window.console.log('fieldRegion', fieldRegion, this.selectors.parentingRegion);
+            window.console.log('parentElement', parentElement);
+            if (!fieldRegion || !parentElement) {
+                continue;
+            }
+            this.moveInnerStructureToParent(fieldRegion, parentElement);
+            fieldRegion.classList.add('d-none');
+        }
+        window.console.log('/moveChildrenToParent');
+    }
+
+    moveInnerStructureToParent(fieldRegion, parentElement) {
+        const innerStructureNodes = fieldRegion.querySelectorAll(this.selectors.parentingRegion);
+        // Elements will be added as siblings of the parent elements.
+        const grandParent = parentElement.parentNode;
+        let beforeElement = parentElement.nextSibling;
+        for (const node of innerStructureNodes) {
+            this.addSubElementClasses(node);
+            grandParent.insertBefore(node, beforeElement);
+            beforeElement = node.nextSibling;
+        }
+    }
+
+    addSubElementClasses(node) {
+        node.classList.add('sub-element');
+        node.classList.add('pl-3');
+    }
+
+
     /**
      * Initializes the schema backup form.
      * @returns {Promise<void>} A promise that resolves when the initialization is complete.
@@ -338,6 +377,7 @@ class BackupFormController {
     async init() {
         await this.fetchStrings();
         this.addSelectors();
+        this.moveChildrenToParent();
     }
 }
 

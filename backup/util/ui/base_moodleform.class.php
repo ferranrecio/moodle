@@ -293,7 +293,10 @@ abstract class base_moodleform extends moodleform {
                     if ($this->sectiondiv) {
                         $this->_form->addElement('html', html_writer::end_tag('div'));
                     }
-                    $mform->addElement('html', html_writer::start_tag('div', array('class' => 'grouped_settings section_level')));
+                    $mform->addElement('html', html_writer::start_tag(
+                        'div',
+                        ['class' => 'grouped_settings section_level', 'data-region' => 'structure_element']
+                    ));
                     $mform->addElement('html', html_writer::start_tag('div', array('class' => 'include_setting section_level')));
                     $this->sectiondiv = true;
                     break;
@@ -301,7 +304,10 @@ abstract class base_moodleform extends moodleform {
                     if ($this->activitydiv) {
                         $this->_form->addElement('html', html_writer::end_tag('div'));
                     }
-                    $mform->addElement('html', html_writer::start_tag('div', array('class' => 'grouped_settings activity_level')));
+                    $mform->addElement('html', html_writer::start_tag(
+                        'div',
+                        ['class' => 'grouped_settings activity_level', 'data-region' => 'structure_element']
+                    ));
                     $mform->addElement('html', html_writer::start_tag('div', array('class' => 'include_setting activity_level')));
                     $this->activitydiv = true;
                     break;

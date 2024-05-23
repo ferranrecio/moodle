@@ -265,16 +265,13 @@ abstract class backup_activity_task extends backup_task {
         global $CFG;
         require_once($CFG->libdir.'/questionlib.php');
 
-        // All the settings related to this activity will include this prefix.
-        $settingprefix = $this->modulename . '_' . $this->moduleid . '_';
-
         // All these are common settings to be shared by all activities.
 
         // Define activity_include (to decide if the whole task must be really executed)
         // Dependent of:
         // - activities root setting.
         // - section_included setting (if exists).
-        $settingname = $settingprefix . 'included';
+        $settingname = $this->get_prefixed_setting_name('included');
         $activityincluded = new backup_activity_generic_setting($settingname, base_setting::IS_BOOLEAN, true);
         $activityincluded->get_ui()->set_icon(new image_icon('monologo', get_string('pluginname', $this->modulename),
             $this->modulename, array('class' => 'iconlarge icon-post ml-1')));
@@ -299,7 +296,7 @@ abstract class backup_activity_task extends backup_task {
         // - users root setting.
         // - sectionuserinfo setting (if exists).
         // - activityincluded setting.
-        $settingname = $settingprefix . 'userinfo';
+        $settingname = $this->get_prefixed_setting_name('userinfo');
         $activityuserinfo = new backup_activity_userinfo_setting($settingname, base_setting::IS_BOOLEAN, true);
 
         $activityuserinfo->get_ui()->set_label('-');
@@ -322,6 +319,20 @@ abstract class backup_activity_task extends backup_task {
 
         // End of common activity settings, let's add the particular ones.
         $this->define_my_settings();
+    }
+
+
+    /**
+     * Returns the prefixed setting name.
+     *
+     * This method concatenates the module name, module ID, and the given setting name
+     * with an underscore as a prefix.
+     *
+     * @param string $settingname The name of the setting.
+     * @return string The prefixed setting name.
+     */
+    protected function get_prefixed_setting_name(string $settingname): string {
+        return $this->modulename . '_' . $this->moduleid . '_' . $settingname;
     }
 
     /**

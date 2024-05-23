@@ -309,6 +309,10 @@ abstract class base_setting {
         return $this->uisetting;
     }
 
+    public function set_ui_parent(base_setting $parent) {
+        $this->uisetting->set_parent_id($parent->get_ui()->get_name());
+    }
+
     /**
      * Adds a dependency where another setting depends on this setting.
      * @param setting_dependency $dependency

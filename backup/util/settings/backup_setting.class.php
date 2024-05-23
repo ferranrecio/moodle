@@ -95,7 +95,8 @@ abstract class backup_setting extends base_setting implements checksumable {
             throw new backup_setting_exception('invalid_backup_setting_parameter');
         }
         // Check the dependency level is >= current level
-        if ($dependentsetting->get_level() < $this->level) {
+        $skiplevelcheck = isset($options['skiplevelcheck']) && $options['skiplevelcheck'] === true;
+        if (!$skiplevelcheck && $dependentsetting->get_level() < $this->level) {
             throw new backup_setting_exception('cannot_add_upper_level_dependency');
         }
         parent::add_dependency($dependentsetting, $type, $options);

@@ -62,7 +62,7 @@ abstract class sectiondelegate {
      * @param string $pluginname
      * @return string|null the delegate class name or null if not found.
      */
-    protected static function get_delegate_class_name(string $pluginname): ?string {
+    public static function get_delegate_class_name(string $pluginname): ?string {
         $classname = $pluginname . '\courseformat\sectiondelegate';
         if (!class_exists($classname)) {
             return null;
@@ -103,5 +103,14 @@ abstract class sectiondelegate {
      */
     public function put_section_state_extra_updates(section_info $section, stateupdates $updates): void {
         // By default, do nothing.
+    }
+
+    public static function reuse_step_define_dependencies(
+        \stdClass $section,
+        \base_plan $plan,
+        \base_setting $sectionincluded,
+        \base_setting $sectionuserinfo,
+    ) {
+        // This method is called by the backup section task to define the section dependencies.
     }
 }
