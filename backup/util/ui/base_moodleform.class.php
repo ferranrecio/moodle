@@ -60,10 +60,24 @@ abstract class base_moodleform extends moodleform {
     protected $sectiondiv = false;
 
     /**
+     * True if we have a subsection div open, false otherwise
+     * @var bool
+     */
+    protected $subsectiondiv = false;
+
+    /**
      * True if we have an activity div open, false otherwise
      * @var bool
      */
     protected $activitydiv = false;
+
+    /**
+     * Group stack.
+     * @var array
+     */
+    protected array $groupstack = array();
+
+    protected int $grouplevel = 0;
 
     /**
      * Creates the form
@@ -180,17 +194,21 @@ abstract class base_moodleform extends moodleform {
      * Closes any open divs
      */
     public function close_task_divs() {
-        if ($this->activitydiv) {
+        // if ($this->activitydiv) {
+        //     $this->_form->addElement('html', html_writer::end_tag('div'));
+        //     $this->activitydiv = false;
+        // }
+        // if ($this->sectiondiv) {
+        //     $this->_form->addElement('html', html_writer::end_tag('div'));
+        //     $this->sectiondiv = false;
+        // }
+        // if ($this->coursediv) {
+        //     $this->_form->addElement('html', html_writer::end_tag('div'));
+        //     $this->coursediv = false;
+        // }
+        while (!empty($this->groupstack)) {
             $this->_form->addElement('html', html_writer::end_tag('div'));
-            $this->activitydiv = false;
-        }
-        if ($this->sectiondiv) {
-            $this->_form->addElement('html', html_writer::end_tag('div'));
-            $this->sectiondiv = false;
-        }
-        if ($this->coursediv) {
-            $this->_form->addElement('html', html_writer::end_tag('div'));
-            $this->coursediv = false;
+            array_pop($this->groupstack);
         }
     }
 
@@ -244,7 +262,8 @@ abstract class base_moodleform extends moodleform {
                 list($identifier, $component) = $setting->get_help();
                 $this->_form->addHelpButton($setting->get_ui_name(), $identifier, $component);
             }
-            $this->_form->addElement('html', html_writer::end_tag('div'));
+            // $this->_form->addElement('html', html_writer::end_tag('div'));
+            $this->pop_group();
         }
         $this->_form->setDefaults($defaults);
         return true;
@@ -270,9 +289,13 @@ abstract class base_moodleform extends moodleform {
         if ($isincludesetting && $setting->get_level() != backup_setting::ROOT_LEVEL) {
             switch ($setting->get_level()) {
                 case backup_setting::COURSE_LEVEL:
-                    if ($this->activitydiv) {
+                    /*if ($this->activitydiv) {
                         $this->_form->addElement('html', html_writer::end_tag('div'));
                         $this->activitydiv = false;
+                    }
+                    if ($this->subsectiondiv) {
+                        $this->_form->addElement('html', html_writer::end_tag('div'));
+                        $this->subsectiondiv = false;
                     }
                     if ($this->sectiondiv) {
                         $this->_form->addElement('html', html_writer::end_tag('div'));
@@ -280,40 +303,111 @@ abstract class base_moodleform extends moodleform {
                     }
                     if ($this->coursediv) {
                         $this->_form->addElement('html', html_writer::end_tag('div'));
-                    }
-                    $mform->addElement('html', html_writer::start_tag('div', array('class' => 'grouped_settings course_level')));
-                    $mform->addElement('html', html_writer::start_tag('div', array('class' => 'include_setting course_level')));
+                    }*/
+                    $this->pop_groups_to('course');
+                    // $mform->addElement('html', html_writer::start_tag('div', array('class' => 'grouped_settings course_level')));
+                    $this->push_group_start('course', 'grouped_settings course_level q1');
+                    // $mform->addElement('html', html_writer::start_tag('div', array('class' => 'include_setting course_level')));
+                    $this->push_group_start(null, 'include_setting course_level q2');
                     $this->coursediv = true;
                     break;
                 case backup_setting::SECTION_LEVEL:
-                    if ($this->activitydiv) {
+                    /*if ($this->activitydiv) {
                         $this->_form->addElement('html', html_writer::end_tag('div'));
                         $this->activitydiv = false;
                     }
+                    if ($this->subsectiondiv) {
+                        $this->_form->addElement('html', html_writer::end_tag('div'));
+                        $this->subsectiondiv = false;
+                    }
                     if ($this->sectiondiv) {
                         $this->_form->addElement('html', html_writer::end_tag('div'));
-                    }
-                    $mform->addElement('html', html_writer::start_tag('div', array('class' => 'grouped_settings section_level')));
-                    $mform->addElement('html', html_writer::start_tag('div', array('class' => 'include_setting section_level')));
+                    }*/
+                    $this->pop_groups_to('course');
+                    // $mform->addElement('html', html_writer::start_tag('div', array('class' => 'grouped_settings section_level')));
+                    $this->push_group_start('section', 'grouped_settings section_level q4');
+                    // $mform->addElement('html', html_writer::start_tag('div', array('class' => 'include_setting section_level')));
+                    $this->push_group_start(null, 'include_setting section_level q5');
                     $this->sectiondiv = true;
                     break;
                 case backup_setting::ACTIVITY_LEVEL:
-                    if ($this->activitydiv) {
+                    /*if ($this->activitydiv) {
                         $this->_form->addElement('html', html_writer::end_tag('div'));
+                    }*/
+                    $this->pop_groups_to('section');
+                    // $mform->addElement('html', html_writer::start_tag('div', array('class' => 'grouped_settings activity_level')));
+                    $this->push_group_start('activity', 'grouped_settings activity_level q8');
+                    // $mform->addElement('html', html_writer::start_tag('div', array('class' => 'include_setting activity_level')));
+                    $this->push_group_start(null, 'include_setting activity_level q9');
+                    $this->activitydiv = true;
+                    break;
+                case backup_setting::SUBSECTION_LEVEL:
+                    /*if ($this->activitydiv) {
+                        $this->_form->addElement('html', html_writer::end_tag('div'));
+                        $this->activitydiv = false;
                     }
-                    $mform->addElement('html', html_writer::start_tag('div', array('class' => 'grouped_settings activity_level')));
-                    $mform->addElement('html', html_writer::start_tag('div', array('class' => 'include_setting activity_level')));
+                    if ($this->subsectiondiv) {
+                        $this->_form->addElement('html', html_writer::end_tag('div'));
+                        $this->subsectiondiv = false;
+                    }*/
+                    $this->pop_groups_to('section');
+                    // $mform->addElement('html', html_writer::start_tag('div', array('class' => 'pl-3 grouped_settings subsection_level')));
+                    $this->push_group_start('subsection', 'grouped_settings subsection_level q3');
+                    // $mform->addElement('html', html_writer::start_tag('div', array('class' => 'normal_setting')));
+                    $this->push_group_start(null, 'normal_setting');
+                    $this->subsectiondiv = true;
+                    break;
+                case backup_setting::SUBACTIVITY_LEVEL:
+                    $this->pop_groups_to('subsection');
+                    // $mform->addElement('html', html_writer::start_tag('div', array('class' => 'grouped_settings activity_level')));
+                    $this->push_group_start('subactivity', 'grouped_settings activity_level q6');
+                    // $mform->addElement('html', html_writer::start_tag('div', array('class' => 'include_setting activity_level')));
+                    $this->push_group_start(null, 'include_setting activity_level q7');
                     $this->activitydiv = true;
                     break;
                 default:
-                    $mform->addElement('html', html_writer::start_tag('div', array('class' => 'normal_setting')));
+                    // $this->pop_group();
+                    // $mform->addElement('html', html_writer::start_tag('div', array('class' => 'normal_setting')));
+                    $this->push_group_start(null, 'normal_setting q10');
                     break;
             }
         } else if ($setting->get_level() == backup_setting::ROOT_LEVEL) {
-            $mform->addElement('html', html_writer::start_tag('div', array('class' => 'root_setting')));
+            // $this->pop_groups_to('root');
+            // $this->pop_group();
+            // $mform->addElement('html', html_writer::start_tag('div', array('class' => 'root_setting')));
+            $this->push_group_start('root', 'root_setting q11');
         } else {
-            $mform->addElement('html', html_writer::start_tag('div', array('class' => 'normal_setting')));
+            // $this->pop_groups_to('normal');
+            // $this->pop_group();
+            // $this->pop_group();
+            // $mform->addElement('html', html_writer::start_tag('div', array('class' => 'normal_setting')));
+            $this->push_group_start(null, 'normal_setting q12');
         }
+    }
+
+    protected function push_group_start(?string $name, string $classes) {
+        $mform = $this->_form;
+        $this->groupstack[] = $name;
+        $mform->addElement('html', html_writer::start_tag('div', ['class' => $classes]));
+        // $mform->addElement('html', html_writer::tag('pre', print_r($this->groupstack, true)));
+    }
+
+    protected function pop_groups_to(string $name) {
+        if (empty($this->groupstack)) {
+            return;
+        }
+        while (!empty($this->groupstack) && end($this->groupstack) !== $name) {
+            $this->pop_group();
+        }
+    }
+
+    protected function pop_group(): ?string {
+        if (empty($this->groupstack)) {
+            return null;
+        }
+        $mform = $this->_form;
+        $mform->addElement('html', html_writer::end_tag('div'));
+        return array_pop($this->groupstack);
     }
 
     /**
@@ -350,7 +444,8 @@ abstract class base_moodleform extends moodleform {
                 $label .= $OUTPUT->render($labelicon);
             }
             $this->_form->addElement('static', 'static_'.$settingui->get_name(), $label, $settingui->get_static_value().$icon);
-            $this->_form->addElement('html', html_writer::end_tag('div'));
+            // $this->_form->addElement('html', html_writer::end_tag('div'));
+            $this->pop_group();
         }
         $this->_form->addElement('hidden', $settingui->get_name(), $settingui->get_value());
         $this->_form->setType($settingui->get_name(), $settingui->get_param_validation());

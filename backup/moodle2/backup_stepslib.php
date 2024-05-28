@@ -119,6 +119,14 @@ abstract class backup_activity_structure_step extends backup_structure_step {
         // Return the root element (activity)
         return $activity;
     }
+
+    protected function set_delegated_section_mapping(string $pluginname, int $itemid) {
+        backup_structure_dbops::insert_backup_ids_record(
+            $this->get_backupid(),
+            "course_section::$pluginname::$itemid",
+            $this->task->get_moduleid()
+        );
+    }
 }
 
 /**
@@ -429,6 +437,8 @@ class backup_section_structure_step extends backup_structure_step {
               WHERE c.id = ? AND cfo.sectionid = ?',
                 array(backup::VAR_COURSEID, backup::VAR_SECTIONID));
 
+        $this->add_delegated_section_element($section);
+
         // Aliases
         $section->set_source_alias('section', 'number');
         // The 'availability' field needs to be renamed because it clashes with
@@ -439,6 +449,22 @@ class backup_section_structure_step extends backup_structure_step {
         $section->annotate_files('course', 'section', 'id');
 
         return $section;
+    }
+
+    protected function add_delegated_section_element($nestedelement) {
+        // For now, only course module delegated sections are supported at a setting level.
+        if (!$this->task->setting_exists(backup::VAR_SECTIONDELEGATECMID)) {
+            return;
+        }
+        // Add the delegated information to the section in case the plaugin wants to use it.
+        $delegateoptions = new backup_nested_element('delegated_section', ['origin', 'id']);
+        $nestedelement->add_child($delegateoptions);
+        $delegateoptions->set_source_array([
+            [
+                'origin' => 'course_modules',
+                'id' => $this->task->get_setting_value(backup::VAR_SECTIONDELEGATECMID),
+            ],
+        ]);
     }
 }
 
