@@ -38,6 +38,7 @@ abstract class backup_activity_task extends backup_task {
 
     protected $moduleid;
     protected $sectionid;
+    protected $section;
     protected $modulename;
     protected $activityid;
     protected $contextid;
@@ -50,6 +51,7 @@ abstract class backup_activity_task extends backup_task {
      * @param backup_plan|null $plan the backup plan instance this task is part of
      */
     public function __construct($name, $moduleid, $plan = null) {
+        global $DB;
 
         // Check moduleid exists
         if (!$coursemodule = get_coursemodule_from_id(false, $moduleid)) {
@@ -65,6 +67,7 @@ abstract class backup_activity_task extends backup_task {
         $this->modulename = $coursemodule->modname;
         $this->activityid = $coursemodule->instance;
         $this->contextid  = context_module::instance($this->moduleid)->id;
+        $this->section = $DB->get_record('course_sections', ['id' => $this->sectionid]);
 
         parent::__construct($name, $plan);
     }
@@ -109,6 +112,24 @@ abstract class backup_activity_task extends backup_task {
      */
     public function get_taskbasepath() {
         return $this->get_basepath() . '/activities/' . $this->modulename . '_' . $this->moduleid;
+    }
+
+    /**
+     * Add a setting to the task. This method is used to add a setting to the task
+     *
+     * @param int|string $identifier the identifier of the setting
+     * @param string $type the type of the setting
+     * @param string|int $value the value of the setting
+     * @return section_backup_setting the setting added
+     */
+    protected function add_section_setting(int|string $identifier, string $type, string|int $value): activity_backup_setting {
+        if (!empty($this->section->component)) {
+            $setting = new backup_subactivity_generic_setting($identifier, $type, $value);
+        } else {
+            $setting = new backup_activity_generic_setting($identifier, $type, $value);
+        }
+        $this->add_setting($setting);
+        return $setting;
     }
 
     /**

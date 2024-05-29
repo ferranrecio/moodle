@@ -38,6 +38,16 @@ class backup_section_task extends backup_task {
     protected $sectionid;
 
     /**
+     * @var stdClass $section The database section object
+     */
+    protected stdClass $section;
+
+    /**
+     * @var int|null $delegatedcmid the course module that is delegating this section (if any)
+     */
+    protected ?int $delegatedcmid = null;
+
+    /**
      * Constructor - instantiates one object of this class
      */
     public function __construct($name, $sectionid, $plan = null) {
@@ -48,13 +58,39 @@ class backup_section_task extends backup_task {
             throw new backup_task_exception('section_task_section_not_found', $sectionid);
         }
 
+        $this->section  = $section;
         $this->sectionid  = $sectionid;
 
         parent::__construct($name, $plan);
     }
 
+    /**
+     * Set the course module that is delegating this section.
+     *
+     * Delegated section can belong to any kind of plugin. However, when a delegated
+     * section belongs to a course module, the UI will present all settings according.
+     *
+     * @param int $cmid the course module id that is delegating this section
+     */
+    public function set_delegated_cm(int $cmid) {
+        $this->delegatedcmid = $cmid;
+    }
+
+    /**
+     * Get the course module that is delegating this section.
+     *
+     * @return int|null the course module id that is delegating this section
+     */
+    public function get_delegated_cm(): ?int {
+        return $this->delegatedcmid;
+    }
+
     public function get_sectionid() {
         return $this->sectionid;
+    }
+
+    public function get_section(): stdClass {
+        return $this->section;
     }
 
     /**

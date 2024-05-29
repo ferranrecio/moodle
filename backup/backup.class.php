@@ -129,6 +129,8 @@ abstract class backup implements checksumable {
     // To be used when defining backup structures
     const VAR_COURSEID   = -1;  // To reference id of course in a processor
     const VAR_SECTIONID  = -11; // To reference id of section in a processor
+
+    const VAR_SECTIONDELEGATECMID  = -15; // To reference the course module controlling a section.
     const VAR_ACTIVITYID = -21; // To reference id of activity in a processor
     const VAR_MODID      = -31; // To reference id of course_module in a processor
     const VAR_MODNAME    = -41; // To reference name of module in a processor

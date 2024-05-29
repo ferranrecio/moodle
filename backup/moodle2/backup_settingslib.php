@@ -185,6 +185,37 @@ class backup_section_included_setting extends section_backup_setting {}
  */
 class backup_section_userinfo_setting extends section_backup_setting {}
 
+/**
+ * generic section setting to pass various settings between tasks and steps
+ */
+class backup_subsection_generic_setting extends section_backup_setting {
+    public function __construct($name, $vtype, $value = null, $visibility = self::VISIBLE, $status = self::NOT_LOCKED) {
+        parent::__construct($name, $vtype, $value, $visibility, $status);
+        $this->level = self::SUBSECTION_LEVEL;
+    }
+}
+
+/**
+ * Setting to define if one section is included or no. Activities _included
+ * settings depend of them if available
+ */
+class backup_subsection_included_setting extends section_backup_setting {
+    public function __construct($name, $vtype, $value = null, $visibility = self::VISIBLE, $status = self::NOT_LOCKED) {
+        parent::__construct($name, $vtype, $value, $visibility, $status);
+        $this->level = self::SUBSECTION_LEVEL;
+    }
+}
+
+/**
+ * section backup setting to control if section will include
+ * user information or no, depends of @backup_users_setting
+ */
+class backup_subsection_userinfo_setting extends section_backup_setting {
+    public function __construct($name, $vtype, $value = null, $visibility = self::VISIBLE, $status = self::NOT_LOCKED) {
+        parent::__construct($name, $vtype, $value, $visibility, $status);
+        $this->level = self::SUBSECTION_LEVEL;
+    }
+}
 
 // Activity backup settings
 
@@ -205,6 +236,39 @@ class backup_activity_included_setting extends activity_backup_setting {}
  * user information or no, depends of @backup_users_setting
  */
 class backup_activity_userinfo_setting extends activity_backup_setting {}
+
+/**
+ * Generic subactivity (activity inside a delegated section) setting to pass various settings between tasks and steps
+ */
+class backup_subactivity_generic_setting extends activity_backup_setting {
+    public function __construct($name, $vtype, $value = null, $visibility = self::VISIBLE, $status = self::NOT_LOCKED) {
+        parent::__construct($name, $vtype, $value, $visibility, $status);
+        $this->level = self::SUBACTIVITY_LEVEL;
+    }
+}
+
+/**
+ * Subactivity (activity inside a delegated section) backup setting to control if activity will
+ * be included or no, depends of @backup_activities_setting and
+ * optionally parent section included setting
+ */
+class backup_subactivity_included_setting extends activity_backup_setting {
+    public function __construct($name, $vtype, $value = null, $visibility = self::VISIBLE, $status = self::NOT_LOCKED) {
+        parent::__construct($name, $vtype, $value, $visibility, $status);
+        $this->level = self::SUBACTIVITY_LEVEL;
+    }
+}
+
+/**
+ * Subactivity (activity inside a delegated section) backup setting to control if activity will include
+ * user information or no, depends of @backup_users_setting
+ */
+class backup_subactivity_userinfo_setting extends activity_backup_setting {
+    public function __construct($name, $vtype, $value = null, $visibility = self::VISIBLE, $status = self::NOT_LOCKED) {
+        parent::__construct($name, $vtype, $value, $visibility, $status);
+        $this->level = self::SUBACTIVITY_LEVEL;
+    }
+}
 
 /**
  * Root setting to control if backup will include content bank content or no

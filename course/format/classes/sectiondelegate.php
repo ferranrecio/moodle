@@ -124,4 +124,11 @@ abstract class sectiondelegate {
     ): ?action_menu {
         return $controlmenu->get_default_action_menu($output);
     }
+
+    /**
+     * Get the section info instance.
+     */
+    public function get_section_info(): section_info {
+        return $this->sectioninfo;
+    }
 }
