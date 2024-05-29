@@ -94,6 +94,16 @@ abstract class backup_activity_task extends backup_task {
     }
 
     /**
+     * Return if the activity is inside a subsection.
+     *
+     * @return bool
+     */
+
+    public function is_in_subsection(): bool {
+        return !empty($this->section->component);
+    }
+
+    /**
      * @return int the id of the activity instance (id in the activity's instances table)
      */
     public function get_activityid() {
@@ -123,7 +133,7 @@ abstract class backup_activity_task extends backup_task {
      * @return section_backup_setting the setting added
      */
     protected function add_section_setting(int|string $identifier, string $type, string|int $value): activity_backup_setting {
-        if (!empty($this->section->component)) {
+        if ($this->is_in_subsection()) {
             $setting = new backup_subactivity_generic_setting($identifier, $type, $value);
         } else {
             $setting = new backup_activity_generic_setting($identifier, $type, $value);
@@ -309,7 +319,7 @@ abstract class backup_activity_task extends backup_task {
         // - activities root setting
         // - sectionincluded setting (if exists)
         $settingname = $settingprefix . 'included';
-        if (!empty($this->section->component)) {
+        if ($this->is_in_subsection()) {
             $activityincluded = new backup_subactivity_generic_setting($settingname, base_setting::IS_BOOLEAN, true);
         } else {
             $activityincluded = new backup_activity_generic_setting($settingname, base_setting::IS_BOOLEAN, true);
@@ -342,7 +352,7 @@ abstract class backup_activity_task extends backup_task {
         // - section_userinfo setting (if exists)
         // - includefield setting
         $settingname = $settingprefix . 'userinfo';
-        if (!empty($this->section->component)) {
+        if ($this->is_in_subsection()) {
             $activityuserinfo = new backup_subactivity_userinfo_setting($settingname, base_setting::IS_BOOLEAN, true);
         } else {
             $activityuserinfo = new backup_activity_userinfo_setting($settingname, base_setting::IS_BOOLEAN, true);

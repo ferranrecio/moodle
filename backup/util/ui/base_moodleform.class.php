@@ -250,37 +250,37 @@ abstract class base_moodleform extends moodleform {
             switch ($setting->get_level()) {
                 case backup_setting::COURSE_LEVEL:
                     $this->pop_groups_to('course');
-                    $this->push_group_start('course', 'grouped_settings course_level q1');
-                    $this->push_group_start(null, 'include_setting course_level q2');
+                    $this->push_group_start('course', 'grouped_settings course_level');
+                    $this->push_group_start(null, 'include_setting course_level');
                     break;
                 case backup_setting::SECTION_LEVEL:
                     $this->pop_groups_to('course');
-                    $this->push_group_start('section', 'grouped_settings section_level q4');
-                    $this->push_group_start(null, 'include_setting section_level q5');
+                    $this->push_group_start('section', 'grouped_settings section_level');
+                    $this->push_group_start(null, 'include_setting section_level');
                     break;
                 case backup_setting::ACTIVITY_LEVEL:
                     $this->pop_groups_to('section');
-                    $this->push_group_start('activity', 'grouped_settings activity_level q8');
-                    $this->push_group_start(null, 'include_setting activity_level q9');
+                    $this->push_group_start('activity', 'grouped_settings activity_level');
+                    $this->push_group_start(null, 'include_setting activity_level');
                     break;
                 case backup_setting::SUBSECTION_LEVEL:
                     $this->pop_groups_to('section');
-                    $this->push_group_start('subsection', 'grouped_settings subsection_level q3');
+                    $this->push_group_start('subsection', 'grouped_settings subsection_level');
                     $this->push_group_start(null, 'normal_setting');
                     break;
                 case backup_setting::SUBACTIVITY_LEVEL:
                     $this->pop_groups_to('subsection');
-                    $this->push_group_start('subactivity', 'grouped_settings activity_level q6');
-                    $this->push_group_start(null, 'include_setting activity_level q7');
+                    $this->push_group_start('subactivity', 'grouped_settings activity_level');
+                    $this->push_group_start(null, 'include_setting activity_level');
                     break;
                 default:
-                    $this->push_group_start(null, 'normal_setting q10');
+                    $this->push_group_start(null, 'normal_setting');
                     break;
             }
         } else if ($setting->get_level() == backup_setting::ROOT_LEVEL) {
-            $this->push_group_start('root', 'root_setting q11');
+            $this->push_group_start('root', 'root_setting');
         } else {
-            $this->push_group_start(null, 'normal_setting q12');
+            $this->push_group_start(null, 'normal_setting');
         }
     }
 

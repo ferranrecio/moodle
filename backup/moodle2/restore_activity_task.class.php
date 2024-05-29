@@ -101,6 +101,16 @@ abstract class restore_activity_task extends restore_task {
     }
 
     /**
+     * Return if the activity is inside a subsection.
+     *
+     * @return bool
+     */
+
+    public function is_in_subsection(): bool {
+        return !empty($this->info->insubsection);
+    }
+
+    /**
      * Returns the old course module id (cmid of activity which will be restored)
      *
      * @return int
@@ -312,7 +322,11 @@ abstract class restore_activity_task extends restore_task {
         // - activities root setting
         // - section_included setting (if exists)
         $settingname = $settingprefix . 'included';
-        $activityincluded = new restore_activity_generic_setting($settingname, base_setting::IS_BOOLEAN, true);
+        if ($this->is_in_subsection()) {
+            $activityincluded = new restore_subactivity_generic_setting($settingname, base_setting::IS_BOOLEAN, true);
+        } else {
+            $activityincluded = new restore_activity_generic_setting($settingname, base_setting::IS_BOOLEAN, true);
+        }
         $activityincluded->get_ui()->set_icon(new image_icon('monologo', get_string('pluginname', $this->modulename),
             $this->modulename, ['class' => 'iconlarge icon-post ml-1']));
         $this->add_setting($activityincluded);
@@ -346,7 +360,11 @@ abstract class restore_activity_task extends restore_task {
             $defaultvalue = true;
         }
 
-        $activityuserinfo = new restore_activity_userinfo_setting($settingname, base_setting::IS_BOOLEAN, $defaultvalue);
+        if ($this->is_in_subsection()) {
+            $activityuserinfo = new restore_subactivity_userinfo_setting($settingname, base_setting::IS_BOOLEAN, $defaultvalue);
+        } else {
+            $activityuserinfo = new restore_activity_userinfo_setting($settingname, base_setting::IS_BOOLEAN, $defaultvalue);
+        }
         if (!$defaultvalue) {
             // This is a bit hacky, but if there is no user data to restore, then
             // we replace the standard check-box with a select menu with the

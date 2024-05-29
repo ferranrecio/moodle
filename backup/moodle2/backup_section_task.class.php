@@ -85,6 +85,13 @@ class backup_section_task extends backup_task {
         return $this->delegatedcmid;
     }
 
+    public function get_modname(): ?string {
+        if (empty($this->section->component)) {
+            return null;
+        }
+        return core_component::normalize_component($this->section->component)[1];
+    }
+
     public function get_sectionid() {
         return $this->sectionid;
     }
@@ -228,8 +235,7 @@ class backup_section_task extends backup_task {
         if ($delegatedcmid) {
             $sectionincluded = new backup_subsection_included_setting($settingname, base_setting::IS_BOOLEAN, true);
             // Subsections depends on the parent activity included setting.
-            $modname = core_component::normalize_component($this->section->component)[1];
-            $settingname = $modname . '_' . $delegatedcmid . '_included';
+            $settingname = $this->get_modname() . '_' . $delegatedcmid . '_included';
             if ($this->plan->setting_exists($settingname)) {
                 $cmincluded = $this->plan->get_setting($settingname);
                 $cmincluded->add_dependency(
@@ -262,8 +268,7 @@ class backup_section_task extends backup_task {
         if ($delegatedcmid) {
             $sectionuserinfo = new backup_subsection_userinfo_setting($settingname, base_setting::IS_BOOLEAN, true);
             // Subsections depends on the parent activity included setting.
-            $modname = core_component::normalize_component($this->section->component)[1];
-            $settingname = $modname . '_' . $delegatedcmid . '_userinfo';
+            $settingname = $this->get_modname() . '_' . $delegatedcmid . '_userinfo';
             if ($this->plan->setting_exists($settingname)) {
                 $cmincluded = $this->plan->get_setting($settingname);
                 $cmincluded->add_dependency(

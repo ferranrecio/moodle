@@ -229,12 +229,14 @@ abstract class backup_controller_dbops extends backup_dbops {
      */
     private static function get_activity_backup_information($task) {
 
-        $contentinfo = array(
+        $contentinfo = [
             'moduleid'   => $task->get_moduleid(),
             'sectionid'  => $task->get_sectionid(),
             'modulename' => $task->get_modulename(),
             'title'      => $task->get_name(),
-            'directory'  => 'activities/' . $task->get_modulename() . '_' . $task->get_moduleid());
+            'directory'  => 'activities/' . $task->get_modulename() . '_' . $task->get_moduleid(),
+            'insubsection' => ($task->is_in_subsection()) ? 1 : '',
+        ];
 
         // Now get activity settings
         // Calculate prefix to find valid settings
@@ -265,10 +267,13 @@ abstract class backup_controller_dbops extends backup_dbops {
      */
     private static function get_section_backup_information($task) {
 
-        $contentinfo = array(
+        $contentinfo = [
             'sectionid'  => $task->get_sectionid(),
             'title'      => $task->get_name(),
-            'directory'  => 'sections/' . 'section_' . $task->get_sectionid());
+            'directory'  => 'sections/' . 'section_' . $task->get_sectionid(),
+            'parentcmid' => $task->get_delegated_cm() ?? '',
+            'modname' => $task->get_modname() ?? '',
+        ];
 
         // Now get section settings
         // Calculate prefix to find valid settings
