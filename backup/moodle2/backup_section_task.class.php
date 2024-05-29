@@ -108,11 +108,19 @@ class backup_section_task extends backup_task {
 
         // Set the backup::VAR_CONTEXTID setting to course context as far as next steps require that
         $coursectxid = context_course::instance($this->get_courseid())->id;
-        $this->add_setting(new backup_activity_generic_setting(backup::VAR_CONTEXTID, base_setting::IS_INTEGER, $coursectxid));
+        $this->add_section_setting(backup::VAR_CONTEXTID, base_setting::IS_INTEGER, $coursectxid);
 
         // Add some extra settings that related processors are going to need
-        $this->add_setting(new backup_activity_generic_setting(backup::VAR_SECTIONID, base_setting::IS_INTEGER, $this->sectionid));
-        $this->add_setting(new backup_activity_generic_setting(backup::VAR_COURSEID, base_setting::IS_INTEGER, $this->get_courseid()));
+        $this->add_section_setting(backup::VAR_SECTIONID, base_setting::IS_INTEGER, $this->sectionid);
+        $this->add_section_setting(backup::VAR_COURSEID, base_setting::IS_INTEGER, $this->get_courseid());
+
+        if ($this->get_delegated_cm()) {
+            $this->add_section_setting(
+                backup::VAR_SECTIONDELEGATECMID,
+                base_setting::IS_INTEGER,
+                $this->get_delegated_cm()
+            );
+        }
 
         // Create the section directory
         $this->add_step(new create_taskbasepath_directory('create_section_directory'));
@@ -128,6 +136,24 @@ class backup_section_task extends backup_task {
 
         // At the end, mark it as built
         $this->built = true;
+    }
+
+    /**
+     * Add a setting to the task. This method is used to add a setting to the task
+     *
+     * @param int|string $identifier the identifier of the setting
+     * @param string $type the type of the setting
+     * @param string|int $value the value of the setting
+     * @return section_backup_setting the setting added
+     */
+    protected function add_section_setting(int|string $identifier, string $type, string|int $value): section_backup_setting {
+        if ($this->get_delegated_cm()) {
+            $setting = new backup_subsection_generic_setting($identifier, $type, $value);
+        } else {
+            $setting = new backup_section_generic_setting($identifier, $type, $value);
+        }
+        $this->add_setting($setting);
+        return $setting;
     }
 
     /**
@@ -181,28 +207,80 @@ class backup_section_task extends backup_task {
         // All the settings related to this activity will include this prefix
         $settingprefix = 'section_' . $this->sectionid . '_';
 
-        // All these are common settings to be shared by all sections
+        $incudefield = $this->add_section_included_setting($settingprefix);
+        $this->add_section_userinfo_setting($settingprefix, $incudefield);
+    }
 
-        $section = $DB->get_record('course_sections', array('id' => $this->sectionid), '*', MUST_EXIST);
-        $course = $DB->get_record('course', array('id' => $section->course), '*', MUST_EXIST);
+    /**
+     * Add the section included setting to the task.
+     *
+     * @param string $settingprefix the identifier of the setting
+     * @return section_backup_setting the setting added
+     */
+    protected function add_section_included_setting(string $settingprefix): section_backup_setting {
+        global $DB;
+        $course = $DB->get_record('course', array('id' => $this->section->course), '*', MUST_EXIST);
 
-        // Define section_included (to decide if the whole task must be really executed)
+        // Define sectionincluded (to decide if the whole task must be really executed)
         $settingname = $settingprefix . 'included';
-        $section_included = new backup_section_included_setting($settingname, base_setting::IS_BOOLEAN, true);
-        $section_included->get_ui()->set_label(get_section_name($course, $section));
-        $this->add_setting($section_included);
 
-        // Define section_userinfo. Dependent of:
+        $delegatedcmid = $this->get_delegated_cm();
+        if ($delegatedcmid) {
+            $sectionincluded = new backup_subsection_included_setting($settingname, base_setting::IS_BOOLEAN, true);
+            // Subsections depends on the parent activity included setting.
+            $modname = core_component::normalize_component($this->section->component)[1];
+            $settingname = $modname . '_' . $delegatedcmid . '_included';
+            if ($this->plan->setting_exists($settingname)) {
+                $cmincluded = $this->plan->get_setting($settingname);
+                $cmincluded->add_dependency(
+                    $sectionincluded,
+                );
+            }
+        } else {
+            $sectionincluded = new backup_section_included_setting($settingname, base_setting::IS_BOOLEAN, true);
+        }
+
+        $sectionincluded->get_ui()->set_label(get_section_name($course, $this->section));
+        $this->add_setting($sectionincluded);
+
+        return $sectionincluded;
+    }
+
+    /**
+     * Add the section userinfo setting to the task.
+     *
+     * @param string $settingprefix the identifier of the setting
+     * @return section_backup_setting the setting added
+     */
+    protected function add_section_userinfo_setting(string $settingprefix, section_backup_setting $includefield): section_backup_setting {
+        // Define sectionuserinfo. Dependent of:
         // - users root setting
         // - section_included setting
         $settingname = $settingprefix . 'userinfo';
-        $section_userinfo = new backup_section_userinfo_setting($settingname, base_setting::IS_BOOLEAN, true);
-        $section_userinfo->get_ui()->set_label(get_string('includeuserinfo','backup'));
-        $this->add_setting($section_userinfo);
+
+        $delegatedcmid = $this->get_delegated_cm();
+        if ($delegatedcmid) {
+            $sectionuserinfo = new backup_subsection_userinfo_setting($settingname, base_setting::IS_BOOLEAN, true);
+            // Subsections depends on the parent activity included setting.
+            $modname = core_component::normalize_component($this->section->component)[1];
+            $settingname = $modname . '_' . $delegatedcmid . '_userinfo';
+            if ($this->plan->setting_exists($settingname)) {
+                $cmincluded = $this->plan->get_setting($settingname);
+                $cmincluded->add_dependency(
+                    $sectionuserinfo,
+                );
+            }
+        } else {
+            $sectionuserinfo = new backup_section_userinfo_setting($settingname, base_setting::IS_BOOLEAN, true);
+        }
+        $sectionuserinfo->get_ui()->set_label(get_string('includeuserinfo', 'backup'));
+        $this->add_setting($sectionuserinfo);
         // Look for "users" root setting
         $users = $this->plan->get_setting('users');
-        $users->add_dependency($section_userinfo);
+        $users->add_dependency($sectionuserinfo);
         // Look for "section_included" section setting
-        $section_included->add_dependency($section_userinfo);
+        $includefield->add_dependency($sectionuserinfo);
+
+        return $sectionuserinfo;
     }
 }
