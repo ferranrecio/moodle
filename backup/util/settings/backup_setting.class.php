@@ -36,6 +36,8 @@ abstract class backup_setting extends base_setting implements checksumable {
     const COURSE_LEVEL   = 5;
     const SECTION_LEVEL  = 9;
     const ACTIVITY_LEVEL = 13;
+    const SUBSECTION_LEVEL = 17;
+    const SUBACTIVITY_LEVEL = 21;
 
     /** @var int Level of the setting, eg {@link self::ROOT_LEVEL} */
     protected $level;
@@ -96,7 +98,12 @@ abstract class backup_setting extends base_setting implements checksumable {
         }
         // Check the dependency level is >= current level
         if ($dependentsetting->get_level() < $this->level) {
-            throw new backup_setting_exception('cannot_add_upper_level_dependency');
+            throw new backup_setting_exception('cannot_add_upper_level_dependency', [
+                $dependentsetting->get_level(),
+                $dependentsetting->get_name(),
+                $this->level,
+                $this->get_name()
+            ]);
         }
         parent::add_dependency($dependentsetting, $type, $options);
     }
