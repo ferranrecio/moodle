@@ -133,6 +133,9 @@ abstract class backup_plan_builder {
         try {
             $plan->add_task(backup_factory::get_backup_activity_task($controller->get_format(), $id));
 
+            // Some activities may have delegated section integrations.
+            self::build_delegated_section_plan($controller, $id);
+
             // For the given activity, add as many block tasks as necessary
             $blockids = backup_plan_dbops::get_blockids_from_moduleid($id);
             foreach ($blockids as $blockid) {
@@ -151,18 +154,61 @@ abstract class backup_plan_builder {
     }
 
     /**
-     * Build one 1-section backup
+     * Build a course module delegated section backup plan.
+     * @param backup_controller $controller
+     * @param int $cmid the parent course module id.
      */
-    protected static function build_section_plan($controller, $id) {
+    protected static function build_delegated_section_plan($controller, $cmid) {
+        global $CFG, $DB;
+
+        // Check moduleid exists
+        if (!$coursemodule = get_coursemodule_from_id(false, $cmid)) {
+            $controller->log(get_string('error_course_module_not_found', 'backup', $cmid), backup::LOG_WARNING);
+        }
+        $classname = 'mod_' . $coursemodule->modname . '\courseformat\sectiondelegate';
+        if (!class_exists($classname)) {
+            return;
+        }
+        $sectionid = null;
+        try {
+            // TODO: move method to new class from Mikel.
+            $sectionid = $classname::delegated_section_id($coursemodule);
+        } catch (dml_exception $error) {
+            $controller->log(get_string('error_delegate_section_not_found', 'backup', $cmid), backup::LOG_WARNING);
+            return;
+        }
+
+        $plan = $controller->get_plan();
+        $sectiontask = backup_factory::get_backup_section_task($controller->get_format(), $sectionid);
+        $sectiontask->set_delegated_cm($cmid);
+        $plan->add_task($sectiontask);
+
+        // For the given section, add as many activity tasks as necessary
+        $coursemodules = backup_plan_dbops::get_modules_from_sectionid($sectionid);
+        foreach ($coursemodules as $coursemodule) {
+            if (plugin_supports('mod', $coursemodule->modname, FEATURE_BACKUP_MOODLE2)) {
+                self::build_activity_plan($controller, $coursemodule->id);
+            } else {
+                // TODO: Debug information about module not supported
+            }
+        }
+    }
+
+    /**
+     * Build one 1-section backup
+     * @param backup_controller $controller
+     * @param int $sectionid the section id
+     */
+    protected static function build_section_plan($controller, $sectionid) {
 
         $plan = $controller->get_plan();
 
         // Add the section task, responsible for outputting
         // all the section related information
-        $plan->add_task(backup_factory::get_backup_section_task($controller->get_format(), $id));
+        $plan->add_task(backup_factory::get_backup_section_task($controller->get_format(), $sectionid));
 
         // For the given section, add as many activity tasks as necessary
-        $coursemodules = backup_plan_dbops::get_modules_from_sectionid($id);
+        $coursemodules = backup_plan_dbops::get_modules_from_sectionid($sectionid);
         foreach ($coursemodules as $coursemodule) {
             if (plugin_supports('mod', $coursemodule->modname, FEATURE_BACKUP_MOODLE2)) { // Check we support the format
                 self::build_activity_plan($controller, $coursemodule->id);
@@ -174,23 +220,30 @@ abstract class backup_plan_builder {
 
     /**
      * Build one 1-course backup
+     * @param backup_controller $controller
+     * @param int $sectionid the section id
      */
-    protected static function build_course_plan($controller, $id) {
+    protected static function build_course_plan($controller, $courseid) {
 
         $plan = $controller->get_plan();
 
         // Add the course task, responsible for outputting
         // all the course related information
-        $plan->add_task(backup_factory::get_backup_course_task($controller->get_format(), $id));
+        $plan->add_task(backup_factory::get_backup_course_task($controller->get_format(), $courseid));
 
         // For the given course, add as many section tasks as necessary
-        $sections = backup_plan_dbops::get_sections_from_courseid($id);
-        foreach ($sections as $section) {
-            self::build_section_plan($controller, $section);
+        $sections = backup_plan_dbops::get_sections_from_courseid($courseid);
+        foreach ($sections as $sectionid) {
+            $sectiondata = backup_plan_dbops::get_section_from_id($sectionid);
+            // Delegated sections are not course responsability.
+            if (!empty($sectiondata->component)) {
+                continue;
+            }
+            self::build_section_plan($controller, $sectionid);
         }
 
         // For the given course, add as many block tasks as necessary
-        $blockids = backup_plan_dbops::get_blockids_from_courseid($id);
+        $blockids = backup_plan_dbops::get_blockids_from_courseid($courseid);
         foreach ($blockids as $blockid) {
             $plan->add_task(backup_factory::get_backup_block_task($controller->get_format(), $blockid));
         }

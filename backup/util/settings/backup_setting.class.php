@@ -36,6 +36,8 @@ abstract class backup_setting extends base_setting implements checksumable {
     const COURSE_LEVEL   = 5;
     const SECTION_LEVEL  = 9;
     const ACTIVITY_LEVEL = 13;
+    const SUBSECTION_LEVEL = 17;
+    const SUBACTIVITY_LEVEL = 21;
 
     /** @var int Level of the setting, eg {@link self::ROOT_LEVEL} */
     protected $level;

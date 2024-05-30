@@ -106,7 +106,7 @@ abstract class backup_plan_dbops extends backup_dbops {
     }
 
     /**
-     * Given one course id, return one array with all the course_sections belonging to it
+     * Given one course id, return one array with all the course_sections ids belonging to it
      */
     public static function get_sections_from_courseid($courseid) {
         global $DB;
@@ -118,6 +118,17 @@ abstract class backup_plan_dbops extends backup_dbops {
             $sectionsarr[] = $section->id;
         }
         return $sectionsarr;
+    }
+
+    /**
+     * Given one section id, returns the full section record.
+     *
+     * @param int $sectionid
+     * @return stdClass
+     */
+    public static function get_section_from_id($sectionid): stdClass {
+        global $DB;
+        return $DB->get_record('course_sections', array('id' => $sectionid));
     }
 
     /**
