@@ -56,6 +56,30 @@ class restore_section_task extends restore_task {
         return $this->get_basepath() . '/sections/section_' . $this->info->sectionid;
     }
 
+    /**
+     * Get the course module that is delegating this section.
+     *
+     * @return int|null the course module id that is delegating this section
+     */
+    public function get_delegated_cm(): ?int {
+        if (!isset($this->info->parentcmid) || empty($this->info->parentcmid)) {
+            return null;
+        }
+        return intval($this->info->parentcmid);
+    }
+
+    /**
+     * Get the delegated activity modname if any.
+     *
+     * @return string|null the modname of the delegated activity
+     */
+    public function get_modname(): ?string {
+        if (!isset($this->info->modname) || empty($this->info->modname)) {
+            return null;
+        }
+        return $this->info->modname;
+    }
+
     public function set_sectionid($sectionid) {
         $this->sectionid = $sectionid;
     }
@@ -169,7 +193,20 @@ class restore_section_task extends restore_task {
         // Define sectionincluded (to decide if the whole task must be really executed).
         $settingname = $settingprefix . 'included';
 
-        $sectionincluded = new restore_section_included_setting($settingname, base_setting::IS_BOOLEAN, true);
+        $delegatedcmid = $this->get_delegated_cm();
+        if ($delegatedcmid) {
+            $sectionincluded = new restore_subsection_included_setting($settingname, base_setting::IS_BOOLEAN, true);
+            // Subsections depends on the parent activity included setting.
+            $settingname = $this->get_modname() . '_' . $delegatedcmid . '_included';
+            if ($this->plan->setting_exists($settingname)) {
+                $cmincluded = $this->plan->get_setting($settingname);
+                $cmincluded->add_dependency(
+                    $sectionincluded,
+                );
+            }
+        } else {
+            $sectionincluded = new restore_section_included_setting($settingname, base_setting::IS_BOOLEAN, true);
+        }
 
         if (is_number($this->info->title)) {
             $label = get_string('includesection', 'backup', $this->info->title);
@@ -208,7 +245,20 @@ class restore_section_task extends restore_task {
             $defaultvalue = true;
         }
 
-        $sectionuserinfo = new restore_section_userinfo_setting($settingname, base_setting::IS_BOOLEAN, $defaultvalue);
+        $delegatedcmid = $this->get_delegated_cm();
+        if ($delegatedcmid) {
+            $sectionuserinfo = new restore_subsection_userinfo_setting($settingname, base_setting::IS_BOOLEAN, $defaultvalue);
+            // Subsections depends on the parent activity included setting.
+            $settingname = $this->get_modname() . '_' . $delegatedcmid . '_userinfo';
+            if ($this->plan->setting_exists($settingname)) {
+                $cmincluded = $this->plan->get_setting($settingname);
+                $cmincluded->add_dependency(
+                    $sectionuserinfo,
+                );
+            }
+        } else {
+            $sectionuserinfo = new restore_section_userinfo_setting($settingname, base_setting::IS_BOOLEAN, $defaultvalue);
+        }
 
         if (!$defaultvalue) {
             // This is a bit hacky, but if there is no user data to restore, then
