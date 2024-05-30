@@ -222,6 +222,30 @@ class restore_section_included_setting extends restore_section_generic_setting {
  */
 class restore_section_userinfo_setting extends restore_section_generic_setting {}
 
+/**
+ * Subsection base class (delegated section).
+ */
+class restore_subsection_generic_setting extends restore_section_generic_setting {
+    public function __construct($name, $vtype, $value = null, $visibility = self::VISIBLE, $status = self::NOT_LOCKED) {
+        parent::__construct($name, $vtype, $value, $visibility, $status);
+        $this->level = self::SUBSECTION_LEVEL;
+    }
+}
+
+/**
+ * Setting to define if one subsection is included or no.
+ *
+ * Activities _included settings depend of them if available.
+ */
+class restore_subsection_included_setting extends restore_subsection_generic_setting {
+}
+
+/**
+ * Subsection backup setting to control if section will include
+ * user information or no, depends of @restore_users_setting.
+ */
+class restore_subsection_userinfo_setting extends restore_subsection_generic_setting {
+}
 
 // Activity backup settings
 
@@ -242,6 +266,32 @@ class restore_activity_included_setting extends restore_activity_generic_setting
  * user information or no, depends of @restore_users_setting
  */
 class restore_activity_userinfo_setting extends restore_activity_generic_setting {}
+
+/**
+ * Generic subactivity setting to pass various settings between tasks and steps
+ */
+class restore_subactivity_generic_setting extends restore_activity_generic_setting {
+    public function __construct($name, $vtype, $value = null, $visibility = self::VISIBLE, $status = self::NOT_LOCKED) {
+        parent::__construct($name, $vtype, $value, $visibility, $status);
+        $this->level = self::SUBACTIVITY_LEVEL;
+    }
+}
+
+/**
+ * Subactivity backup setting to control if activity will be included or no.
+ *
+ * Depends of restore_activities_setting and optionally parent section included setting.
+ */
+class restore_subactivity_included_setting extends restore_subactivity_generic_setting {
+}
+
+/**
+ * Subactivity backup setting to control if activity will include user information.
+ *
+ * Depends of restore_users_setting.
+ */
+class restore_subactivity_userinfo_setting extends restore_subactivity_generic_setting {
+}
 
 /**
  * root setting to control if restore will create content bank content or no
