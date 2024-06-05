@@ -112,12 +112,12 @@ abstract class base_task implements checksumable, executable, loggable {
      * @return bool
      */
     public function setting_exists($name) {
-        try {
-            $this->get_setting($name);
-            return true;
-        } catch (base_plan_exception $e) {
-            return false;
+        foreach ($this->settings as $setting) {
+            if ($setting->get_name() == $name) {
+                return true;
+            }
         }
+        return $this->plan->setting_exists($name);
     }
 
     public function get_setting_value($name) {
