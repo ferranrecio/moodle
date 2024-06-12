@@ -108,6 +108,9 @@ export default class extends BaseComponent {
      * @returns {Object} exported course module drop data
      */
     _getDraggableData() {
+        if (this.section.component !== null) {
+            return null;
+        }
         const exporter = this.reactive.getExporter();
         return exporter.sectionDraggableData(this.reactive.state, this.id);
     }
