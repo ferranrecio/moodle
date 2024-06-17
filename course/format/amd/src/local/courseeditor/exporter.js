@@ -115,6 +115,9 @@ export default class {
         if (cminfo.hasdelegatedsection) {
             const sectioninfo = state.section.get(cminfo.delegatesectionid);
             cm.sectioninfo = this.section(state, sectioninfo);
+            cm.sectioninfo.delegatedmoduleid = cminfo.id;
+        } else {
+            cm.sectioninfo = false; // This is used to avoid an infinite loop in the movecm component template.
         }
         return cm;
     }

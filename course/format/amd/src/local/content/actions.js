@@ -357,7 +357,10 @@ export default class extends BaseComponent {
         // Open the cm section node if possible (Bootstrap 4 uses jQuery to interact with collapsibles).
         // All jQuery in this code can be replaced when MDL-71979 is integrated.
         cmIds.forEach(cmId => {
-            const currentElement = modalBody.querySelector(`${this.selectors.CMLINK}[data-id='${cmId}']`);
+            const cmInfo = this.reactive.get('cm', cmId);
+            const selector = !cmInfo.hasdelegatedsection ? `${this.selectors.CMLINK}[data-id='${cmId}']`
+                : `${this.selectors.SECTIONLINK}[data-id='${cmInfo.sectionid}']`;
+            const currentElement = modalBody.querySelector(selector);
             const sectionnode = currentElement.closest(this.selectors.SECTIONNODE);
             const toggler = jQuery(sectionnode).find(this.selectors.MODALTOGGLER);
             let collapsibleId = toggler.data('target') ?? toggler.attr('href');
@@ -381,6 +384,7 @@ export default class extends BaseComponent {
 
             let targetSectionId;
             let targetCmId;
+            let droppedCmIds = [...cmIds];
             if (target.dataset.for == 'cm') {
                 const dropData = exporter.cmDraggableData(this.reactive.state, target.dataset.id);
                 targetSectionId = dropData.sectionid;
@@ -390,7 +394,19 @@ export default class extends BaseComponent {
                 targetSectionId = target.dataset.id;
                 targetCmId = section?.cmlist[0];
             }
-            this.reactive.dispatch('cmMove', cmIds, targetSectionId, targetCmId);
+            const section = this.reactive.get('section', targetSectionId);
+            if (section.component) {
+                // Remove cmIds which are not allowed to be moved to this delegated section (mostly
+                // all other delegated cm).
+                droppedCmIds = droppedCmIds.filter(cmId => {
+                    const cmInfo = this.reactive.get('cm', cmId);
+                    return !cmInfo.hasdelegatedsection;
+                });
+            }
+            if (droppedCmIds.length === 0) {
+                return; // No cm to move.
+            }
+            this.reactive.dispatch('cmMove', droppedCmIds, targetSectionId, targetCmId);
             this._destroyModal(modal, editTools);
         });
 
