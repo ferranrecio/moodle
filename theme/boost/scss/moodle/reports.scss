@@ -12,3 +12,16 @@
 #page-report-participation-index .participationselectform div label[for=menuinstanceid] {
     margin-left: 0; // No left margin for LTR.
 }
+
+// Outline report styles
+#page-report-outline-index .font-lg {
+    font-size: $font-size-base * 1.1;
+}
+#page-report-outline-index .generaltable tbody {
+    tr {
+        background-color: $white;
+    }
+}
+#page-report-outline-index .generaltable tbody td.delegated {
+    padding-left: $spacer * 3.5;
+}

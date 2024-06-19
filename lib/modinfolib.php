@@ -411,6 +411,28 @@ class course_modinfo {
     }
 
     /**
+     * Gets data about section delegated by course modules, indexed by course module instance.
+     * @return array section_info objects array indexed by course module instance as key
+     */
+    public function get_sections_delegated_by_cm(): array {
+        $delegatedbycm = [];
+        foreach ($this->delegatedsections as $componentsections) {
+            foreach ($componentsections as $section) {
+                $delegateinstance = $section->get_component_instance();
+                if (!$delegateinstance || !($delegateinstance instanceof \core_courseformat\sectiondelegatemodule)) {
+                    // We only return sections delegated by course modules.
+                    continue;
+                }
+                if (!$cm = $delegateinstance->get_cm()) {
+                    continue;
+                }
+                $delegatedbycm[$cm->id] = $section;
+            }
+        }
+        return $delegatedbycm;
+    }
+
+    /**
      * Static cache for generated course_modinfo instances
      *
      * @see course_modinfo::instance()
