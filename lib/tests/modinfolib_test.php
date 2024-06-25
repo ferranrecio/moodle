@@ -1733,4 +1733,32 @@ class modinfolib_test extends advanced_testcase {
         $cacherevthree = $DB->get_field('course', 'cacherev', ['id' => $coursethree->id]);
         $this->assertGreaterThan($prevcacherevthree, $cacherevthree);
     }
+
+    /**
+     * Test get_sections_delegated_by_cm method
+     *
+     * @covers \course_modinfo::get_sections_delegated_by_cm
+     */
+    public function test_get_sections_delegated_by_cm(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course(['numsections' => 1]);
+
+        $modinfo = get_fast_modinfo($course);
+        $delegatedsections = $modinfo->get_sections_delegated_by_cm();
+        $this->assertEmpty($delegatedsections);
+
+        // Add a section delegated by a course module.
+        $subsection = $this->getDataGenerator()->create_module('subsection', ['course' => $course]);
+        $modinfo = get_fast_modinfo($course);
+        $delegatedsections = $modinfo->get_sections_delegated_by_cm();
+        $this->assertCount(1, $delegatedsections);
+        $this->assertArrayHasKey($subsection->cmid, $delegatedsections);
+
+        // Add a section delegated by a block.
+        formatactions::section($course)->create_delegated('block_site_main_menu', 1);
+        $modinfo = get_fast_modinfo($course);
+        $delegatedsections = $modinfo->get_sections_delegated_by_cm();
+        // Sections delegated by a block shouldn't be returned.
+        $this->assertCount(1, $delegatedsections);
+    }
 }
