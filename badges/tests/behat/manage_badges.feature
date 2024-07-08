@@ -77,14 +77,14 @@ Feature: Manage badges
     And I press "Save"
     And I navigate to "Badges > Manage badges" in site administration
     And I press "Enable access" action in the "Badge #1" report row
-    And I should see "Changes in badge access"
-    And I press "Continue"
-    And I should see "Access to the badges was successfully enabled"
+    And I should see "This will make your badge visible to users and allow them to start earning it."
+    And I click on "Enable" "button" in the "Confirm" "dialogue"
+    And I should see "Access to badge 'Badge #1' enabled"
     Then the following should exist in the "reportbuilder-table" table:
       | Name      | Badge status  |
       | Badge #1  | Available     |
     And I press "Disable access" action in the "Badge #1" report row
-    And I should see "Access to the badges was successfully disabled"
+    And I should see "Access to badge 'Badge #1' disabled"
     And the following should exist in the "reportbuilder-table" table:
       | Name      | Badge status  |
       | Badge #1  | Not available |
@@ -99,7 +99,7 @@ Feature: Manage badges
     And I press "Save"
     And I navigate to "Badges > Manage badges" in site administration
     And I press "Enable access" action in the "Badge #1" report row
-    And I press "Continue"
+    And I click on "Enable" "button" in the "Confirm" "dialogue"
     And I press "Award badge" action in the "Badge #1" report row
     And I set the field "potentialrecipients[]" to "Admin User (moodle@example.com)"
     And I press "Award badge"
@@ -129,3 +129,33 @@ Feature: Manage badges
       | Badge #1 | Not available | 2          |
       | Badge #2 | Available     | 1          |
       | Badge #3 | Available     | 0          |
+
+  @_file_upload
+  Scenario: Badge names are not unique anymore
+    Given the following "courses" exist:
+      | fullname | shortname | category |
+      | Course 1 | C1        | 0        |
+    And the following "core_badges > Badge" exists:
+      | name           | Badge #2                     |
+      | status         | 0                            |
+      | course         | C1                           |
+      | type           | 1                            |
+      | version        | 1.0                          |
+      | language       | en                           |
+      | description    | Test badge description       |
+      | image          | badges/tests/behat/badge.png |
+      | imageauthorurl | http://author.example.com    |
+      | imagecaption   | Test caption image           |
+    And I log in as "admin"
+    And I navigate to "Badges > Add a new badge" in site administration
+    And I set the following fields to these values:
+      | name           | Badge #1                     |
+      | description    | Test badge description       |
+    And I upload "badges/tests/behat/badge.png" file to "Image" filemanager
+    When I press "Create badge"
+    Then I should see "Criteria for this badge have not been set up yet."
+    And I select "Edit details" from the "jump" singleselect
+    # Set name for a site badge with existing badge name in a course is also allowed.
+    And I set the field "name" to "Badge #2"
+    And I press "Save changes"
+    And I should see "Changes saved"
