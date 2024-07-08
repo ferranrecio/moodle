@@ -31,6 +31,16 @@ use context_system;
 class stored_file_test extends advanced_testcase {
 
     /**
+     * Set up the test environment.
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest(true);
+        // Make sure the EXIF ​​remover is disabled so it doesn't interfere with phpunit's processing of JPG image files.
+        set_config('exifremoverenabled', 0, 'core_fileredact');
+    }
+
+    /**
      * Test that the rotate_image() method does not rotate
      * an image that is not supposed to be rotated.
      */

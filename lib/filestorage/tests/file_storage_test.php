@@ -50,6 +50,16 @@ require_once($CFG->libdir . '/filestorage/stored_file.php');
 class file_storage_test extends \advanced_testcase {
 
     /**
+     * Set up the test environment.
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest(true);
+        // Make sure the EXIF ​​remover is disabled so it doesn't interfere with phpunit's processing of JPG image files.
+        set_config('exifremoverenabled', 0, 'core_fileredact');
+    }
+
+    /**
      * Files can be created from strings.
      *
      * @covers ::create_file_from_string

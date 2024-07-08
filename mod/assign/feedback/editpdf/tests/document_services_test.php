@@ -34,6 +34,16 @@ final class document_services_test extends \advanced_testcase {
     use \mod_assign_test_generator;
 
     /**
+     * Set up the test environment.
+     */
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest(true);
+        // Make sure the EXIF ​​remover is disabled so it doesn't interfere with phpunit's processing of JPG image files.
+        set_config('exifremoverenabled', 0, 'core_fileredact');
+    }
+
+    /**
      * Test that the save file method saves the file.
      */
     public function test_save_file_saves_the_file(): void {
