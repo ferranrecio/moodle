@@ -2353,13 +2353,25 @@ EOF;
     /**
      * Enable an specific plugin.
      *
-     * @When /^I enable "(?P<plugin_string>(?:[^"]|\\")*)" "(?P<plugintype_string>[^"]*)" plugin$/
+     * @Given I enable :plugin :plugintype plugin
      * @param string $plugin Plugin we look for
      * @param string $plugintype The type of the plugin
      */
     public function i_enable_plugin($plugin, $plugintype) {
         $class = core_plugin_manager::resolve_plugininfo_class($plugintype);
         $class::enable_plugin($plugin, true);
+    }
+
+    /**
+     * Disable an specific plugin.
+     *
+     * @Given I disable :plugin :plugintype plugin
+     * @param string $plugin Plugin we look for
+     * @param string $plugintype The type of the plugin
+     */
+    public function i_disable_plugin($plugin, $plugintype) {
+        $class = core_plugin_manager::resolve_plugininfo_class($plugintype);
+        $class::enable_plugin($plugin, false);
     }
 
     /**
