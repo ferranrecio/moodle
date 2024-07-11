@@ -35,6 +35,17 @@ class icon_system_fontawesome extends icon_system_font {
      */
     private $map = [];
 
+    private array $families = [
+        'fa-brands',
+        'fa-solid',
+        'fa-regular',
+        'light',
+        'thin',
+        'duotone',
+        'sharp',
+        'fa',
+    ];
+
     public function get_core_icon_map() {
         return [
             'core:docs' => 'fa-info-circle',
@@ -476,10 +487,7 @@ class icon_system_fontawesome extends icon_system_font {
 
                 // Add the solid class by default to all icons that have not specific family.
                 foreach ($this->map as $from => $to) {
-                    if ($this->has_family($to)) {
-                        continue;
-                    }
-                    $this->map[$from] = 'fa ' . $to;
+                    $this->map[$from] = $this->add_family($to);
                 }
 
                 $cache->set($mapkey, $this->map);
@@ -489,28 +497,17 @@ class icon_system_fontawesome extends icon_system_font {
     }
 
     /**
-     * Check if the given icon has a family defined.
+     * Add the family class, if not present.
      *
-     * @param string $key The icon.
-     * @return bool True if the icon includes a family (fa-regular, fa-brands, fa-solid...), false otherwise.
+     * @param string $cssclasses The icon classes.
+     * @return string the new key with family class.
      */
-    protected function has_family(string $key): bool {
-        $families = [
-            'fa-brands',
-            'fa-solid',
-            'fa-regular',
-            'light',
-            'thin',
-            'duotone',
-            'sharp',
-        ];
-
-        foreach ($families as $family) {
-            if (str_contains($key, $family)) {
-                return true;
-            }
+    protected function add_family(string $cssclasses): string {
+        $family = array_intersect(explode(' ', $cssclasses), $this->families);
+        if (count($family) != 0) {
+            return $cssclasses;
         }
-        return false;
+        return 'fa ' . $cssclasses;
     }
 
     #[\Override]
