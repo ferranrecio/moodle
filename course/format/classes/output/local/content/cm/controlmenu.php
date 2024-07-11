@@ -120,6 +120,14 @@ class controlmenu implements named_templatable, renderable {
 
         $mod = $this->mod;
 
+        // In case module is delegating a section, we should return delegated section action menu.
+        if ($delegated = $mod->get_delegated_section_info()) {
+            $controlmenuclass = $this->format->get_output_classname('content\\cm\\delegatedcontrolmenu');
+            $controlmenu = new $controlmenuclass($this->format, $delegated, $mod);
+
+            return $controlmenu->get_action_menu($output);
+        }
+
         $controls = $this->cm_control_items();
 
         if (empty($controls)) {
