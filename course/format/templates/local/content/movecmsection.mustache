@@ -92,14 +92,14 @@
     <span class="dragicon ml-auto">{{#pix}}i/dragdrop{{/pix}}</span>
 </div>
 <div id="movemodalcollapse{{number}}"
-     class="collapse-list-item-content collapse"
+     class="collapse"
      aria-labelledby="movemodalsection{{number}}"
      role="group"
 >
     <ul class="unlist" data-for="cmlist" data-id="{{id}}">
         {{#cms}}
             {{#sectioninfo}}
-                <li class="collapse-list-item d-flex flex-column" role="treeitem">
+                <li class="d-flex flex-column" role="treeitem" data-for="sectionnode">
                     {{> core_courseformat/local/content/movecmsection}}
                 </li>
             {{/sectioninfo}}

@@ -1724,12 +1724,16 @@ $divider-hover-color: $primary !default;
         }
 
         a {
-            color: $list-group-action-color;
+            color: $list-group-action-active-color;
 
             &:hover,
             &:focus {
                 text-decoration: none;
             }
+        }
+
+        a.disabled {
+            color: $list-group-disabled-color;
         }
     }
 

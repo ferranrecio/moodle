@@ -29897,10 +29897,13 @@ span.editinstructions .alert-link {
   color: #083863;
 }
 .move-activity-tree .collapse-list-item a {
-  color: #495057;
+  color: #1d2125;
 }
 .move-activity-tree .collapse-list-item a:hover, .move-activity-tree .collapse-list-item a:focus {
   text-decoration: none;
+}
+.move-activity-tree .collapse-list-item a.disabled {
+  color: #6a737b;
 }
 .move-activity-tree .collapse-list-item-content .collapse-list-item {
   padding: 0.5rem 1rem;
