@@ -1,0 +1,8 @@
+issueNumber: MDL-82510
+notes:
+  core_courseformat:
+    - message: >-
+        New \core_courseformat\output\local\content\cmdelegatedcontrolmenu class
+        have been created to render delegated section action menu combining
+        section and module action menu.
+      type: improved

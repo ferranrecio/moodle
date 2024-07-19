@@ -88,7 +88,7 @@ class controlmenu implements named_templatable, renderable {
     /**
      * Generate the action menu element depending on the section.
      *
-     * Sections controlled by a plugin will delegate the control menu to the plugin.
+     * Sections controlled by a plugin will delegate the control menu to the delegated section class.
      *
      * @param \renderer_base $output typically, the renderer that's calling this function
      * @return action_menu|null the activity action menu or null if no action menu is available
