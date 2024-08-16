@@ -113,6 +113,86 @@ class coursestructure implements \renderable, \templatable {
     }
 
     /**
+     * Exports course sections, sections delegated by modules and modules data in a hierarchical format.
+     *
+     * @param \renderer_base $output
+     * @return array|\stdClass
+     */
+    public function export_hierarchy(\renderer_base $output) {
+
+        $sections = [];
+
+        $delegatedsections = $this->modinfo->get_sections_delegated_by_cm();
+        $allsections = $this->modinfo->get_sections();
+        foreach ($allsections as $sectionnum => $sectionmodules) {
+            // Add the section row.
+            $sectioninfo = $this->modinfo->get_section_info($sectionnum);
+
+            // Don't show subsections here. We are showing them in the corresponding module.
+            if ($sectioninfo->is_delegated()) {
+                continue;
+            }
+
+            if (!$sectioninfo->uservisible) {
+                continue;
+            }
+
+            $section = $this->export_section_data($output, $sectioninfo, false);
+            if (empty($sectioninfo) || empty($sectioninfo->sequence)) {
+                continue;
+            }
+
+            $sectionmodules = explode(",", $sectioninfo->sequence);
+            $activities = [];
+            // Add section modules and possibly subsections.
+            foreach ($sectionmodules as $cmid) {
+                $cm = $this->modinfo->cms[$cmid];
+
+                // Check if the module is delegating a section.
+                if (array_key_exists($cm->id, $delegatedsections)) {
+                    $subsectioninfo = $delegatedsections[$cm->id];
+                    // Only non-empty are listed in allsections. We don't show empty sections.
+                    if (!array_key_exists($subsectioninfo->sectionnum, $allsections)) {
+                        continue;
+                    }
+
+                    $subsection = $this->export_section_data($output, $subsectioninfo, true);
+                    if (empty($subsection)) {
+                        continue;
+                    }
+
+                    // Show activities inside the section.
+                    $subsectionmodules = $allsections[$subsectioninfo->sectionnum];
+                    $subactivities = [];
+                    foreach ($subsectionmodules as $subsectioncmid) {
+                        $cm = $this->modinfo->cms[$subsectioncmid];
+                        $activity = $this->export_activity_data($output, $cm, true);
+                        if (!empty($activity)) {
+                            $subactivities[] = $activity;
+                        }
+                    }
+                    if (!empty($subactivities)) {
+                        $subsection['activities'] = $subactivities;
+                    }
+                    $activities[] = $subsection;
+                } else {
+                    // It's simply a module.
+                    $activity = $this->export_activity_data($output, $cm);
+                    if (!empty($activity)) {
+                        $activities[] = $activity;
+                    }
+                }
+            }
+            if (!empty($activities)) {
+                $section['activities'] = $activities;
+            }
+            $sections[] = $section;
+        }
+
+        return $sections;
+    }
+
+    /**
      * Exports the headers for report table.
      *
      * @param \renderer_base $output
@@ -121,7 +201,6 @@ class coursestructure implements \renderable, \templatable {
     protected function export_headers(\renderer_base $output): array {
         return [get_string('activity')];
     }
-
 
     /**
      * Exports the data for a single section.
