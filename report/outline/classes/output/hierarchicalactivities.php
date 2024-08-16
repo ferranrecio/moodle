@@ -75,47 +75,49 @@ class hierarchicalactivities extends coursestructure {
         $instance = $DB->get_record($mod->modname, ['id' => $mod->instance]);
         $libfile = "$CFG->dirroot/mod/$mod->modname/lib.php";
 
-        if (file_exists($libfile)) {
-            require_once($libfile);
+        if (!file_exists($libfile)) {
+            return;
+        }
 
-            switch ($mode) {
-                case "outline":
-                    $useroutline = $mod->modname . "_user_outline";
-                    if (function_exists($useroutline)) {
-                        $toprint = $useroutline($course, $user, $mod, $instance);
-                    } else {
-                        $toprint = report_outline_user_outline($user->id, $mod->id, $mod->modname, $mod->instance);
-                    }
-                    if (!$toprint) {
-                        $toprint = (object) ['info' => '-'];
-                    }
-                    report_outline_print_row($mod, $instance, $toprint);
-                    break;
-                case "complete":
-                    $usercomplete = $mod->modname . "_user_complete";
-                    $image = $output->pix_icon('monologo', $mod->modfullname, 'mod_' . $mod->modname, ['class' => 'icon']);
-                    echo "<h4 class=\"h6\">$image $mod->modfullname: " .
-                            "<a href=\"$CFG->wwwroot/mod/$mod->modname/view.php?id=$mod->id\">" .
-                            format_string($instance->name, true) . "</a></h4>";
+        require_once($libfile);
 
-                    ob_start();
+        switch ($mode) {
+            case "outline":
+                $useroutline = $mod->modname . "_user_outline";
+                if (function_exists($useroutline)) {
+                    $toprint = $useroutline($course, $user, $mod, $instance);
+                } else {
+                    $toprint = report_outline_user_outline($user->id, $mod->id, $mod->modname, $mod->instance);
+                }
+                if (!$toprint) {
+                    $toprint = (object) ['info' => '-'];
+                }
+                report_outline_print_row($mod, $instance, $toprint);
+                break;
+            case "complete":
+                $usercomplete = $mod->modname . "_user_complete";
+                $image = $output->pix_icon('monologo', $mod->modfullname, 'mod_' . $mod->modname, ['class' => 'icon']);
+                echo "<h4 class=\"h6\">$image $mod->modfullname: " .
+                        "<a href=\"$CFG->wwwroot/mod/$mod->modname/view.php?id=$mod->id\">" .
+                        format_string($instance->name, true) . "</a></h4>";
 
-                    echo "<ul>";
-                    if (function_exists($usercomplete)) {
-                        $usercomplete($course, $user, $mod, $instance);
-                    } else {
-                        echo report_outline_user_complete($user->id, $mod->id, $mod->modname, $mod->instance);
-                    }
-                    echo "</ul>";
+                ob_start();
 
-                    $toprint = ob_get_contents();
-                    ob_end_clean();
+                echo "<ul>";
+                if (function_exists($usercomplete)) {
+                    $usercomplete($course, $user, $mod, $instance);
+                } else {
+                    echo report_outline_user_complete($user->id, $mod->id, $mod->modname, $mod->instance);
+                }
+                echo "</ul>";
 
-                    if (str_replace(' ', '', $toprint) != '<ul></ul>') {
-                        echo $toprint;
-                    }
-                    break;
-            }
+                $toprint = ob_get_contents();
+                ob_end_clean();
+
+                if (str_replace(' ', '', $toprint) != '<ul></ul>') {
+                    echo $toprint;
+                }
+                break;
         }
     }
 }
