@@ -1465,7 +1465,7 @@ class stateactions_test extends \advanced_testcase {
      * @param array $references
      * @return array
      */
-    private function get_course_tree(stdClass $course, array $references) {
+    private function get_course_tree(stdClass $course, array $references): array {
         $coursetree = [];
         $modinfo = get_fast_modinfo($course); // Get refreshed version.
 
@@ -1474,26 +1474,32 @@ class stateactions_test extends \advanced_testcase {
         foreach ($allsections as $sectioninfo) {
             $sectionkey = 'section' . $sectioninfo->sectionnum;
             $coursetree[$sectionkey] = [];
-            if (!empty(trim($sectioninfo->sequence))) {
-                $cmids = explode(",", $sectioninfo->sequence);
-                foreach ($cmids as $cmid) {
-                    $cm = $modinfo->get_cm($cmid);
-                    $delegatedsection = $cm->get_delegated_section_info();
-                    if (!$delegatedsection) {
-                        $coursetree[$sectionkey][] = $cmidstoref[$cmid];
-                    } else {
-                        $delegatedsectionkey = $delegatedsection->name;
-                        $coursetree[$sectionkey][$delegatedsectionkey] = [];
-                        if (!empty(trim($delegatedsection->sequence))) {
-                            $delegatedcmids = explode(",", $delegatedsection->sequence);
-                            $delegatedsectionkey = $delegatedsection->name; // We gave it a name, so let's use it.
-                            $coursetree[$sectionkey][$delegatedsectionkey] = [];
-                            foreach ($delegatedcmids as $dcmid) {
-                                $coursetree[$sectionkey][$delegatedsectionkey][] = $cmidstoref[$dcmid];
-                            }
-                        }
-                    }
+            if (empty(trim($sectioninfo->sequence))) {
+                continue;
+            }
+            $cmids = explode(",", $sectioninfo->sequence);
+            foreach ($cmids as $cmid) {
+                $cm = $modinfo->get_cm($cmid);
+                $delegatedsection = $cm->get_delegated_section_info();
+
+                // Course modules without a delegated section are included as activities.
+                if (!$delegatedsection) {
+                    $coursetree[$sectionkey][] = $cmidstoref[$cmid];
+                    continue;
                 }
+
+                // Course modules with a delegated are included as a section, not as an activity.
+                $delegatedsectionkey = $delegatedsection->name; // We gave it a name, so let's use it as key.
+                $coursetree[$sectionkey][$delegatedsectionkey] = [];
+
+                if (empty(trim($delegatedsection->sequence))) {
+                    continue;
+                }
+                $delegatedcmids = explode(",", $delegatedsection->sequence);
+                foreach ($delegatedcmids as $dcmid) {
+                    $coursetree[$sectionkey][$delegatedsectionkey][] = $cmidstoref[$dcmid];
+                }
+
             }
         }
         return $coursetree;
