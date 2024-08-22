@@ -46,6 +46,7 @@ export default class Component extends DndCmItem {
         this.selectors = {
             CM_NAME: `[data-for='cm_name']`,
             CM_COMPLETION: `[data-for='cm_completion']`,
+            DELEGATED_SECTION_ITEM: `.courseindex-section-title`,
         };
         // Default classes to toggle on refresh.
         this.classes = {
