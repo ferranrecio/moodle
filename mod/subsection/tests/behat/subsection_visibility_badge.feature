@@ -22,7 +22,6 @@ Feature: Subsections visibility badges
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
     And I log in as "teacher1"
-    # And I am on the "C1" "Course" page logged in as "teacher1"
 
   @javascript
   Scenario: Hide/Show subsection badge on the course page

@@ -78,7 +78,7 @@ class visibility implements named_templatable, renderable {
 
         $data->notavailable = false;
         $data->hiddenfromstudents = true;
-        if ($this->is_section_visibility_editable()) {
+        if ($data->editing && $this->is_section_visibility_editable()) {
             $data->dropwdown = $this->get_visibility_dropdown($output);
         } else {
             // The user is editing but cannot edit the visibility on this specific section,
@@ -94,11 +94,9 @@ class visibility implements named_templatable, renderable {
      */
     protected function is_section_visibility_editable(): bool {
         // Delegated section inside a hidden sections are not editable.
-        $sectiondelegate = $this->section->get_component_instance();
-        if ($sectiondelegate instanceof sectiondelegatemodule) {
-            /** @var sectiondelegatemodule $sectiondelegate */
-            $parentcm = $sectiondelegate->get_cm();
-            return $parentcm->get_section_info()->visible;
+        $parentsection = $this->section->get_component_instance()?->get_parent_section();
+        if ($parentsection && !$parentsection->visible) {
+            return false;
         }
         return true;
     }
@@ -110,13 +108,13 @@ class visibility implements named_templatable, renderable {
      */
     protected function get_visibility_dropdown(\renderer_base $output): array {
         $badgetext = $output->sr_text(get_string('availability'));
-        $badgetext .= get_string("hiddenfromstudents");
+        $badgetext .= get_string('hiddenfromstudents');
         $icon = $this->get_icon('hide');
 
         $choice = new choicelist();
         $choice->add_option(
             'show',
-            get_string("availability_show", 'core_courseformat'),
+            get_string('availability_show', 'core_courseformat'),
             $this->get_option_data('show', 'sectionShow')
         );
         $choice->add_option(
