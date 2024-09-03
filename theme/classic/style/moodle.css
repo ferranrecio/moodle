@@ -29148,7 +29148,6 @@ span.editinstructions .alert-link {
 /* Activity cards */
 .activity {
   list-style: none;
-  position: relative;
   padding-top: 0.25rem;
   margin-top: 0.25rem;
   border-top: 1px solid #dee2e6;
@@ -29160,7 +29159,6 @@ span.editinstructions .alert-link {
 }
 
 .activity-item {
-  position: relative;
   padding: 0.75rem;
   border-radius: 1rem;
 }
