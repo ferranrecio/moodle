@@ -44,6 +44,7 @@ function subsection_supports($feature) {
         FEATURE_SHOW_DESCRIPTION => false,
         FEATURE_MOD_PURPOSE => MOD_PURPOSE_CONTENT,
         FEATURE_QUICKCREATE => true,
+        FEATURE_MODEDIT_DEFAULT_COMPLETION => false,
         default => null,
     };
 }
