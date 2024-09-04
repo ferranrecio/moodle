@@ -14,6 +14,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * A configuration to provide to the modal.
+ *
+ * @typedef {Object} courseItem
+ *
+ * @property {String} type The type of element (section, cm).
+ * @property {Number} id Element ID.
+ * @property {String} url Element URL.
+ * @property {boolean} [delegatedsection] If the section is delegated.
+ */
+
+/**
  * Module to export parts of the state and transform them to be used in templates
  * and as draggable data.
  *
@@ -228,7 +239,7 @@ export default class {
      * Return a sorted list of all sections and cms items in the state.
      *
      * @param {Object} state the current state.
-     * @returns {Array} all sections and cms items in the state.
+     * @returns {courseItem[]} all sections and cms items in the state.
      */
     allItemsArray(state) {
         const items = [];
@@ -236,31 +247,59 @@ export default class {
         // Add sections.
         sectionlist.forEach(sectionid => {
             const sectioninfo = state.section.get(sectionid);
-            if (sectioninfo.component === null) {
-                items.push({type: 'section', id: sectioninfo.id, url: sectioninfo.sectionurl, delegatedsection: false});
+            // Skip delegated sections because components are responsible for them.
+            if (sectioninfo.component !== null) {
+                return;
             }
+
+            items.push({
+                type: 'section',
+                id: sectioninfo.id,
+                url: sectioninfo.sectionurl
+            });
             // Add cms.
             const cmlist = sectioninfo.cmlist ?? [];
             cmlist.forEach(cmid => {
-                const cminfo = state.cm.get(cmid);
-                if (cminfo.hasdelegatedsection) {
-                    const delegatedsection = state.section.get(cminfo.delegatesectionid);
-                    items.push({
-                        type: 'section', id: delegatedsection.id,
-                        url: delegatedsection.sectionurl,
-                        delegatedsection: true
-                    });
-                    const delegatedCmlist = delegatedsection.cmlist ?? [];
-                    delegatedCmlist.forEach(cmid => {
-                        const cminfo = state.cm.get(cmid);
-                        items.push({type: 'cm', id: cminfo.id, url: cminfo.url});
-                    });
-                } else {
-                    items.push({type: 'cm', id: cminfo.id, url: cminfo.url});
-                }
+                const cmInfo = state.cm.get(cmid);
+                items.push(...this.cmItemsArray(state, cmInfo));
             });
         });
         return items;
+    }
+
+    /**
+     * Return a list of all items associated with an activity.
+     *
+     * @private
+     * @param {Object} state the full current state.
+     * @param {Object} cmInfo the course module state data.
+     * @return {courseItem[]} the items array associated with that cm.
+     */
+    cmItemsArray(state, cmInfo) {
+        // Activities with delegated sections are exported as sections.
+        if (cmInfo.hasdelegatedsection) {
+            const items = [];
+            const delegatedsection = state.section.get(cmInfo.delegatesectionid);
+            items.push({
+                type: 'section',
+                id: delegatedsection.id,
+                url: delegatedsection.sectionurl
+            });
+            const delegatedCmlist = delegatedsection.cmlist ?? [];
+            delegatedCmlist.forEach(cmid => {
+                const cmInfo = state.cm.get(cmid);
+                items.push({
+                    type: 'cm',
+                    id: cmInfo.id,
+                    url: cmInfo.url
+                });
+            });
+            return items;
+        }
+
+        return [
+            {type: 'cm', id: cmInfo.id, url: cmInfo.url},
+        ];
     }
 
     /**
