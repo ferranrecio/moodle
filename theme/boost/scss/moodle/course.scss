@@ -1301,7 +1301,6 @@ $divider-hover-color: $primary !default;
 
 .activity {
     list-style: none;
-    position: relative;
     padding-top: map-get($spacers, 1);
     margin-top: map-get($spacers, 1);
     border-top: $border-width solid $border-color;
@@ -1316,7 +1315,6 @@ $divider-hover-color: $primary !default;
 }
 
 .activity-item {
-    position: relative;
     padding: $activity-item-padding;
     @include border-radius($activity-border-radius);
     &.activityinline {

@@ -236,12 +236,28 @@ export default class {
         // Add sections.
         sectionlist.forEach(sectionid => {
             const sectioninfo = state.section.get(sectionid);
-            items.push({type: 'section', id: sectioninfo.id, url: sectioninfo.sectionurl});
+            if (sectioninfo.component === null) {
+                items.push({type: 'section', id: sectioninfo.id, url: sectioninfo.sectionurl, delegatedsection: false});
+            }
             // Add cms.
             const cmlist = sectioninfo.cmlist ?? [];
             cmlist.forEach(cmid => {
                 const cminfo = state.cm.get(cmid);
-                items.push({type: 'cm', id: cminfo.id, url: cminfo.url});
+                if (cminfo.hasdelegatedsection) {
+                    const delegatedsection = state.section.get(cminfo.delegatesectionid);
+                    items.push({
+                        type: 'section', id: delegatedsection.id,
+                        url: delegatedsection.sectionurl,
+                        delegatedsection: true
+                    });
+                    const delegatedCmlist = delegatedsection.cmlist ?? [];
+                    delegatedCmlist.forEach(cmid => {
+                        const cminfo = state.cm.get(cmid);
+                        items.push({type: 'cm', id: cminfo.id, url: cminfo.url});
+                    });
+                } else {
+                    items.push({type: 'cm', id: cminfo.id, url: cminfo.url});
+                }
             });
         });
         return items;
