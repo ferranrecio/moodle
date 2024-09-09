@@ -159,6 +159,17 @@ var getH5PObject = async (iFrame) => {
     return H5P;
 };
 
+/* eslint-disable promise/no-native */
+/**
+ * Load the core/pending module.
+ * @returns {Promise<Pending>}
+ */
+const getPendingClass = () => new Promise((resolve) => {
+    require(['core/pending'], (Pending) => {
+        resolve(Pending);
+    });
+});
+
 document.onreadystatechange = async() => {
     // Wait for instances to be initialize.
     if (document.readyState !== 'complete') {
@@ -211,41 +222,33 @@ document.onreadystatechange = async() => {
     H5PEmbedCommunicator.on('resize', function() {
         H5P.trigger(instance, 'resize');
     });
-    /* eslint-disable promise/no-native */
-    const pendingPromise = new Promise(function(resolve) {
-        require(['core/pending'], function(Pending) {
-            // Resolve the Promise with Repository to allow any queued calls to be executed.
-            resolve(Pending);
-        });
-    });
-    pendingPromise.then(function(Pending) {
-        var pending = new Pending('core/modal_factory:create');
-        H5P.on(instance, 'resize', function() {
-            if (H5P.isFullscreen) {
-                return; // Skip iframe resize.
-            }
 
-            // Use a delay to make sure iframe is resized to the correct size.
-            clearTimeout(resizeDelay);
-            resizeDelay = setTimeout(function() {
-                // Only resize if the iframe can be resized.
-                if (parentIsFriendly) {
-                    H5PEmbedCommunicator.send('prepareResize',
-                        {
-                            scrollHeight: iFrame.contentDocument.body.scrollHeight,
-                            clientHeight: iFrame.contentDocument.body.clientHeight
-                        }
-                    );
-                } else {
-                    H5PEmbedCommunicator.send('hello');
-                }
-                pending.resolve();
-            }, 150);
-        });
-        return pending;
-    }).catch(function() {
-        window.console.error('Error while loading pending');
+    const Pending = await getPendingClass();
+    var resizePending = new Pending('core_h5p/iframe:resize');
+
+    H5P.on(instance, 'resize', function() {
+        if (H5P.isFullscreen) {
+            return; // Skip iframe resize.
+        }
+
+        // Use a delay to make sure iframe is resized to the correct size.
+        clearTimeout(resizeDelay);
+        resizeDelay = setTimeout(function() {
+            // Only resize if the iframe can be resized.
+            if (parentIsFriendly) {
+                H5PEmbedCommunicator.send('prepareResize',
+                    {
+                        scrollHeight: iFrame.contentDocument.body.scrollHeight,
+                        clientHeight: iFrame.contentDocument.body.clientHeight
+                    }
+                );
+            } else {
+                H5PEmbedCommunicator.send('hello');
+            }
+            resizePending.resolve();
+        }, 150);
     });
+
     // Get emitted xAPI data.
     H5P.externalDispatcher.on('xAPI', function(event) {
         statementPosted = false;
@@ -306,11 +309,5 @@ document.onreadystatechange = async() => {
         }
     });
 
-    // Trigger initial resize for instance.
-    pendingPromise.then(function() {
-        H5P.trigger(instance, 'resize');
-        return true;
-    }).catch(function() {
-        window.console.error('Error while triggering initial resize');
-    });
+    H5P.trigger(instance, 'resize');
 };
