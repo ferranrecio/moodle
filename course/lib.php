@@ -2867,11 +2867,11 @@ function include_course_editor(course_format $format) {
 
     $course = $format->get_course();
 
-    if ($SITE->id === $course->id) {
+    $statekey = course_format::session_cache($course);
+
+    if (!$format->supports_ajax()?->capable) {
         return;
     }
-
-    $statekey = course_format::session_cache($course);
 
     // Edition mode and some format specs must be passed to the init method.
     $setup = (object)[
