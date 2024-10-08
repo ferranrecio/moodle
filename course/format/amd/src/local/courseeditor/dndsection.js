@@ -49,7 +49,7 @@ export default class extends BaseComponent {
     /**
      * Register state values and the drag and drop subcomponent.
      *
-     * @param {BaseComponent} sectionitem section item component
+     * @param {BaseComponent} [sectionitem] section item component, if any.
      */
     configDragDrop(sectionitem) {
         // Drag and drop is only available for components compatible course formats.

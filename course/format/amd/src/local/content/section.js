@@ -79,6 +79,8 @@ export default class extends DndSection {
                     fullregion: this.element,
                 });
                 this.configDragDrop(headerComponent);
+            } else {
+                this.configDragDrop();
             }
         }
         this._openSectionIfNecessary();
