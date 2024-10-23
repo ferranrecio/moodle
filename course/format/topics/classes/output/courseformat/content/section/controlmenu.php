@@ -24,6 +24,7 @@
 
 namespace format_topics\output\courseformat\content\section;
 
+use core\output\action_menu\link as action_menu_link;
 use core_courseformat\output\local\content\section\controlmenu as controlmenu_base;
 use moodle_url;
 
@@ -50,20 +51,16 @@ class controlmenu extends controlmenu_base {
      * @return array of edit control items
      */
     public function section_control_items() {
-
-        $format = $this->format;
         $section = $this->section;
-        $coursecontext = $format->get_context();
-
         $parentcontrols = parent::section_control_items();
 
-        if ($section->is_orphan() || !$section->section) {
+        if ($section->is_orphan() || !$section->sectionnum) {
             return $parentcontrols;
         }
 
         $controls = [];
-        if (has_capability('moodle/course:setcurrentsection', $coursecontext)) {
-            $controls['highlight'] = $this->get_highlight_control();
+        if (has_capability('moodle/course:setcurrentsection', $this->coursecontext)) {
+            $controls['highlight'] = $this->get_section_highlight_item();
         }
 
         // If the edit key exists, we are going to insert our controls after it.
@@ -106,11 +103,80 @@ class controlmenu extends controlmenu_base {
     }
 
     /**
+     * Retrieves the view item for the section control menu.
+     *
+     * @return action_menu_link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_section_highlight_item(): ?action_menu_link {
+        $format = $this->format;
+        $section = $this->section;
+        $course = $format->get_course();
+        $sectionreturn = $format->get_sectionnum();
+        $url = $this->get_course_url();
+        if (!is_null($sectionreturn)) {
+            $url->param('sectionid', $format->get_sectionid());
+        }
+
+        $highlightoff = get_string('highlightoff');
+        $highlightofficon = 'i/marked';
+
+        $highlighton = get_string('highlight');
+        $highlightonicon = 'i/marker';
+
+        if ($course->marker == $section->sectionnum) {  // Show the "light globe" on/off.
+            $url->param('marker', 0);
+            $item = [
+                'url' => $url,
+                'icon' => $highlightofficon,
+                'name' => $highlightoff,
+                'pixattr' => ['class' => ''],
+                'attr' => [
+                    'class' => 'editing_highlight',
+                    'data-action' => 'sectionUnhighlight',
+                    'data-sectionreturn' => $sectionreturn,
+                    'data-id' => $section->id,
+                    'data-icon' => $highlightofficon,
+                    'data-swapname' => $highlighton,
+                    'data-swapicon' => $highlightonicon,
+                ],
+            ];
+        } else {
+            $url->param('marker', $section->section);
+            $item = [
+                'url' => $url,
+                'icon' => $highlightonicon,
+                'name' => $highlighton,
+                'pixattr' => ['class' => ''],
+                'attr' => [
+                    'class' => 'editing_highlight',
+                    'data-action' => 'sectionHighlight',
+                    'data-sectionreturn' => $sectionreturn,
+                    'data-id' => $section->id,
+                    'data-icon' => $highlightonicon,
+                    'data-swapname' => $highlightoff,
+                    'data-swapicon' => $highlightofficon,
+                ],
+            ];
+        }
+        return $this->normalize_action_menu_link($item);
+    }
+
+    /**
      * Return the specific section highlight action.
      *
+     * @deprecated since Moodle 5.0
+     * @todo Remove this method in Moodle 6.0 (MDL-83530).
      * @return array the action element.
      */
+    #[\core\attribute\deprecated(
+        replacement: 'get_section_highlight_item',
+        since: '4.0',
+        mdl: 'MDL-83527',
+        reason: 'Wrong return type',
+        final: true,
+    )]
     protected function get_highlight_control(): array {
+        \core\deprecation::emit_deprecation_if_present([self::class, __FUNCTION__]);
         $format = $this->format;
         $section = $this->section;
         $course = $format->get_course();
