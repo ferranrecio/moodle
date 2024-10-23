@@ -16,8 +16,9 @@
 
 namespace core_courseformat\output\local\content\cm;
 
-use action_menu;
 use context_course;
+use core\output\action_menu;
+use core\output\action_menu\link as action_menu_link;
 use core_courseformat\base as course_format;
 use core_courseformat\output\local\content\basecontrolmenu;
 use moodle_url;
@@ -60,14 +61,107 @@ class delegatedcontrolmenu extends basecontrolmenu {
     /**
      * Generate the edit control items of a section.
      *
-     * It is not clear this kind of controls are still available in 4.0 so, for now, this
-     * method is almost a clone of the previous section_control_items from the course/renderer.php.
-     *
-     * This method must remain public until the final deprecation of section_edit_control_items.
-     *
      * @return array of edit control items
      */
     public function delegated_control_items() {
+        // TODO remove this if as part of MDL-83530.
+        if (!$this->format->supports_components()) {
+            return $this->delegated_control_items_legacy();
+        }
+
+        $controls = [];
+        $controls['view'] = $this->get_section_view_item();
+        $controls['edit'] = $this->get_section_edit_item();
+        $controls['visibility'] = $this->get_section_visibility_item();
+        $controls['movesection'] = $this->get_cm_move_item();
+        $controls['permalink'] = $this->get_section_permalink_item();
+        $controls['delete'] = $this->get_cm_delete_item();
+
+        return $controls;
+    }
+
+    /**
+     * Generates the delete item for a course module.
+     *
+     * @return action_menu_link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_cm_delete_item(): ?action_menu_link {
+        // Delete deletes the module.
+        if (!has_capability('moodle/course:manageactivities', $this->coursecontext)) {
+            return null;
+        }
+
+        $url = new moodle_url('/course/mod.php');
+        $url->param('sesskey', sesskey());
+        $url->param('delete', $this->mod->id);
+        $url->param('sr', $this->mod->sectionnum);
+
+        return $this->normalize_action_menu_link([
+            'url' => $url,
+            'icon' => 't/delete',
+            'name' => get_string('delete'),
+            'pixattr' => ['class' => ''],
+            'attr' => [
+                'class' => 'editing_delete text-danger',
+                'data-action' => 'cmDelete',
+                'data-sectionreturn' => $this->format->get_sectionnum(),
+                'data-id' => $this->mod->id,
+            ],
+        ]);
+    }
+
+    /**
+     * Generates the move item for a course module.
+     *
+     * @return action_menu_link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_cm_move_item(): ?action_menu_link {
+        // Only show the move link if we are not already in the section view page.
+        if (
+            $this->format->get_sectionid() == $this->section->id
+            || !has_capability('moodle/course:manageactivities', $this->coursecontext)
+        ) {
+            return null;
+        }
+        return $this->normalize_action_menu_link([
+            'url'   => $this->baseurl,
+            'icon' => 'i/dragdrop',
+            'name' => get_string('move'),
+            'pixattr' => ['class' => ''],
+            'attr' => [
+                // This tool requires ajax and will appear only when the frontend state is ready.
+                'class' => 'editing_movecm waitstate',
+                'data-action' => 'moveCm',
+                'data-id' => $this->mod->id,
+            ],
+        ]);
+    }
+
+    /**
+     * Retrieves the get_section_visibility_menu_item item for the section control menu.
+     *
+     * @return action_menu_link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_section_visibility_item(): ?action_menu_link {
+        // Disabling show and hide when the parent section is not visible
+        // reduces the complexity of the delegated section visibility logic.
+        $parentsection = $this->mod->get_section_info();
+        if (!$parentsection->visible) {
+            return null;
+        }
+        return parent::get_section_visibility_item();
+    }
+
+    /**
+     * Generate the edit control items of a section.
+     *
+     * It is not clear this kind of controls are still available in 4.0 so, for now, this
+     * method is almost a clone of the previous section_control_items from the course/renderer.php.
+     *
+     * @todo Remove this method in Moodle 6.0 (MDL-83530).
+     * @return array of edit control items
+     */
+    protected function delegated_control_items_legacy(): array {
         global $USER;
 
         $format = $this->format;

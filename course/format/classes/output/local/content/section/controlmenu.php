@@ -79,14 +79,43 @@ class controlmenu extends basecontrolmenu {
     /**
      * Generate the edit control items of a section.
      *
+     * @return array of edit control items
+     */
+    public function section_control_items() {
+        // TODO remove this if as part of MDL-83530.
+        if (!$this->format->supports_components()) {
+            return $this->section_control_items_legacy();
+        }
+
+        $controls = [];
+
+        $controls['view'] = $this->get_section_view_item();
+
+        if (!$this->section->is_orphan()) {
+            $controls['edit'] = $this->get_section_edit_item();
+            $controls['duplicate'] = $this->get_section_duplicate_item();
+            $controls['visibility'] = $this->get_section_visibility_item();
+            $controls['movesection'] = $this->get_section_movesection_item();
+            $controls['permalink'] = $this->get_section_permalink_item();
+        }
+
+        $controls['delete'] = $this->get_section_delete_item();
+
+        return $controls;
+    }
+
+    /**
+     * Generate the edit control items of a section.
+     *
      * It is not clear this kind of controls are still available in 4.0 so, for now, this
      * method is almost a clone of the previous section_control_items from the course/renderer.php.
      *
      * This method must remain public until the final deprecation of section_edit_control_items.
      *
+     * @todo Remove this method in Moodle 6.0 (MDL-83530).
      * @return array of edit control items
      */
-    public function section_control_items() {
+    protected function section_control_items_legacy(): array {
         global $USER, $PAGE;
 
         $format = $this->format;
