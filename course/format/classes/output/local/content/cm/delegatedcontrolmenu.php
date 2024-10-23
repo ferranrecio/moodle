@@ -16,13 +16,18 @@
 
 namespace core_courseformat\output\local\content\cm;
 
-use action_menu;
-use context_course;
+use cm_info;
+use core\context\course as context_course;
+use core\context\module as context_module;
+use core\output\action_menu;
+use core\output\action_menu\link as action_menu_link;
+use core\output\action_menu\link_secondary as action_menu_link_secondary;
+use core\output\renderer_base;
 use core_courseformat\base as course_format;
 use core_courseformat\output\local\content\basecontrolmenu;
-use moodle_url;
+use core\output\pix_icon;
+use core\url;
 use section_info;
-use cm_info;
 
 /**
  * Base class to render delegated section controls.
@@ -32,6 +37,11 @@ use cm_info;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class delegatedcontrolmenu extends basecontrolmenu {
+    /** @var context_module|null modcontext the module context if any */
+    protected ?context_module $modcontext = null;
+
+    /** @var bool $canmanageactivities Optimization to know if the user can manage activities */
+    protected bool $canmanageactivities;
 
     /**
      * Constructor.
@@ -42,6 +52,9 @@ class delegatedcontrolmenu extends basecontrolmenu {
      */
     public function __construct(course_format $format, section_info $section, cm_info $mod) {
         parent::__construct($format, $section, $mod, $section->id);
+
+        $this->modcontext = context_module::instance($mod->id);
+        $this->canmanageactivities = has_capability('moodle/course:manageactivities', $this->modcontext);
     }
 
     /**
@@ -49,12 +62,221 @@ class delegatedcontrolmenu extends basecontrolmenu {
      *
      * This method is public in case some block needs to modify the menu before output it.
      *
-     * @param \renderer_base $output typically, the renderer that's calling this function
+     * @param renderer_base $output typically, the renderer that's calling this function
      * @return action_menu|null the action menu
      */
-    public function get_default_action_menu(\renderer_base $output): ?action_menu {
+    public function get_default_action_menu(renderer_base $output): ?action_menu {
         $controls = $this->delegated_control_items();
         return $this->format_controls($controls);
+    }
+
+    /**
+     * Generate the edit control items of a section.
+     *
+     * @return array of edit control items
+     */
+    public function delegated_control_items() {
+        // TODO remove this if as part of MDL-83530.
+        if (!$this->format->supports_components()) {
+            return $this->delegated_control_items_legacy();
+        }
+
+        $controls = [];
+        $controls['view'] = $this->get_section_view_item();
+        $controls['edit'] = $this->get_section_edit_item();
+        $controls['visibility'] = $this->get_section_visibility_item();
+        $controls['movesection'] = $this->get_cm_move_item();
+        $controls['permalink'] = $this->get_section_permalink_item();
+        $controls['delete'] = $this->get_cm_delete_item();
+
+        return $controls;
+    }
+
+    /**
+     * Retrieves the view item for the section control menu.
+     *
+     * @return action_menu_link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_section_view_item(): ?action_menu_link {
+        // Only show the view link if we are not already in the section view page.
+        if ($this->format->get_sectionid() == $this->section->id) {
+            return null;
+        }
+        return new action_menu_link_secondary(
+                url: new url('/course/section.php', ['id' => $this->section->id]),
+                icon: new pix_icon('i/viewsection', ''),
+                text: get_string('view'),
+                attributes: ['class' => 'view'],
+        );
+    }
+
+    /**
+     * Retrieves the edit item for the section control menu.
+     *
+     * @return action_menu_link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_section_edit_item(): ?action_menu_link {
+        if (!has_capability('moodle/course:update', $this->coursecontext)) {
+            return null;
+        }
+        $params = ['id' => $this->section->id];
+        $params['sr'] = $this->section->section;
+
+        return new action_menu_link_secondary(
+                url: new url('/course/editsection.php', $params),
+                icon: new pix_icon('i/settings', ''),
+                text: get_string('editsection'),
+                attributes: ['class' => 'edit'],
+        );
+    }
+
+
+
+    /**
+     * Generates the move item for a course module.
+     *
+     * @return action_menu_link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_cm_move_item(): ?action_menu_link {
+        // Only show the move link if we are not already in the section view page.
+        if (
+            !$this->canmanageactivities
+            || $this->format->get_sectionid() == $this->section->id
+        ) {
+            return null;
+        }
+
+        return new action_menu_link_secondary(
+            url: $this->baseurl,
+            icon: new pix_icon('i/dragdrop', ''),
+            text: get_string('move'),
+            attributes: [
+                // This tool requires ajax and will appear only when the frontend state is ready.
+                'class' => 'editing_movecm waitstate',
+                'data-action' => 'moveCm',
+                'data-id' => $this->mod->id,
+            ],
+        );
+    }
+
+    /**
+     * Retrieves the get_section_visibility_menu_item item for the section control menu.
+     *
+     * @return action_menu_link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_section_visibility_item(): ?action_menu_link {
+        // Disabling show and hide when the parent section is not visible
+        // reduces the complexity of the delegated section visibility logic.
+        $parentsection = $this->mod->get_section_info();
+        if (
+            !$parentsection->visible
+            || !has_capability('moodle/course:activityvisibility', $this->modcontext)
+        ) {
+            return null;
+        }
+
+        $outputclass = $this->format->get_output_classname('content\\cm\\visibility');
+        /** @var \core_courseformat\output\local\content\cm\visibility $availability */
+        $output = new $outputclass($this->format, $this->section, $this->mod);
+        return $output->get_menu_item();
+    }
+
+    /**
+     * Retrieves the permalink item for the section control menu.
+     *
+     * @return action_menu_link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_section_permalink_item(): ?action_menu_link {
+        if (!has_any_capability(
+                [
+                    'moodle/course:movesections',
+                    'moodle/course:update',
+                    'moodle/course:sectionvisibility',
+                ],
+                $this->coursecontext
+            )
+        ) {
+            return null;
+        }
+
+        $url = new url(
+            '/course/section.php',
+            ['id' => $this->section->id]
+        );
+        return new action_menu_link_secondary(
+            url: $url,
+            icon: new pix_icon('i/link', ''),
+            text: get_string('sectionlink', 'course'),
+            attributes: [
+                'class' => 'permalink',
+                'data-action' => 'permalink',
+            ],
+        );
+    }
+
+    /**
+     * Generates the delete item for a course module.
+     *
+     * @return action_menu_link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_cm_delete_item(): ?action_menu_link {
+        if (!$this->canmanageactivities) {
+            return null;
+        }
+
+        $url = new url(
+            '/course/mod.php',
+            [
+                'sesskey' => sesskey(),
+                'delete' => $this->mod->id,
+                'sr' => $this->mod->sectionnum,
+            ],
+        );
+
+        return new action_menu_link_secondary(
+            url: $url,
+            icon: new pix_icon('t/delete', ''),
+            text: get_string('delete'),
+            attributes: [
+                'class' => 'editing_delete text-danger',
+                'data-action' => 'cmDelete',
+                'data-sectionreturn' => $this->format->get_sectionnum(),
+                'data-id' => $this->mod->id,
+            ],
+        );
+    }
+
+    /**
+     * Retrieves the delete item for the section control menu.
+     *
+     * @return action_menu_link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_section_delete_item(): ?action_menu_link {
+        if (!course_can_delete_section($this->format->get_course(), $this->section)) {
+            return null;
+        }
+
+        $params = [
+            'id' => $this->section->id,
+            'delete' => 1,
+            'sesskey' => sesskey(),
+        ];
+        $params['sr'] ??= $this->format->get_sectionnum();
+
+        $url = new url(
+            '/course/editsection.php',
+            $params,
+        );
+        return new action_menu_link_secondary(
+            url: $url,
+            icon: new pix_icon('i/delete', ''),
+            text: get_string('delete'),
+            attributes: [
+                'class' => 'editing_delete text-danger',
+                'data-action' => 'deleteSection',
+                'data-id' => $this->section->id,
+            ],
+        );
     }
 
     /**
@@ -63,11 +285,10 @@ class delegatedcontrolmenu extends basecontrolmenu {
      * It is not clear this kind of controls are still available in 4.0 so, for now, this
      * method is almost a clone of the previous section_control_items from the course/renderer.php.
      *
-     * This method must remain public until the final deprecation of section_edit_control_items.
-     *
+     * @todo Remove this method in Moodle 6.0 (MDL-83530).
      * @return array of edit control items
      */
-    public function delegated_control_items() {
+    protected function delegated_control_items_legacy(): array {
         global $USER;
 
         $format = $this->format;
@@ -83,7 +304,7 @@ class delegatedcontrolmenu extends basecontrolmenu {
         $baseurl = course_get_url($course, $sectionreturn);
         $baseurl->param('sesskey', sesskey());
 
-        $cmbaseurl = new moodle_url('/course/mod.php');
+        $cmbaseurl = new url('/course/mod.php');
         $cmbaseurl->param('sesskey', sesskey());
 
         $hasmanageactivities = has_capability('moodle/course:manageactivities', $coursecontext);
@@ -94,7 +315,7 @@ class delegatedcontrolmenu extends basecontrolmenu {
         // Only show the view link if we are not already in the section view page.
         if (!$isheadersection) {
             $controls['view'] = [
-                'url'   => new moodle_url('/course/section.php', ['id' => $section->id]),
+                'url'   => new url('/course/section.php', ['id' => $section->id]),
                 'icon' => 'i/viewsection',
                 'name' => get_string('view'),
                 'pixattr' => ['class' => ''],
@@ -113,7 +334,7 @@ class delegatedcontrolmenu extends basecontrolmenu {
 
             // Edit settings goes to section settings form.
             $controls['edit'] = [
-                'url'   => new moodle_url('/course/editsection.php', $params),
+                'url'   => new url('/course/editsection.php', $params),
                 'icon' => 'i/settings',
                 'name' => $streditsection,
                 'pixattr' => ['class' => ''],
@@ -171,7 +392,7 @@ class delegatedcontrolmenu extends basecontrolmenu {
         // Move (only for component compatible formats).
         if (!$isheadersection && $hasmanageactivities && $usecomponents) {
             $controls['move'] = [
-                'url'   => new moodle_url('/course/mod.php', ['copy' => $cm->id]),
+                'url'   => new url('/course/mod.php', ['copy' => $cm->id]),
                 'icon' => 'i/dragdrop',
                 'name' => get_string('move'),
                 'pixattr' => ['class' => ''],
@@ -211,7 +432,7 @@ class delegatedcontrolmenu extends basecontrolmenu {
                 'moodle/course:sectionvisibility',
             ], $coursecontext)
         ) {
-            $sectionlink = new moodle_url(
+            $sectionlink = new url(
                 '/course/section.php',
                 ['id' => $section->id]
             );
