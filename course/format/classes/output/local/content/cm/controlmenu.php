@@ -24,12 +24,11 @@
 
 namespace core_courseformat\output\local\content\cm;
 
-use action_menu;
-use action_menu_link;
 use cm_info;
+use core\output\action_menu;
+use core\output\action_menu\link as action_menu_link;
 use core_courseformat\base as course_format;
 use core_courseformat\output\local\content\basecontrolmenu;
-use core_courseformat\output\local\courseformat_named_templatable;
 use section_info;
 use stdClass;
 
@@ -105,15 +104,60 @@ class controlmenu extends basecontrolmenu {
             return $this->menu;
         }
 
-        $mod = $this->mod;
-
         // In case module is delegating a section, we should return delegated section action menu.
-        if ($delegated = $mod->get_delegated_section_info()) {
+        if ($delegated = $this->mod->get_delegated_section_info()) {
             $controlmenuclass = $this->format->get_output_classname('content\\cm\\delegatedcontrolmenu');
             $controlmenu = new $controlmenuclass($this->format, $delegated, $mod);
 
             return $controlmenu->get_action_menu($output);
         }
+
+        // TODO remove this if as part of MDL-83530.
+        if (!$this->format->supports_components()) {
+            $this->menu = $this->get_action_menu_legacy($output);
+            return $this->menu;
+        }
+
+        $controls = $this->get_cm_control_items();
+        return $this->format_controls($controls);
+    }
+
+    /**
+     * Generate the edit control items of a course module.
+     *
+     * This method uses course_get_cm_edit_actions function to get the cm actions.
+     * However, format plugins can override the method to add or remove elements
+     * from the menu.
+     *
+     * @return array of edit control items
+     */
+    protected function get_cm_control_items(): ?array {
+        $controls = [];
+
+        $controls['update'] = $this->get_cm_edit_item();
+        $controls['move'] = $this->get_cm_move_item();
+        $controls['moveright'] = $this->get_cm_moveend_item();
+        $controls['moveleft'] = $this->get_cm_movestart_item();
+        $controls['availability'] = $this->get_cm_visibility_item();
+        $controls['duplicate'] = $this->get_cm_duplicate_item();
+        $controls['assign'] = $this->get_cm_assign_item();
+        $controls['groupmode'] = $this->get_cm_groupmode_item();
+        $controls['delete'] = $this->get_cm_delete_item();
+
+        return $controls;
+    }
+
+    /**
+     * Generate the action menu element for old course formats.
+     *
+     * This method is public in case some block needs to modify the menu before output it.
+     *
+     * @todo Remove this method in Moodle 6.0 (MDL-83530).
+     * @param \renderer_base $output typically, the renderer that's calling this function
+     * @return action_menu|null the activity action menu
+     */
+    private function get_action_menu_legacy(\renderer_base $output): ?action_menu {
+        $mod = $this->mod;
 
         $controls = $this->cm_control_items();
 
@@ -151,6 +195,7 @@ class controlmenu extends basecontrolmenu {
      * However, format plugins can override the method to add or remove elements
      * from the menu.
      *
+     * @todo Remove this method in Moodle 6.0 (MDL-83530).
      * @return array of edit control items
      */
     protected function cm_control_items() {

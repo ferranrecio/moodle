@@ -19,11 +19,15 @@ namespace core_courseformat\output\local\content;
 use core\output\action_menu;
 use core\output\action_menu\link as action_menu_link;
 use core\output\action_menu\link_secondary as action_menu_link_secondary;
+use core\output\action_menu\subpanel as action_menu_subpanel;
+use core\output\action_link;
 use core\output\named_templatable;
 use core\output\pix_icon;
 use core_courseformat\base as course_format;
 use core_courseformat\output\local\courseformat_named_templatable;
+use core_courseformat\sectiondelegate;
 use context_course;
+use core\context\module as context_module;
 use moodle_url;
 use renderable;
 use section_info;
@@ -56,6 +60,9 @@ abstract class basecontrolmenu implements named_templatable, renderable {
     /** @var context_course the course context */
     protected $coursecontext;
 
+    /** @var context_module|null modcontext the module context if any */
+    protected ?context_module $modcontext = null;
+
     /** @var string the menu ID */
     protected $menuid;
 
@@ -64,6 +71,12 @@ abstract class basecontrolmenu implements named_templatable, renderable {
 
     /** @var moodle_url The base URL for the course or the section */
     protected moodle_url $baseurl;
+
+    /** @var moodle_url The course module update url */
+    protected ?moodle_url $modupdateurl = null;
+
+    /** @var bool $canmanageactivities Optimization to know if the user can manage activities */
+    protected bool $canmanageactivities;
 
     /**
      * Constructor.
@@ -81,6 +94,16 @@ abstract class basecontrolmenu implements named_templatable, renderable {
         $this->course = $format->get_course();
         $this->coursecontext = $format->get_context();
         $this->baseurl = $format->get_view_url($format->get_sectionnum(), ['navigation' => true]);
+
+        if ($mod !== null) {
+            $this->modcontext = context_module::instance($mod->id);
+            $this->canmanageactivities = has_capability('moodle/course:manageactivities', $this->modcontext);
+            $this->modupdateurl = new moodle_url('/course/mod.php');
+            $this->modupdateurl->param('sesskey', sesskey());
+            $this->modupdateurl->param('sr', $mod->sectionnum);
+        } else {
+            $this->canmanageactivities = has_capability('moodle/course:manageactivities', $this->coursecontext);
+        }
     }
 
     /**
@@ -166,16 +189,16 @@ abstract class basecontrolmenu implements named_templatable, renderable {
      * for backward compatibility, this method will normalize the array into
      * te correct action_menu_link object.
      *
-     * @param array|action_menu_link|null $itemdata the item data
+     * @param array|action_menu_link|action_link|null $itemdata the item data
      * @return void
      */
     protected function normalize_action_menu_link(
-        array|action_menu_link|null $itemdata
-    ): ?action_menu_link_secondary {
+        array|action_menu_link|action_link|null $itemdata
+    ): action_menu_link_secondary|action_link|null {
         if (empty($itemdata)) {
             return null;
         }
-        if ($itemdata instanceof action_menu_link) {
+        if ($itemdata instanceof action_menu_link || $itemdata instanceof action_link) {
             return $itemdata;
         }
 
@@ -421,6 +444,213 @@ abstract class basecontrolmenu implements named_templatable, renderable {
                 'class' => 'icon editing_delete text-danger',
                 'data-action' => 'deleteSection',
                 'data-id' => $this->section->id,
+            ],
+        ]);
+    }
+
+    // Course module items:
+
+    protected function get_cm_edit_item(): ?action_menu_link {
+        if (!$this->canmanageactivities) {
+            return null;
+        }
+
+        $url = clone ($this->modupdateurl);
+        $url->param('update', $this->mod->id);
+
+        return $this->normalize_action_menu_link([
+            'url'   => $url,
+            'icon' => 'i/settings',
+            'name' => get_string('editsettings'),
+            'pixattr' => ['class' => ''],
+            'attr' => [
+                'class' => 'editing_update',
+                'data-action' => 'update',
+            ],
+        ]);
+    }
+
+    /**
+     * Generates the move item for a course module.
+     *
+     * @return action_menu_link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_cm_move_item(): ?action_menu_link {
+        // Only show the move link if we are not already in the section view page.
+        if (!$this->canmanageactivities) {
+            return null;
+        }
+        return $this->normalize_action_menu_link([
+            'url'   => $this->baseurl,
+            'icon' => 'i/dragdrop',
+            'name' => get_string('move'),
+            'pixattr' => ['class' => ''],
+            'attr' => [
+                // This tool requires ajax and will appear only when the frontend state is ready.
+                'class' => 'editing_movecm waitstate',
+                'data-action' => 'moveCm',
+                'data-id' => $this->mod->id,
+            ],
+        ]);
+    }
+
+    protected function can_indent_cm(): bool {
+        return $this->canmanageactivities
+            && !sectiondelegate::has_delegate_class('mod_'.$this->mod->modname)
+            && empty($this->displayoptions['disableindentation'])
+            && $this->format->uses_indentation();
+    }
+
+    protected function get_cm_moveend_item(): ?action_menu_link {
+        if (!$this->can_indent_cm() || $this->mod->indent > 0) {
+            return null;
+        }
+
+        $url = clone ($this->modupdateurl);
+        $url->param('id', $this->mod->id);
+        $url->param('indent', 1);
+
+        return $this->normalize_action_menu_link([
+            'url' => new moodle_url($this->baseurl, ['id' => $this->mod->id, 'indent' => '1']),
+            'icon' => (right_to_left()) ? 't/left' : 't/right',
+            'name' => get_string('moveright'),
+            'pixattr' => ['class' => ''],
+            'attr' => [
+                'class' => 'editing_moveright',
+                'data-action' => 'cmMoveRight',
+                'data-keepopen' => true,
+                'data-sectionreturn' => $this->format->get_sectionnum(),
+                'data-id' => $this->mod->id,
+            ],
+        ]);
+    }
+
+    protected function get_cm_movestart_item(): ?action_menu_link {
+        if (!$this->can_indent_cm() || $this->mod->indent <= 0) {
+            return null;
+        }
+
+        $url = clone ($this->modupdateurl);
+        $url->param('id', $this->mod->id);
+        $url->param('indent', 1);
+
+        return $this->normalize_action_menu_link([
+            'url' => new moodle_url($this->baseurl, ['id' => $this->mod->id, 'indent' => '-1']),
+            'icon' => (right_to_left()) ? 't/right' : 't/left',
+            'name' => get_string('moveleft'),
+            'pixattr' => ['class' => ''],
+            'attr' => [
+                'class' => 'editing_moveleft',
+                'data-action' => 'cmMoveLeft',
+                'data-keepopen' => true,
+                'data-sectionreturn' => $this->format->get_sectionnum(),
+                'data-id' => $this->mod->id,
+            ],
+        ]);
+    }
+
+    protected function get_cm_visibility_item(): ?action_menu_link {
+        if (!has_capability('moodle/course:activityvisibility', $this->modcontext)) {
+            return null;
+        }
+        $outputclass = $this->format->get_output_classname('content\\cm\\visibility');
+        /** @var \core_courseformat\output\local\content\cm\visibility $availability */
+        $output = new $outputclass($this->format, $this->section, $this->mod);
+        return $output->get_menu_item();
+    }
+
+    protected function get_cm_duplicate_item(): ?action_menu_link {
+        if (
+            !has_all_capabilities(
+                ['moodle/backup:backuptargetimport', 'moodle/restore:restoretargetimport'],
+                $this->coursecontext
+            )
+            || !plugin_supports('mod', $this->mod->modname, FEATURE_BACKUP_MOODLE2)
+            || !course_allowed_module($this->mod->get_course(), $this->mod->modname)
+        ) {
+                return null;
+        }
+
+        return $this->normalize_action_menu_link([
+            'url' => new moodle_url($this->baseurl, ['duplicate' => $this->mod->id]),
+            'icon' => 't/copy',
+            'name' => get_string('duplicate'),
+            'pixattr' => ['class' => ''],
+            'attr' => [
+                'class' => 'editing_duplicate',
+                'data-action' => 'cmDuplicate',
+                'data-sectionreturn' => $this->format->get_sectionnum(),
+                'data-id' => $this->mod->id,
+            ],
+        ]);
+    }
+
+    protected function get_cm_assign_item(): ?action_menu_link {
+        if (
+            !has_capability('moodle/role:assign', $this->modcontext)
+            || sectiondelegate::has_delegate_class('mod_'.$this->mod->modname)
+        ) {
+            return null;
+        }
+
+        return $this->normalize_action_menu_link([
+            'url' => new moodle_url('/admin/roles/assign.php', ['contextid' => $this->modcontext->id]),
+            'icon' => 't/assignroles',
+            'name' => get_string('assignroles', 'role'),
+            'pixattr' => ['class' => ''],
+            'attr' => [
+                'class' => 'editing_assign',
+                'data-action' => 'assignroles',
+                'data-sectionreturn' => $this->format->get_sectionnum(),
+            ],
+        ]);
+    }
+
+    // get_cm_groupmode_item
+    protected function get_cm_groupmode_item(): ?action_menu_subpanel {
+        if (
+            !$this->format->show_groupmode($this->mod)
+            || $this->mod->coursegroupmodeforce
+        ) {
+            return null;
+        }
+
+        $groupmodeclass = $this->format->get_output_classname('content\\cm\\groupmode');
+        /** @var \core_courseformat\output\local\content\cm\groupmode $groupmode */
+        $groupmode = new $groupmodeclass($this->format, $this->section, $this->mod);
+        return new action_menu_subpanel(
+            get_string('groupmode', 'group'),
+            $groupmode->get_choice_list(),
+            ['class' => 'editing_groupmode'],
+            new pix_icon('t/groupv', '', 'moodle', ['class' => 'iconsmall'])
+        );
+    }
+
+    /**
+     * Generates the delete item for a course module.
+     *
+     * @return action_menu_link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_cm_delete_item(): ?action_menu_link {
+        if (!$this->canmanageactivities) {
+            return null;
+        }
+
+        $url = new moodle_url('/course/mod.php');
+        $url->param('sesskey', sesskey());
+        $url->param('delete', $this->mod->id);
+        $url->param('sr', $this->mod->sectionnum);
+
+        return $this->normalize_action_menu_link([
+            'url' => $url,
+            'icon' => 't/delete',
+            'name' => get_string('delete'),
+            'pixattr' => ['class' => ''],
+            'attr' => [
+                'class' => 'editing_delete text-danger',
+                'data-action' => 'cmDelete',
+                'data-sectionreturn' => $this->format->get_sectionnum(),
+                'data-id' => $this->mod->id,
             ],
         ]);
     }

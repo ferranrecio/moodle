@@ -81,60 +81,16 @@ class delegatedcontrolmenu extends basecontrolmenu {
     }
 
     /**
-     * Generates the delete item for a course module.
-     *
-     * @return action_menu_link|null The menu item if applicable, otherwise null.
-     */
-    protected function get_cm_delete_item(): ?action_menu_link {
-        // Delete deletes the module.
-        if (!has_capability('moodle/course:manageactivities', $this->coursecontext)) {
-            return null;
-        }
-
-        $url = new moodle_url('/course/mod.php');
-        $url->param('sesskey', sesskey());
-        $url->param('delete', $this->mod->id);
-        $url->param('sr', $this->mod->sectionnum);
-
-        return $this->normalize_action_menu_link([
-            'url' => $url,
-            'icon' => 't/delete',
-            'name' => get_string('delete'),
-            'pixattr' => ['class' => ''],
-            'attr' => [
-                'class' => 'editing_delete text-danger',
-                'data-action' => 'cmDelete',
-                'data-sectionreturn' => $this->format->get_sectionnum(),
-                'data-id' => $this->mod->id,
-            ],
-        ]);
-    }
-
-    /**
      * Generates the move item for a course module.
      *
      * @return action_menu_link|null The menu item if applicable, otherwise null.
      */
     protected function get_cm_move_item(): ?action_menu_link {
         // Only show the move link if we are not already in the section view page.
-        if (
-            $this->format->get_sectionid() == $this->section->id
-            || !has_capability('moodle/course:manageactivities', $this->coursecontext)
-        ) {
+        if ($this->format->get_sectionid() == $this->section->id) {
             return null;
         }
-        return $this->normalize_action_menu_link([
-            'url'   => $this->baseurl,
-            'icon' => 'i/dragdrop',
-            'name' => get_string('move'),
-            'pixattr' => ['class' => ''],
-            'attr' => [
-                // This tool requires ajax and will appear only when the frontend state is ready.
-                'class' => 'editing_movecm waitstate',
-                'data-action' => 'moveCm',
-                'data-id' => $this->mod->id,
-            ],
-        ]);
+        return parent::get_cm_move_item();
     }
 
     /**
