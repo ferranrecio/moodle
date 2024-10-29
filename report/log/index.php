@@ -35,6 +35,7 @@ $group       = optional_param('group', 0, PARAM_INT); // Group to display.
 $user        = optional_param('user', 0, PARAM_INT); // User to display.
 $date        = optional_param('date', 0, PARAM_INT); // Date to display.
 $modid       = optional_param('modid', 0, PARAM_ALPHANUMEXT); // Module id or 'site_errors'.
+$cmid        = optional_param('cmid', 0, PARAM_INT); // Course Module ID.
 $modaction   = optional_param('modaction', '', PARAM_ALPHAEXT); // An action as recorded in the logs.
 $page        = optional_param('page', '0', PARAM_INT);     // Which page to show.
 $perpage     = optional_param('perpage', '100', PARAM_INT); // How many per page.
@@ -104,6 +105,14 @@ if ($id != $SITE->id) {
     $course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
     require_login($course);
     $context = context_course::instance($course->id);
+    if ($cmid) {
+        $modinfo = get_fast_modinfo($course);
+        if (!isset($modinfo->cms[$cmid])) {
+            throw new moodle_exception('invalidmoduleid', '', '', $modid);
+        }
+        $context = context_module::instance($cmid);
+        $PAGE->set_cm($modinfo->cms[$cmid]);
+    }
 } else {
     $course = $SITE;
     require_login();
@@ -146,7 +155,7 @@ if ($course->id == $SITE->id) {
 }
 
 $reportlog = new report_log_renderable($logreader, $course, $user, $modid, $modaction, $group, $edulevel, $showcourses, $showusers,
-        $chooselog, true, $url, $date, $logformat, $page, $perpage, 'timecreated DESC', $origin);
+        $chooselog, true, $url, $date, $logformat, $page, $perpage, 'timecreated DESC', $origin, $cmid);
 $readers = $reportlog->get_readers();
 $output = $PAGE->get_renderer('report_log');
 
@@ -162,7 +171,9 @@ if (empty($readers)) {
             echo $output->header();
             // Print selector dropdown.
             $pluginname = get_string('pluginname', 'report_log');
-            report_helper::print_report_selector($pluginname);
+            if (empty($cmid)) {
+                report_helper::print_report_selector($pluginname);
+            }
             $userinfo = get_string('allparticipants');
             $dateinfo = get_string('alldays');
 
@@ -186,7 +197,9 @@ if (empty($readers)) {
         echo $output->header();
         // Print selector dropdown.
         $pluginname = get_string('pluginname', 'report_log');
-        report_helper::print_report_selector($pluginname);
+        if (empty($cmid)) {
+            report_helper::print_report_selector($pluginname);
+        }
         echo $output->heading(get_string('chooselogs') .':', 3);
         echo $output->render($reportlog);
     }
