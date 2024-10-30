@@ -1,0 +1,9 @@
+issueNumber: MDL-82767
+notes:
+  core_courseformat:
+    - message: >-
+        Many get actions from course/view.php and course/mod.php are now
+        deprecated. Use the new course/format/update.php instead to replace all
+        direct edit urls  in your code. The course/format/updates.php uses the
+        same parameters as the core_courseformat_course_update webservice
+      type: deprecated
