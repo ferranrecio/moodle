@@ -37,7 +37,7 @@ class hook_listener {
     ): void {
         $group = $hook->groupinstance;
         $course = get_course($group->courseid);
-        base::session_cache_reset($course);
+        base::invalidate_all_session_caches_for_course($course);
     }
 
     /**
@@ -50,6 +50,6 @@ class hook_listener {
     ): void {
         $group = $hook->groupinstance;
         $course = get_course($group->courseid);
-        base::session_cache_reset($course);
+        base::invalidate_all_session_caches_for_course($course);
     }
 }
