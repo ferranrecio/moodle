@@ -178,13 +178,12 @@ class delegatedcontrolmenu extends basecontrolmenu {
         }
 
         $sectionreturn = $this->format->get_sectionnum();
-        $url = clone ($this->baseurl);
 
         $strhide = get_string('hide');
         $strshow = get_string('show');
 
         if ($this->section->visible) {
-            $url->param('hide', $this->section->sectionnum);
+            $action = 'section_hide';
             $icon = 'i/show';
             $name = $strhide;
             $attributes = [
@@ -197,7 +196,7 @@ class delegatedcontrolmenu extends basecontrolmenu {
                 'data-swapicon' => 'i/hide',
             ];
         } else {
-            $url->param('show', $this->section->sectionnum);
+            $action = 'section_show';
             $icon = 'i/hide';
             $name = $strshow;
             $attributes = [
@@ -210,6 +209,12 @@ class delegatedcontrolmenu extends basecontrolmenu {
                 'data-swapicon' => 'i/show',
             ];
         }
+
+        $url = $this->format->get_update_url(
+            action: $action,
+            ids: [$this->section->id],
+            returnurl: $this->baseurl,
+        );
 
         return new link_secondary(
             url: $url,
@@ -262,13 +267,10 @@ class delegatedcontrolmenu extends basecontrolmenu {
             return null;
         }
 
-        $url = new url(
-            '/course/mod.php',
-            [
-                'sesskey' => sesskey(),
-                'delete' => $this->mod->id,
-                'sr' => $this->mod->sectionnum,
-            ],
+        $url = $this->format->get_update_url(
+            action: 'cm_delete',
+            ids: [$this->mod->id],
+            returnurl: $this->baseurl,
         );
 
         return new link_secondary(

@@ -238,14 +238,10 @@ class controlmenu extends basecontrolmenu {
             return null;
         }
 
-        $url = new url(
-            '/course/mod.php',
-            [
-                'sesskey' => sesskey(),
-                'sr' => $this->mod->sectionnum,
-                'id' => $this->mod->id,
-                'indent' => 1,
-            ],
+        $url = $this->format->get_update_url(
+            action: 'cm_moveright',
+            ids: [$this->mod->id],
+            returnurl: $this->baseurl,
         );
 
         $icon = (right_to_left()) ? 't/left' : 't/right';
@@ -274,14 +270,10 @@ class controlmenu extends basecontrolmenu {
             return null;
         }
 
-        $url = new url(
-            '/course/mod.php',
-            [
-                'sesskey' => sesskey(),
-                'sr' => $this->mod->sectionnum,
-                'id' => $this->mod->id,
-                'indent' => -1,
-            ],
+        $url = $this->format->get_update_url(
+            action: 'cm_moveleft',
+            ids: [$this->mod->id],
+            returnurl: $this->baseurl,
         );
 
         $icon = (right_to_left()) ? 't/right' : 't/left';
@@ -332,8 +324,14 @@ class controlmenu extends basecontrolmenu {
                 return null;
         }
 
+        $url = $this->format->get_update_url(
+            action: 'cm_duplicate',
+            ids: [$this->mod->id],
+            returnurl: $this->baseurl,
+        );
+
         return new link_secondary(
-            url: new url($this->baseurl, ['duplicate' => $this->mod->id]),
+            url: $url,
             icon: new pix_icon('t/copy', ''),
             text: get_string('duplicate'),
             attributes: [
@@ -403,13 +401,10 @@ class controlmenu extends basecontrolmenu {
             return null;
         }
 
-        $url = new url(
-            '/course/mod.php',
-            [
-                'sesskey' => sesskey(),
-                'delete' => $this->mod->id,
-                'sr' => $this->mod->sectionnum,
-            ],
+        $url = $this->format->get_update_url(
+            action: 'cm_delete',
+            ids: [$this->mod->id],
+            returnurl: $this->baseurl,
         );
 
         return new link_secondary(
