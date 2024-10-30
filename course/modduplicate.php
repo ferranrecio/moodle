@@ -21,6 +21,7 @@
  * from the same course, using the default import settings. The newly created
  * copy of the activity is then moved right below the original one.
  *
+ * @todo Remove this file in Moodle 6.0 (MDL-83530).
  * @package    core
  * @subpackage course
  * @deprecated Moodle 2.8 MDL-46428 - Now redirects to mod.php.
@@ -29,6 +30,7 @@
  */
 
 require_once(__DIR__ . '/../config.php');
+require_once($CFG->dirroot .'/course/lib.php');
 
 $cmid           = required_param('cmid', PARAM_INT);
 $courseid       = required_param('course', PARAM_INT);
@@ -36,10 +38,25 @@ $sectionreturn  = optional_param('sr', null, PARAM_INT);
 
 require_sesskey();
 
-debugging('Please use moodle_url(\'/course/mod.php\', array(\'duplicate\' => $cmid
-    , \'id\' => $courseid, \'sesskey\' => sesskey(), \'sr\' => $sectionreturn)))
-    instead of new moodle_url(\'/course/modduplicate.php\', array(\'cmid\' => $cmid
-    , \'course\' => $courseid, \'sr\' => $sectionreturn))', DEBUG_DEVELOPER);
+debugging(
+    'This page is deprecated, please use state actions instead or
+    generate the new url using the course format instance. For example
+    $format->get_update_url(
+        action: \'cm_duplicate\',
+        ids: [$cm->id],
+    );',
+    DEBUG_DEVELOPER
+);
 
-redirect(new moodle_url('/course/mod.php', array('duplicate' => $cmid, 'id' => $courseid,
-                                                 'sesskey' => sesskey(), 'sr' => $sectionreturn)));
+$format = course_get_format($courseid);
+if ($sectionreturn === null) {
+    $format->set_sectionnum($sectionnum);
+}
+
+$redirect = $format->get_update_url(
+    action: 'cm_duplicate',
+    ids: [$cmid],
+    returnurl: $format->get_view_url($format->get_sectionnum(), ['navigation' => true]),
+);
+
+redirect($redirect);
