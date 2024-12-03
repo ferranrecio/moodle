@@ -1320,15 +1320,21 @@ class moodle_page {
      */
     public function set_pagelayout($pagelayout) {
         global $SESSION;
+        // Some pages can force embedded layout for iframes.
+        if (optional_param('forcedembedlayout', false, PARAM_BOOL)) {
+            $this->_pagelayout = 'embedded';
+            return;
+        }
 
+        // LTI forces layout via session.
         if (!empty($SESSION->forcepagelayout)) {
             $this->_pagelayout = $SESSION->forcepagelayout;
-        } else {
-            // Uncomment this to debug theme pagelayout issues like missing blocks.
-            // if (!empty($this->_wherethemewasinitialised) && $pagelayout != $this->_pagelayout)
-            //     debugging('Page layout has already been set and cannot be changed.', DEBUG_DEVELOPER);
-            $this->_pagelayout = $pagelayout;
+            return;
         }
+        // Uncomment this to debug theme pagelayout issues like missing blocks.
+        // if (!empty($this->_wherethemewasinitialised) && $pagelayout != $this->_pagelayout)
+        //     debugging('Page layout has already been set and cannot be changed.', DEBUG_DEVELOPER);
+        $this->_pagelayout = $pagelayout;
     }
 
     /**
