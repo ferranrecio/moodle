@@ -1,0 +1,199 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+namespace core_course\output\local\overview;
+
+use core\context\course as context_course;
+use core\output\named_templatable;
+use core\output\renderable;
+use core\output\renderer_base;
+use core_course\activityoverviewbase;
+use core_course\local\overview\overviewitem;
+use cm_info;
+use stdClass;
+
+/**
+ * Class overviewtable
+ *
+ * @package    core_course
+ * @copyright  2024 Ferran Recio <ferran@moodle.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class overviewtable implements renderable, named_templatable {
+    private array $headers = [];
+    private array $columnhascontent = [];
+
+    /**
+    * Constructor.
+    *
+    * @param stdClass $course the course object.
+    */
+    public function __construct(
+        /** @var stdClass the course object  */
+        protected stdClass $course,
+        /** @var string the module name (or "resources" for generic resources overview) */
+        protected string $modname,
+    ) {
+    }
+
+    #[\Override]
+    public function export_for_template(renderer_base $output): stdClass {
+        $activities = $this->load_all_overviews_from_each_activity($output);
+        $headers = $this->export_headers();
+        $result = (object) [
+            'headers' => $headers,
+            'activities' => $this->export_filtered_overviews($output, $activities, $headers),
+        ];
+        return $result;
+    }
+
+    /**
+     * Export the filtered list of headers.
+     *
+     * This method will remove any header that does not have any content.
+     *
+     * @return array
+     */
+    private function export_headers(): array {
+        return array_values(
+            array_filter($this->headers, function($header) {
+                return $this->columnhascontent[$header->key];
+            })
+        );
+    }
+
+    /**
+     * Exports filtered overviews for the given activities and headers.
+     *
+     * @param renderer_base $output
+     * @param array $activities An array of activities, each containing an 'overviews' array and a 'cmid'.
+     * @param array $headers An array of header objects, each containing a 'key' property.
+     * @return array An array of filtered overviews, each containing 'cmid' and 'overviews' with rendered content.
+     */
+    private function export_filtered_overviews(
+        renderer_base $output,
+        array $activities,
+        array $headers,
+    ): array {
+        $result = [];
+        foreach ($activities as $activity) {
+            $items = [];
+            foreach ($headers as $header) {
+                if (!isset($activity['overviews'][$header->key])) {
+                    $items[] = (object) ['content' => '', 'overview' => $header->key];
+                    continue;
+                }
+                /** @var overviewitem $item */
+                $item = $activity['overviews'][$header->key];
+                $items[] = (object)[
+                    'content' => $item->get_rendered_content($output),
+                    'overview' => $header->key,
+                    'value' => $item->get_value(),
+                    'important' => $item->is_important(),
+                    'textalign' => $item->get_text_align()->classes(),
+                ];
+            }
+            $result[] = [
+                'cmid' => $activity['cmid'],
+                'overviews' => $items,
+            ];
+        }
+        return $result;
+    }
+
+    /**
+     * Loads all overviews from activities for the given course and module name.
+     *
+     * @param renderer_base $output
+     * @return array An array of overviews.
+     */
+    private function load_all_overviews_from_each_activity(renderer_base $output): array {
+        $result = [];
+        $modinfo = get_fast_modinfo($this->course->id);
+        foreach ($modinfo->get_instances_of($this->modname) as $cm) {
+            $result[] = [
+                'cmid' => $cm->id,
+                'overviews' => $this->load_overview_items_from_activity($output, $cm)
+            ];
+        }
+        return $result;
+    }
+
+    /**
+     * Loads overview items from a given activity.
+     *
+     * @param renderer_base $output
+     * @param cm_info $cm
+     * @return array An associative array containing the overview items for the activity.
+     */
+    private function load_overview_items_from_activity(renderer_base $output, cm_info $cm): array {
+        global $PAGE;
+        $overview = activityoverviewbase::instance_from_cm($cm);
+
+        $row = [
+            'name' => $overview->get_name_overview($output),
+            'duedate' => $overview->get_due_date_overview($output),
+            'completion' => $overview->get_completion_overview($output),
+        ];
+
+        $row = array_merge($row, $overview->get_extra_overview_items($output));
+
+        // Actions are always the last column, if any.
+        $row['actions'] = $overview->get_actions_overview($output);
+
+        $row = array_filter($row, function($item) {
+            return $item !== null;
+        });
+
+        $this->register_columns($row);
+
+        $result = [];
+        foreach ($row as $key => $item) {
+            $result[$key] = $item;
+        }
+        return $result;
+    }
+
+    /**
+     * Regiter a new row into the table.
+     *
+     * @param overviewitem[] $row
+     * @return void
+     */
+    private function register_columns(array $row): void {
+        foreach ($row as $key => $item) {
+            if (!isset($this->columnhascontent[$key])) {
+                $this->columnhascontent[$key] = false;
+                $this->headers[] = (object) [
+                    'name' => $item->get_name(),
+                    'key' => $key,
+                    'textalign' => $item->get_text_align()->classes(),
+                ];
+            }
+            $this->columnhascontent[$key] = $this->columnhascontent[$key] || $item->get_value() !== null;
+        }
+    }
+
+    /**
+     * Get the template name.
+     *
+     * @param renderer_base $renderer Renderer base.
+     * @return string
+     */
+    public function get_template_name(renderer_base $renderer): string {
+        return 'core_course/local/overview/overviewtable';
+    }
+}

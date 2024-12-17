@@ -93,6 +93,7 @@ $string['downloadcontent'] = 'Include in course content download';
 $string['downloadcontent_help'] = 'Should this activity or resource be included in the zip file of course content available for download? File, Folder, Page and Label can be fully downloaded. For all other activities and resources, only the name and description are downloaded. This option requires download course content to be enabled in the course settings.
 
 The setting has no effect on mobile app content download for offline usage.';
+$string['duedate'] = 'Due date';
 $string['enabledownloadcoursecontent'] = 'Enable download course content';
 $string['errorendbeforestart'] = 'The end date ({$a}) is before the course start date.';
 $string['favourite'] = 'Starred course';
@@ -100,10 +101,13 @@ $string['filterbothactive'] = 'First ({$a->first}) Last ({$a->last})';
 $string['filterbyname'] = 'Filter by name';
 $string['filterfirstactive'] = 'First ({$a->first})';
 $string['filterlastactive'] = 'Last ({$a->last})';
+$string['goto_overview'] = 'Go to {$a} overview';
 $string['gradetopassnotset'] = 'This course does not have a grade to pass set. It may be set in the grade item of the course (Gradebook setup).';
 $string['hideendedcoursestask'] = 'Hide courses on end date';
 $string['informationformodule'] = 'Information about the {$a} activity';
 $string['module'] = 'Activity';
+$string['overview_missing_title'] = 'Information not avaialble here for {$a} activities';
+$string['overview_missing_notice'] = 'Check the overview page for more details.';
 $string['namewithlink'] = 'Category name with link';
 $string['nocourseactivity'] = 'Not enough course activity between the start and the end of the course';
 $string['nocourseendtime'] = 'The course does not have an end time';
