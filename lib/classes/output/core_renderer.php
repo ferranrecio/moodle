@@ -42,6 +42,7 @@ use core\hook\output\before_standard_footer_html_generation;
 use core\hook\output\before_standard_top_of_body_html_generation;
 use core\output\actions\component_action;
 use core\output\actions\popup_action;
+use core\output\local\properties\badge;
 use core\plugin_manager;
 use moodleform;
 use moodle_page;
@@ -2960,6 +2961,26 @@ EOD;
             $contents,
             ['class' => 'sr-only']
         ) . ' ';
+    }
+
+    /**
+     * Outputs a screen reader only inline text.
+     *
+     * @param string $contents The content of the badge
+     * @return string the HTML to output.
+     */
+    public function notice_badge(
+        string $contents,
+        badge $badgestyle = badge::PRIMARY
+    ): string {
+        if ($contents === '') {
+            return '';
+        }
+        return html_writer::tag(
+            'span',
+            $contents,
+            ['class' => 'ms-1 ' . $badgestyle->classes()]
+        );
     }
 
     /**
