@@ -23273,6 +23273,11 @@ a.autolink.glossary:hover {
   cursor: help;
 }
 
+/* Add a min-width to Bootstrap rounded pills so they are not deformed when has one character. */
+.rounded-pill {
+  min-width: 1rem;
+}
+
 /* Block which is hidden if javascript enabled, prevents fickering visible when JS from footer used! */
 .collapsibleregioncaption {
   white-space: nowrap;
