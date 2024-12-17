@@ -35225,6 +35225,13 @@ table .sticky-column {
   font-size: 3rem;
 }
 
+.cleartable td .btn {
+  min-width: 120px;
+}
+.cleartable td .badge {
+  min-width: 1.5em;
+}
+
 .singlebutton {
   display: inline-block;
 }

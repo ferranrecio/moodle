@@ -81,3 +81,15 @@ table {
         font-size: 3rem;
     }
 }
+
+.cleartable {
+    td {
+        .btn {
+            min-width: 120px;
+        }
+
+        .badge {
+            min-width: 1.5em;
+        }
+    }
+}
