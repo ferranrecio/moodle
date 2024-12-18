@@ -103,6 +103,9 @@ class report_log_renderable implements renderable {
      */
     public $grouplist;
 
+    /** @var int current coursemodule Id */
+    public $currentcmid;
+
     /**
      * Constructor.
      *
@@ -126,7 +129,7 @@ class report_log_renderable implements renderable {
      */
     public function __construct($logreader = "", $course = 0, $userid = 0, $modid = 0, $action = "", $groupid = 0, $edulevel = -1,
             $showcourses = false, $showusers = false, $showreport = true, $showselectorform = true, $url = "", $date = 0,
-            $logformat='showashtml', $page = 0, $perpage = 100, $order = "timecreated ASC", $origin ='') {
+            $logformat='showashtml', $page = 0, $perpage = 100, $order = "timecreated ASC", $origin ='', int $currentcmid = 0) {
 
         global $PAGE;
 
@@ -171,6 +174,7 @@ class report_log_renderable implements renderable {
         $this->showselectorform = $showselectorform;
         $this->logformat = $logformat;
         $this->origin = $origin;
+        $this->currentcmid = $currentcmid;
     }
 
     /**
