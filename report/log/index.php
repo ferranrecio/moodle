@@ -100,18 +100,23 @@ $url = new moodle_url("/report/log/index.php", $params);
 $PAGE->set_url('/report/log/index.php', array('id' => $id));
 $PAGE->set_pagelayout('report');
 
+$cminfo = null;
+if ($cmid) {
+    $modinfo = get_fast_modinfo($id);
+    if (!isset($modinfo->cms[$cmid])) {
+        throw new moodle_exception('invalidmoduleid', '', '', $modid);
+    }
+    $cminfo = $modinfo->cms[$cmid];
+}
+
 // Get course details.
 if ($id != $SITE->id) {
     $course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
     require_login($course);
     $context = context_course::instance($course->id);
-    if ($cmid) {
-        $modinfo = get_fast_modinfo($course);
-        if (!isset($modinfo->cms[$cmid])) {
-            throw new moodle_exception('invalidmoduleid', '', '', $modid);
-        }
-        $context = context_module::instance($cmid);
-        $PAGE->set_cm($modinfo->cms[$cmid]);
+    if ($cminfo !== null) {
+        $context = $cminfo->context;
+        $PAGE->set_cm($cminfo);
     }
 } else {
     $course = $SITE;
@@ -150,12 +155,36 @@ if ($course->id == $SITE->id) {
     $PAGE->set_title($strlogs);
     $PAGE->set_primary_active_tab('siteadminnode');
 } else {
-    $PAGE->set_title($course->shortname .': '. $strlogs);
+    $contexttitle = $course->shortname . ': ';
+    if ($cminfo !== null) {
+        $contexttitle .= $cminfo->name . ' - ';
+    }
+    $PAGE->set_title($contexttitle . $strlogs);
     $PAGE->set_heading($course->fullname);
 }
 
-$reportlog = new report_log_renderable($logreader, $course, $user, $modid, $modaction, $group, $edulevel, $showcourses, $showusers,
-        $chooselog, true, $url, $date, $logformat, $page, $perpage, 'timecreated DESC', $origin, $cmid);
+$reportlog = new report_log_renderable(
+    logreader: $logreader,
+    course: $course,
+    userid: $user,
+    modid: $modid,
+    action: $modaction,
+    groupid: $group,
+    edulevel: $edulevel,
+    showcourses: $showcourses,
+    showusers: $showusers,
+    showreport: $chooselog,
+    showselectorform: true,
+    url: $url,
+    date: $date,
+    logformat: $logformat,
+    page: $page,
+    perpage: $perpage,
+    order: 'timecreated DESC',
+    origin: $origin,
+    currentcmid: $cmid
+);
+
 $readers = $reportlog->get_readers();
 $output = $PAGE->get_renderer('report_log');
 
