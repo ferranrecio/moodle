@@ -4820,6 +4820,25 @@ function course_output_fragment_new_base_form($args) {
 }
 
 /**
+ * Get the course overview fragment.
+ *
+ * @param array $args the fragment arguments
+ * @return string the course overview fragment
+ */
+function course_output_fragment_course_overview($args) {
+    global $PAGE;
+    if (empty($args['modname']) || empty($args['courseid'])) {
+        throw new coding_exception('modname and courseid are required');
+    }
+    $modname = $args['modname'];
+    $course = get_course($args['courseid']);
+    can_access_course($course);
+    $renderer = $PAGE->get_renderer('format_' . $course->format);
+    $output = new \core_course\output\local\overview\overviewtable($course, $modname);
+    return $renderer->render($output);
+}
+
+/**
  * Get the current course image for the given course.
  *
  * @param \stdClass $course
