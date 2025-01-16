@@ -27,6 +27,9 @@ require_once('lib.php');
 require_once($CFG->libdir . '/completionlib.php');
 
 $courseid = required_param('id', PARAM_INT);
+// The expand param is just a quick way of expanding a specific activity type so it
+// does not require javascript to expand it. It is mostly used to accelerate behats.
+$expand = optional_param_array('expand', [], PARAM_ALPHANUM);
 
 $PAGE->set_url('/course/overview.php', ['id' => $courseid]);
 
@@ -38,12 +41,14 @@ require_login($course);
 require_capability('moodle/course:viewoverview', $context);
 
 $output = $PAGE->get_renderer('format_' . $course->format);
-$overview = new core_course\output\local\overview\overviewpage($course);
+$overview = new core_course\output\local\overview\overviewpage($course, $expand);
 
 $PAGE->set_pagelayout('incourse');
 
 $PAGE->set_title(get_string('overview_page_title', 'course', $course->fullname));
 $PAGE->set_heading($course->fullname);
+include_course_ajax($course);
+
 echo $output->header();
 
 echo $output->heading(get_string('activities'), 2, 'h4');
