@@ -16,6 +16,14 @@ Feature: Courses can be searched for and moved in bulk.
       | Biology Y2 | BIO2 | MISC |
       | English Y1 | ENG1 | ENG |
       | English Y2 | ENG2 | MISC |
+    And the following "users" exist:
+      | username  | firstname | lastname | email          |
+      | teacher1  | Teacher   | 1        | t1@example.com |
+      | teacher2  | Teacher   | 2        | t2@example.com |
+    And the following "course enrolments" exist:
+      | user | course | role |
+      | teacher1 | BIO1 | editingteacher |
+      | teacher2 | ENG2 | editingteacher |
 
   Scenario: Search courses finds correct results
     Given I log in as "admin"
@@ -26,6 +34,18 @@ Feature: Courses can be searched for and moved in bulk.
     And I should see "Biology Y2"
     And I should not see "English Y1"
     And I should not see "English Y2"
+
+  @javascript
+  Scenario: Search courses displays contact names
+    Given I log in as "admin"
+    And I go to the courses management page
+    When I set the field "Search" to "BIO1"
+    And I press "Search"
+    Then I should see "Biology Y1"
+    When I follow "Biology Y1"
+    Then I should see "Course contacts"
+    And I should see "Teacher: Teacher 1"
+    And I should not see "Teacher: Teacher 2"
 
   @javascript
   Scenario: Search courses and move results in bulk

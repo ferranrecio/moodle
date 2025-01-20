@@ -129,6 +129,36 @@ class helper {
                 'value' => join('<br />', $roledetails)
             );
         }
+
+        $contactsbyrole = [];
+        foreach ($course->get_course_contacts() as $contact) {
+            $rolenames = array_map(function ($role) {
+                return $role->displayname;
+            }, $contact['roles']);
+            $contacturl = new \moodle_url('/user/view.php', ['id' => $contact['user']->id]);
+            $coursecontact = \html_writer::link($contacturl, $contact['username']);
+
+            foreach ($rolenames as $rolename) {
+                if (!array_key_exists($rolename, $contactsbyrole)) {
+                    $contactsbyrole[$rolename] = [];
+                }
+                $contactsbyrole[$rolename][] = $coursecontact;
+            }
+        }
+        $contactsbyrolelist = [];
+        foreach ($contactsbyrole as $rolename => $contacts) {
+            $a = new \stdClass;
+            $a->role = $rolename;
+            $a->contacts = implode(', ', $contacts);
+            $contactsbyrolelist[] = \get_string('contactsbyrolelist', 'moodle', $a);
+        }
+        if ($canaccess && !empty($contactsbyrolelist)) {
+            $details['coursecontact'] = [
+                'key' => \get_string('coursecontact', 'admin'),
+                'value' => join('<br>', $contactsbyrolelist),
+            ];
+        }
+
         if ($course->can_review_enrolments()) {
             $enrolmentlines = array();
             $instances = \enrol_get_instances($course->id, true);
