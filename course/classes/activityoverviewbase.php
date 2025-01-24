@@ -21,6 +21,7 @@ use core\context\module as module_context;
 use core_completion\cm_completion_details;
 use core_course\local\overview\overviewitem;
 use core_course\output\local\overview\activityname;
+use core_course\output\local\overview\overviewpage;
 use core_courseformat\base as courseformat;
 
 /**
@@ -67,6 +68,16 @@ abstract class activityoverviewbase {
         $this->context = $cm->context;
         $this->course = $cm->get_course();
         $this->format = courseformat::instance($this->course);
+    }
+
+    /**
+     * Redirects to the overview page for the activity.
+     *
+     * @param int $courseid The course id.
+     * @param string $modname The module name.
+     */
+    public static function redirect_to_overview_page(int $courseid, string $modname): void {
+        redirect(overviewpage::get_modname_url($courseid, $modname));
     }
 
     /**
