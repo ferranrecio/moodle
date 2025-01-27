@@ -108,6 +108,7 @@ class completion implements named_templatable, renderable {
         $buttoncontent = get_string('completionmenuitem', 'completion');
         $buttonclass = '';
         if ($completioninfo->istrackeduser) {
+            $buttonclass = 'btn-outline-secondary';
             $buttoncontent = get_string('todo', 'completion');
             if ($completioninfo->overallcomplete) {
                 $buttoncontent = $output->pix_icon('i/checked', '') . " " . get_string('completion_manual:done', 'core_course');
