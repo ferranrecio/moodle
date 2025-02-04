@@ -4832,7 +4832,27 @@ function course_output_fragment_course_overview($args) {
     }
     $modname = $args['modname'];
     $course = get_course($args['courseid']);
+    $context = context_course::instance($course->id, MUST_EXIST);
     can_access_course($course);
+
+    // Some plugins may have a list view event.
+    $eventclassname = 'mod_' . $modname . '\\event\\course_module_instance_list_viewed';
+    if ($modname === 'resource') {
+        $eventclassname = 'core\\event\\course_resources_list_viewed';
+    }
+    if (class_exists($eventclassname)) {
+        try {
+            $event = $eventclassname::create(['context' => $context]);
+            $event->add_record_snapshot('course', $course);
+            $event->trigger();
+        } catch (\Throwable $th) {
+            // This may happens if the plugin implements a custom event class.
+            // It is highly unlikely but we should not stop the rendering because of this.
+            // Instead, we will log the error and continue.
+            debugging('Error while triggering the course module instance viewed event: ' . $th->getMessage());
+        }
+    }
+
     $renderer = course_get_format($course)->get_renderer($PAGE);
     $output = new \core_course\output\local\overview\overviewtable($course, $modname);
     return $renderer->render($output);
