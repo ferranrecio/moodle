@@ -31,6 +31,7 @@ final class activityoverviewbase_test extends \advanced_testcase {
         global $CFG;
         require_once($CFG->libdir . '/completionlib.php');
         require_once($CFG->dirroot . '/course/tests/fixtures/fake_activityoverview.php');
+        require_once($CFG->libdir . '/gradelib.php');
         parent::setUpBeforeClass();
     }
 
@@ -165,5 +166,91 @@ final class activityoverviewbase_test extends \advanced_testcase {
         $this->assertEquals(get_string('completion_status', 'completion'), $result->get_name());
         $this->assertEquals(null, $result->get_value());
         $this->assertEquals('-', $result->get_content());
+    }
+
+    /**
+     * Test get_grades_overviews method.
+     *
+     * @covers ::get_grades_overviews
+     */
+    public function test_get_grades_overviews(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+
+        $user = $generator->create_user();
+        $generator->enrol_user($user->id, $course->id);
+
+        // Create some modules.
+        $assign = $this->getDataGenerator()->create_module(
+            'assign',
+            ['course' => $course->id]
+        );
+        $workshop = $this->getDataGenerator()->create_module(
+            'workshop',
+            ['course' => $course->id],
+            ['grade' => 100.0],
+        );
+        $page = $this->getDataGenerator()->create_module(
+            'page',
+            ['course' => $course->id]
+        );
+
+        // Assignments have one grade item.
+        $assignitems = \grade_item::fetch_all([
+            'itemtype' => 'mod',
+            'itemmodule' => 'assign',
+            'iteminstance' => (int) $assign->id,
+            'courseid' => $course->id,
+        ]);
+        $gradegrade = new \grade_grade();
+        $gradegrade->itemid = reset($assignitems)->id;
+        $gradegrade->userid = (int) $user->id;
+        $gradegrade->rawgrade = 88;
+        $gradegrade->finalgrade = 88;
+        $gradegrade->insert();
+
+        // Workshops have two grade items.
+        $workshopitems = array_values(
+            \grade_item::fetch_all([
+                'itemtype' => 'mod',
+                'itemmodule' => 'workshop',
+                'iteminstance' => (int) $workshop->id,
+                'courseid' => $course->id,
+                ['grade' => 100.0],
+            ])
+        );
+        $gradegrade = new \grade_grade();
+        $gradegrade->itemid = reset($workshopitems)->id;
+        $gradegrade->userid = (int) $user->id;
+        $gradegrade->rawgrade = 77;
+        $gradegrade->finalgrade = 77;
+        $gradegrade->insert();
+
+        $this->setUser($user);
+        $modinfo = get_fast_modinfo($course);
+
+        // Validate assign gradeitems.
+        $cm = $modinfo->get_cm($assign->cmid);
+        $overview = new \core_course\fake_activityoverview($cm);
+        $result = $overview->get_grades_overviews();
+        $this->assertCount(1, $result);
+        $this->assertEquals(get_string('gradenoun'), $result[0]->get_name());
+        $this->assertEquals(88, $result[0]->get_value());
+        $this->assertEquals('88.00', $result[0]->get_content());
+
+        // Validate workshop gradeitems (having two grade, they should return an empty array).
+        $cm = $modinfo->get_cm($workshop->cmid);
+        $overview = new \core_course\fake_activityoverview($cm);
+        $result = $overview->get_grades_overviews();
+        $this->assertEmpty($result);
+
+        // Validate page has no gradeitems.
+        $cm = $modinfo->get_cm($page->cmid);
+        $overview = new \core_course\fake_activityoverview($cm);
+        $result = $overview->get_grades_overviews();
+        $this->assertEmpty($result);
     }
 }
