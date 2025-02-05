@@ -226,6 +226,15 @@ class overviewtable implements renderable, named_templatable {
 
         $row = array_merge($row, $overview->get_extra_overview_items($output));
 
+        $gradeitems = $overview->get_grades_overviews();
+        $gradeindex = 0;
+        if (!empty($gradeitems)) {
+            foreach ($gradeitems as $gradeitem) {
+                $row["grade{$gradeindex}"] = $gradeitem;
+                $gradeindex++;
+            }
+        }
+
         // Actions are always the last column, if any.
         $row['actions'] = $overview->get_actions_overview($output);
 
