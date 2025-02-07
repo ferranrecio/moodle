@@ -4853,9 +4853,16 @@ function course_output_fragment_course_overview($args) {
         }
     }
 
+    $content = '';
     $renderer = course_get_format($course)->get_renderer($PAGE);
+
+    // Plugins with not implemented overview table will have an extra link to the index.php.
+    $output = new \core_course\output\local\overview\missinoverviewnotice($course, $modname);
+    $content .= $renderer->render($output);
+
     $output = new \core_course\output\local\overview\overviewtable($course, $modname);
-    return $renderer->render($output);
+    $content .= $renderer->render($output);
+    return $content;
 }
 
 /**
