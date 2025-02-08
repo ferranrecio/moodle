@@ -151,6 +151,7 @@ abstract class activityoverviewbase {
             $this->cm->get_section_info(),
             $this->cm
         );
+        $completion->set_smallbutton(false);
 
         return new overviewitem(
             name: get_string('completion_status', 'completion'),

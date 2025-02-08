@@ -119,19 +119,19 @@ final class activityoverviewbase_test extends \advanced_testcase {
     public static function provider_get_completion_overview(): array {
         return [
             'complet' => [
-                'setcompletion' => COMPLETION_COMPLETE,
+                'setcompletion' => \COMPLETION_COMPLETE,
                 'contentstring' => 'completion-y',
             ],
             'incomplete' => [
-                'setcompletion' => COMPLETION_INCOMPLETE,
+                'setcompletion' => \COMPLETION_INCOMPLETE,
                 'contentstring' => 'completion-n',
             ],
             'complete pass' => [
-                'setcompletion' => COMPLETION_COMPLETE_PASS,
+                'setcompletion' => \COMPLETION_COMPLETE_PASS,
                 'contentstring' => 'completion-pass',
             ],
             'complete fail' => [
-                'setcompletion' => COMPLETION_COMPLETE_FAIL,
+                'setcompletion' => \COMPLETION_COMPLETE_FAIL,
                 'contentstring' => 'completion-fail',
             ],
         ];
