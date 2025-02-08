@@ -38,6 +38,9 @@ class completion implements named_templatable, renderable {
 
     use courseformat_named_templatable;
 
+    /** @var bool $smallbutton if the button is rendered small (like in course page). */
+    private bool $smallbutton = true;
+
     /**
      * Constructor.
      *
@@ -50,6 +53,19 @@ class completion implements named_templatable, renderable {
         protected section_info $section,
         protected cm_info $mod,
     ) {
+    }
+
+    /**
+     * Set if the button is rendered small.
+     *
+     * By default, the button is rendered small like in the course page. However,
+     * in other pages like the activities overview, the button is rendered like
+     * a regular button.
+     *
+     * @param bool $smallbutton if the button is rendered small (like in course page).
+     */
+    public function set_smallbutton(bool $smallbutton): void {
+        $this->smallbutton = $smallbutton;
     }
 
     /**
@@ -76,7 +92,7 @@ class completion implements named_templatable, renderable {
             return null;
         }
 
-        $completion = new activity_completion($this->mod, $completiondetails);
+        $completion = new activity_completion($this->mod, $completiondetails, $this->smallbutton);
         $completiondata = $completion->export_for_template($output);
 
         if ($completiondata->isautomatic || ($completiondata->ismanual && !$completiondata->istrackeduser)) {
@@ -116,9 +132,11 @@ class completion implements named_templatable, renderable {
             }
         }
 
+        $buttonclass .= $this->smallbutton ? ' btn-sm' : '';
+
         $completiondialog = new dropdown_dialog($buttoncontent, $dialogcontent, [
             'classes' => 'completion-dropdown',
-            'buttonclasses' => 'btn btn-sm dropdown-toggle icon-no-margin ' . $buttonclass,
+            'buttonclasses' => 'btn dropdown-toggle icon-no-margin ' . $buttonclass,
             'dropdownposition' => dropdown_dialog::POSITION['end'],
         ]);
 
