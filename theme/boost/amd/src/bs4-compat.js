@@ -28,6 +28,11 @@
  * @todo       Final deprecation in Moodle 6.0. See MDL-84465.
  */
 
+import {DefaultAllowlist} from './bootstrap/util/sanitizer';
+import Popover from 'theme_boost/bootstrap/popover';
+import Tooltip from 'theme_boost/bootstrap/tooltip';
+import log from 'core/log';
+
 /**
  * List of Bootstrap 4 elements to replace with Bootstrap 5 elements.
  * This list is based on the Bootstrap 4 to 5 migration guide:
@@ -111,23 +116,51 @@ const bootstrapElements = [
 
 /**
  * Replace Bootstrap 4 attributes with Bootstrap 5 attributes.
+ *
+ * @param {HTMLElement} container The element to search for Bootstrap 4 elements.
  */
-const replaceBootstrap4Attributes = () => {
+const replaceBootstrap4Attributes = (container) => {
     for (const bootstrapElement of bootstrapElements) {
-        const elements = document.querySelectorAll(bootstrapElement.selector);
+        const elements = container.querySelectorAll(bootstrapElement.selector);
         for (const element of elements) {
             for (const replacement of bootstrapElement.replacements) {
                 if (element.hasAttribute(replacement.bs4)) {
                     element.setAttribute(replacement.bs5, element.getAttribute(replacement.bs4));
                     element.removeAttribute(replacement.bs4);
-                    window.console.warn(
-                        `Silent Bootstrap 4 to 5 compatibility: ${replacement.bs4} replaced by ${replacement.bs5}`,
-                        element
-                    );
+                    log.debug(`Silent Bootstrap 4 to 5 compatibility: ${replacement.bs4} replaced by ${replacement.bs5}`);
+                    log.debug(element);
                 }
             }
         }
     }
+};
+
+/**
+ * Ensure Bootstrap 4 components are initialized.
+ *
+ * Some elements (tooltip and popovers) needs to be initialized manually after adding the data attributes.
+ *
+ * @param {HTMLElement} container The element to search for Bootstrap 4 elements.
+ */
+const ensureBootsrap4ComponentsAreInit = (container) => {
+    const popoverConfig = {
+        container: 'body',
+        trigger: 'focus',
+        allowList: Object.assign(DefaultAllowlist, {table: [], thead: [], tbody: [], tr: [], th: [], td: []}),
+    };
+    container.querySelectorAll('[data-bs-toggle="popover"]').forEach((tooltipTriggerEl) => {
+        const popOverInstance = Popover.getInstance(tooltipTriggerEl);
+        if (!popOverInstance) {
+            new Popover(tooltipTriggerEl, popoverConfig);
+        }
+    });
+
+    container.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((tooltipTriggerEl) => {
+        const tooltipInstance = Tooltip.getInstance(tooltipTriggerEl);
+        if (!tooltipInstance) {
+            new Tooltip(tooltipTriggerEl);
+        }
+    });
 };
 
 /**
@@ -141,5 +174,6 @@ const initBootstrap4Compatibility = (element) => {
         element = document;
     }
     replaceBootstrap4Attributes(element);
+    ensureBootsrap4ComponentsAreInit(element);
 };
 export default initBootstrap4Compatibility;
