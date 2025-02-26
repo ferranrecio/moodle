@@ -195,7 +195,6 @@ class humandate implements renderable, templatable {
     public function export_for_template(renderer_base $output): array {
         $timestamp = $this->datetime->getTimestamp();
         $userdate = userdate($timestamp, get_string('strftimedayshort'));
-        $due = $this->datetime->diff($this->clock->now());
         $relative = null;
         if ($this->userelatives) {
             $relative = $this->format_relative_date();
@@ -207,7 +206,7 @@ class humandate implements renderable, templatable {
             $date = $relative ?? $userdate;
         }
         $data = [
-            'timestamp' => $this->datetime->getTimestamp(),
+            'timestamp' => $timestamp,
             'userdate' => $userdate,
             'date' => $date,
             'time' => $this->format_time(),
@@ -215,7 +214,7 @@ class humandate implements renderable, templatable {
             'needtitle' => ($relative !== null || $this->timeonly),
             'link' => $this->link ? $this->link->out(false) : '',
         ];
-        if (($this->near !== null) && ($this->interval_to_seconds($due) < $this->near && $this->interval_to_seconds($due) > 0)) {
+        if ($this->is_near()) {
             $icon = new pix_icon(
                 pix: 'i/warning',
                 alt: get_string('warning'),
@@ -229,15 +228,28 @@ class humandate implements renderable, templatable {
     }
 
     /**
+     * Checks if the date is near.
+     *
+     * @return bool Whether the date is near.
+     */
+    private function is_near(): bool {
+        if ($this->near === null) {
+            return false;
+        }
+        $due = $this->datetime->diff($this->clock->now());
+        $intervalseconds = $this->interval_to_seconds($due);
+        return $intervalseconds < $this->near && $intervalseconds > 0;
+    }
+
+    /**
      * Converts a DateInterval object to total seconds.
      *
      * @param \DateInterval $interval The interval to convert.
      * @return int The total number of seconds.
      */
     private function interval_to_seconds(DateInterval $interval): int {
-        $reference = new DateTimeImmutable;
+        $reference = new DateTimeImmutable();
         $entime = $reference->add($interval);
-
         return $reference->getTimestamp() - $entime->getTimestamp();
     }
 
@@ -250,7 +262,7 @@ class humandate implements renderable, templatable {
      *
      * @return string|null
      */
-    private function format_relative_date(): string|null {
+    private function format_relative_date(): ?string {
         $usertimestamp = $this->get_user_date($this->datetime->getTimestamp());
         if ($usertimestamp == $this->get_user_date($this->clock->now()->getTimestamp())) {
             $format = get_string('strftimerelativetoday', 'langconfig');

@@ -207,5 +207,4 @@ final class humandate_test extends \advanced_testcase {
             }
         }
     }
-
 }

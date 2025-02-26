@@ -163,5 +163,4 @@ final class humantimeperiod_test extends \advanced_testcase {
             $this->assertEquals($expected[$field], $actual[$field], "Field $field does not match");
         }
     }
-
 }
