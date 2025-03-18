@@ -39,7 +39,13 @@ if ($course->id == SITEID) {
     $PAGE->set_pagelayout('incourse');
 }
 $PAGE->set_url('/mod/feedback/view.php', array('id' => $cm->id));
-$PAGE->set_title($feedback->name);
+
+/** @var \mod_feedback\output\renderer $renderer */
+$renderer = $PAGE->get_renderer('mod_feedback');
+$renderer->set_title(
+    [format_string($feedback->name), format_string($course->fullname)]
+);
+
 $PAGE->set_heading($course->fullname);
 $PAGE->add_body_class('limitedwidth');
 
@@ -64,9 +70,6 @@ $actionbar = new \mod_feedback\output\standard_action_bar(
     $feedbackcompletion->get_resume_page(),
     $courseid
 );
-
-/** @var \mod_feedback\output\renderer $renderer */
-$renderer = $PAGE->get_renderer('mod_feedback');
 
 // Trigger module viewed event.
 $feedbackcompletion->trigger_module_viewed();
