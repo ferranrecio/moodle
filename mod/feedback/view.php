@@ -40,12 +40,6 @@ if ($course->id == SITEID) {
 }
 $PAGE->set_url('/mod/feedback/view.php', array('id' => $cm->id));
 
-/** @var \mod_feedback\output\renderer $renderer */
-$renderer = $PAGE->get_renderer('mod_feedback');
-$renderer->set_title(
-    [format_string($feedback->name), format_string($course->fullname)]
-);
-
 $PAGE->set_heading($course->fullname);
 $PAGE->add_body_class('limitedwidth');
 
@@ -53,6 +47,12 @@ $PAGE->add_body_class('limitedwidth');
 if ($courseid AND $courseid != SITEID) {
     require_course_login(get_course($courseid)); // This overwrites the object $COURSE .
 }
+
+/** @var \mod_feedback\output\renderer $renderer */
+$renderer = $PAGE->get_renderer('mod_feedback');
+$renderer->set_title(
+    [format_string($feedback->name), format_string($course->fullname)]
+);
 
 // Check whether the feedback is mapped to the given courseid.
 if (!has_capability('mod/feedback:edititems', $context) &&
