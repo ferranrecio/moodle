@@ -42,6 +42,9 @@ define(
     'core/str',
     'core/config',
     'core/ajax',
+    'core/local/aria/focuslock',
+    'core/modal_backdrop',
+    'core/templates'
 ],
 function(
     $,
@@ -64,11 +67,13 @@ function(
     Str,
     Config,
     Ajax,
+    FocusLock,
+    ModalBackdrop,
+    Templates
 ) {
 
     var SELECTORS = {
         DRAWER: '[data-region="right-hand-drawer"]',
-        JUMPTO: '.popover-region [data-region="jumpto"]',
         PANEL_BODY_CONTAINER: '[data-region="panel-body-container"]',
         PANEL_HEADER_CONTAINER: '[data-region="panel-header-container"]',
         VIEW_CONTACT: '[data-region="view-contact"]',
@@ -141,6 +146,65 @@ function(
         });
     };
 
+    // The open button is the button that opened the drawer. The element is send
+    // using the pubsub event so we need to store when the user clicks the button.
+    let openButton = null;
+
+    let backdropPromise = null;
+
+    /**
+     * Set the focus on the drawer.
+     *
+     * This method also creates or destroy any necessary backdrop zone and focus trap.
+     *
+     * @param {Object} root The message drawer container.
+     * @param {Boolean} hasFocus Whether the drawer has focus or not.
+     */
+    var setFocus = function(root, hasFocus) {
+        var drawerRoot = Drawer.getDrawerRoot(root);
+        if (!drawerRoot.length) {
+            return;
+        }
+        if (!backdropPromise) {
+            backdropPromise = Templates.render('core/modal_backdrop', {})
+                .then(html => new ModalBackdrop(html));
+        }
+        const backdropWithAdjustments = backdropPromise.then(modalBackdrop => {
+            const messageDrawerZIndex = window.getComputedStyle(drawerRoot[0]).zIndex;
+            if (messageDrawerZIndex) {
+                modalBackdrop.setZIndex(messageDrawerZIndex - 1);
+            }
+            modalBackdrop.getAttachmentPoint().get(0).addEventListener('click', e => {
+                e.preventDefault();
+            });
+            return modalBackdrop;
+        });
+        if (hasFocus) {
+            FocusLock.trapFocus(root[0]);
+            // eslint-disable-next-line promise/catch-or-return
+            backdropWithAdjustments.then(modalBackdrop => {
+                if (modalBackdrop) {
+                    modalBackdrop.show();
+                    const pageWrapper = document.getElementById('page');
+                    pageWrapper.style.overflow = 'hidden';
+                }
+                return modalBackdrop;
+            });
+        } else {
+            FocusLock.untrapFocus();
+            // eslint-disable-next-line promise/catch-or-return
+            backdropWithAdjustments.then(modalBackdrop => {
+                if (modalBackdrop) {
+                    modalBackdrop.hide();
+                    const pageWrapper = document.getElementById('page');
+                    pageWrapper.style.overflow = 'visible';
+                }
+                return modalBackdrop;
+            });
+            // Return the focus to the button that opened the drawer.
+            openButton?.focus();
+        }
+    };
     /**
      * Show the message drawer.
      *
@@ -155,6 +219,7 @@ function(
 
         var drawerRoot = Drawer.getDrawerRoot(root);
         if (drawerRoot.length) {
+            setFocus(root, true);
             Drawer.show(drawerRoot);
         }
     };
@@ -167,6 +232,7 @@ function(
     var hide = function(root) {
         var drawerRoot = Drawer.getDrawerRoot(root);
         if (drawerRoot.length) {
+            setFocus(root, false);
             Drawer.hide(drawerRoot);
         }
     };
@@ -430,22 +496,6 @@ function(
             });
         });
 
-        $(SELECTORS.JUMPTO).focus(function() {
-            var firstInput = root.find(SELECTORS.CLOSE_BUTTON);
-            if (firstInput.length) {
-                firstInput.focus();
-            } else {
-                $(SELECTORS.HEADER_CONTAINER).find(SELECTORS.ROUTES_BACK).focus();
-            }
-        });
-
-        $(SELECTORS.DRAWER).focus(function() {
-            var button = $(this).attr('data-origin');
-            if (button) {
-                $('#' + button).focus();
-            }
-        });
-
         if (!alwaysVisible) {
             PubSub.subscribe(Events.SHOW, function() {
                 show(namespace, root);
@@ -460,12 +510,11 @@ function(
                 if (isVisible(root)) {
                     hide(root);
                     buttonElement?.setAttribute('aria-expanded', false);
-                    $(SELECTORS.JUMPTO).attr('tabindex', -1);
                 } else {
+                    openButton = buttonElement;
                     show(namespace, root);
                     buttonElement?.setAttribute('aria-expanded', true);
                     setJumpFrom(buttonid);
-                    $(SELECTORS.JUMPTO).attr('tabindex', 0);
                 }
             });
         }
@@ -485,6 +534,7 @@ function(
                 $('#' + button).focus();
             }
             PubSub.publish(Events.TOGGLE_VISIBILITY, button);
+            setFocus(root, false);
         });
 
         PubSub.subscribe(Events.CREATE_CONVERSATION_WITH_USER, function(args) {
