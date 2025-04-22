@@ -175,6 +175,7 @@ function(
                 modalBackdrop.setZIndex(messageDrawerZIndex - 1);
             }
             modalBackdrop.getAttachmentPoint().get(0).addEventListener('click', e => {
+                PubSub.publish(Events.HIDE);
                 e.preventDefault();
             });
             return modalBackdrop;
