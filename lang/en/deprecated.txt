@@ -73,3 +73,5 @@ tt_editevent,core_calendar
 userevent,core_calendar
 togglenotificationmenu,core_message
 externalblogdeleteconfirm,core_blog
+maxsectionslimit,core
+maxsectionaddmessage,core_courseformat

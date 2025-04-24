@@ -49,10 +49,7 @@ class permission {
             return false;
         }
         $format = course_get_format($section->course);
-        if ($format->get_last_section_number() >= $format->get_max_sections()) {
-            return false;
-        }
-        if (!$format->supports_components()) {
+        if (!$format->supports_components() || !$format->can_add_delegated_sections()) {
             return false;
         }
         return true;

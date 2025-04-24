@@ -165,8 +165,21 @@ class format_social extends core_courseformat\base {
     }
 
 
-    #[\Override]
+    /**
+     * Method used to get the maximum number of sections for this course format.
+     *
+     * @deprecated Since 5.1 the setting is removed.
+     * @todo Remove this method in Moodle 6.0 (MDL-85272).
+     * @return int
+     */
+    #[\core\attribute\deprecated(
+        replacement: null,
+        reason: 'The maxsection setting is removed.',
+        since: '5.1',
+        mdl: 'MDL-84291',
+    )]
     public function get_max_sections() {
+        \core\deprecation::emit_deprecation_if_present([self::class, __FUNCTION__]);
         // Social ony uses one section.
         return 1;
     }
@@ -185,5 +198,10 @@ class format_social extends core_courseformat\base {
     public function is_section_visible(section_info $section): bool {
         $visible = parent::is_section_visible($section);
         return $visible && $section->section == 0;
+    }
+
+    #[\Override]
+    public function can_add_delegated_sections(): bool {
+        return false;
     }
 }
