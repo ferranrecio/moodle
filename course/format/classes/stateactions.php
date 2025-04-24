@@ -269,12 +269,6 @@ class stateactions {
 
         // Get course format settings.
         $format = course_get_format($course->id);
-        $lastsectionnumber = $format->get_last_section_number();
-        $maxsections = $format->get_max_sections();
-
-        if ($lastsectionnumber >= $maxsections) {
-            throw new moodle_exception('maxsectionslimit', 'moodle', '', $maxsections);
-        }
 
         $modinfo = get_fast_modinfo($course);
 
