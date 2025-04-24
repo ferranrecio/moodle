@@ -290,8 +290,7 @@ class format_topics extends core_courseformat\base {
             // The "Number of sections" option is no longer available when editing course, instead teachers should
             // delete and add sections when needed.
             $courseconfig = get_config('moodlecourse');
-            $max = (int)$courseconfig->maxsections;
-            $element = $mform->addElement('select', 'numsections', get_string('numberweeks'), range(0, $max ?: 52));
+            $element = $mform->addElement('text', 'numsections', get_string('numberweeks'));
             $mform->setType('numsections', PARAM_INT);
             if (is_null($mform->getElementValue('numsections'))) {
                 $mform->setDefault('numsections', $courseconfig->numsections);
@@ -300,6 +299,18 @@ class format_topics extends core_courseformat\base {
         }
 
         return $elements;
+    }
+
+    #[\Override]
+    public function edit_form_validation($data, $files, $errors) {
+        $data = (array)$data;
+        if (!isset($data['numsections'])) {
+            return $errors;
+        }
+        if (!is_numeric($data['numsections']) || $data['numsections'] < 0) {
+            $errors['numsections'] = get_string('error_not_numeric_sections', 'core_courseformat');
+        }
+        return $errors;
     }
 
     /**

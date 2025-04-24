@@ -260,8 +260,8 @@ class format_legacy extends core_courseformat\base {
      */
     public function course_format_options($foreditform = false) {
         static $courseformatoptions = false;
+        $courseconfig = get_config('moodlecourse');
         if ($courseformatoptions === false) {
-            $courseconfig = get_config('moodlecourse');
             $courseformatoptions = array(
                 'numsections' => array(
                     'default' => $courseconfig->numsections,
@@ -278,16 +278,10 @@ class format_legacy extends core_courseformat\base {
             );
         }
         if ($foreditform && !isset($courseformatoptions['coursedisplay']['label'])) {
-            $courseconfig = get_config('moodlecourse');
-            $sectionmenu = array();
-            for ($i = 0; $i <= $courseconfig->maxsections; $i++) {
-                $sectionmenu[$i] = "$i";
-            }
             $courseformatoptionsedit = array(
                 'numsections' => array(
-                    'label' => new lang_string('numberweeks'),
-                    'element_type' => 'select',
-                    'element_attributes' => array($sectionmenu),
+                    'default' => $courseconfig->numsections,
+                    'type' => PARAM_INT,
                 ),
                 'hiddensections' => array(
                     'label' => new lang_string('hiddensections'),

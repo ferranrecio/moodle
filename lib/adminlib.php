@@ -5416,9 +5416,27 @@ class admin_settings_country_select extends admin_setting_configselect {
  *
  * @copyright 2011 The Open University
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @deprecated since Moodle 5.2.
+ * @todo Remove this class in Moodle 6.0 (MDL-85272).
  */
 class admin_settings_num_course_sections extends admin_setting_configselect {
+    /**
+     * Constructor.
+     *
+     * @param string $name The name of the setting
+     * @param string $visiblename The visible name of the setting
+     * @param string $description The description of the setting
+     * @param int $defaultsetting The default setting value
+     * @deprecated since Moodle 5.2
+     * @todo Final deprecation in Moodle 6.0 (MDL-84291)
+     */
+    #[\core\attribute\deprecated(
+        replacement: 'admin_settings_default_course_sections',
+        since: '5.1',
+        mdl: 'MDL-84291',
+    )]
     public function __construct($name, $visiblename, $description, $defaultsetting) {
+        \core\deprecation::emit_deprecation_if_present(__FUNCTION__);
         parent::__construct($name, $visiblename, $description, $defaultsetting, array());
     }
 
@@ -5435,6 +5453,41 @@ class admin_settings_num_course_sections extends admin_setting_configselect {
     }
 }
 
+/**
+ * admin_setting_configselect for the default number of sections in a course,
+ * simply so we can lazy-load the choices.
+ *
+ * @copyright 2011 The Open University
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class admin_settings_default_course_sections extends admin_setting_configtext {
+
+    /**
+     * Creator.
+     *
+     * @param string $name The name of the setting
+     * @param string $visiblename The visible name of the setting
+     * @param string $description The description of the setting
+     * @param int $defaultsetting The default setting value
+     */
+    public function __construct(string $name, string $visiblename, string $description, int $defaultsetting) {
+        parent::__construct($name, $visiblename, $description, $defaultsetting, PARAM_INT);
+    }
+
+    /**
+     * Validate data before storage.
+     *
+     * @param string $data The submitted data
+     * @return bool|string true if ok, string if error found
+     */
+    public function validate($data) {
+        global $CFG;
+        if (!is_numeric($data) || (int) $data < 0) {
+            return get_string('error_not_numeric_sections', 'core_courseformat');
+        }
+        return true;
+    }
+}
 
 /**
  * Course category selection
