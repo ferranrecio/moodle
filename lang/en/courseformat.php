@@ -69,7 +69,7 @@ $string['cmsmove_title'] = 'Move selected activities';
 $string['cmsmove_info'] = 'Move {$a} activities after';
 $string['courseindex'] = 'Course index';
 $string['courseindexoptions'] = 'Course index options';
-$string['maxsectionaddmessage'] = 'You have reached the maximum number of sections allowed for a course.';
+$string['error_not_numeric_sections'] = 'The number of sections must be a positive number.';
 $string['nobulkaction'] = 'No bulk actions available';
 $string['orphansectionwarning'] = 'This section and its content are not part of the course structure and are not visible to students. To use any of this content, move it to a different section.';
 $string['preference:coursesectionspreferences'] = 'Section user preferences for course {$a}';
@@ -96,3 +96,6 @@ $string['sectionsmove_info'] = 'Move {$a} sections after';
 $string['sectionsmove_title'] = 'Move selected sections';
 $string['selectcm'] = 'Select activity {$a}';
 $string['selectsection'] = 'Select section {$a}';
+
+// Deprecated since Moodle 5.1.
+$string['maxsectionaddmessage'] = 'You have reached the maximum number of sections allowed for a course.';

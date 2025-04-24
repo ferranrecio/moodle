@@ -1,0 +1,13 @@
+issueNumber: MDL-84291
+notes:
+  core_courseformat:
+    - message: >-
+        The maxsections setting is now considered deprecated and will be removed
+        in Moodle 6.0. Consider implementing your own setting in your format
+        plguin if needed.
+      type: deprecated
+    - message: >-
+        A new can_add_delegated_sections method has been added to
+        core_courseformat\base class to specify if the format can add
+        new subsections or any type of delegated sections.
+      type: improved
