@@ -23,16 +23,13 @@
  */
 
 import {BaseComponent} from 'core/reactive';
+import * as BulkSelection from 'core_courseformat/local/content/actions/bulkselection';
 import {disableStickyFooter, enableStickyFooter} from 'core/sticky-footer';
 import {getCurrentCourseEditor} from 'core_courseformat/courseeditor';
 import {getString} from 'core/str';
+import Log from 'core/log';
 import Pending from 'core/pending';
 import {prefetchStrings} from 'core/prefetch';
-import {
-    selectAllBulk,
-    switchBulkSelection,
-    checkAllBulkSelected
-} from 'core_courseformat/local/content/actions/bulkselection';
 import Notification from 'core/notification';
 
 // Load global strings.
@@ -56,7 +53,9 @@ export default class Component extends BaseComponent {
             CANCEL: `[data-for="bulkcancel"]`,
             COUNT: `[data-for='bulkcount']`,
             SELECTABLE: `[data-bulkcheckbox][data-is-selectable]`,
+            // TODO: remove this selector in Moodle 6.0 (MDL-XXXXX).
             SELECTALL: `[data-for="selectall"]`,
+            BULKACTION: `[data-bulk-action]`,
             BULKBTN: `[data-for="enableBulk"]`,
         };
         // Most classes will be loaded later by DndCmItem.
@@ -85,14 +84,12 @@ export default class Component extends BaseComponent {
      * Initial state ready method.
      */
     stateReady() {
-        const cancelBtn = this.getElement(this.selectors.CANCEL);
-        if (cancelBtn) {
-            this.addEventListener(cancelBtn, 'click', this._cancelBulk);
-        }
+        // TODO: select all click event in Moodle 6.0 (MDL-XXXXX).
         const selectAll = this.getElement(this.selectors.SELECTALL);
         if (selectAll) {
             this.addEventListener(selectAll, 'click', this._selectAllClick);
         }
+        this.addEventListener(this.element, 'click', this._handleClickEvent);
     }
 
     /**
@@ -168,7 +165,7 @@ export default class Component extends BaseComponent {
         const pending = new Pending(`courseformat/bulktools:refreshSelectAll`);
         setTimeout(
             () => {
-                selectall.checked = checkAllBulkSelected(this.reactive);
+                selectall.checked = BulkSelection.checkAllBulkSelected(this.reactive);
                 pending.resolve();
             },
             100
@@ -210,27 +207,57 @@ export default class Component extends BaseComponent {
 
     /**
      * Handle special select all cases.
+     *
+     * @deprecated since Moodle 5.1 (MDL-XXXXX)
+     * @todo remove in Moodle 6.0 (MDL-XXXXX)
      * @param {Event} event
      */
     _selectAllClick(event) {
+        Log.debug('The select all checkbox is deprecated. Please, use data-bulk-action attributes instead');
         event.preventDefault();
         if (event.altKey) {
-            switchBulkSelection(this.reactive);
+            BulkSelection.switchBulkSelection(this.reactive);
             return;
         }
-        if (checkAllBulkSelected(this.reactive)) {
+        if (BulkSelection.checkAllBulkSelected(this.reactive)) {
             this._handleUnselectAll();
             return;
         }
-        selectAllBulk(this.reactive, true);
+        BulkSelection.selectAllBulk(this.reactive, true);
+    }
+
+    /**
+     * Handle click events on the bulk action buttons.
+     *
+     * @param {Event} event
+     * @private
+     */
+    _handleClickEvent(event) {
+        const target = event.target.closest(this.selectors.BULKACTION);
+        if (target) {
+            event.preventDefault();
+            const action = target.dataset.bulkAction;
+            if (action && BulkSelection[action] !== undefined) {
+                BulkSelection[action](this.reactive);
+            }
+        }
+
+        const cancelBtn = event.target.closest(this.selectors.CANCEL);
+        if (cancelBtn) {
+            this._cancelBulk();
+        }
     }
 
     /**
      * Process unselect all elements.
+     *
+     * @deprecated since Moodle 5.1 (MDL-XXXXX)
+     * @todo remove in Moodle 6.0 (MDL-XXXXX)
      */
     _handleUnselectAll() {
+        Log.debug('The _handleUnselectAll method is deprecated. Please, use data-bulk-action attributes instead');
         const pending = new Pending(`courseformat/content:bulktUnselectAll`);
-        selectAllBulk(this.reactive, false);
+        BulkSelection.selectAllBulk(this.reactive, false);
         // Wait for a while and focus on the first checkbox.
         setTimeout(() => {
             document.querySelector(this.selectors.SELECTABLE)?.focus();

@@ -115,6 +115,37 @@ class BulkSelector {
     }
 
     /**
+     * Select all elements of the current type that match a filter.
+     * @param {String} elementType cm or section
+     * @param {Function} filter a function that returns true if the element must be selected
+     */
+    selectAllFilter(elementType, filter) {
+        this.selectAll(false);
+        if (!filter) {
+            this._updateBulkSelectionAll(elementType, true);
+            return;
+        }
+        const affectedIds = [];
+        this._getContentCheckboxes(elementType).forEach(bulkSelect => {
+            if (bulkSelect.disabled) {
+                return;
+            }
+            if (elementType == 'section') {
+                const section = this.courseEditor.get('section', bulkSelect.dataset.id);
+                if (!section?.bulkeditable) {
+                    return;
+                }
+            }
+            const id = bulkSelect.dataset.id;
+            const element = this.courseEditor.get(elementType, id);
+            if (filter(element)) {
+                affectedIds.push(id);
+            }
+        });
+        this._updateBulkSelection(affectedIds, elementType, true);
+    }
+
+    /**
      * Checks if all selectable elements are selected.
      * @returns {Boolean} true if all are selected
      */
@@ -377,6 +408,55 @@ export const switchBulkSelection = function(courseEditor) {
 export const selectAllBulk = function(courseEditor, value) {
     const bulkSelector = new BulkSelector(courseEditor);
     bulkSelector.selectAll(value);
+};
+
+/**
+ * Select all sections.
+ *
+ * @method
+ * @param {CourseEditor} courseEditor
+ */
+export const selectAllSections = function(courseEditor) {
+    const bulkSelector = new BulkSelector(courseEditor);
+    bulkSelector.selectAllFilter('section');
+};
+
+/**
+ * Select all sections that are empty (no cm).
+ *
+ * @method
+ * @param {CourseEditor} courseEditor
+ */
+export const selectEmptySections = function(courseEditor) {
+    const bulkSelector = new BulkSelector(courseEditor);
+    bulkSelector.selectAllFilter(
+        'section',
+        function(section) {
+            return section.cmlist?.length == 0;
+        }
+    );
+};
+
+/**
+ * Select all cm elements.
+ *
+ * @method
+ * @param {CourseEditor} courseEditor
+ */
+export const selectAllCms = function(courseEditor) {
+    const bulkSelector = new BulkSelector(courseEditor);
+    bulkSelector.selectAllFilter('cm');
+};
+
+/**
+ * Unselect all elements.
+ *
+ * @method
+ * @param {CourseEditor} courseEditor
+ */
+export const selectNone = function(courseEditor) {
+    const bulkSelector = new BulkSelector(courseEditor);
+    bulkSelector.selectAll(false);
 };
 
 /**

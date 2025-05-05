@@ -39,11 +39,27 @@
     {{$ disable }} data-disable="true" {{/ disable }}
     {{$ extradata }} data-for="bulkedittools" {{/ extradata }}
     {{$ stickycontent }}
-    <div class="form-check">
-        <input type="checkbox" class="form-check-input" id="selectall" data-for="selectall" disabled>
-        <label class="form-check-label" for="selectall">
-            {{#str}} selectall {{/str}}
-        </label>
+    <div class="dropup bulkselectall">
+        <button
+            class="btn dropdown-toggle"
+            type="button"
+            id="dropdownMenuButton1"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+        >
+            {{#str}} select, core {{/str}}
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+            <li><a class="dropdown-item" data-bulk-action="selectNone">{{#str}} none, core {{/str}}</a></li>
+            <li><a class="dropdown-item" data-bulk-action="selectAllSections">{{#str}} sections, core {{/str}}</a></li>
+            <li><a class="dropdown-item" data-bulk-action="selectAllCms">{{#str}} activities, core {{/str}}</a></li>
+            <li>
+                <a
+                    class="dropdown-item"
+                    data-bulk-action="selectEmptySections"
+                >{{#str}} emptysections, core_courseformat {{/str}}</a>
+            </li>
+        </ul>
     </div>
     <div class="mx-auto" data-for="bulktools">
         {{^hasactions}}

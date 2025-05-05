@@ -28438,6 +28438,7 @@ body.dragging .dragging {
   border: 0;
   font: var(--fa-font-solid);
   content: "\f077";
+  font-size: 9px;
 }
 
 .select-menu li:first-child ul[role=group] {
@@ -38262,7 +38263,7 @@ body {
   font-size: calc(0.9375rem * 1.10);
 }
 .stickyfooter .sticky-footer-content {
-  overflow: hidden;
+  overflow: visible;
 }
 @media (min-width: 768px) {
   .pagelayout-standard .stickyfooter .sticky-footer-content, body.limitedwidth.uses-drawers .stickyfooter .sticky-footer-content {

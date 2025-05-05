@@ -69,6 +69,7 @@ $string['cmsmove_title'] = 'Move selected activities';
 $string['cmsmove_info'] = 'Move {$a} activities after';
 $string['courseindex'] = 'Course index';
 $string['courseindexoptions'] = 'Course index options';
+$string['emptysections'] = 'Empty sections';
 $string['maxsectionaddmessage'] = 'You have reached the maximum number of sections allowed for a course.';
 $string['nobulkaction'] = 'No bulk actions available';
 $string['orphansectionwarning'] = 'This section and its content are not part of the course structure and are not visible to students. To use any of this content, move it to a different section.';
