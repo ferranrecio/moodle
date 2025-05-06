@@ -952,6 +952,12 @@ function prepare_new_moduleinfo_data($course, $modulename, $section, string $suf
         if (get_string_manager()->string_exists('quickcreatename', "mod_{$data->modulename}")) {
             $data->name = get_string("quickcreatename", "mod_{$data->modulename}");
         }
+        $data = component_callback(
+            component: "mod_{$data->modulename}",
+            function: 'quickcreate_get_default_data',
+            params: [$course, $data],
+            default: $data,
+        );
     }
 
     return array($module, $context, $cw, $cm, $data);

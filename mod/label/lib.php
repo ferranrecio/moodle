@@ -195,21 +195,21 @@ function label_reset_userdata($data) {
  * @return mixed True if module supports feature, false if not, null if doesn't know or string for the module purpose.
  */
 function label_supports($feature) {
-    switch($feature) {
-        case FEATURE_IDNUMBER:                return true;
-        case FEATURE_GROUPS:                  return false;
-        case FEATURE_GROUPINGS:               return false;
-        case FEATURE_MOD_INTRO:               return true;
-        case FEATURE_COMPLETION_TRACKS_VIEWS: return false;
-        case FEATURE_GRADE_HAS_GRADE:         return false;
-        case FEATURE_GRADE_OUTCOMES:          return false;
-        case FEATURE_MOD_ARCHETYPE:           return MOD_ARCHETYPE_RESOURCE;
-        case FEATURE_BACKUP_MOODLE2:          return true;
-        case FEATURE_NO_VIEW_LINK:            return true;
-        case FEATURE_MOD_PURPOSE:             return MOD_PURPOSE_CONTENT;
-
-        default: return null;
-    }
+    return match ($feature) {
+        FEATURE_IDNUMBER => true,
+        FEATURE_GROUPS => false,
+        FEATURE_GROUPINGS => false,
+        FEATURE_MOD_INTRO => true,
+        FEATURE_COMPLETION_TRACKS_VIEWS => false,
+        FEATURE_GRADE_HAS_GRADE => false,
+        FEATURE_GRADE_OUTCOMES => false,
+        FEATURE_MOD_ARCHETYPE => MOD_ARCHETYPE_RESOURCE,
+        FEATURE_BACKUP_MOODLE2 => true,
+        FEATURE_NO_VIEW_LINK => true,
+        FEATURE_MOD_PURPOSE => MOD_PURPOSE_CONTENT,
+        FEATURE_QUICKCREATE => true,
+        default => null,
+    };
 }
 
 /**
@@ -402,4 +402,18 @@ function mod_label_core_calendar_provide_event_action(calendar_event $event,
         1,
         true
     );
+}
+
+/**
+ * Returns the default data for the quick create feature.
+ *
+ * @param stdClass $course The course object.
+ * @param stdClass $data The data object.
+ * @return stdClass The modified data object.
+ */
+function mod_label_quickcreate_get_default_data(stdClass $course, stdClass $data): stdClass {
+    // In general, quick create modules uses the quickcreatename string for the module naming.
+    // But in this case, we need to use an empty name to avoid the module name being set to "label".
+    $data->name = '';
+    return $data;
 }
