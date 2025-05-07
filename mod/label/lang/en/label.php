@@ -31,6 +31,7 @@ $string['dndresizeheight'] = 'Resize drag and drop height';
 $string['dndresizewidth'] = 'Resize drag and drop width';
 $string['dnduploadlabel'] = 'Add media to course page';
 $string['dnduploadlabeltext'] = 'Add a Text and media area to the course page';
+$string['edit'] = 'Edit content of {$a->name} in {$a->sectionname}';
 $string['indicator:cognitivedepth'] = 'Text and media area cognitive';
 $string['indicator:cognitivedepth_help'] = 'This indicator is based on the cognitive depth reached by the student in a Text and media area resource.';
 $string['indicator:cognitivedepthdef'] = 'Text and media area cognitive';

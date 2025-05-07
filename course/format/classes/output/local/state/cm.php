@@ -77,7 +77,7 @@ class cm implements renderable {
             'visible' => !empty($cm->visible),
             'stealth' => $cm->is_stealth(),
             'sectionid' => $section->id,
-            'sectionnumber' => $section->section,
+            'sectionnumber' => $section->sectionnum,
             'uservisible' => $cm->uservisible,
             'hascmrestrictions' => $this->get_has_restrictions(),
             'modname' => get_string('pluginname', 'mod_' . $cm->modname),
@@ -87,6 +87,10 @@ class cm implements renderable {
             'plugin' => 'mod_' . $cm->modname,
             // Activities with delegate section has some restriction to prevent structure loops.
             'hasdelegatedsection' => !empty($delegatedsectioninfo),
+            // Some activities uses adhoc activity cards using the cm_info_view callback.
+            // To know if the frontend needs to refresh the activity card, they inform the
+            // last time the activity was modified.
+            'timemodified' => $cm->timemodified,
         ];
 
         if (!empty($delegatedsectioninfo)) {

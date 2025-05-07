@@ -153,7 +153,7 @@ function label_delete_instance($id) {
 function label_get_coursemodule_info($coursemodule) {
     global $DB;
 
-    if ($label = $DB->get_record('label', array('id'=>$coursemodule->instance), 'id, name, intro, introformat')) {
+    if ($label = $DB->get_record('label', array('id'=>$coursemodule->instance), 'id, name, intro, introformat, timemodified')) {
         if (empty($label->name)) {
             // label name missing, fix it
             $label->name = "label{$label->id}";
@@ -163,10 +163,28 @@ function label_get_coursemodule_info($coursemodule) {
         // no filtering hre because this info is cached and filtered later
         $info->content = format_module_intro('label', $label, $coursemodule->id, false);
         $info->name  = $label->name;
+        $info->timemodified = $label->timemodified;
         return $info;
     } else {
         return null;
     }
+}
+
+/**
+ * Called when viewing course page. Shows extra details after the link if
+ * enabled.
+ *
+ * @param cm_info $cm Course module information
+ */
+function mod_label_cm_info_view(cm_info $cm) {
+    $format = \core_courseformat\base::instance($cm->course);
+    if (!$format->show_editor() || !$format->supports_components()) {
+        return;
+    }
+
+    $renderer = \core\di::get(\core\output\renderer_helper::class)->get_core_renderer();
+    $button = new \mod_label\output\editlabel($cm);
+    $cm->set_after_link($renderer->render($button));
 }
 
 /**

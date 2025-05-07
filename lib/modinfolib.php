@@ -1054,6 +1054,10 @@ class course_modinfo {
                                 if (!empty($info->name)) {
                                     $mods[$cmid]->name = $info->name;
                                 }
+                                // Some modules may inform the frontend about the last update.
+                                if (!empty($info->timemodified)) {
+                                    $mods[$cmid]->timemodified = $info->timemodified;
+                                }
                                 if ($info instanceof cached_cm_info) {
                                     // When using cached_cm_info you can include three new fields.
                                     // That aren't available for legacy code.
@@ -1451,6 +1455,13 @@ class cm_info implements IteratorAggregate {
     private $showdescription;
 
     /**
+     * The instance timestamp of the last modification.
+     * Not all modules inform this field, in that cases the value is set to 0.
+     * @var int
+     */
+    private $timemodified;
+
+    /**
      * Extra HTML that is put in an unhelpful part of the HTML when displaying this module in
      * course page - from cached data in modinfo field
      * @deprecated This is crazy, don't use it. Replaced by ->extraclasses and ->onclick
@@ -1675,6 +1686,7 @@ class cm_info implements IteratorAggregate {
         'sectionid' => false,
         'sectionnum' => false,
         'showdescription' => false,
+        'timemodified' => false,
         'uservisible' => 'get_user_visible',
         'visible' => false,
         'visibleoncoursepage' => false,
@@ -2445,6 +2457,7 @@ class cm_info implements IteratorAggregate {
         $this->iconcomponent    = isset($mod->iconcomponent) ? $mod->iconcomponent : '';
         $this->customdata       = isset($mod->customdata) ? $mod->customdata : '';
         $this->showdescription  = isset($mod->showdescription) ? $mod->showdescription : 0;
+        $this->timemodified     = isset($mod->timemodified) ? $mod->timemodified : 0;
         $this->state = self::STATE_BASIC;
 
         $this->sectionid = isset($mod->sectionid) ? $mod->sectionid : 0;
@@ -3129,6 +3142,12 @@ class cached_cm_info {
      * @var string
      */
     public $onclick;
+
+    /**
+     * Optional timemodified field to determine if the course module has been modified.
+     * @var int
+     */
+    public int $timemodified = 0;
 }
 
 

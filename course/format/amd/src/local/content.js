@@ -238,6 +238,7 @@ export default class Component extends BaseComponent {
             {watch: `cm.sectionid:updated`, handler: this._reloadCm},
             {watch: `cm.indent:updated`, handler: this._reloadCm},
             {watch: `cm.groupmode:updated`, handler: this._reloadCm},
+            {watch: `cm.timemodified:updated`, handler: this._reloadCm},
             {watch: `cm.name:updated`, handler: this._refreshCmName},
             // Update section number and title.
             {watch: `section.number:updated`, handler: this._refreshSectionNumber},
