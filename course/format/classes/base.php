@@ -505,6 +505,15 @@ abstract class base {
     }
 
     /**
+     * Returns true if this course format uses delegated sections (for example subsections).
+     *
+     * @return bool
+     */
+    public function can_add_delegated_sections(): bool {
+        return true;
+    }
+
+    /**
      * Returns true if this course format uses course index
      *
      * This function may be called without specifying the course id

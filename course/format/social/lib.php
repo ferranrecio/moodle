@@ -186,4 +186,9 @@ class format_social extends core_courseformat\base {
         $visible = parent::is_section_visible($section);
         return $visible && $section->section == 0;
     }
+
+    #[\Override]
+    public function can_add_delegated_sections(): bool {
+        return false;
+    }
 }
