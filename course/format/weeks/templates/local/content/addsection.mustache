@@ -1,0 +1,51 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template format_weeks/local/content/addsection
+
+    TODO describe template addsection
+
+    Example context (json):
+    {
+        "setfinalweek": true,
+    }
+}}
+{{#showaddsection}}
+<div class="d-flex flex-column flex-md-row gap-3">
+    <div class="flex-fill">
+        {{> core_courseformat/local/content/addsection }}
+    </div>
+    {{#setfinalweek}}
+    <div id="format_weeks_week_manager" class="changenumsections bulk-hidden mt-5">
+        <button
+            class="w-100 btn add-section justify-content-center align-items-center p-3"
+            data-action="formatWeeksDefineFinalWeek"
+        >
+            {{#pix}} i/calendar, core {{/pix}}
+            {{#str}} finalweek_define, format_weeks {{/str}}
+        </button>
+    </div>
+    {{/setfinalweek}}
+</div>
+{{/showaddsection}}
+{{#setfinalweek}}
+{{#js}}
+require(['format_weeks/finalweek'], function(Modal) {
+    Modal.init();
+});
+{{/js}}
+{{/setfinalweek}}
