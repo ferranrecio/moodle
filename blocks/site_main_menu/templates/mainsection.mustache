@@ -24,7 +24,7 @@
     Example context (json):
     {
         "cmlist": "Sample",
-        "siteid": 1,
+        "courseid": 1,
         "sectionid": 1,
         "sectionname": "Sample",
         "sectionnum": 1,
@@ -74,10 +74,17 @@ require(
         Component,
         Courseeditor
     ) {
+        {{! There might be several blocks in the page. }}
+        {{! Identify the block that has subsections (site block doesn't support them). }}
+        const targetSubsectionLink = document.querySelector('.block_site_main_menu .dropdown-menu a[data-modname="subsection"]');
+        let mainMenuBlock = targetSubsectionLink
+            ? targetSubsectionLink.closest('.block_site_main_menu')
+            : document.querySelector('.block_site_main_menu');
+
         {{! The block could be included static in other courses so we use Courseeditor.getCourseEditor. }}
         new Component({
-            element: document.getElementById('block_site_main_menu_section'),
-            reactive: Courseeditor.getCourseEditor({{siteid}}),
+            element: mainMenuBlock,
+            reactive: Courseeditor.getCourseEditor({{courseid}}),
         });
     }
 );

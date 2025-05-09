@@ -315,7 +315,7 @@ final class stateactions_test extends \advanced_testcase {
      * @return array the testing scenarios
      */
     public static function course_state_provider(string $format): array {
-        $expectedexception = ($format === 'singleactivity');
+        $expectedexception = false;
 
         $cms = ['cm0', 'cm1', 'cm2', 'cm3'];
         // All sections and cms that the user can access to.
@@ -383,9 +383,7 @@ final class stateactions_test extends \advanced_testcase {
      * @return array the testing scenarios
      */
     public static function section_state_provider(string $format, string $role): array {
-        // Social format will raise an exception and debug messages because it does not
-        // use sections and it does not provide a renderer.
-        $expectedexception = ($format === 'singleactivity');
+        $expectedexception = false;
 
         // All sections and cms that the user can access to.
         $usersections = ['section0', 'section1', 'section2', 'section3'];
@@ -592,7 +590,7 @@ final class stateactions_test extends \advanced_testcase {
                     'section' => array_intersect(['section1', 'section2'], $usersections),
                     'cm' => array_intersect(['cm0'], $usercms),
                 ],
-                'expectedexception' => ($format === 'singleactivity'),
+                'expectedexception' => false,
             ],
             "$role $format cm_state using targetcm" => [
                 'format' => $format,
