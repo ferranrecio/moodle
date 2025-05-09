@@ -1,0 +1,5 @@
+issueNumber: MDL-81842
+notes:
+  core_form:
+    - message: Add parameter to core_renderer::mform_element so it renders differently if we are within the sticky footer or not.
+      type: improved
