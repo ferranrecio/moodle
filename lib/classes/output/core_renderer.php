@@ -4643,12 +4643,11 @@ EOD;
      * @param bool $advanced if input is an advanced field
      * @param string $error error message to display
      * @param bool $ingroup True if this element is rendered as part of a group
-     * @param bool $isstickyfooter True if this element is in the sticky footer
      * @return mixed string|bool
      */
-    public function mform_element($element, $required, $advanced, $error, $ingroup, bool $isstickyfooter = false) {
+    public function mform_element($element, $required, $advanced, $error, $ingroup) {
         $templatename = 'core_form/element-' . $element->getType();
-        if ($ingroup || $isstickyfooter) {
+        if ($ingroup) {
             $templatename .= "-inline";
         }
         try {

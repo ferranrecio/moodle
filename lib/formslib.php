@@ -3374,7 +3374,7 @@ class MoodleQuickForm_Renderer extends HTML_QuickForm_Renderer_Tableless{
         $advanced = isset($this->_advancedElements[$group->getName()]);
 
         $isinstickyfooter = $group->getName() && ($this->_stickyfooterelement == $group->getName());
-        $html = $OUTPUT->mform_element($group, $required, $advanced, $error, false, $isinstickyfooter);
+        $html = $OUTPUT->mform_element($group, $required, $advanced, $error, $isinstickyfooter);
         $fromtemplate = !empty($html);
         if (!$fromtemplate) {
             if (method_exists($group, 'getElementTemplateType')) {
