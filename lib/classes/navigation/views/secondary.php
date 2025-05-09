@@ -1108,10 +1108,17 @@ class secondary extends view {
         // the course in order to obtain the required module settings navigation.
         if ($page->context instanceof \context_course) {
             $this->page->set_secondary_active_tab($coursesecondarynode->key);
-            // Get the currently used module in the single activity course.
-            $module = current(array_filter(get_course_mods($course->id), function ($module) {
-                return $module->visible == 1;
-            }));
+            // Get the currently used module in course.
+            $format = course_get_format($course);
+            if (method_exists($format, 'get_activity')) {
+                // TODO: Create interface for single activity course format.
+                $module = $format->get_activity();
+            } else {
+                $module = current(array_filter(get_course_mods($course->id), function ($module) {
+                    return $module->visible == 1;
+                }));
+            }
+
             // If the default module for the single course format has not been set yet, skip displaying the module
             // related navigation in the secondary navigation.
             if (!$module) {
