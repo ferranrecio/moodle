@@ -23,15 +23,13 @@ namespace core\output\local\properties;
  * @copyright  2024 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-enum button: string {
-    case PRIMARY = 'btn-primary';
-    case SECONDARY = 'btn-secondary';
-    case SUCCESS = 'btn-success';
-    case DANGER = 'btn-danger';
-
-    case PRIMARY_OUTLINE = 'btn-outline-primary';
-
-    case SECONDARY_OUTLINE = 'btn-outline-secondary';
+enum button: string implements cssproperty {
+    case PRIMARY = 'btn btn-primary';
+    case SECONDARY = 'btn btn-secondary';
+    case SUCCESS = 'btn btn-success';
+    case DANGER = 'btn btn-danger';
+    case PRIMARY_OUTLINE = 'btn btn-outline-primary';
+    case SECONDARY_OUTLINE = 'btn btn-outline-secondary';
 
     /**
      * Returns the CSS classes for the property based on its type.
@@ -39,13 +37,6 @@ enum button: string {
      * @return string The CSS classes.
      */
     public function classes(): string {
-        return match ($this) {
-            self::PRIMARY => ' btn btn-primary',
-            self::SECONDARY => ' btn btn-secondary',
-            self::SUCCESS => ' btn btn-success',
-            self::DANGER => ' btn btn-danger',
-            self::PRIMARY_OUTLINE => ' btn btn-outline-primary',
-            self::SECONDARY_OUTLINE => ' btn btn-outline-secondary',
-        };
+        return ' ' . $this->value;
     }
 }

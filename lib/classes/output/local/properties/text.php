@@ -25,7 +25,7 @@ namespace core\output\local\properties;
  * @copyright  2024 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-enum text: string {
+enum text: string implements cssproperty {
     case DEFAULT = 'text-body';
     case PRIMARY = 'text-primary';
     case SECONDARY = 'text-secondary-emphasis';

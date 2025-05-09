@@ -23,11 +23,11 @@ namespace core\output\local\properties;
  * @copyright  2024 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-enum text_align: string {
-    case START = 'start';
-    case END = 'end';
-    case CENTER = 'center';
-    case JUSTIIFY = 'justify';
+enum text_align: string implements cssproperty {
+    case START = 'text-start';
+    case END = 'text-end';
+    case CENTER = 'text-center';
+    case JUSTIIFY = 'text-justify';
 
     /**
      * Returns the CSS classes for the property based on its type.
@@ -35,11 +35,6 @@ enum text_align: string {
      * @return string The CSS classes.
      */
     public function classes(): string {
-        return match ($this) {
-            self::START => ' text-start',
-            self::END => ' text-end',
-            self::CENTER => ' text-center',
-            self::JUSTIIFY => ' text-justify',
-        };
+        return ' ' . $this->value;
     }
 }

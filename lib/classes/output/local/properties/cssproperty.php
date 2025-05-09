@@ -17,30 +17,17 @@
 namespace core\output\local\properties;
 
 /**
- * Icon sizes property enum.
+ * The interface to identify any property that cna provide CSS classes.
  *
  * @package    core
- * @copyright  2024 Ferran Recio <ferran@moodle.com>
+ * @copyright  2025 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-enum iconsize: string implements cssproperty {
-    case UNDEFINED = '';
-    case SIZE0 = 'icon-size-0';
-    case SIZE1 = 'icon-size-1';
-    case SIZE2 = 'icon-size-2';
-    case SIZE3 = 'icon-size-3';
-    case SIZE4 = 'icon-size-4';
-    case SIZE5 = 'icon-size-5';
-    case SIZE6 = 'icon-size-6';
-    case SIZE7 = 'icon-size-7';
-
-
+interface cssproperty {
     /**
      * Returns the CSS classes for the property based on its type.
      *
      * @return string The CSS classes.
      */
-    public function classes(): string {
-        return ' ' . $this->value;
-    }
+    public function classes(): string;
 }

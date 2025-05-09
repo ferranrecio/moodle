@@ -25,13 +25,13 @@ namespace core\output\local\properties;
  * @copyright  2025 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-enum badge: string {
-    case PRIMARY = 'primary';
-    case SECONDARY = 'secondary';
-    case SUCCESS = 'success';
-    case DANGER = 'danger';
-    case WARNING = 'warning';
-    case INFO = 'info';
+enum badge: string implements cssproperty {
+    case PRIMARY = 'badge rounded-pill text-bg-primary';
+    case SECONDARY = 'badge rounded-pill text-bg-secondary';
+    case SUCCESS = 'badge rounded-pill text-bg-success';
+    case DANGER = 'badge rounded-pill text-bg-danger';
+    case WARNING = 'badge rounded-pill text-bg-warning';
+    case INFO = 'badge rounded-pill text-bg-info';
 
     /**
      * Returns the CSS classes for the property based on its type.
@@ -39,13 +39,6 @@ enum badge: string {
      * @return string The CSS classes.
      */
     public function classes(): string {
-        return match ($this) {
-            self::PRIMARY => ' badge rounded-pill text-bg-primary',
-            self::SECONDARY => ' badge rounded-pill text-bg-secondary',
-            self::SUCCESS => ' badge rounded-pill text-bg-success',
-            self::DANGER => ' badge rounded-pill text-bg-danger',
-            self::WARNING => ' badge rounded-pill text-bg-warning',
-            self::INFO => ' badge rounded-pill text-bg-info',
-        };
+        return ' ' . $this->value;
     }
 }
