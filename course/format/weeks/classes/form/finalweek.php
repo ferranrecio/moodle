@@ -54,17 +54,24 @@ class finalweek extends dynamic_form {
     protected function definition() {
         $mform = $this->_form;
 
-        $mform->addElement('static', 'descriptio', '', get_string('finalweek_explanation', 'format_weeks'));
+        $mform->addElement('header', 'datepicker', get_string('finalweek_dates', 'format_weeks'));
+
+        $mform->addElement('date_selector', 'startdate', get_string('startdate', 'moodle'));
+        $mform->addHelpButton('startdate', 'startdate', 'moodle');
 
         $mform->addElement('hidden', 'courseid');
         $mform->setType('courseid', PARAM_INT);
 
         $mform->addElement('date_selector', 'finalweek', get_string('finalweek_date', 'format_weeks'));
+        $mform->addHelpButton('finalweek', 'finalweek_date', 'format_weeks');
 
         $options = $this->format->get_format_options();
         if (empty($options['automaticenddate'])) {
             $mform->addElement('checkbox', 'updateenddate', '', get_string('finalweek_updateenddate', 'format_weeks'));
         }
+
+        $mform->addElement('header', 'moresettings', get_string('finalweek_more', 'format_weeks'));
+        $mform->setExpanded('moresettings', false);
 
         $options = [
             self::FINALWEEK_MERGE_MOVE => get_string('finalweek_merge_move', 'format_weeks'),
@@ -73,6 +80,7 @@ class finalweek extends dynamic_form {
         $mform->addElement('select', 'mergemethod', get_string('finalweek_merge', 'format_weeks'), $options);
         $mform->setDefault('mergemethod', self::FINALWEEK_MERGE_MOVE);
         $mform->addHelpButton('mergemethod', 'finalweek_merge', 'format_weeks');
+        // $mform->setAdvanced('mergemethod');
 
         $renderer = \core\di::get(\core\output\renderer_helper::class)->get_core_renderer();
         $deletewarning = $renderer->container(
@@ -81,13 +89,34 @@ class finalweek extends dynamic_form {
         );
         $mform->addElement('static', 'warning', '', $deletewarning);
         $mform->hideif('warning', 'mergemethod', 'eq', self::FINALWEEK_MERGE_MOVE);
+
+        $options = [
+            0 => get_string('hiddensectionscollapsed'),
+            1 => get_string('hiddensectionsinvisible'),
+        ];
+        $mform->addElement('select', 'hiddensections', get_string('hiddensections'), $options);
+        $mform->setDefault('hiddensections', 0);
+        $mform->addHelpButton('hiddensections', 'hiddensections', 'moodle');
+
+        $options = [
+            COURSE_DISPLAY_SINGLEPAGE => get_string('coursedisplay_single'),
+            COURSE_DISPLAY_MULTIPAGE => get_string('coursedisplay_multi')
+        ];
+        $mform->addElement('select', 'coursedisplay', get_string('coursedisplay'), $options);
+        $mform->setDefault('coursedisplay', COURSE_DISPLAY_SINGLEPAGE);
+        $mform->addHelpButton('coursedisplay', 'coursedisplay', 'moodle');
     }
 
     #[\Override]
     public function set_data_for_dynamic_submission(): void {
+        $course = $this->format->get_course();
+        $options = $this->format->get_format_options();
 
         $data = (object) [
             'courseid' => $this->optional_param('courseid', null, PARAM_INT),
+            'coursedisplay' => $options['coursedisplay'],
+            'hiddensections' => $options['hiddensections'],
+            'startdate' => $course->startdate,
         ];
 
         $lastsection = $this->format->get_section(
@@ -147,18 +176,28 @@ class finalweek extends dynamic_form {
 
     #[\Override]
     public function process_dynamic_submission() {
+        $db = \core\di::get(\moodle_database::class);
         $data = $this->get_data();
+        $course = $this->format->get_course();
 
-        $iscoursemodified = formatactions::section($data->courseid)->set_final_week_date(
+        $options = $this->format->get_format_options();
+        if (empty($options['automaticenddate']) && !empty($data->updateenddate)) {
+            $db->set_field('course', 'enddate', $data->finalweek, ['id' => $data->courseid]);
+            $iscoursemodified = true;
+        }
+
+        if ($data->startdate != $course->startdate) {
+            $db->set_field('course', 'startdate', $data->startdate, ['id' => $data->courseid]);
+            $iscoursemodified = true;
+        }
+
+        $iscoursemodified = $iscoursemodified || formatactions::section($data->courseid)->set_final_week_date(
             $data->finalweek,
             $data->mergemethod == self::FINALWEEK_MERGE_MOVE,
         );
 
-        $options = $this->format->get_format_options();
-        if (empty($options['automaticenddate']) && !empty($data->updateenddate)) {
-            $db = \core\di::get(\moodle_database::class);
-            $db->set_field('course', 'enddate', $data->finalweek, ['id' => $data->courseid]);
-        }
+        $iscoursemodified = $iscoursemodified || $this->format->update_course_format_options($data);
+
         return [
             'result' => (bool) $iscoursemodified,
             'url' => $this->get_page_url_for_dynamic_submission()->out(),
