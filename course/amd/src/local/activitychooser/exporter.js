@@ -1,0 +1,197 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Module to generate tempalte data for the activity chooser.
+ *
+ * @module     core_course/local/activitychooser/exporter
+ * @copyright  2025 Ferran Recio <ferran@moodle.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+import {getStrings} from 'core/str';
+
+// Purposes.
+const allPurposes = [
+    'administration',
+    'assessment',
+    'collaboration',
+    'communication',
+    'content',
+    'interactivecontent',
+    'other',
+];
+
+let allStrings = null;
+
+export default class {
+    /**
+     * A tab data structure.
+     *
+     * @typedef {object} TabData
+     * @property {String} tabId the tab ID
+     * @property {Boolean} active whether the tab is active or not
+     * @property {Array} items the filtered modules to be displayed in the tab
+     * @property {Boolean} displayed whether the tab is displayed or not
+     * @property {String} tabLabel the tab label
+     * @property {String|null} tabHelp the help text for the tab (optional)
+     */
+
+    /**
+     * Class constructor.
+     *
+     * @param {Number} courseId Course ID.
+     * @param {Object} chooserConfig Configuration object.
+     */
+    constructor(courseId, chooserConfig) {
+        this.courseId = courseId;
+        this.chooserConfig = chooserConfig;
+        // Preload any necessary strings.
+        loadNecessaryStrings();
+    }
+
+    /**
+     * Generate a tab data object for the activity chooser.
+     *
+     * @private
+     * @param {String} tabId Tab ID.
+     * @param {Array} filteredModules Filtered modules to be displayed in the tab.
+     * @param {String} tabLabel Tab label.
+     * @param {String|null} tabHelp Help text for the tab (optional).
+     * @param {Boolean} active Whether the tab is active or not.
+     * @return {TabData} Tab data object.
+     */
+    getTabData(tabId, filteredModules, tabLabel, tabHelp = null, active = false) {
+        const result = {
+            tabId: tabId,
+            active: active,
+            items: filteredModules,
+            displayed: filteredModules.length > 0,
+            tabLabel,
+        };
+        if (tabHelp) {
+            result.tabHelp = tabHelp;
+        }
+        return result;
+    }
+
+    /**
+     * Fetch the chooser template data for a specific section.
+     *
+     * @param {Object} modulesData Modules data to be used in the chooser.
+     * @return {Promise<Object>} Promise resolved with the chooser template data.
+     */
+    async getModChooserTemplateData(modulesData) {
+        const allStrings = await loadNecessaryStrings();
+        const favouriteTab = await this.getFavouriteTabData(modulesData);
+
+        const tabs = [
+            this.getTabData(
+                'all',
+                modulesData,
+                allStrings.all,
+                null,
+                !favouriteTab.displayed,
+            ),
+            favouriteTab,
+            this.getTabData(
+                'recommended',
+                modulesData.filter(mod => mod.recommended === true),
+                allStrings.recommended,
+                allStrings.recommended_help
+            ),
+        ];
+
+        const purposes = [];
+
+        allPurposes.forEach((purpose) => {
+            const purposeModules = modulesData.filter(mod => mod.purpose === purpose);
+            if (purposeModules.length === 0) {
+                return;
+            }
+            purposes.push(
+                this.getTabData(
+                    purpose,
+                    modulesData.filter(mod => mod.purpose === purpose),
+                    allStrings['mod_purpose_' + purpose],
+                    allStrings['mod_purpose_' + purpose + '_help']
+                )
+            );
+        });
+
+        return {
+            modules: modulesData,
+            tabs,
+            purposes,
+        };
+    }
+
+    /**
+     * Get the favourite tab data.
+     *
+     * @param {Array} modulesData Modules data to be used in the chooser.
+     * @return {Promise<TabData>} Tab data object for the favourite tab.
+     */
+    async getFavouriteTabData(modulesData) {
+        const allStrings = await loadNecessaryStrings();
+
+        const favouriteModules = modulesData.filter(mod => mod.favourite === true);
+
+        return this.getTabData(
+            'favourite',
+            favouriteModules,
+            allStrings.favourites,
+            null,
+            favouriteModules.length > 0,
+        );
+    }
+}
+
+/**
+ * Load the necessary strings for the activity chooser.
+ *
+ * @return {Promise<Object>} Promise resolved with the loaded strings.
+ */
+async function loadNecessaryStrings() {
+    if (allStrings !== null) {
+        return allStrings;
+    }
+    allStrings = {};
+
+    const stringToLoad = [
+        {key: 'all', component: 'core'},
+        {key: 'favourites', component: 'core'},
+        {key: 'recommended', component: 'core'},
+        {key: 'recommended_help', component: 'core_course'},
+        ...allPurposes.map(
+            (key) => ({
+                key: 'mod_purpose_' + key,
+                component: 'core_course',
+            })
+        ),
+        ...allPurposes.map(
+            (key) => ({
+                key: 'mod_purpose_' + key + '_help',
+                component: 'core_course',
+            })
+        ),
+    ];
+
+    const loadedStrings = await getStrings(stringToLoad);
+    stringToLoad.forEach(({key}, index) => {
+        allStrings[key] = loadedStrings[index];
+    });
+    return allStrings;
+}

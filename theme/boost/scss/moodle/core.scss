@@ -1481,9 +1481,9 @@ audio.mediaplugin_html5audio {
     }
 }
 
-.modchoosercontainer.noscroll {
-    overflow-y: hidden;
-}
+// .modchoosercontainer.noscroll {
+//     overflow-y: hidden;
+// }
 
 .modchoosercontainer .optionscontainer,
 .modchoosercontainer .searchresultitemscontainer {
@@ -1491,6 +1491,11 @@ audio.mediaplugin_html5audio {
     .option {
         // 2 items per line.
         flex-basis: calc(50% - 0.5rem);
+
+        &:hover {
+            border: 1px solid $secondary-border-subtle-dark;
+        }
+
         .optionactions {
             .optionaction {
                 cursor: pointer;
@@ -1507,6 +1512,56 @@ audio.mediaplugin_html5audio {
                     text-decoration: none;
                 }
             }
+        }
+    }
+}
+
+.modchoosercontainer {
+    .modchooserfilters {
+        grid-area: filters;
+    }
+
+    .modchoosernav {
+        grid-area: nav;
+        min-width: 150px;
+    }
+
+    .modchoosercontent {
+        grid-area: content;
+        // max-height: 70vh;
+        overflow: auto;
+    }
+
+    .searchresultscontainer {
+        // max-height: 70vh;
+        overflow: auto;
+    }
+
+    display: grid;
+    width: 100%;
+    height: 70vh;
+
+
+    grid-template-areas:
+        "nav filters"
+        "nav content";
+
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 1rem;
+
+    @include media-breakpoint-down(sm) {
+        grid-template-areas:
+            "filters"
+            "nav"
+            "content";
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto 1fr;
+
+        .modchoosernav {
+            overflow-x: auto;
+            height: 3rem;
+            white-space: nowrap;
         }
     }
 }
@@ -1570,7 +1625,7 @@ audio.mediaplugin_html5audio {
     .modchoosercontainer .optionscontainer .option,
     .modchoosercontainer .searchresultitemscontainer .option {
         // Six items per line.
-        flex-basis: calc(16.66% - 0.5rem);
+        flex-basis: calc(25% - 0.5rem);
     }
 }
 

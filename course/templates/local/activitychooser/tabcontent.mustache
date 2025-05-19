@@ -15,18 +15,32 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template core_course/local/activitychooser/search
+    @template core_course/local/activitychooser/tabcontent
 
-    Chooser search template.
+    TODO describe template tabcontent
 
     Example context (json):
-    {}
+    {
+    }
 }}
-{{< core/search_input_auto }}
-    {{$label}}{{#str}}
-        searchactivities, core
-    {{/str}}{{/label}}
-    {{$placeholder}}{{#str}}
-        search, core
-    {{/str}}{{/placeholder}}
-{{/ core/search_input_auto }}
+<div
+    class="tab-pane {{#active}}active{{/active}} {{^displayed}}d-none{{/displayed}}"
+    id="{{tabId}}-{{uniqid}}"
+    data-region="{{tabId}}"
+    role="tabpanel"
+    aria-labelledby="{{tabId}}-tab-{{uniqid}}"
+>
+    <h6>{{tabLabel}}</h6>
+    {{#tabHelp}}
+    <p class="activitychooser_help">{{tabHelp}}</p>
+    {{/tabHelp}}
+    <div
+        class="optionscontainer d-flex flex-wrap mw-100 position-relative"
+        role="menubar"
+        data-region="chooser-options-container"
+    >
+        {{#items}}
+            {{>core_course/local/activitychooser/item}}
+        {{/items}}
+    </div>
+</div>
