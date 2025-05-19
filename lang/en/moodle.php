@@ -894,7 +894,7 @@ $string['expandcategory'] = 'Expand {$a}';
 $string['explanation'] = 'Explanation';
 $string['explanationdigitalminor'] = 'This information is required to determine if your age is over the digital age of consent. This is the age when an individual can consent to terms and conditions and their data being legally stored and processed.';
 $string['extendperiod'] = 'Extended period';
-$string['favourites'] = 'Starred';
+$string['favourites'] = 'Favourites';
 $string['failedloginattempts'] = '{$a->attempts} failed logins since your last login';
 $string['failedtaskbody'] = '<p>Hi {$a->firstname},</p>
 <p>The task <b>{$a->taskname}</b> has failed multiple times and requires attention.</p>
