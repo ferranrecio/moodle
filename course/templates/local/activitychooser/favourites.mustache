@@ -31,6 +31,16 @@
         }
     }
 }}
-{{#favourites}}
-    {{>core_course/local/activitychooser/item}}
-{{/favourites}}
+<h6>{{tabLabel}}</h6>
+{{#tabHelp}}
+<p class="activitychooser_help">{{tabHelp}}</p>
+{{/tabHelp}}
+<div
+    class="optionscontainer d-flex flex-wrap mw-100 position-relative"
+    role="menubar"
+    data-region="chooser-options-container"
+>
+    {{#items}}
+        {{>core_course/local/activitychooser/item}}
+    {{/items}}
+</div>

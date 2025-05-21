@@ -36,6 +36,8 @@ const allPurposes = [
 
 let allStrings = null;
 
+loadNecessaryStrings();
+
 export default class {
     /**
      * A tab data structure.
@@ -48,19 +50,6 @@ export default class {
      * @property {String} tabLabel the tab label
      * @property {String|null} tabHelp the help text for the tab (optional)
      */
-
-    /**
-     * Class constructor.
-     *
-     * @param {Number} courseId Course ID.
-     * @param {Object} chooserConfig Configuration object.
-     */
-    constructor(courseId, chooserConfig) {
-        this.courseId = courseId;
-        this.chooserConfig = chooserConfig;
-        // Preload any necessary strings.
-        loadNecessaryStrings();
-    }
 
     /**
      * Generate a tab data object for the activity chooser.
@@ -88,12 +77,31 @@ export default class {
     }
 
     /**
+     * Normalise the modules data to be used in the chooser.
+     *
+     * The modulesData can be a plain array or a Map. This method will convert it to a
+     * plain array of objects.
+     *
+     * @param {Array|Map} modulesData Modules data to be used in the chooser.
+     * @return {Array} Normalised modules data.
+     */
+    normaliseModulesData(modulesData) {
+        if (modulesData instanceof Map) {
+            modulesData = Array.from(modulesData.values());
+        } else if (!Array.isArray(modulesData)) {
+            throw new Error('Invalid modules data format. Expected an array or a Map.');
+        }
+        return modulesData;
+    }
+
+    /**
      * Fetch the chooser template data for a specific section.
      *
-     * @param {Object} modulesData Modules data to be used in the chooser.
-     * @return {Promise<Object>} Promise resolved with the chooser template data.
+     * @param {Array|Map} modulesData Modules data to be used in the chooser.
+     * @return {Promise<Object>} Promise resolved with the template data.
      */
     async getModChooserTemplateData(modulesData) {
+        modulesData = this.normaliseModulesData(modulesData);
         const allStrings = await loadNecessaryStrings();
         const favouriteTab = await this.getFavouriteTabData(modulesData);
 
@@ -106,22 +114,23 @@ export default class {
                 !favouriteTab.displayed,
             ),
             favouriteTab,
-            this.getTabData(
+            {
+                ...this.getTabData(
                 'recommended',
                 modulesData.filter(mod => mod.recommended === true),
                 allStrings.recommended,
                 allStrings.recommended_help
-            ),
+                ),
+                separator: true,
+            },
         ];
-
-        const purposes = [];
 
         allPurposes.forEach((purpose) => {
             const purposeModules = modulesData.filter(mod => mod.purpose === purpose);
             if (purposeModules.length === 0) {
                 return;
             }
-            purposes.push(
+            tabs.push(
                 this.getTabData(
                     purpose,
                     modulesData.filter(mod => mod.purpose === purpose),
@@ -134,20 +143,25 @@ export default class {
         return {
             modules: modulesData,
             tabs,
-            purposes,
         };
     }
 
     /**
      * Get the favourite tab data.
      *
-     * @param {Array} modulesData Modules data to be used in the chooser.
-     * @return {Promise<TabData>} Tab data object for the favourite tab.
+     * @param {Array|Map} modulesData Modules data to be used in the chooser.
+     * @return {Promise<Object>} Promise resolved with the template data.
      */
     async getFavouriteTabData(modulesData) {
+        modulesData = this.normaliseModulesData(modulesData);
         const allStrings = await loadNecessaryStrings();
 
-        const favouriteModules = modulesData.filter(mod => mod.favourite === true);
+        // We need to deconstruct the modules data to ensure it is an array.
+        const favouriteModules = modulesData.filter(
+            mod => {
+                return mod.favourite === true;
+            }
+        );
 
         return this.getTabData(
             'favourite',
@@ -156,6 +170,20 @@ export default class {
             null,
             favouriteModules.length > 0,
         );
+    }
+
+    /**
+     * Get the search result template data.
+     *
+     * @param {Array|Map} resultsModulesData Modules data to be used in the chooser.
+     * @return {Object} The template data.
+     */
+    getSearchResultData(resultsModulesData) {
+        resultsModulesData = this.normaliseModulesData(resultsModulesData);
+        return {
+            'searchresultsnumber': resultsModulesData.length,
+            'searchresults': resultsModulesData,
+        };
     }
 }
 

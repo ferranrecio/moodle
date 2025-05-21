@@ -21,26 +21,32 @@
 
     Example context (json):
     {
+        "tabLabel": "Activities",
+        "tabHelp": "Activities help",
+        "items": [
+            {
+                "label": "Option name",
+                "description": "Option description",
+                "urls": {
+                    "addoption": "http://addoptionurl.com"
+                },
+                "icon": "<img class='icon' src='http://urltooptionicon' alt='icon'>",
+                "purpose": "content",
+                "branded": 0
+            }
+        ]
     }
 }}
+<h6>{{tabLabel}}</h6>
+{{#tabHelp}}
+<p class="activitychooser_help">{{tabHelp}}</p>
+{{/tabHelp}}
 <div
-    class="tab-pane {{#active}}active{{/active}} {{^displayed}}d-none{{/displayed}}"
-    id="{{tabId}}-{{uniqid}}"
-    data-region="{{tabId}}"
-    role="tabpanel"
-    aria-labelledby="{{tabId}}-tab-{{uniqid}}"
+    class="optionscontainer d-flex flex-wrap mw-100 position-relative"
+    role="menubar"
+    data-region="chooser-options-container"
 >
-    <h6>{{tabLabel}}</h6>
-    {{#tabHelp}}
-    <p class="activitychooser_help">{{tabHelp}}</p>
-    {{/tabHelp}}
-    <div
-        class="optionscontainer d-flex flex-wrap mw-100 position-relative"
-        role="menubar"
-        data-region="chooser-options-container"
-    >
-        {{#items}}
-            {{>core_course/local/activitychooser/item}}
-        {{/items}}
-    </div>
+    {{#items}}
+        {{>core_course/local/activitychooser/item}}
+    {{/items}}
 </div>

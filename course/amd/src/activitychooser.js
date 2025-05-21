@@ -26,7 +26,6 @@ import * as Repository from 'core_course/local/activitychooser/repository';
 import selectors from 'core_course/local/activitychooser/selectors';
 import CustomEvents from 'core/custom_interaction_events';
 import Pending from 'core/pending';
-import Exporter from 'core_course/local/activitychooser/exporter';
 
 let initialized = false;
 
@@ -40,7 +39,12 @@ let initialized = false;
 export const init = (courseId, chooserConfig) => {
     const pendingPromise = new Pending();
 
-    registerListenerEvents(courseId, chooserConfig);
+    // TODO: Remove the chooserConfig in Moodle 6.0 (MDL-XXXXX)
+    if (chooserConfig.tabmode !== undefined) {
+        window.console.warn('The tabmode config option has been deprecated and will be ignored.');
+    }
+
+    registerListenerEvents(courseId);
 
     pendingPromise.resolve();
 };
@@ -50,9 +54,8 @@ export const init = (courseId, chooserConfig) => {
  *
  * @method registerListenerEvents
  * @param {Number} courseId
- * @param {Object} chooserConfig Any PHP config settings that we may need to reference
  */
-const registerListenerEvents = (courseId, chooserConfig) => {
+const registerListenerEvents = (courseId) => {
     if (initialized) {
         return;
     }
@@ -63,8 +66,6 @@ const registerListenerEvents = (courseId, chooserConfig) => {
         CustomEvents.events.activate,
         CustomEvents.events.keyboardActivate
     ];
-
-    const exporter = new Exporter(courseId, chooserConfig);
 
     CustomEvents.define(document, eventsToHandle);
 
@@ -85,7 +86,7 @@ const registerListenerEvents = (courseId, chooserConfig) => {
                 position.beforeMod,
             );
 
-            ChooserDialogue.displayActivityChooserModal(exporter, footerDataPromise, modulesDataPromise);
+            ChooserDialogue.displayActivityChooserModal(footerDataPromise, modulesDataPromise);
         });
     });
 };

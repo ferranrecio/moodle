@@ -21,6 +21,66 @@
 
     Example context (json):
     {
+        "uniqid": "123abc",
+        "tabs": [
+            {
+                "tabId": "activities",
+                "tabLabel": "Activities",
+                "active": true,
+                "displayed": true,
+                "separator": false,
+                "items": [
+                    {
+                        "label": "Option name",
+                        "description": "Option description",
+                        "urls": {
+                            "addoption": "http://addoptionurl.com"
+                        },
+                        "icon": "<img class='icon' src='http://urltooptionicon' alt='icon'>",
+                        "purpose": "content",
+                        "branded": 0
+                    }
+                ]
+            },
+            {
+                "tabId": "resources",
+                "tabLabel": "Resources",
+                "active": false,
+                "displayed": true,
+                "separator": true,
+                "items": [
+                    {
+                        "label": "Option name",
+                        "description": "Option description",
+                        "urls": {
+                            "addoption": "http://addoptionurl.com"
+                        },
+                        "icon": "<img class='icon' src='http://urltooptionicon' alt='icon'>",
+                        "purpose": "content",
+                        "branded": 0
+                    }
+                ]
+            },
+            {
+                "tabId": "tools",
+                "tabLabel": "Tools",
+                "active": false,
+                "displayed": false,
+                "separator": false,
+                "items": [
+                    {
+                        "label": "Option name",
+                        "description": "Option description",
+                        "urls": {
+                            "addoption": "http://addoptionurl.com"
+                        },
+                        "icon": "<img class='icon' src='http://urltooptionicon' alt='icon'>",
+                        "purpose": "content",
+                        "branded": 0
+                    }
+                ]
+            }
+        ]
     }
 }}
 <div
@@ -38,6 +98,7 @@
         id="activities-{{uniqid}}"
         role="tablist"
     >
+        {{! Tab navigation items }}
         {{#tabs}}
         <a
             class="nav-item nav-link {{#active}}active{{/active}} {{^displayed}} d-none {{/displayed}}"
@@ -52,22 +113,11 @@
         >
             {{tabLabel}}
         </a>
+        {{#separator}}<hr>{{/separator}}
         {{/tabs}}
-        <hr>
-        {{#purposes}}
-        <a class="nav-item nav-link {{#active}}active{{/active}} {{^displayed}} d-none {{/displayed}}"
-            id="{{tabId}}-tab-{{uniqid}}"
-            data-bs-toggle="tab"
-            data-region="{{tabId}}-tab-nav"
-            href="#{{tabId}}-{{uniqid}}"
-            role="tab"
-            aria-controls="{{tabId}}-{{uniqid}}"
-            aria-selected="{{#active}}true{{/active}}{{^active}}false{{/active}}"
-            {{^displayed}} disabled="true" {{/displayed}}
-        >
-            {{tabLabel}}
-        </a>
-        {{/purposes}}
+        {{! Hidden search tab navigation item }}
+        {{! This is a hidden tab that is used to show the search results. }}
+        {{! It is not displayed in the tab navigation. }}
         <a
             class="nav-item nav-link d-none"
             id="search-tab-{{uniqid}}"
@@ -87,6 +137,7 @@
         id="tabbed-activities-{{uniqid}}"
         data-region="tabcontent"
     >
+        {{! Search results container }}
         <div
             class="tab-pane"
             id="search-{{uniqid}}"
@@ -98,11 +149,17 @@
             <div class="searchresultscontainer" data-region="search-results-container" aria-live="polite">
             </div>
         </div>
+        {{! Tab contents }}
         {{#tabs}}
-        {{>core_course/local/activitychooser/tabcontent}}
+        <div
+            class="tab-pane {{#active}}active{{/active}}"
+            id="{{tabId}}-{{uniqid}}"
+            data-region="{{tabId}}"
+            role="tabpanel"
+            aria-labelledby="{{tabId}}-tab-{{uniqid}}"
+        >
+            {{>core_course/local/activitychooser/tabcontent}}
+        </div>
         {{/tabs}}
-        {{#purposes}}
-        {{>core_course/local/activitychooser/tabcontent}}
-        {{/purposes}}
     </div>
 </div>
