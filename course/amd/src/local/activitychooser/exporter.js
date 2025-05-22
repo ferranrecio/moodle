@@ -150,7 +150,7 @@ export default class {
      * Get the favourite tab data.
      *
      * @param {Array|Map} modulesData Modules data to be used in the chooser.
-     * @return {Promise<Object>} Promise resolved with the template data.
+     * @return {Promise<TabData>} Promise resolved with the template data.
      */
     async getFavouriteTabData(modulesData) {
         modulesData = this.normaliseModulesData(modulesData);
@@ -185,6 +185,17 @@ export default class {
             'searchresults': resultsModulesData,
         };
     }
+
+    /**
+     * Get the number of items in a tab.
+     *
+     * @param {TabData} tabData The tab data.
+     * @return {Number} The number of items in the tab.
+     */
+    countTabItems(tabData) {
+        return tabData.items?.length ?? 0;
+    }
+
 }
 
 /**

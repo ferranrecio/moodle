@@ -36,6 +36,8 @@ export default {
     regions: {
         chooser: getDataSelector('region', 'chooser-container'),
         getSectionChooserOptions: containerid => `${containerid} ${getDataSelector('region', 'chooser-options-container')}`,
+        chooserOptions: getDataSelector('region', 'chooser-options-container'),
+        focusableChooserOption: `${getDataSelector('region', 'chooser-options-container')}[tabindex="0"]`,
         chooserOption: {
             container: getDataSelector('region', 'chooser-option-container'),
             actions: getDataSelector('region', 'chooser-option-actions-container'),
@@ -63,7 +65,6 @@ export default {
         resourceTab: getDataSelector('region', 'resources'),
         getModuleSelector: modname => `[role="menuitem"][data-modname="${modname}"]`,
         searchResults: getDataSelector('region', 'search-results-container'),
-        searchResultItems: getDataSelector('region', 'search-result-items-container'),
     },
     actions: {
         optionActions: {

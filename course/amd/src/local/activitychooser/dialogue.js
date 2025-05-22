@@ -21,9 +21,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import {addIconToContainer} from 'core/loadingicon';
-import Carousel from 'theme_boost/bootstrap/carousel';
+// import {addIconToContainer} from 'core/loadingicon';
 import {debounce} from 'core/utils';
+import DialogueDom from 'core_course/local/activitychooser/dialoguedom';
 import {end, arrowLeft, arrowRight, home, enter, space} from 'core/key_codes';
 import Exporter from 'core_course/local/activitychooser/exporter';
 import {getFirst} from 'core/normalise';
@@ -33,7 +33,6 @@ import * as ModalEvents from 'core/modal_events';
 import Notification from 'core/notification';
 import * as Repository from 'core_course/local/activitychooser/repository';
 import selectors from 'core_course/local/activitychooser/selectors';
-import Tab from 'theme_boost/bootstrap/tab';
 import * as Templates from 'core/templates';
 const getPlugin = pluginName => import(pluginName);
 
@@ -117,6 +116,8 @@ export const displayChooser = (modalPromise, sectionModules, partialFavourite, f
 
 /**
  * Activity Chooser Dialogue class.
+ *
+ * @private
  */
 class ActivityChooserDialogue {
     /**
@@ -127,7 +128,7 @@ class ActivityChooserDialogue {
      */
     constructor(modal, modulesData, footerData) {
         this.modal = modal;
-        this.modalBody = null; // Body may not be ready yet. It is loade don init.
+        this.dialogueDom = null; // We cannot init until we have the modal body loaded.
         this.footerData = footerData;
         this.exporter = new Exporter();
         // Make a map so we can quickly fetch a specific module's object for either rendering or searching.
@@ -144,8 +145,9 @@ class ActivityChooserDialogue {
      * @return {Promise} A promise that resolves when the modal is ready.
      */
     async init() {
-        this.modalBody = getFirst(await this.modal.getBodyPromise());
-        this.registerListenerEvents();
+        const modalBody = getFirst(await this.modal.getBodyPromise());
+        this.dialogueDom = new DialogueDom(this, modalBody, this.exporter);
+        this.registerModalListenerEvents();
         this.setupKeyboardAccessibility();
         // We want to focus on the action select when the dialog is closed.
         this.modal.getRoot().on(ModalEvents.hidden, () => {
@@ -158,45 +160,53 @@ class ActivityChooserDialogue {
      *
      * @returns {Promise} A promise that resolves when events are registered
      */
-    async registerListenerEvents() {
+    async registerModalListenerEvents() {
+        const modalRoot = getFirst(this.modal.getRoot());
+
         // Changing the tab should cancell any active search.
-        this.modalBody.addEventListener('shown.bs.tab', (event) => {
-            if (event.target.closest(selectors.regions.searchTabNav)) {
-                return;
-            }
-            const searchInput = this.modalBody.querySelector(selectors.actions.search);
-            if (searchInput.value.length > 0) {
-                searchInput.value = "";
-                this.toggleSearchResultsView(searchInput.value);
-            }
-        });
+        modalRoot.addEventListener(
+            'shown.bs.tab',
+            (event) => {
+                if (event.target.closest(selectors.regions.searchTabNav)) {
+                    return;
+                }
+                const searchInput = this.dialogueDom.getSearchInputElement();
+                if (searchInput.value.length > 0) {
+                    searchInput.value = "";
+                    this.toggleSearchResultsView(searchInput.value);
+                }
+            },
+        );
 
-        // Set up the carousel.
-        const carousel = this.modalBody.querySelector(selectors.regions.carousel);
-        new Carousel(carousel, {
-            interval: false,
-            pause: true,
-            keyboard: false
-        });
-
-        // Add the listener for clicks on the body.
-        this.modalBody.addEventListener(
+        // Add the listener for clicks on the full modal.
+        modalRoot.addEventListener(
             'click',
-            this.handleBodyClick.bind(this),
+            this.handleModalClick.bind(this),
         );
 
         // Add a listener for an input change in the activity chooser's search bar.
-        const searchInput = this.modalBody.querySelector(selectors.actions.search);
-        searchInput.addEventListener('input', debounce(() => {
-            this.toggleSearchResultsView(searchInput.value);
-        }, 300));
+        const searchInput = this.dialogueDom.getSearchInputElement();
+        searchInput.addEventListener(
+            'input',
+            debounce(
+                () => {
+                    this.toggleSearchResultsView(searchInput.value);
+                },
+                300,
+            ),
+        );
 
-        // Register event listeners related to the keyboard navigation controls.
-        const activeSectionId = this.modalBody.querySelector(selectors.elements.activetab).getAttribute("href");
-        const sectionChooserOptions = this.modalBody.querySelector(selectors.regions.getSectionChooserOptions(activeSectionId));
-        const firstChooserOption = sectionChooserOptions.querySelector(selectors.regions.chooserOption.container);
-        this.toggleFocusableChooserOption(firstChooserOption, true);
-        this.initChooserOptionsKeyboardNavigation(sectionChooserOptions);
+        this.dialogueDom.initBootstrapComponents();
+
+        // Handle focus when a new tab is shown.
+        modalRoot.addEventListener('shown.bs.tab', (event) => {
+            if (event.relatedTarget) {
+                this.dialogueDom.disableFocusAllChooserOptions(event.relatedTarget);
+            }
+            this.dialogueDom.initActiveTabNavigation();
+        });
+
+        this.dialogueDom.initActiveTabNavigation();
 
         const modalFooter = getFirst(await this.modal.getFooterPromise());
 
@@ -226,7 +236,7 @@ class ActivityChooserDialogue {
      * @param {Object} event The event object
      * @return {Promise} A promise that resolves when the event is handled
      */
-    async handleBodyClick(event) {
+    async handleModalClick(event) {
         const target = event.target;
 
         if (target.closest(selectors.actions.optionActions.showSummary)) {
@@ -234,12 +244,12 @@ class ActivityChooserDialogue {
         }
 
         if (target.closest(selectors.actions.optionActions.manageFavourite)) {
-            await this.handleManageFavourite(target);
+            await this.handleFavouriteClick(target);
         }
 
         // From the help screen go back to the module overview.
         if (target.matches(selectors.actions.closeOption)) {
-            this.handleBackToChooser(target);
+            this.dialogueDom.hideModuleHelp(target.dataset.modname);
         }
 
         // The "clear search" button is triggered.
@@ -254,185 +264,27 @@ class ActivityChooserDialogue {
      * @param {HTMLElement} target The target element that triggered the event
      */
     handleShowSummary(target) {
-        const carousel = this.modalBody.querySelector(selectors.regions.carousel);
-
-        const module = target.closest(selectors.regions.chooserOption.container);
+        const module = this.dialogueDom.getClosestChooserOption(target);
         const moduleName = module.dataset.modname;
         const moduleData = this.mappedModules.get(moduleName);
         // We need to know if the overall modal has a footer so we know when to show a real / vs fake footer.
         moduleData.showFooter = this.modal.hasFooterContent();
-        this.showModuleHelp(carousel, moduleData, this.modal);
+        this.dialogueDom.showModuleHelp(moduleData, this.modal);
     }
 
     /**
-     * Handle the favourite state of a module when the user clicks on the "manage favourite" button.
+     * Handle the favourite state of a module when the user clicks on the "starred" button.
      *
      * @param {HTMLElement} target The target element that triggered the event
      * @return {Promise} A promise that resolves when the event is handled
      */
-    async handleManageFavourite(target) {
+    async handleFavouriteClick(target) {
         const caller = target.closest(selectors.actions.optionActions.manageFavourite);
-        await this.manageFavouriteState(caller);
-        const activeSectionId = this.modalBody.querySelector(selectors.elements.activetab).getAttribute("href");
-        const sectionChooserOptions = this.modalBody
-            .querySelector(selectors.regions.getSectionChooserOptions(activeSectionId));
-        const firstChooserOption = sectionChooserOptions
-            .querySelector(selectors.regions.chooserOption.container);
-        this.toggleFocusableChooserOption(firstChooserOption, true);
-        this.initChooserOptionsKeyboardNavigation(sectionChooserOptions);
-    }
-
-    /**
-     * Handle the "back to chooser" action when the user clicks on the "back" button.
-     *
-     * @param {HTMLElement} target The target element that triggered the event
-     */
-    handleBackToChooser(target) {
-        const carousel = this.modalBody.querySelector(selectors.regions.carousel);
-
-        // Trigger the transition between 'pages'.
-        Carousel.getInstance(carousel).prev();
-        carousel.addEventListener('slid.bs.carousel', () => {
-            const allModules = this.modalBody.querySelector(selectors.regions.modules);
-            const caller = allModules.querySelector(selectors.regions.getModuleSelector(target.dataset.modname));
-            caller.focus();
-        });
-    }
-
-    /**
-     * Handle a clear search action.
-     */
-    handleClearSearch() {
-        const searchInput = this.modalBody.querySelector(selectors.actions.search);
-        searchInput.value = "";
-        searchInput.focus();
-        this.toggleSearchResultsView(searchInput.value);
-    }
-
-    /**
-     * Initialise the keyboard navigation controls for the chooser options.
-     *
-     * @method initChooserOptionsKeyboardNavigation
-     * @param {HTMLElement} chooserOptionsContainer The section that contains the chooser items
-     */
-    initChooserOptionsKeyboardNavigation(chooserOptionsContainer) {
-        const chooserOptions = chooserOptionsContainer.querySelectorAll(selectors.regions.chooserOption.container);
-
-        Array.from(chooserOptions).forEach((element) => {
-            return element.addEventListener('keydown', (e) => {
-
-                // Check for enter/ space triggers for showing the help.
-                if (e.keyCode === enter || e.keyCode === space) {
-                    if (e.target.matches(selectors.actions.optionActions.showSummary)) {
-                        e.preventDefault();
-                        this.handleShowSummary(e.target);
-                    }
-                }
-
-                // Next.
-                if (e.keyCode === arrowRight) {
-                    e.preventDefault();
-                    const currentOption = e.target.closest(selectors.regions.chooserOption.container);
-                    const nextOption = currentOption.nextElementSibling;
-                    const firstOption = chooserOptionsContainer.firstElementChild;
-                    const toFocusOption = this.clickErrorHandler(nextOption, firstOption);
-                    this.focusChooserOption(toFocusOption, currentOption);
-                }
-
-                // Previous.
-                if (e.keyCode === arrowLeft) {
-                    e.preventDefault();
-                    const currentOption = e.target.closest(selectors.regions.chooserOption.container);
-                    const previousOption = currentOption.previousElementSibling;
-                    const lastOption = chooserOptionsContainer.lastElementChild;
-                    const toFocusOption = this.clickErrorHandler(previousOption, lastOption);
-                    this.focusChooserOption(toFocusOption, currentOption);
-                }
-
-                if (e.keyCode === home) {
-                    e.preventDefault();
-                    const currentOption = e.target.closest(selectors.regions.chooserOption.container);
-                    const firstOption = chooserOptionsContainer.firstElementChild;
-                    this.focusChooserOption(firstOption, currentOption);
-                }
-
-                if (e.keyCode === end) {
-                    e.preventDefault();
-                    const currentOption = e.target.closest(selectors.regions.chooserOption.container);
-                    const lastOption = chooserOptionsContainer.lastElementChild;
-                    this.focusChooserOption(lastOption, currentOption);
-                }
-            });
-        });
-    }
-
-    /**
-     * Given an event from the main module 'page' navigate to it's help section via a carousel.
-     *
-     * @method showModuleHelp
-     * @param {Element} carousel Our initialized carousel to manipulate
-     * @param {Object} moduleData Data of the module to carousel to
-     */
-    showModuleHelp(carousel, moduleData) {
-        // If we have a real footer then we need to change temporarily.
-        if (moduleData.showFooter === true) {
-            this.modal.setFooter(Templates.render(
-                'core_course/local/activitychooser/footer_partial',
-                moduleData
-            ));
-        }
-        const help = carousel.querySelector(selectors.regions.help);
-        help.innerHTML = '';
-        help.classList.add('m-auto');
-
-        // Add a spinner.
-        const spinnerPromise = addIconToContainer(help);
-
-        // Used later...
-        let transitionPromiseResolver = null;
-        const transitionPromise = new Promise(resolve => {
-            transitionPromiseResolver = resolve;
-        });
-
-        // Build up the html & js ready to place into the help section.
-        const contentPromise = Templates.renderForPromise(
-            'core_course/local/activitychooser/help',
-            moduleData
-        );
-
-        // Wait for the content to be ready, and for the transition to be complet.
-        Promise.all([contentPromise, spinnerPromise, transitionPromise])
-            .then(([{html, js}]) => Templates.replaceNodeContents(help, html, js))
-            .then(() => {
-                help.querySelector(selectors.regions.chooserSummary.header).focus();
-                return help;
-            })
-            .catch(Notification.exception);
-
-        // Move to the next slide, and resolve the transition promise when it's done.
-        carousel.addEventListener(
-            'slid.bs.carousel',
-            () => {
-                transitionPromiseResolver();
-            },
-            {once: true}
-        );
-        // Trigger the transition between 'pages'.
-        Carousel.getInstance(carousel).next();
-    }
-
-    /**
-     * Given a user wants to change the favourite state of a module we either add or remove the status.
-     * We also propergate this change across our map of modals.
-     *
-     * @method manageFavouriteState
-     * @param {HTMLElement} caller
-     */
-    async manageFavouriteState(caller) {
         const isFavourite = caller.dataset.favourited;
         const id = caller.dataset.id;
         const name = caller.dataset.name;
         const internal = caller.dataset.internal;
+
         // Switch on fave or not.
         if (isFavourite === 'true') {
             await Repository.unfavouriteModule(name, id);
@@ -444,78 +296,56 @@ class ActivityChooserDialogue {
     }
 
     /**
-     * Focus on a chooser option element and remove the previous chooser element from the focus order
-     *
-     * @method focusChooserOption
-     * @param {HTMLElement} currentChooserOption The current chooser option element that we want to focus
-     * @param {HTMLElement|null} previousChooserOption The previous focused option element
-    */
-    focusChooserOption(currentChooserOption, previousChooserOption = null) {
-        if (previousChooserOption !== null) {
-            this.toggleFocusableChooserOption(previousChooserOption, false);
-        }
-        this.toggleFocusableChooserOption(currentChooserOption, true);
-        currentChooserOption.focus();
+     * Handle a clear search action.
+     */
+    handleClearSearch() {
+        const searchInput = this.dialogueDom.getSearchInputElement();
+        searchInput.value = "";
+        searchInput.focus();
+        this.toggleSearchResultsView(searchInput.value);
     }
 
     /**
-     * Add or remove a chooser option from the focus order.
+     * Set up our tabindex information across the chooser.
      *
-     * @method toggleFocusableChooserOption
-     * @param {HTMLElement} chooserOption The chooser option element which should be added or removed from the focus order
-     * @param {Boolean} isFocusable Whether the chooser element is focusable or not
+     * @method setupKeyboardAccessibility
      */
-    toggleFocusableChooserOption(chooserOption, isFocusable) {
-        const chooserOptionLink = chooserOption.querySelector(selectors.actions.addChooser);
-        const chooserOptionHelp = chooserOption.querySelector(selectors.actions.optionActions.showSummary);
-        const chooserOptionFavourite = chooserOption.querySelector(selectors.actions.optionActions.manageFavourite);
+    setupKeyboardAccessibility() {
+        const mainElement = getFirst(this.modal.getModal());
 
-        if (isFocusable) {
-            // Set tabindex to 0 to add current chooser option element to the focus order.
-            chooserOption.tabIndex = 0;
-            chooserOptionLink.tabIndex = 0;
-            chooserOptionHelp.tabIndex = 0;
-            chooserOptionFavourite.tabIndex = 0;
-        } else {
-            // Set tabindex to -1 to remove the previous chooser option element from the focus order.
-            chooserOption.tabIndex = -1;
-            chooserOptionLink.tabIndex = -1;
-            chooserOptionHelp.tabIndex = -1;
-            chooserOptionFavourite.tabIndex = -1;
-        }
-    }
+        mainElement.tabIndex = -1;
 
-    /**
-     * Small error handling function to make sure the navigated to object exists
-     *
-     * @method clickErrorHandler
-     * @param {HTMLElement} item What we want to check exists
-     * @param {HTMLElement} fallback If we dont match anything fallback the focus
-     * @return {HTMLElement}
-     */
-    clickErrorHandler(item, fallback) {
-        if (item !== null) {
-            return item;
-        } else {
-            return fallback;
-        }
-    }
+        mainElement.addEventListener('keydown', (e) => {
+            const currentOption = this.dialogueDom.getClosestChooserOption(e.target);
+            if (currentOption === null) {
+                return;
+            }
 
-    /**
-     * Render the search results in a defined container
-     *
-     * @method renderSearchResults
-     * @param {HTMLElement} searchResultsContainer The container where the data should be rendered
-     * @param {Object} searchResultsData Data containing the module items that satisfy the search criteria
-     */
-    async renderSearchResults(searchResultsContainer, searchResultsData) {
-        const templateData = this.exporter.getSearchResultData(searchResultsData);
-        // Build up the html & js ready to place into the help section.
-        const {html, js} = await Templates.renderForPromise(
-            'core_course/local/activitychooser/search_results',
-            templateData
-        );
-        await Templates.replaceNodeContents(searchResultsContainer, html, js);
+            // Check for enter/ space triggers for showing the help.
+            if (e.keyCode === enter || e.keyCode === space) {
+                if (e.target.matches(selectors.actions.optionActions.showSummary)) {
+                    e.preventDefault();
+                    this.handleShowSummary(e.target);
+                }
+            }
+
+            if (e.keyCode === arrowRight) {
+                e.preventDefault();
+                this.dialogueDom.focusNextChooserOption(currentOption);
+            }
+            if (e.keyCode === arrowLeft) {
+                e.preventDefault();
+                this.dialogueDom.focusPreviousChooserOption(currentOption);
+            }
+            if (e.keyCode === home) {
+                e.preventDefault();
+                this.dialogueDom.focusFirstChooserOption(currentOption);
+            }
+            if (e.keyCode === end) {
+                e.preventDefault();
+                this.dialogueDom.focusLastChooserOption(currentOption);
+            }
+        });
     }
 
     /**
@@ -525,27 +355,14 @@ class ActivityChooserDialogue {
      * @param {String} searchQuery The search query
      */
     async toggleSearchResultsView(searchQuery) {
-        const searchResultsContainer = this.modalBody.querySelector(selectors.regions.searchResults);
-        const clearSearchButton = this.modalBody.querySelector(selectors.actions.clearSearch);
+        const searchResultsData = this.searchModules(searchQuery);
 
-        if (searchQuery.length > 0) { // Search query is present.
-            const searchResultsData = this.searchModules(searchQuery);
-            await this.renderSearchResults(searchResultsContainer, searchResultsData);
-            const searchResultItemsContainer = searchResultsContainer.querySelector(selectors.regions.searchResultItems);
-            const firstSearchResultItem = searchResultItemsContainer.querySelector(selectors.regions.chooserOption.container);
-            if (firstSearchResultItem) {
-                // Set the first result item to be focusable.
-                this.toggleFocusableChooserOption(firstSearchResultItem, true);
-                // Register keyboard events on the created search result items.
-                this.initChooserOptionsKeyboardNavigation(searchResultItemsContainer);
-            }
-            clearSearchButton.classList.remove('d-none');
-            searchResultsContainer.removeAttribute('hidden');
-            this.activateSearchTab(true);
-        } else { // Search query is not present.
-            clearSearchButton.classList.add('d-none');
-            searchResultsContainer.setAttribute('hidden', 'hidden');
-            this.activateSearchTab(false);
+        if (searchQuery.length > 0) {
+            await this.dialogueDom.refreshSearchResults(searchResultsData);
+            this.dialogueDom.activateSearchTab(true);
+        } else {
+            this.dialogueDom.cleanSearchResults();
+            this.dialogueDom.activateSearchTab(false);
         }
     }
 
@@ -574,56 +391,6 @@ class ActivityChooserDialogue {
     }
 
     /**
-     * Set up our tabindex information across the chooser.
-     *
-     * @method setupKeyboardAccessibility
-     */
-    setupKeyboardAccessibility() {
-        getFirst(this.modal.getModal()).tabIndex = -1;
-        this.modalBody.querySelectorAll(selectors.elements.tab).forEach((navTab) => {
-            // Init the Bootstrap Tab navigation.
-            Tab.getOrCreateInstance(navTab);
-            // Set the tab to be focusable.
-            navTab.addEventListener('shown.bs.tab', (event) => {
-                const activeSectionId = event.target.getAttribute("href");
-                const activeSectionChooserOptions = this.modalBody
-                    .querySelector(selectors.regions.getSectionChooserOptions(activeSectionId));
-
-                const prevActiveSectionId = event.relatedTarget.getAttribute("href");
-                const prevActiveSectionChooserOptions = this.modalBody
-                    .querySelector(selectors.regions.getSectionChooserOptions(prevActiveSectionId));
-
-                if (prevActiveSectionChooserOptions !== null) {
-                    // Disable the focus of every chooser option in the previous active section.
-                    this.disableFocusAllChooserOptions(prevActiveSectionChooserOptions);
-                }
-
-                // Only sections that have chooser options needs to be enabled.
-                if (activeSectionChooserOptions !== null) {
-                    const firstChooserOption = activeSectionChooserOptions
-                        .querySelector(selectors.regions.chooserOption.container);
-                    // Enable the focus of the first chooser option in the current active section.
-                    this.toggleFocusableChooserOption(firstChooserOption, true);
-                    this.initChooserOptionsKeyboardNavigation(activeSectionChooserOptions);
-                }
-            });
-        });
-    }
-
-    /**
-     * Disable the focus of all chooser options in a specific container (section).
-     *
-     * @method disableFocusAllChooserOptions
-     * @param {HTMLElement} sectionChooserOptions The section that contains the chooser items
-     */
-    disableFocusAllChooserOptions(sectionChooserOptions) {
-        const allChooserOptions = sectionChooserOptions.querySelectorAll(selectors.regions.chooserOption.container);
-        allChooserOptions.forEach((chooserOption) => {
-            this.toggleFocusableChooserOption(chooserOption, false);
-        });
-    }
-
-    /**
      * Update the favourite item value in the mapped modules.
      *
      * @param {String} internal The internal name of the module.
@@ -637,104 +404,10 @@ class ActivityChooserDialogue {
         }
         moduleItem.favourite = favourite;
 
-        this.refreshFavouriteTabContent();
+        this.dialogueDom.updateItemStarredIcons(internal, favourite);
+        await this.dialogueDom.refreshFavouritesTabContent(this.mappedModules);
 
-        this.updateItemStarredIcons(internal, favourite);
-    }
-
-    /**
-     * A small helper function to handle the case where there are no more favourites
-     * and we need to mess a bit with the available tabs in the chooser
-     *
-     * @param {Boolean} displayed Whether we want to show or hide the favourite tab
-     */
-    toggleFavouriteTabDisplay(displayed) {
-        const favouriteTabNav = this.modalBody.querySelector(selectors.regions.favouriteTabNav);
-
-        let moveFocusTo;
-        if (!displayed && favouriteTabNav.classList.contains('active')) {
-            moveFocusTo = this.showAllActivitiesTab();
-        }
-
-        favouriteTabNav?.classList.toggle('d-none', !displayed);
-        favouriteTabNav.tabIndex = displayed ? 0 : -1;
-        // The disabled attribute is used by Boostrap Nav for keyboard navigation.
-        if (displayed) {
-            favouriteTabNav.removeAttribute('disabled');
-        } else {
-            favouriteTabNav.setAttribute('disabled', 'true');
-        }
-
-        if (moveFocusTo) {
-            moveFocusTo.focus();
-        }
-    }
-
-    /**
-     * Refresh the favourite tab content.
-     */
-    async refreshFavouriteTabContent() {
         const favouriteCount = this.mappedModules.filter(mod => mod.favourite === true).size;
-
-        const favouriteArea = this.modalBody.querySelector(selectors.regions.favouriteTab);
-        const templateData = await this.exporter.getFavouriteTabData(this.mappedModules);
-        const {html, js} = await Templates.renderForPromise(
-            'core_course/local/activitychooser/tabcontent',
-            templateData,
-        );
-        await Templates.replaceNodeContents(favouriteArea, html, js);
-        favouriteArea.classList.toggle('d-none', favouriteCount === 0);
-
-        this.toggleFavouriteTabDisplay(favouriteCount > 0);
-    }
-
-    /**
-     * Update the starred icons in the chooser modal.
-     *
-     * @method updateItemStarredIcons
-     * @param {String} internal The internal name of the module.
-     * @param {Boolean} favourite Whether the module is a favourite or not.
-     */
-    updateItemStarredIcons(internal, favourite) {
-        const favouriteButtons = this.modalBody.querySelectorAll(
-            `${selectors.elements.moduleItem(internal)} ${selectors.actions.optionActions.manageFavourite}`
-        );
-        Array.from(favouriteButtons).forEach((element) => {
-            element.classList.toggle('text-muted', !favourite);
-            element.classList.toggle('text-primary', favourite);
-            element.dataset.favourited = favourite;
-            element.setAttribute('aria-pressed', favourite);
-            element.querySelector(selectors.elements.favouriteIconActive)?.classList.toggle('d-none', !favourite);
-            element.querySelector(selectors.elements.favouriteIconInactive)?.classList.toggle('d-none', favourite);
-        });
-    }
-
-    /**
-     * Show the "All activities" tab.
-     *
-     * @method showAllActivitiesTab
-     * @return {HTMLElement} The "All activities" tab element.
-     */
-    showAllActivitiesTab() {
-        const navTab = this.modalBody.querySelector(selectors.regions.allTabNav);
-        Tab.getOrCreateInstance(navTab).show();
-        return navTab;
-    }
-
-    /**
-     * Show the "All activities" tab.
-     *
-     * @method showAllActivitiesTab
-     * @param {Boolean} active Whether to activate the search tab or not.
-     * @return {HTMLElement} The "All activities" tab element.
-     */
-    activateSearchTab(active) {
-        const navTab = this.modalBody.querySelector(selectors.regions.searchTabNav);
-        if (active) {
-            Tab.getOrCreateInstance(navTab).show();
-        } else {
-            this.showAllActivitiesTab();
-        }
-        return navTab;
+        this.dialogueDom.toggleFavouriteTabDisplay(favouriteCount > 0);
     }
 }
