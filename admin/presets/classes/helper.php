@@ -295,6 +295,7 @@ class helper {
         static::add_item($presetid, 'showdataretentionsummary', '1', 'tool_dataprivacy');
         static::add_item($presetid, 'forum_maxattachments', '9');
         static::add_item($presetid, 'guestloginbutton', '1');
+        // TODO: remove activitychoosertabmode preset in Moodle 6.0 (MDL-85655).
         // Set Activity chooser tabs to the default value ("Starred, Recommended, All, Activities, Resources").
         static::add_item($presetid, 'activitychoosertabmode', '3');
 
