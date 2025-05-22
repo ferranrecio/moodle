@@ -1,0 +1,8 @@
+issueNumber: MDL-85533
+notes:
+  core_course:
+    - message: >-
+        The activitychoosertabmode is now considered deprecated and will be
+        removed in Moodle 6.0. Consider implementing your own setting in your
+        theme if needed.
+      type: deprecated

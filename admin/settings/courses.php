@@ -288,6 +288,8 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
     );
 
     $temp = new admin_settingpage('activitychoosersettings', new lang_string('activitychoosersettings', 'course'));
+
+    // TODO: Remove this setting in Moodle 6.0 (MDL-XXXXX).
     // Tab mode for the activity chooser.
     $temp->add(
         new admin_setting_configselect(
@@ -328,6 +330,8 @@ if ($hassiteconfig or has_any_capability($capabilities, $systemcontext)) {
 
     // Add to the 'Activity Chooser' category.
     $temp = new admin_settingpage('activitychoosersettings', new lang_string('activitychoosersettings', 'course'));
+
+    // TODO: Remove this setting in Moodle 6.0 (MDL-XXXXX).
     // Tab mode for the activity chooser.
     $temp->add(
         new admin_setting_configselect(
