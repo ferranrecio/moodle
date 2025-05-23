@@ -80,6 +80,7 @@ $string['eventmessageuserblocked'] = 'User blocked';
 $string['eventmessageuserunblocked'] = 'User unblocked';
 $string['eventmessageviewed'] = 'Message viewed';
 $string['eventmessagesent'] = 'Message sent';
+$string['favourites'] = 'Starred';
 $string['forced'] = 'Locked';
 $string['forcedmessage'] = 'Locked on';
 $string['guestnoeditmessage'] = 'Guest user can not edit messaging options';
