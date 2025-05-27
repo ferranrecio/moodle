@@ -25,7 +25,7 @@ use cm_info;
 use mod_glossary_entry_query_builder;
 
 /**
- * Class overview
+ * Glossary overview integration class.
  *
  * @package    mod_glossary
  * @copyright  2025 Mikel Martín <mikel@moodle.com>
@@ -42,6 +42,8 @@ class overview extends \core_courseformat\activityoverviewbase {
         cm_info $cm,
         /** @var \core\output\renderer_helper $rendererhelper the renderer helper */
         protected readonly \core\output\renderer_helper $rendererhelper,
+        /** @var \core_string_manager $sm the string manager */
+        protected readonly \core_string_manager $sm,
     ) {
         parent::__construct($cm);
     }
@@ -67,17 +69,17 @@ class overview extends \core_courseformat\activityoverviewbase {
         $renderer = $this->rendererhelper->get_core_renderer();
         $badge = $renderer->notice_badge(
             contents: $entriescount,
-            title: get_string('numberofentriesneedapprove', 'mod_glossary'),
+            title: $this->sm->get_string('numberofentriesneedapprove', 'mod_glossary'),
         );
 
         $content = new action_link(
             url: new url('/mod/glossary/view.php', ['id' => $this->cm->id, 'mode' => 'approval']),
-            text: get_string('approve', 'mod_glossary') . $badge,
+            text: $this->sm->get_string('approve', 'mod_glossary') . $badge,
             attributes: ['class' => button::SECONDARY_OUTLINE->classes()],
         );
 
         return new overviewitem(
-            name: get_string('actions'),
+            name: $this->sm->get_string('actions'),
             value: $entriescount,
             content: $entriescount ? $content : '-',
             textalign: text_align::CENTER,
@@ -90,9 +92,9 @@ class overview extends \core_courseformat\activityoverviewbase {
      * @return overviewitem The overview item.
      */
     private function get_extra_totalentries_overview(): overviewitem {
-        $columnheader = get_string('entries', 'mod_glossary');
+        $columnheader = $this->sm->get_string('entries', 'mod_glossary');
         if (!has_capability('mod/glossary:approve', $this->context)) {
-            $columnheader = get_string('totalentries', 'mod_glossary');
+            $columnheader = $this->sm->get_string('totalentries', 'mod_glossary');
         }
 
         $qb = new mod_glossary_entry_query_builder($this->cm->get_instance_record());
@@ -131,7 +133,7 @@ class overview extends \core_courseformat\activityoverviewbase {
         $entriescount = $qb->count_records();
 
         return new overviewitem(
-            name: get_string('myentries', 'mod_glossary'),
+            name: $this->sm->get_string('myentries', 'mod_glossary'),
             value: $entriescount,
             content: $entriescount ?: '-',
             textalign: text_align::CENTER,
