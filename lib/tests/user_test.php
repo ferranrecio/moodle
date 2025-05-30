@@ -1034,4 +1034,25 @@ final class user_test extends \advanced_testcase {
             ],
         ];
     }
+
+    /**
+     * Test for get_current_user method.
+     *
+     * @covers \core_user::get_current_user
+     */
+    public function test_get_current_user(): void {
+        global $USER;
+
+        $this->resetAfterTest();
+
+        // Create user and try fetach it with api.
+        $user = $this->getDataGenerator()->create_user();
+
+        $this->setUser($user);
+        $currentuser = \core_user::get_current_user();
+
+        $this->assertEquals($user->id, $currentuser->id);
+
+        $this->assertEquals($USER, $currentuser);
+    }
 }

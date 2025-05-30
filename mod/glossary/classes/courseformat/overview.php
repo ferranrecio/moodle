@@ -124,15 +124,13 @@ class overview extends \core_courseformat\activityoverviewbase {
      * @return overviewitem|null The overview item (or null if the user can approve entries).
      */
     private function get_extra_myentries_overview(): ?overviewitem {
-        global $USER;
-
         if (has_capability('mod/glossary:approve', $this->context)) {
             return null;
         }
 
         $qb = new mod_glossary_entry_query_builder($this->cm->get_instance_record());
         $qb->join_user(true);
-        $qb->where('id', 'user', $USER->id);
+        $qb->where('id', 'user', \core\user::get_current_user()->id);
         $entriescount = $qb->count_records();
 
         return new overviewitem(

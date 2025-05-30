@@ -595,6 +595,19 @@ class user {
     }
 
     /**
+     * Get the current user object.
+     *
+     * This function is a wrapper around the global $USER object to be used
+     * instead of directly accessing the global variable.
+     *
+     * @return object
+     */
+    public static function get_current_user(): stdClass {
+        global $USER;
+        return $USER;
+    }
+
+    /**
      * Check if the given user is an active user in the site.
      *
      * @param  stdClass  $user         user object
