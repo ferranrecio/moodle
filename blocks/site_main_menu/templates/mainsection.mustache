@@ -32,8 +32,8 @@
     }
 }}
 <div
-    id="block_site_main_menu_section"
-    class="course-content"
+    class="course-content block_site_main_menu_section"
+    data-courseid="{{courseid}}"
 >
     {{! The section list is used by the content module to init the sections.}}
     <div
@@ -66,26 +66,9 @@
 {{! The block should be fast to load, we only load the editor when needed.}}
 {{#editing}}
 require(
-    [
-        'core_courseformat/local/content',
-        'core_courseformat/courseeditor'
-    ],
-    function(
-        Component,
-        Courseeditor
-    ) {
-        {{! There might be several blocks in the page. }}
-        {{! Identify the block that has subsections (site block doesn't support them). }}
-        const targetSubsectionLink = document.querySelector('.block_site_main_menu .dropdown-menu a[data-modname="subsection"]');
-        let mainMenuBlock = targetSubsectionLink
-            ? targetSubsectionLink.closest('.block_site_main_menu')
-            : document.querySelector('.block_site_main_menu');
-
-        {{! The block could be included static in other courses so we use Courseeditor.getCourseEditor. }}
-        new Component({
-            element: mainMenuBlock,
-            reactive: Courseeditor.getCourseEditor({{courseid}}),
-        });
+    ['block_site_main_menu/mainsection'],
+    function(Component) {
+        Component.init('.block_site_main_menu_section[data-courseid="{{courseid}}"]');
     }
 );
 {{/editing}}

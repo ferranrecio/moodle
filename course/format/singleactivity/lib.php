@@ -436,6 +436,11 @@ class format_singleactivity extends core_courseformat\base {
 
     #[\Override]
     public function get_section_name($section) {
+        $section = $this->get_section($section);
+        if ($section->is_delegated()) {
+            return $section->name;
+        }
+        // The single activity only uses one section inside the additional activities block.
         return get_string('pluginname', 'format_singleactivity');
     }
 
@@ -448,5 +453,22 @@ class format_singleactivity extends core_courseformat\base {
     #[\Override]
     public function allow_stealth_module_visibility($cm, $section) {
         return true;
+    }
+
+    /**
+     * Returns if a specific section is visible to the current user.
+     *
+     * The single activity format does only have the section zero
+     * and subsections (delegated sections).
+     *
+     * @param section_info $section the section modinfo
+     * @return bool;
+     */
+    #[\Override]
+    public function is_section_visible(section_info $section): bool {
+        $visible = parent::is_section_visible($section);
+        // Social format does only use section 0 as a normal section.
+        // Any other included section should be a delegated one (subsections).
+        return $visible && ($section->sectionnum == 0 || $section->is_delegated());
     }
 }
