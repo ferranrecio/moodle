@@ -57,6 +57,7 @@ $string['choice'] = 'Choice';
 $string['completion'] = 'Completion';
 $string['contentbank'] = 'More information about the content bank';
 $string['contentbank_help'] = 'In the content bank you can create and store content using several authoring tools, including an integrated H5P creator.';
+$string['contenttype'] = 'H5P type';
 $string['correct_answer'] = 'Correct answer';
 $string['deleteallattempts'] = 'All H5P attempts';
 $string['displayexport'] = 'Allow download';
@@ -103,6 +104,7 @@ $string['newsubmissions'] = 'H5P submitted';
 $string['no_compatible_track'] = 'This interaction ({$a}) does not provide tracking information or the tracking
         provided is not compatible with the current activity version.';
 $string['noparticipants'] = 'No participants to display';
+$string['unkowntype'] = 'Unkown type';
 $string['opencontentbank'] = '<a href="{$a}" target="_blank">Access the H5P file in the content bank</a> (opens in a new window).';
 $string['outcome'] = 'Outcome';
 $string['package'] = 'Package file';
