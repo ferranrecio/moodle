@@ -30,10 +30,10 @@ use stdClass;
 class manager {
 
     /** Module name. */
-    const MODULE = 'choice';
+    public const MODULE = 'choice';
 
     /** The plugin name. */
-    const PLUGINNAME = 'mod_choice';
+    public const PLUGINNAME = 'mod_choice';
 
     /** @var stdClass course_module record. */
     private $instance;
@@ -90,7 +90,7 @@ class manager {
      * @param stdClass|cm_info $cm an activity record
      * @return manager
      */
-    public static function create_from_coursemodule($cm): self {
+    public static function create_from_coursemodule(stdClass|cm_info $cm): self {
         // Ensure that $this->cm is a cm_info object.
         $cm = cm_info::create($cm);
         $db = \core\di::get(\moodle_database::class);
@@ -141,8 +141,12 @@ class manager {
      * @return array the answers
      */
     public function get_all_answers(int $userid): array {
-        ['join' => $groupmemberjoin, 'params' => $params, 'where' => $where] =
-            $this->get_group_member_join($userid, $this->instance->id);
+        [
+            'join' => $groupmemberjoin,
+            'params' => $params,
+            'where' => $where
+        ] = $this->get_group_member_join($userid, $this->instance->id);
+
         return $this->db->get_records_sql(
             'SELECT ca.* FROM {choice_answers} ca' . $groupmemberjoin . $where . ' ORDER BY ca.id',
             $params,
@@ -159,8 +163,10 @@ class manager {
     private function get_group_member_join(int $userid, int $choiceid): array {
         $where = ' WHERE ca.choiceid = :choiceid';
         $params = ['choiceid' => $choiceid];
-        if ($this->groupmode == SEPARATEGROUPS
-            && !has_capability('moodle/site:accessallgroups', $this->context, $userid)) {
+        if (
+            $this->groupmode == SEPARATEGROUPS
+            && !has_capability('moodle/site:accessallgroups', $this->context, $userid)
+        ) {
             $groups = groups_get_all_groups($this->course->id, $userid, 0, 'g.id');
             if (empty($groups)) {
                 // No groups found for this user, return empty join but we show only records belonging to the user.
@@ -170,7 +176,11 @@ class manager {
             }
             $groupids = array_column($groups, 'id');
 
-            [$groupmembersql, $groupmemberparams] = groups_get_members_ids_sql($groupids, $this->context);
+            [
+                $groupmembersql,
+                $groupmemberparams
+            ] = groups_get_members_ids_sql($groupids, $this->context);
+
             $params = array_merge($params, $groupmemberparams);
             $groupmemberjoin = " JOIN ({$groupmembersql}) jg ON jg.id = ca.userid";
         } else {
@@ -199,8 +209,12 @@ class manager {
      * @return int the number of answers
      */
     public function get_all_answers_count(int $userid): int {
-        ['join' => $groupmemberjoin, 'params' => $params, 'where' => $where] =
-            $this->get_group_member_join($userid, $this->instance->id);
+        [
+            'join' => $groupmemberjoin,
+            'params' => $params,
+            'where' => $where
+        ] = $this->get_group_member_join($userid, $this->instance->id);
+
         return $this->db->count_records_sql(
             'SELECT COUNT(*) FROM {choice_answers} ca' . $groupmemberjoin . $where,
             $params
