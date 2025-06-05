@@ -138,6 +138,7 @@ $string['publishnames'] = 'Publish full results, showing names and their choices
 $string['publishnot'] = 'Do not publish results to students';
 $string['removemychoice'] = 'Remove my choice';
 $string['removeresponses'] = 'All responses';
+$string['responded'] = 'Responded';
 $string['responses'] = 'Responses';
 $string['responsesresultgraphheader'] = 'Graph display';
 $string['responsesa'] = 'Responses: {$a}';
