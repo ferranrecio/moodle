@@ -60,17 +60,23 @@ class behat_mod_choice_generator extends behat_generator_base {
         // Get the choice options.
         $choices = $DB->get_records_menu('choice_options', ['choiceid' => $data['choiceid']], '', 'id,text');
         $choices = array_map('trim', $choices);
-        $choices = array_map(function($choice) {
-            return strtolower(trim($choice));
-        }, $choices);
+        $choices = array_map(
+            function($choice) {
+                return strtolower(trim($choice));
+            },
+            $choices,
+        );
         $choices = array_flip($choices);
 
         $responsesfieldcontent = $data['responses'] ?? ($data['response'] ?? '');
         $userresponse = str_getcsv($responsesfieldcontent);
-        $userresponse = array_map(function($response) use ($choices) {
-            $item = strtolower(trim($response));
-            return $choices[$item] ?? null;
-        }, $userresponse);
+        $userresponse = array_map(
+            function($response) use ($choices) {
+                $item = strtolower(trim($response));
+                return $choices[$item] ?? null;
+            },
+            $userresponse,
+        );
         $userresponse = array_filter($userresponse, function($answer) {
             return !empty($answer);
         });
@@ -81,5 +87,4 @@ class behat_mod_choice_generator extends behat_generator_base {
         $data['responses'] = $userresponse;
         return $data;
     }
-
 }
