@@ -28,7 +28,6 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class manager {
-
     /** Module name. */
     public const MODULE = 'wiki';
 
@@ -138,8 +137,23 @@ class manager {
      * @return int the number of entries
      */
     public function get_all_entries_count(int $userid): int {
-        ['join' => $groupmemberjoin, 'params' => $params, 'where' => $where] =
-            $this->get_group_member_join($userid, $this->instance->id);
+        [
+            'join' => $groupmemberjoin,
+            'params' => $params,
+            'where' => $where,
+        ] = $this->get_group_member_join($userid, $this->instance->id);
+
+        // Individual wikis acts like a personal notebook, so we only count the pages of the current user.
+        // However, for teachers, or in visible groups, the user also sees pages from other users.
+        if (
+            $this->get_wiki_mode() == wiki_mode::INDIVIDUAL
+            && !has_capability('mod/wiki:managewiki', $this->context, $userid)
+            && $this->cm->groupmode != VISIBLEGROUPS
+        ) {
+            $where .= ' AND wp.userid = :authoruserid';
+            $params['authoruserid'] = $userid;
+        }
+
         return $this->db->count_records_sql(
             'SELECT COUNT(*) FROM {wiki_pages} wp
                     LEFT JOIN {wiki_subwikis} wsp ON wsp.id=wp.subwikiid'
@@ -158,14 +172,20 @@ class manager {
     private function get_group_member_join(int $userid, int $wikiid): array {
         $where = ' WHERE wsp.wikiid = :wikiid';
         $params = ['wikiid' => $wikiid];
-        if ($this->groupmode == SEPARATEGROUPS
-            && !has_capability('moodle/site:accessallgroups', $this->context, $userid)) {
+        if (
+            $this->groupmode == SEPARATEGROUPS
+            && !has_capability('moodle/site:accessallgroups', $this->context, $userid)
+        ) {
             $groups = groups_get_all_groups($this->course->id, $userid, 0, 'g.id');
             if (empty($groups)) {
                 // No groups found for this user, return empty join but we show only records belonging to this user.
                 $where .= ' AND wp.userid = :userid';
                 $params['userid'] = $userid;
-                return ['join' => '', 'params' => $params, 'where' => $where];
+                return [
+                    'join' => '',
+                    'params' => $params,
+                    'where' => $where,
+                ];
             }
             // If not we wil check both group from the subwiki and wiki pages user's.
             $groupids = array_column($groups, 'id');
@@ -189,8 +209,10 @@ class manager {
      */
     public function get_user_entries_count(int $userid): int {
         $where = ' WHERE wsp.wikiid = :wikiid AND wp.userid = :userid';
-        $params = ['wikiid' => $this->instance->id, 'userid' => $userid];
-
+        $params = [
+            'wikiid' => $this->instance->id,
+            'userid' => $userid,
+        ];
         return $this->db->count_records_sql(
             'SELECT COUNT(*) FROM {wiki_pages} wp
                     LEFT JOIN {wiki_subwikis} wsp ON wsp.id=wp.subwikiid' . $where,
@@ -217,6 +239,7 @@ class manager {
     public function get_main_wiki_pageid(): ?int {
         global $USER, $CFG;
         require_once($CFG->dirroot . '/mod/wiki/locallib.php');
+
         if (!$wiki = wiki_get_wiki($this->cm->instance)) {
             return null;
         }

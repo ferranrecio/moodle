@@ -32,8 +32,8 @@ final class manager_test extends \advanced_testcase {
      */
     public static function get_wiki_mode_provider(): array {
         return [
-            'collaborative' => ['mode' => 'collaborative', 'expected' => \mod_wiki\wiki_mode::COLLABORATIVE],
-            'individual' => ['mode' => 'individual', 'expected' => \mod_wiki\wiki_mode::INDIVIDUAL],
+            'collaborative' => ['mode' => 'collaborative', 'expected' => wiki_mode::COLLABORATIVE],
+            'individual' => ['mode' => 'individual', 'expected' => wiki_mode::INDIVIDUAL],
         ];
     }
 
@@ -44,13 +44,102 @@ final class manager_test extends \advanced_testcase {
      */
     public static function get_all_entries_count_provider(): array {
         return [
-            'teacher 1 (no group mode)' => ['t1', NOGROUPS, 2],
-            'teacher 1 (separate group mode)' => ['t1', SEPARATEGROUPS, 1], // Teacher 1 belongs to group 1, so should see s1.
-            'teacher 1 (visible group mode)' => ['t1', VISIBLEGROUPS, 2],
+            'teacher 1 (no group mode, collaborative)' => [
+                'username' => 't1',
+                'coursegroupmode' => NOGROUPS,
+                'wikimode' => wiki_mode::COLLABORATIVE,
+                'expectedcount' => 2,
+            ],
+            'teacher 1 (separate group mode, collaborative)' => [
+                'username' => 't1',
+                'coursegroupmode' => SEPARATEGROUPS,
+                'wikimode' => wiki_mode::COLLABORATIVE,
+                'expectedcount' => 1,
+            ],
+            // Teacher 1 belongs to group 1, so should see s1.
+            'teacher 1 (visible group mode, collaborative)' => [
+                'username' => 't1',
+                'coursegroupmode' => VISIBLEGROUPS,
+                'wikimode' => wiki_mode::COLLABORATIVE,
+                'expectedcount' => 2,
+            ],
             // Teacher 2 does not belong to any group.
-            'teacher 2 (no group mode)' => ['t2', NOGROUPS, 2],
-            'teacher 2 (separate group mode)' => ['t2', SEPARATEGROUPS, 0], // Teacher 2 does not belong to any group.
-            'teacher 2 (visible group mode)' => ['t2', VISIBLEGROUPS, 2],
+            'teacher 2 (no group mode, collaborative)' => [
+                'username' => 't2',
+                'coursegroupmode' => NOGROUPS,
+                'wikimode' => wiki_mode::COLLABORATIVE,
+                'expectedcount' => 2,
+            ],
+            'teacher 2 (separate group mode, collaborative)' => [
+                'username' => 't2',
+                'coursegroupmode' => SEPARATEGROUPS,
+                'wikimode' => wiki_mode::COLLABORATIVE,
+                'expectedcount' => 0,
+            ],
+            // Teacher 2 does not belong to any group.
+            'teacher 2 (visible group mode, collaborative)' => [
+                'username' => 't2',
+                'coursegroupmode' => VISIBLEGROUPS,
+                'wikimode' => wiki_mode::COLLABORATIVE,
+                'expectedcount' => 2,
+            ],
+            // Teacher Individual mode.
+            'teacher 1 (no group mode, individual)' => [
+                'username' => 't1',
+                'coursegroupmode' => NOGROUPS,
+                'wikimode' => wiki_mode::INDIVIDUAL,
+                'expectedcount' => 2,
+            ],
+            'teacher 1 (separate group mode, individual)' => [
+                'username' => 't1',
+                'coursegroupmode' => SEPARATEGROUPS,
+                'wikimode' => wiki_mode::INDIVIDUAL,
+                'expectedcount' => 1,
+            ],
+            'teacher 1 (visible group mode, individual)' => [
+                'username' => 't1',
+                'coursegroupmode' => VISIBLEGROUPS,
+                'wikimode' => wiki_mode::INDIVIDUAL,
+                'expectedcount' => 2,
+            ],
+            // Student collaborative mode.
+            'student 1 (no group mode, collaborative)' => [
+                'username' => 's1',
+                'coursegroupmode' => NOGROUPS,
+                'wikimode' => wiki_mode::COLLABORATIVE,
+                'expectedcount' => 2,
+            ],
+            'student 1 (separate group mode, collaborative)' => [
+                'username' => 's1',
+                'coursegroupmode' => SEPARATEGROUPS,
+                'wikimode' => wiki_mode::COLLABORATIVE,
+                'expectedcount' => 1,
+            ],
+            'student 1 (visible group mode, collaborative)' => [
+                'username' => 's1',
+                'coursegroupmode' => VISIBLEGROUPS,
+                'wikimode' => wiki_mode::COLLABORATIVE,
+                'expectedcount' => 2,
+            ],
+            // Student individual mode.
+            'student 1 (no group mode, individual)' => [
+                'username' => 's1',
+                'coursegroupmode' => NOGROUPS,
+                'wikimode' => wiki_mode::INDIVIDUAL,
+                'expectedcount' => 1,
+            ],
+            'student 1 (separate group mode, individual)' => [
+                'username' => 's1',
+                'coursegroupmode' => SEPARATEGROUPS,
+                'wikimode' => wiki_mode::INDIVIDUAL,
+                'expectedcount' => 1,
+            ],
+            'student 1 (visible group mode, individual)' => [
+                'username' => 's1',
+                'coursegroupmode' => VISIBLEGROUPS,
+                'wikimode' => wiki_mode::INDIVIDUAL,
+                'expectedcount' => 2,
+            ],
         ];
     }
 
@@ -83,7 +172,7 @@ final class manager_test extends \advanced_testcase {
     public function test_create_manager_instance_from_instance_record(): void {
         $this->resetAfterTest();
         ['instance' => $instance] = $this->setup_users_and_activity();
-        $manager = \mod_wiki\manager::create_from_instance($instance);
+        $manager = manager::create_from_instance($instance);
         $this->assertNotNull($manager);
     }
 
@@ -103,7 +192,6 @@ final class manager_test extends \advanced_testcase {
         if ($groupmode !== NOGROUPS) {
             // Set the group mode for the course.
             $courseparams['groupmode'] = $groupmode;
-            $courseparams['groupmodeforce'] = 1; // Force the group mode.
         }
         $course = $generator->create_course($courseparams);
         foreach (['s1' => 'student', 's2' => 'student', 't1' => 'teacher', 't2' => 'teacher'] as $username => $role) {
@@ -119,10 +207,14 @@ final class manager_test extends \advanced_testcase {
             groups_add_member($groups[1], $users['s2']->id);
             groups_add_member($groups[0], $users['t1']->id);
         }
-        $instance = $generator->create_module('wiki', [
-            'course' => $course,
-            'wikimode' => $mode->value,
-        ]);
+        $instance = $generator->create_module(
+            'wiki',
+            [
+                'course' => $course,
+                'wikimode' => $mode->value,
+                'groupmode' => $groupmode,
+            ],
+        );
 
         $wikigenerator = $generator->get_plugin_generator('mod_wiki');
 
@@ -172,7 +264,7 @@ final class manager_test extends \advanced_testcase {
         $this->resetAfterTest();
         ['instance' => $instance, 'course' => $course] = $this->setup_users_and_activity();
         $cm = get_fast_modinfo($course)->get_cm($instance->cmid);
-        $manager = \mod_wiki\manager::create_from_coursemodule($cm);
+        $manager = manager::create_from_coursemodule($cm);
         $this->assertNotNull($manager);
     }
 
@@ -180,16 +272,16 @@ final class manager_test extends \advanced_testcase {
      * Test the wiki mode of the wiki instance.
      *
      * @param string $mode the mode of the wiki instance.
-     * @param \mod_wiki\wiki_mode $expected the expected wiki mode.
+     * @param wiki_mode $expected the expected wiki mode.
      *
      * @covers       \mod_wiki\manager::get_wiki_mode
      * @dataProvider get_wiki_mode_provider
      */
-    public function test_wiki_mode(string $mode, \mod_wiki\wiki_mode $expected): void {
+    public function test_wiki_mode(string $mode, wiki_mode $expected): void {
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
         $wiki = $this->getDataGenerator()->create_module('wiki', ['course' => $course, 'wikimode' => $mode]);
-        $manager = \mod_wiki\manager::create_from_instance($wiki);
+        $manager = manager::create_from_instance($wiki);
         $this->assertEquals($expected, $manager->get_wiki_mode());
     }
 
@@ -198,14 +290,24 @@ final class manager_test extends \advanced_testcase {
      *
      * @param string $username the username of the user to retrieve entries count for.
      * @param int $coursegroupmode the group mode of the course.
+     * @param wiki_mode $wikimode the wiki mode of the instance.
      * @param int $expectedcount the expected count of answers for the user.
      *
-     * @covers       \mod_wiki\manager::get_wiki_mode
+     * @covers       \mod_wiki\manager::get_all_entries_count
      * @dataProvider get_all_entries_count_provider
      */
-    public function test_get_all_entries_count(string $username, int $coursegroupmode, int $expectedcount): void {
-        ['users' => $users, 'instance' => $instance] = $this->setup_users_and_activity($coursegroupmode);
-        $manager = \mod_wiki\manager::create_from_instance($instance);
+    public function test_get_all_entries_count(
+        string $username,
+        int $coursegroupmode,
+        wiki_mode $wikimode,
+        int $expectedcount
+    ): void {
+        [
+            'users' => $users,
+            'instance' => $instance
+        ] = $this->setup_users_and_activity($coursegroupmode, $wikimode);
+
+        $manager = manager::create_from_instance($instance);
         $count = $manager->get_all_entries_count($users[$username]->id);
         $this->assertEquals($expectedcount, $count);
     }
@@ -221,7 +323,7 @@ final class manager_test extends \advanced_testcase {
      */
     public function test_get_user_entries_count(string $username, int $expectedcount): void {
         ['users' => $users, 'instance' => $instance] = $this->setup_users_and_activity();
-        $manager = \mod_wiki\manager::create_from_instance($instance);
+        $manager = manager::create_from_instance($instance);
         $count = $manager->get_user_entries_count($users[$username]->id);
         $this->assertEquals($expectedcount, $count);
     }
@@ -240,7 +342,7 @@ final class manager_test extends \advanced_testcase {
     public function test_get_main_wiki_pageid(string $username, int $groupmode, wiki_mode $wikimode, ?string $expectedpage): void {
         $this->resetAfterTest();
         ['users' => $users, 'instance' => $instance, 'pages' => $pages] = $this->setup_users_and_activity($groupmode, $wikimode);
-        $manager = \mod_wiki\manager::create_from_instance($instance);
+        $manager = manager::create_from_instance($instance);
         $this->setUser($users[$username]); // Set the user to the one who created the wiki.
         $pageid = $manager->get_main_wiki_pageid();
         $pagestoid = array_map(function($page) {
@@ -336,6 +438,4 @@ final class manager_test extends \advanced_testcase {
             ],
         ];
     }
-
-
 }

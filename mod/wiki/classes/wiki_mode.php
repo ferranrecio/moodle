@@ -34,10 +34,10 @@ enum wiki_mode: string {
      * @return string user friendly representation.
      */
     public function to_string(): string {
-        $sm = \core\di::get(\core_string_manager::class);
+        $stringmanager = \core\di::get(\core_string_manager::class);
         if ($this === self::UNDEFINED) {
-            return $sm->get_string('wikimodeundefined', 'mod_wiki');
+            return $stringmanager->get_string('wikimodeundefined', 'mod_wiki');
         }
-        return $sm->get_string('wikimode' . $this->value, 'mod_wiki');
+        return $stringmanager->get_string('wikimode' . $this->value, 'mod_wiki');
     }
 }
