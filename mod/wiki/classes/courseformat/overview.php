@@ -48,8 +48,8 @@ class overview extends \core_courseformat\activityoverviewbase {
         cm_info $cm,
         /** @var \core\output\renderer_helper $rendererhelper the renderer helper */
         protected readonly \core\output\renderer_helper $rendererhelper,
-        /** @var \core_string_manager $sm the string manager */
-        protected readonly \core_string_manager $sm,
+        /** @var \core_string_manager $stringmanager the string manager */
+        protected readonly \core_string_manager $stringmanager,
     ) {
         parent::__construct($cm);
         $this->manager = manager::create_from_coursemodule($cm);
@@ -57,31 +57,25 @@ class overview extends \core_courseformat\activityoverviewbase {
 
     #[\Override]
     public function get_actions_overview(): ?overviewitem {
-        global $USER;
-        $entriescount  = $this->manager->get_all_entries_count($USER->id);
+        // If a wiki does not have a main page means it is not used yet, so we do not show the action link.
+        $pageid = $this->manager->get_main_wiki_pageid();
+        if (!$pageid) {
+            return null;
+        }
+
+        $text = $this->stringmanager->get_string('view');
+
         $content = new action_link(
             url: new url(
-                '/mod/wiki/view.php',
-                ['id' => $this->cm->id],
-                'wiki-viewlet-view',
+                '/mod/wiki/map.php',
+                ['pageid' => $pageid],
             ),
-            text: $entriescount,
+            text: $text,
             attributes: ['class' => button::SECONDARY_OUTLINE->classes()],
         );
-        if (($pageid = $this->manager->get_main_wiki_pageid())) {
-            $content = new action_link(
-                url: new url(
-                    '/mod/wiki/history.php',
-                    ['pageid' => $pageid],
-                    'wiki-viewlet-view',
-                ),
-                text: $entriescount,
-                attributes: ['class' => button::SECONDARY_OUTLINE->classes()],
-            );
-        }
         return new overviewitem(
-            name: $this->sm->get_string('totalentries', 'wiki'),
-            value: $entriescount,
+            name: $this->stringmanager->get_string('actions'),
+            value: $text,
             content: $content,
             textalign: text_align::CENTER,
         );
@@ -92,6 +86,7 @@ class overview extends \core_courseformat\activityoverviewbase {
         return [
             'wiki_type' => $this->get_extra_wiki_type(),
             'my_entries' => $this->get_extra_my_entries(),
+            'entries' => $this->get_extra_entries(),
         ];
     }
     /**
@@ -104,7 +99,7 @@ class overview extends \core_courseformat\activityoverviewbase {
             return null; // If the user cannot manage the wiki, we don't show the wiki type.
         }
         return new overviewitem(
-            name: $this->sm->get_string('wikimode', 'wiki'),
+            name: $this->stringmanager->get_string('wikimode', 'wiki'),
             value: $this->manager->get_wiki_mode()->value,
             content: $this->manager->get_wiki_mode()->to_string(),
             textalign: text_align::CENTER,
@@ -123,7 +118,24 @@ class overview extends \core_courseformat\activityoverviewbase {
         }
         $entriescount  = $this->manager->get_user_entries_count($USER->id);
         return new overviewitem(
-            name: $this->sm->get_string('myentries', 'wiki'),
+            name: $this->stringmanager->get_string('myentries', 'wiki'),
+            value: $entriescount,
+            content: $entriescount,
+            textalign: text_align::CENTER,
+        );
+    }
+
+    /**
+     * Get the overview item for total entries.
+     *
+     * @return overviewitem|null An overview item, or null if the user lacks the required capability.
+     */
+    public function get_extra_entries(): ?overviewitem {
+        global $USER;
+        $entriescount = $this->manager->get_all_entries_count($USER->id);
+
+        return new overviewitem(
+            name: $this->stringmanager->get_string('totalentries', 'wiki'),
             value: $entriescount,
             content: $entriescount,
             textalign: text_align::CENTER,

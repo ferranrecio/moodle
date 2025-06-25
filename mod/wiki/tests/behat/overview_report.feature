@@ -20,10 +20,30 @@ In order to summarize the wikis
       | student2 | C1     | student        |
       | student3 | C1     | student        |
       | teacher1 | C1     | editingteacher |
+    Given the following "groups" exist:
+      | name    | course | idnumber | participation |
+      | Group 1 | C1     | G1       | 1             |
+      | Group 2 | C1     | G2       | 1             |
+      | Group 3 | C1     | G3       | 0             |
+    And the following "group members" exist:
+      | user     | group |
+      | student1 | G1    |
+      | student2 | G2    |
+      | student3 | G3    |
     And the following "activities" exist:
       | activity | course | name          | idnumber | wikimode      | firstpagetitle  | groupmode |
       | wiki     | C1     | Separate wiki | wiki1    | collaborative | Separate page 1 | 1         |
       | wiki     | C1     | Visible wiki  | wiki2    | collaborative | Visible page 1  | 2         |
+    And the following wiki pages exist:
+      | wiki  | title           | content      | group |
+      | wiki1 | Separate page 1 | Group 1 page | G1    |
+      | wiki1 | Separate page 1 | Group 2 page | G2    |
+      | wiki2 | Visible page 1  | Group 1 page | G1    |
+      | wiki2 | Visible page 1  | Group 2 page | G2    |
+    And the following wiki pages exist:
+      | wiki  | title           | content       |
+      | wiki1 | Separate page 1 | No group page |
+      | wiki2 | Visible page 1  | No group page |
 
   Scenario: The wiki overview report should generate log events
     Given I am on the "Course 1" "course > activities > wiki" page logged in as "teacher1"
@@ -34,22 +54,20 @@ In order to summarize the wikis
     Then I should see "Course activities overview page viewed"
     And I should see "viewed the instance list for the module 'wiki'"
 
-  @javascript
   Scenario: Students can see relevant columns in the wiki overview
     Given I am on the "Course 1" "course > activities > wiki" page logged in as "student1"
-    # Check columns.
-    Then I should see "Name" in the "wiki_overview_collapsible" "region"
-    And I should see "Total entries" in the "wiki_overview_collapsible" "region"
-    And I should see "My entries" in the "wiki_overview_collapsible" "region"
+    Then the following should exist in the "Table listing all Wiki activities" table:
+      | Name          | My entries | Total entries | Actions |
+      | Separate wiki | 0          | 0             | View    |
+      | Visible wiki  | 0          | 3             | View    |
 
   Scenario: Teachers can see relevant columns in the wiki overview
     Given I am on the "Course 1" "course > activities > wiki" page logged in as "teacher1"
-    # Check columns.
-    Then I should see "Name" in the "wiki_overview_collapsible" "region"
-    And I should see "Wiki mode" in the "wiki_overview_collapsible" "region"
-    And I should see "Total entries" in the "wiki_overview_collapsible" "region"
+    Then the following should exist in the "Table listing all Wiki activities" table:
+      | Name          | Wiki mode          | Total entries | Actions |
+      | Separate wiki | Collaborative wiki | 3             | View    |
+      | Visible wiki  | Collaborative wiki | 3             | View    |
 
-  @javascript
   Scenario: The wiki index redirect to the activities overview
     When I log in as "admin"
     And I am on "Course 1" course homepage with editing mode on

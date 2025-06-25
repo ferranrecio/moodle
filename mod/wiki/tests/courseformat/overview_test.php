@@ -110,28 +110,6 @@ final class overview_test extends \advanced_testcase {
     }
 
     /**
-     * Test get_actions_overview method.
-     *
-     * @param string $username
-     * @param int $coursegroupmode
-     * @param int $expectedcount
-     *
-     * @covers ::get_actions_overview
-     * @dataProvider data_provider_get_actions_overview
-     */
-    public function test_get_actions_overview(string $username, int $coursegroupmode, int $expectedcount): void {
-        $this->resetAfterTest();
-        ['users' => $users, 'instance' => $instance, 'course' => $course] = $this->setup_users_and_activity($coursegroupmode);
-        $cm = get_fast_modinfo($course)->get_cm($instance->cmid);
-        $this->setUser($users[$username]->id);
-        $overview = overviewfactory::create($cm);
-        $this->assertEquals(
-            $expectedcount,
-            $overview->get_actions_overview()->get_value(),
-        );
-    }
-
-    /**
      * Setup users and activity for testing answers retrieval.
      *
      * @param int $groupmode the group mode to use for the course.
@@ -148,7 +126,6 @@ final class overview_test extends \advanced_testcase {
         if ($groupmode !== NOGROUPS) {
             // Set the group mode for the course.
             $courseparams['groupmode'] = $groupmode;
-            $courseparams['groupmodeforce'] = 1; // Force the group mode.
         }
         $course = $generator->create_course($courseparams);
         foreach (['s1' => 'student', 's2' => 'student', 't1' => 'teacher', 't2' => 'teacher'] as $username => $role) {
@@ -164,10 +141,15 @@ final class overview_test extends \advanced_testcase {
             groups_add_member($groups[1], $users['s2']->id);
             groups_add_member($groups[0], $users['t1']->id);
         }
-        $instance = $generator->create_module('wiki', [
-            'course' => $course,
-            'wikimode' => $mode,
-        ]);
+        $instance = $generator->create_module(
+            'wiki',
+            [
+                'course' => $course,
+                'wikimode' => $mode,
+                'groupmode' => $groupmode,
+                'firstpagetitle' => 'Wiki first page title',
+            ],
+        );
 
         $wikigenerator = $generator->get_plugin_generator('mod_wiki');
 
@@ -178,22 +160,30 @@ final class overview_test extends \advanced_testcase {
             $this->setUser($user->id);
             $groups = groups_get_my_groups();
             foreach ($groups as $group) {
+                $authorid = ($mode === wiki_mode::INDIVIDUAL->value) ? $user->id : 0;
+
                 // Ensure the user is in the group.
-                $pages[] = $wikigenerator->create_first_page($instance, [
-                    'wikiid' => $instance->id,
-                    'userid' => $user->id,
-                    'group' => $group->id,
-                    'content' => "Wiki first page content  for $username",
-                    'title' => "Wiki first page title  for $username",
-                ]);
+                $pages[] = $wikigenerator->create_first_page(
+                    $instance,
+                    [
+                        'wikiid' => $instance->id,
+                        'userid' => $authorid,
+                        'group' => $group->id,
+                        'content' => "Wiki first page content for $username",
+                        'title' => "Wiki first page title",
+                    ],
+                );
             }
             if (empty($groups)) {
-                $pages[] = $wikigenerator->create_page($instance, [
-                    'wikiid' => $instance->id,
-                    'userid' => $user->id,
-                    'content' => "Wiki first page content  for $username",
-                    'title' => "Wiki first page title  for $username",
-                ]);
+                $pages[] = $wikigenerator->create_page(
+                    $instance,
+                    [
+                        'wikiid' => $instance->id,
+                        'userid' => $user->id,
+                        'content' => "Wiki first page content for $username",
+                        'title' => "Wiki first page title",
+                    ],
+                );
             }
         }
         return [
@@ -206,11 +196,44 @@ final class overview_test extends \advanced_testcase {
     }
 
     /**
-     * Data provider for get_actions_overview.
+     * Test get_extra_entries method.
+     *
+     * @param string $username
+     * @param int $coursegroupmode
+     * @param int $expectedcount
+     *
+     * @covers ::get_extra_entries
+     * @dataProvider data_provider_get_extra_entries
+     */
+    public function test_get_extra_entries(
+        string $username,
+        int $coursegroupmode,
+        int $expectedcount
+    ): void {
+        $this->resetAfterTest();
+        [
+            'users' => $users,
+            'instance' => $instance,
+            'course' => $course
+        ] = $this->setup_users_and_activity($coursegroupmode);
+
+        $cm = get_fast_modinfo($course)->get_cm($instance->cmid);
+        $this->setUser($users[$username]->id);
+
+        $overview = overviewfactory::create($cm);
+        $reflection = new ReflectionClass($overview);
+        $method = $reflection->getMethod('get_extra_entries');
+        $item = $method->invoke($overview);
+
+        $this->assertEquals($expectedcount, $item->get_value());
+    }
+
+    /**
+     * Data provider for get_extra_entries.
      *
      * @return array
      */
-    public static function data_provider_get_actions_overview(): array {
+    public static function data_provider_get_extra_entries(): array {
         return [
             'teacher 1 (no group mode)' => ['t1', NOGROUPS, 2],
             'teacher 1 (separate group mode)' => ['t1', SEPARATEGROUPS, 1], // Teacher 1 belongs to group 1, so should see s1.
@@ -220,5 +243,45 @@ final class overview_test extends \advanced_testcase {
             'teacher 2 (separate group mode)' => ['t2', SEPARATEGROUPS, 0], // Teacher 2 does not belong to any group.
             'teacher 2 (visible group mode)' => ['t2', VISIBLEGROUPS, 2],
         ];
+    }
+
+    /**
+     * Test get_extra_entries method.
+     *
+     * @covers ::get_actions_overview
+     */
+    public function test_get_actions_overview(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        [
+            'users' => $users,
+            'instance' => $instance,
+            'course' => $course
+        ] = $this->setup_users_and_activity(SEPARATEGROUPS);
+
+        $notinitinstance = $this->getDataGenerator()->create_module(
+            'wiki',
+            [
+                'course' => $course,
+                'wikimode' => wiki_mode::INDIVIDUAL->value,
+            ]
+        );
+
+        $this->setUser($users['s1']->id);
+
+        $cm = get_fast_modinfo($course)->get_cm($instance->cmid);
+        $emptycm = get_fast_modinfo($course)->get_cm($notinitinstance->cmid);
+
+        $overview = overviewfactory::create($cm);
+        $item = $overview->get_actions_overview();
+
+        $this->assertNotNull($item);
+
+        $overview = overviewfactory::create($emptycm);
+        $item = $overview->get_actions_overview();
+
+        $this->assertNull($item);
     }
 }
