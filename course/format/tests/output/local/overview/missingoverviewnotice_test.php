@@ -87,4 +87,42 @@ final class missingoverviewnotice_test extends \advanced_testcase {
             'workshop' => ['modname' => 'workshop', 'expectempty' => true],
         ];
     }
+
+    /**
+     * Test the export_for_external returns the right structure.
+     *
+     * @dataProvider overview_integrations_provider
+     * @param string $modname
+     * @param bool $expectempty
+     * @covers ::export_for_external
+     */
+    public function test_export_for_external(
+        string $modname,
+        bool $expectempty,
+    ): void {
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+
+        $renderer = \core\di::get(\core\output\renderer_helper::class)->get_core_renderer();
+
+        $missingoverviewnotice = new missingoverviewnotice($course, $modname);
+
+        $data = $missingoverviewnotice->export_for_external($renderer);
+
+        $this->assertObjectHasProperty('courseid', $data);
+        $this->assertObjectHasProperty('modname', $data);
+        $this->assertObjectHasProperty('hasintegration', $data);
+        $this->assertCount(3, get_object_vars($data));
+
+        $expected = [
+            'courseid' => $course->id,
+            'modname' => $modname,
+            'hasintegration' => $expectempty,
+        ];
+
+        foreach ($expected as $property => $value) {
+            $this->assertEquals($value, $data->$property, "Property '$property' does not match expected value.");
+        }
+    }
 }

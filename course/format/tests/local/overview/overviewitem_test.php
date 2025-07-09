@@ -17,6 +17,7 @@
 namespace core_courseformat\local\overview;
 
 use core\output\local\properties\text_align;
+use core_reportbuilder\external\filters\set;
 
 /**
  * Tests for overviewitem.
@@ -46,8 +47,12 @@ final class overviewitem_test extends \advanced_testcase {
         $textalign = text_align::CENTER;
         $alertcount = 1;
         $alertlabel = 'Alert label';
+        $extradata = (object)[
+            'key1' => 'value1',
+            'key2' => 'value2',
+        ];
 
-        $item = new overviewitem($name, $value, $content, $textalign, $alertcount, $alertlabel);
+        $item = new overviewitem($name, $value, $content, $textalign, $alertcount, $alertlabel, $extradata);
 
         $this->assertEquals($name, $item->get_name());
         $this->assertEquals($value, $item->get_value());
@@ -55,6 +60,8 @@ final class overviewitem_test extends \advanced_testcase {
         $this->assertEquals($textalign, $item->get_text_align());
         $this->assertEquals($alertcount, $item->get_alert_count());
         $this->assertEquals($alertlabel, $item->get_alert_label());
+        $this->assertNull($item->get_key()); // Key is null by default.
+        $this->assertEquals($extradata, $item->get_extra_data());
     }
 
     /**
@@ -89,12 +96,19 @@ final class overviewitem_test extends \advanced_testcase {
         $textalign = text_align::END;
         $alertcount = 2;
         $alertlabel = 'New alert label';
+        $key = 'newkey';
+        $extradata = (object)[
+            'key1' => 'value1',
+            'key2' => 'value2',
+        ];
 
         $item->set_name($name)
             ->set_value($value)
             ->set_content($content)
             ->set_text_align($textalign)
-            ->set_alert($alertcount, $alertlabel);
+            ->set_alert($alertcount, $alertlabel)
+            ->set_key($key)
+            ->set_extra_data($extradata);
 
         $this->assertEquals($name, $item->get_name());
         $this->assertEquals($value, $item->get_value());
@@ -102,5 +116,56 @@ final class overviewitem_test extends \advanced_testcase {
         $this->assertEquals($textalign, $item->get_text_align());
         $this->assertEquals($alertcount, $item->get_alert_count());
         $this->assertEquals($alertlabel, $item->get_alert_label());
+        $this->assertEquals($key, $item->get_key());
+        $this->assertEquals($extradata, $item->get_extra_data());
+    }
+
+    /**
+     * Test the export_for_external returns the right structure.
+     *
+     * @covers ::export_for_external
+     */
+    public function test_export_for_external(): void {
+        $name = 'Activity name';
+        $value = 1;
+        $content = 'Activity content';
+        $textalign = text_align::CENTER;
+        $alertcount = 1;
+        $alertlabel = 'Alert label';
+        $key = 'newkey';
+        $extradata = (object) [
+            'key1' => 'value1',
+            'key2' => 'value2',
+        ];
+
+        $item = new overviewitem($name, $value, $content, $textalign, $alertcount, $alertlabel, $extradata);
+        $item->set_key($key);
+
+        $renderer = \core\di::get(\core\output\renderer_helper::class)->get_core_renderer();
+
+        $data = $item->export_for_external($renderer);
+
+        $this->assertObjectHasProperty('name', $data);
+        $this->assertObjectHasProperty('key', $data);
+        $this->assertObjectHasProperty('contenttype', $data);
+        $this->assertObjectHasProperty('alertlabel', $data);
+        $this->assertObjectHasProperty('alertcount', $data);
+        $this->assertObjectHasProperty('contentdata', $data);
+        $this->assertObjectHasProperty('extradata', $data);
+        $this->assertCount(7, get_object_vars($data));
+
+        $this->assertObjectHasProperty('value', $data->contentdata);
+        $this->assertObjectHasProperty('datatype', $data->contentdata);
+        $this->assertCount(2, get_object_vars($data->contentdata));
+
+        $this->assertEquals($name, $data->name);
+        $this->assertEquals($key, $data->key);
+        $this->assertEquals('basic', $data->contenttype);
+        $this->assertEquals($alertcount, $data->alertcount);
+        $this->assertEquals($alertlabel, $data->alertlabel);
+        $this->assertEquals($extradata, $data->extradata);
+
+        $this->assertEquals($value, $data->contentdata->value);
+        $this->assertEquals(gettype($value), $data->contentdata->datatype);
     }
 }

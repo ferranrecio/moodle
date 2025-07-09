@@ -16,12 +16,14 @@
 
 namespace core_courseformat\output\local\overview;
 
+use core\output\externable;
 use core\output\named_templatable;
 use core\output\renderable;
 use core\output\renderer_base;
 use core\plugin_manager;
 use core_courseformat\local\overview\overviewitem;
 use core_courseformat\local\overview\overviewfactory;
+use core_courseformat\output\local\overview\missingoverviewnotice;
 use cm_info;
 use stdClass;
 
@@ -32,7 +34,7 @@ use stdClass;
  * @copyright  2025 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class overviewtable implements renderable, named_templatable {
+class overviewtable implements renderable, named_templatable, externable {
     /** @var array $header the table headers */
     private array $headers = [];
 
@@ -140,6 +142,7 @@ class overviewtable implements renderable, named_templatable {
             }
             $result[] = [
                 'cmid' => $cm->id,
+                'cm' => $cm,
                 'overviews' => $this->load_overview_items_from_activity($output, $cm),
             ];
         }
@@ -252,6 +255,7 @@ class overviewtable implements renderable, named_templatable {
 
         $result = [];
         foreach ($row as $key => $item) {
+            $item->set_key($key);
             $result[$key] = $item;
         }
         return $result;
@@ -275,6 +279,74 @@ class overviewtable implements renderable, named_templatable {
             }
             $this->columnhascontent[$key] = $this->columnhascontent[$key] || $item->get_value() !== null;
         }
+    }
+
+    #[\Override]
+    public function export_for_external(renderer_base $output): stdClass {
+        $activities = $this->load_all_overviews_from_each_activity($output);
+
+        // External webservices need to know when the activity has an integration or not.
+        // In web UI this is loaded via fragment and it is not part of the table output.
+        $missingnotive = new missingoverviewnotice(
+            course: $this->course,
+            modname: $this->modname,
+        );
+        $missingdata = $missingnotive->export_for_external($output);
+
+        $result = (object) [
+            'caption' => $this->get_table_caption(),
+            'headers' => $this->export_headers(),
+            'courseid' => $this->course->id,
+            'hasintegration' => $missingdata?->hasintegration ?? false,
+            'overviews' => $this->export_activities_for_external($output, $activities),
+        ];
+        return $result;
+    }
+
+    /**
+     * Exports the activities for external use.
+     *
+     * @param renderer_base $output
+     * @param array $activities An array of activities, each containing a 'cm' and 'overviews'.
+     * @return array An array of activities ready for external export.
+     */
+    private function export_activities_for_external(
+        renderer_base $output,
+        array $activities,
+    ): array {
+        $result = [];
+        foreach ($activities as $activity) {
+            /** @var cm_info $cm */
+            $cm = $activity['cm'];
+            $result[] = (object) [
+                'cmid' => $cm->id,
+                'contextid' => $cm->context->id,
+                'modname' => $cm->modname,
+                'name' => $cm->name,
+                'url' => $cm->url->out(false),
+                'haserror' => false, // Error will be implemented in MDL-85852.
+                'items' => $this->export_items_for_external($output, $activity['overviews']),
+            ];
+        }
+        return $result;
+    }
+
+    /**
+     * Exports the overviews for external use.
+     *
+     * @param renderer_base $output
+     * @param overviewitem[] $overviews An array of overview items.
+     * @return array An array of overviews ready for external export.
+     */
+    private function export_items_for_external(renderer_base $output, array $overviews): array {
+        $result = [];
+        foreach ($overviews as $key => $overview) {
+            if (!$this->columnhascontent[$key]) {
+                continue;
+            }
+            $result[] = $overview->export_for_external($output);
+        }
+        return $result;
     }
 
     /**

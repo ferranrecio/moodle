@@ -17,6 +17,7 @@
 namespace core_courseformat\output\local\overview;
 
 use core\output\action_link;
+use core\output\externable;
 use core\output\named_templatable;
 use core\output\renderable;
 use core\output\notification;
@@ -31,7 +32,7 @@ use stdClass;
  * @copyright  2025 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class missingoverviewnotice implements renderable, named_templatable {
+class missingoverviewnotice implements renderable, named_templatable, externable {
     /**
      * Constructor.
      *
@@ -109,5 +110,14 @@ class missingoverviewnotice implements renderable, named_templatable {
     #[\Override]
     public function get_template_name(\renderer_base $renderer): string {
         return 'core_courseformat/local/overview/missingoverviewnotice';
+    }
+
+    #[\Override]
+    public function export_for_external(\renderer_base $output): stdClass {
+        return (object) [
+            'courseid' => $this->course->id,
+            'modname' => $this->modname,
+            'hasintegration' => $this->activity_has_overview_integration($this->modname),
+        ];
     }
 }
