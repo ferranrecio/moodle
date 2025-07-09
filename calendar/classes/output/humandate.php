@@ -19,6 +19,7 @@ namespace core_calendar\output;
 use DateInterval;
 use DateTimeInterface;
 use DateTimeImmutable;
+use core\output\externable;
 use core\output\pix_icon;
 use core\output\templatable;
 use core\output\renderable;
@@ -39,7 +40,7 @@ use core\url;
  * @copyright  2024 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class humandate implements renderable, templatable {
+class humandate implements renderable, templatable, externable {
 
     /** @var int|null The number of seconds within which a date is considered near. 1 day by default. */
     protected ?int $near = DAYSECS;
@@ -224,6 +225,34 @@ class humandate implements renderable, templatable {
             $data['nearicon'] = $icon->export_for_template($output);
         }
         return $data;
+    }
+
+    #[\Override]
+    public function export_for_external(renderer_base $output): \stdClass {
+        $tempatedata = $this->export_for_template($output);
+
+        $icondata = null;
+        if ($this->is_near()) {
+            $icon = new pix_icon(
+                pix: 'i/warning',
+                alt: get_string('warning'),
+                component: 'moodle',
+                attributes: ['class' => 'me-0 pb-1']
+            );
+            $icondata = $icon->export_for_external($output);
+        }
+
+        return (object) [
+            'timestamp' => $tempatedata['timestamp'],
+            'userdate' => $tempatedata['userdate'],
+            'date' => $tempatedata['date'],
+            'time' => $tempatedata['time'],
+            'needtitle' => $tempatedata['needtitle'],
+            'link' => $tempatedata['link'],
+            'ispast' => $tempatedata['ispast'],
+            'isnear' => $tempatedata['isnear'] ?? false,
+            'nearicon' => $icondata,
+        ];
     }
 
     /**

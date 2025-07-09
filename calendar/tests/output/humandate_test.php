@@ -252,4 +252,85 @@ final class humandate_test extends \advanced_testcase {
             $this->assertStringNotContainsString('Tomorrow', $actual['date']);
         }
     }
+
+    /**
+     * Test test_export_for_external() method.
+     *
+     * @dataProvider provider_export_for_template
+     * @param int $addseconds The number of seconds to add to the current time.
+     * @param bool $userelatives Whether to use relative dates.
+     * @param string|null $date For relative dates, the expected string (Tomorrow, Today, Yesterday).
+     * @param bool $ispast Whether the date is in the past.
+     * @param bool $needtitle Whether the date needs a title.
+     * @param bool $isnear Whether the date is near.
+     * @param string $userdateformat The user date expected format.
+     */
+    public function test_export_for_external(
+        int $addseconds,
+        bool $userelatives,
+        ?string $date,
+        bool $ispast,
+        bool $needtitle,
+        bool $isnear,
+        string $userdateformat,
+    ): void {
+        global $PAGE;
+
+        $this->resetAfterTest();
+
+        // 26 February 2025 15:59:59 (GMT).
+        $clock = $this->mock_clock_with_frozen(1740585599);
+        $renderer = $PAGE->get_renderer('core');
+
+        $icondata = null;
+        if ($isnear) {
+            $icon = new \core\output\pix_icon(
+                pix: 'i/warning',
+                alt: get_string('warning'),
+                component: 'moodle',
+                attributes: ['class' => 'me-0 pb-1']
+            );
+            $icondata = $icon->export_for_external($renderer);
+        }
+
+        $timestamp = $clock->time() + $addseconds;
+
+        $humandate = humandate::create_from_timestamp($timestamp);
+        $humandate->set_use_relatives($userelatives);
+        $data = $humandate->export_for_external($renderer);
+
+        $this->assertObjectHasProperty('timestamp', $data);
+        $this->assertObjectHasProperty('userdate', $data);
+        $this->assertObjectHasProperty('date', $data);
+        $this->assertObjectHasProperty('time', $data);
+        $this->assertObjectHasProperty('needtitle', $data);
+        $this->assertObjectHasProperty('link', $data);
+        $this->assertObjectHasProperty('ispast', $data);
+        $this->assertObjectHasProperty('isnear', $data);
+        $this->assertObjectHasProperty('nearicon', $data);
+        $this->assertCount(9, get_object_vars($data));
+
+        $formatmethod = new \ReflectionMethod(humandate::class, 'format_time');
+        $formatmethod->setAccessible(true);
+
+        $expected = [
+            'timestamp' => $timestamp,
+            'userdate' => userdate($timestamp, get_string($userdateformat)),
+            'time' => $formatmethod->invoke($humandate),
+            'needtitle' => $needtitle,
+            'link' => '',
+            'ispast' => $ispast,
+            'isnear' => $isnear,
+            'nearicon' => $icondata,
+        ];
+        foreach ($expected as $key => $value) {
+            $this->assertEquals($value, $data->$key);
+        }
+
+        if ($userelatives) {
+            $this->assertStringContainsString($date, $data->date);
+        } else {
+            $this->assertStringContainsString($expected['userdate'], $data->date);
+        }
+    }
 }

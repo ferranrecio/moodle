@@ -19,9 +19,10 @@ namespace core_courseformat\output\local\content\cm;
 use cm_info;
 use core_course\output\activity_completion;
 use section_info;
-use renderable;
 use stdClass;
+use core\output\externable;
 use core\output\named_templatable;
+use core\output\renderable;
 use core\output\local\dropdown\dialog as dropdown_dialog;
 use core_completion\cm_completion_details;
 use core_courseformat\base as course_format;
@@ -34,7 +35,7 @@ use core_courseformat\output\local\courseformat_named_templatable;
  * @copyright 2023 Mikel Martin <mikel@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class completion implements named_templatable, renderable {
+class completion implements named_templatable, renderable, externable {
 
     use courseformat_named_templatable;
 
@@ -100,6 +101,19 @@ class completion implements named_templatable, renderable {
         }
 
         return $completiondata;
+    }
+
+    #[\Override]
+    public function export_for_external(\renderer_base $output): stdClass {
+        global $USER;
+        // In this case, the exporter provides all the necessary data for the completion dialog
+        // any APP will need about completion information for this activity.
+        $exporter = new \core_completion\external\completion_info_exporter(
+            $this->format->get_course(),
+            $this->mod,
+            $USER->id,
+        );
+        return $exporter->export($output);
     }
 
     /**

@@ -29,14 +29,14 @@ use stdClass;
  * @package core
  * @category output
  */
-class action_link implements renderable {
+class action_link implements renderable, externable {
     /**
      * @var moodle_url Href url
      */
     public $url;
 
     /**
-     * @var string Link text HTML fragment
+     * @var string|renderable Link text HTML fragment
      */
     public $text;
 
@@ -58,7 +58,7 @@ class action_link implements renderable {
     /**
      * Constructor
      * @param moodle_url $url
-     * @param string $text HTML fragment
+     * @param string|renderable $text HTML fragment
      * @param null|component_action $action
      * @param null|array $attributes associative array of html link attributes + disabled
      * @param null|pix_icon $icon optional pix_icon to render with the link text
@@ -159,6 +159,27 @@ class action_link implements renderable {
         $data->hasactions = !empty($this->actions);
 
         return $data;
+    }
+
+    #[\Override]
+    public function export_for_external(renderer_base $output): stdClass {
+        $templatgedata = $this->export_for_template($output);
+        // Mirar si text es un exportable i fer export for external i afegir type.
+        if ($this->text instanceof externable) {
+            $textype = $this->text::class;
+            $textdata = $this->text->export_for_external($output);
+        } else {
+            $textype = 'string';
+            $textdata = null;
+        }
+        return (object) [
+            'url' => $templatgedata->url,
+            'text' => $templatgedata->text,
+            'icon' => $this->icon ? $this->icon->export_for_external($output) : null,
+            'classes' => $templatgedata->classes,
+            'texttype' => $textype,
+            'textdata' => $textdata,
+        ];
     }
 }
 

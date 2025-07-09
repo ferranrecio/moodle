@@ -17,6 +17,7 @@
 namespace core_courseformat\output\local\overview;
 
 use cm_info;
+use core\output\externable;
 use core\output\named_templatable;
 use core\output\renderable;
 use core\output\renderer_base;
@@ -30,7 +31,7 @@ use stdClass;
  * @copyright  2025 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class activityname implements renderable, named_templatable {
+class activityname implements renderable, named_templatable, externable {
     /**
      * Constructor.
      *
@@ -64,6 +65,19 @@ class activityname implements renderable, named_templatable {
             $result->sectiontitle = $format->get_section_name($section);
         }
         return $result;
+    }
+
+    #[\Override]
+    public function export_for_external(renderer_base $output): stdClass {
+        $templatedata = $this->export_for_template($output);
+        return (object) [
+            'activityname' => $templatedata->activityname,
+            'activityurl' => $templatedata->activityurl ? $templatedata->activityurl->out(false) : null,
+            'hidden' => $templatedata->hidden,
+            'stealth' => $templatedata->stealth,
+            'sectiontitle' => $templatedata->sectiontitle ?? null,
+            'nogrouperror' => false, // No group error will be implemented in MDL-85852.
+        ];
     }
 
     /**

@@ -1,0 +1,76 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+namespace core_courseformat\output\local\overview;
+
+/**
+ * Tests for courseformat
+ *
+ * @package    core_courseformat
+ * @category   test
+ * @copyright  2025 Ferran Recio <ferran@moodle.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers     \core_courseformat\output\local\overview\activityname
+ */
+final class activityname_test extends \advanced_testcase {
+    /**
+     * Test the export_for_external returns the right structure.
+     *
+     * @covers ::export_for_external
+     */
+    public function test_export_for_external(): void {
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+
+        $user = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($user->id, $course->id, 'editingteacher');
+
+        $mod = $this->getDataGenerator()->create_module('assign', ['course' => $course->id]);
+        $modinfo = get_fast_modinfo($course);
+        $cm = $modinfo->get_cm($mod->cmid);
+
+        $this->setUser($user);
+
+        $format = course_get_format($course);
+        $renderer = \core\di::get(\core\output\renderer_helper::class)->get_core_renderer();
+
+        $overviewtable = new activityname($cm);
+
+        $data = $overviewtable->export_for_external($renderer);
+
+        $this->assertObjectHasProperty('activityname', $data);
+        $this->assertObjectHasProperty('activityurl', $data);
+        $this->assertObjectHasProperty('hidden', $data);
+        $this->assertObjectHasProperty('stealth', $data);
+        $this->assertObjectHasProperty('sectiontitle', $data);
+        $this->assertObjectHasProperty('nogrouperror', $data);
+        $this->assertCount(6, get_object_vars($data));
+
+        $expected = [
+            'activityname' => \core_external\util::format_string($cm->name, $cm->context, true),
+            'activityurl' => $cm->url->out(false),
+            'hidden' => empty($cm->visible),
+            'stealth' => $cm->is_stealth(),
+            'sectiontitle' => $format->get_section_name($cm->get_section_info()),
+            'nogrouperror' => false, // No group error will be implemented in MDL-85852.
+        ];
+
+        foreach ($expected as $property => $value) {
+            $this->assertEquals($value, $data->$property, "Property '$property' does not match expected value.");
+        }
+    }
+}

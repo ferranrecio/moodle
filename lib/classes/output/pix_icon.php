@@ -25,7 +25,7 @@ namespace core\output;
  * @package core
  * @category output
  */
-class pix_icon implements renderable, templatable {
+class pix_icon implements renderable, templatable, externable {
     /**
      * @var string The icon name
      */
@@ -127,6 +127,15 @@ class pix_icon implements renderable, templatable {
         ];
 
         return $data;
+    }
+
+    #[\Override]
+    public function export_for_external(renderer_base $output): \stdClass {
+        return (object) [
+            'key' => $this->pix,
+            'component' => $this->component,
+            'attributes' => $this->attributes,
+        ];
     }
 
     /**
