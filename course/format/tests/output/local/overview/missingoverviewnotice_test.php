@@ -79,7 +79,7 @@ final class missingoverviewnotice_test extends \advanced_testcase {
             'lti' => ['modname' => 'lti', 'expectempty' => false],
             'page' => ['modname' => 'page', 'expectempty' => false],
             'qbank' => ['modname' => 'qbank', 'expectempty' => false],
-            'quiz' => ['modname' => 'quiz', 'expectempty' => false],
+            'quiz' => ['modname' => 'quiz', 'expectempty' => true],
             'resource' => ['modname' => 'resource', 'expectempty' => true],
             'scorm' => ['modname' => 'scorm', 'expectempty' => false],
             'url' => ['modname' => 'url', 'expectempty' => false],

@@ -133,7 +133,7 @@ final class overviewfactory_test extends \advanced_testcase {
             ],
             'quiz' => [
                 'resourcetype' => 'quiz',
-                'expected' => resourceoverview::class,
+                'expected' => \mod_quiz\courseformat\overview::class,
             ],
             'scorm' => [
                 'resourcetype' => 'scorm',
