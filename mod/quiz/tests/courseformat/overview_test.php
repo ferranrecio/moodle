@@ -44,30 +44,30 @@ final class overview_test extends \advanced_testcase {
         $cm = get_coursemodule_from_instance('quiz', $quiz->id);
 
         // Add a question to the quiz.
-        $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
+        $questiongenerator = $generator->get_plugin_generator('core_question');
         $cat = $questiongenerator->create_question_category();
         $question = $questiongenerator->create_question('numerical', null, ['category' => $cat->id]);
         quiz_add_quiz_question($question->id, $quiz);
 
         // Create users and groups.
-        $groups = [];
-        $user = [];
-        $groups['g1'] = $generator->create_group(['courseid' => $course->id, 'name' => 'g1']);
-        $groups['g2'] = $generator->create_group(['courseid' => $course->id, 'name' => 'g2']);
+        $groups = [
+            'g1' => $generator->create_group(['courseid' => $course->id, 'name' => 'g1']),
+            'g2' => $generator->create_group(['courseid' => $course->id, 'name' => 'g2']),
+        ];
+        $users = [];
         $attempts = [];
-        foreach ($data as $username => $userdata) {
-            [$role, $group, $attemptsnum] = $userdata;
-            $user[$username] = $generator->create_and_enrol($course, $role, ['username' => $username]);
+        foreach ($data as $username => [$role, $group, $attemptsnum]) {
+            $users[$username] = $generator->create_and_enrol($course, $role, ['username' => $username]);
             if ($group) {
-                $generator->create_group_member(['userid' => $user[$username]->id, 'groupid' => $groups[$group]->id]);
+                $generator->create_group_member(['userid' => $users[$username]->id, 'groupid' => $groups[$group]->id]);
             }
             if ($attemptsnum) {
                 // Create attempts for the user.
                 for ($acount = 1; $acount <= $attemptsnum; $acount++) {
-                    $quizobj = quiz_settings::create($quiz->id, $user[$username]->id);
+                    $quizobj = quiz_settings::create($quiz->id, $users[$username]->id);
                     // Create an attempt for the student in the quiz.
                     $timenow = time();
-                    $attempt = quiz_create_attempt($quizobj, $acount, false, $timenow, false, $user[$username]->id);
+                    $attempt = quiz_create_attempt($quizobj, $acount, false, $timenow, false, $users[$username]->id);
                     $quba = \question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
                     $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
                     quiz_start_new_attempt($quizobj, $quba, $attempt, 1, $timenow);
@@ -81,7 +81,7 @@ final class overview_test extends \advanced_testcase {
             }
         }
         return [
-            'users' => $user,
+            'users' => $users,
             'groups' => $groups,
             'quiz' => $quiz,
             'cm' => $cm,
@@ -276,9 +276,6 @@ final class overview_test extends \advanced_testcase {
         string $currentuser,
         ?string $expected
     ): void {
-        $this->resetAfterTest();
-        $this->setAdminUser();
-
         $this->resetAfterTest();
         $this->setAdminUser();
 

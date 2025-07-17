@@ -46,14 +46,11 @@ class overview extends \core_courseformat\activityoverviewbase {
      *
      * @param cm_info $cm the course module instance.
      * @param renderer_helper $rendererhelper the renderer helper.
-     * @param \core_string_manager $stringmanager
      */
     public function __construct(
         cm_info $cm,
         /** @var renderer_helper $rendererhelper the renderer helper */
         protected readonly renderer_helper $rendererhelper,
-        /** @var \core_string_manager $stringmanager the string manager */
-        protected readonly \core_string_manager $stringmanager,
     ) {
         parent::__construct($cm);
         $this->quizsettings = quiz_settings::create_for_cmid($cm->id);
@@ -65,7 +62,7 @@ class overview extends \core_courseformat\activityoverviewbase {
 
         $dates = new dates($this->cm, $USER->id);
         $duedate = $dates->get_due_date();
-        $name = $this->stringmanager->get_string('duedate', 'quiz');
+        $name = get_string('duedate', 'quiz');
 
         if (empty($duedate)) {
             return new overviewitem(
@@ -87,19 +84,18 @@ class overview extends \core_courseformat\activityoverviewbase {
     #[\Override]
     public function get_actions_overview(): ?overviewitem {
         if (!has_capability('mod/quiz:viewreports', $this->cm->context)) {
-            return null; // If the user cannot manage the quiz, we don't show the quiz type.
+            return null;
         }
-        $text = $this->stringmanager->get_string('view');
         $content = new action_link(
             url: new url(
                 '/mod/quiz/report.php',
                 ['id' => $this->cm->id, 'mode' => 'responses'],
             ),
-            text: $text,
+            text: get_string('view'),
             attributes: ['class' => button::SECONDARY_OUTLINE->classes()],
         );
         return new overviewitem(
-            name: $this->stringmanager->get_string('actions'),
+            name: get_string('actions'),
             value: '',
             content: $content,
             textalign: text_align::CENTER,
@@ -108,23 +104,25 @@ class overview extends \core_courseformat\activityoverviewbase {
 
     #[\Override]
     public function get_extra_overview_items(): array {
-        if (has_capability('mod/quiz:viewreports', $this->cm->context)) {
-            return [
-                'studentswhoattempted' => $this->get_students_who_attempted_overview(),
-                'totalattempts' => $this->get_total_attempts_overview(),
-            ];
-        }
-        return [];
+        global $CFG;
+        // Some extra items require global quiz functions.
+        require_once($CFG->dirroot . '/mod/quiz/lib.php');
+
+        return [
+            'studentswhoattempted' => $this->get_extra_students_who_attempted_overview(),
+            'totalattempts' => $this->get_extra_total_attempts_overview(),
+        ];
     }
 
     /**
      * Get the "Students who attempted" item.
      *
-     * @return overviewitem The overview item.
+     * @return overviewitem|null The overview item.
      */
-    private function get_students_who_attempted_overview(): overviewitem {
-        global $CFG;
-        require_once($CFG->dirroot . '/mod/quiz/lib.php');
+    private function get_extra_students_who_attempted_overview(): ?overviewitem {
+        if (!has_capability('mod/quiz:viewreports', $this->cm->context)) {
+            return null;
+        }
         $numstudentattempted = quiz_num_users_who_attempted(
             $this->quizsettings->get_quiz()->id,
             $this->cm->id
@@ -132,14 +130,14 @@ class overview extends \core_courseformat\activityoverviewbase {
         $numstudentwhocanattempt = quiz_num_users_who_can_attempt(
             $this->cm->id
         );
-        $studentattemptedvalue = $this->stringmanager->get_string(
+        $studentattemptedvalue = get_string(
             'count_of_total',
             'core',
             ['count' => $numstudentattempted, 'total' => $numstudentwhocanattempt]
         );
-        // Add total entries.
+
         return new overviewitem(
-            name: $this->stringmanager->get_string('studentswhoattempted', 'mod_quiz'),
+            name: get_string('studentswhoattempted', 'mod_quiz'),
             value: html_to_text($studentattemptedvalue),
             content: $studentattemptedvalue,
             textalign: text_align::CENTER,
@@ -149,24 +147,32 @@ class overview extends \core_courseformat\activityoverviewbase {
     /**
      * Get the "Total attempts" item.
      *
-     * @return overviewitem The overview item.
+     * @return overviewitem|null The overview item.
      */
-    private function get_total_attempts_overview(): overviewitem {
-        $numattempts = quiz_num_attempts($this->quizsettings->get_quiz(), $this->cm->get_course_module_record());
+    private function get_extra_total_attempts_overview(): ?overviewitem {
+        if (!has_capability('mod/quiz:viewreports', $this->cm->context)) {
+            return null;
+        }
+        $numattempts = quiz_num_attempts(
+            $this->quizsettings->get_quiz(),
+            $this->cm->get_course_module_record(),
+        );
 
         $overviewdialog = new overviewdialog(
             buttoncontent:  $numattempts->total,
-            description: $this->stringmanager->get_string('totalattempts', 'mod_quiz'),
+            description: get_string('totalattempts', 'mod_quiz'),
             definition: ['buttonclasses' => button::SECONDARY_OUTLINE->classes() . ' dropdown-toggle'],
         );
+
         $allowedattempts = $this->quizsettings->get_quiz()->attempts;
         if ($allowedattempts == 0) {
-            $allowedattempts = $this->stringmanager->get_string('attemptsunlimited', 'mod_quiz');
+            $allowedattempts = get_string('attemptsunlimited', 'mod_quiz');
         }
         $overviewdialog->add_item(
-            $this->stringmanager->get_string('allowedattemptsperstudent', 'mod_quiz'),
+            get_string('allowedattemptsperstudent', 'mod_quiz'),
             $allowedattempts,
         );
+
         $numstudentattempted = quiz_num_users_who_attempted(
             $this->quizsettings->get_quiz()->id,
             $this->cm->id,
@@ -176,13 +182,13 @@ class overview extends \core_courseformat\activityoverviewbase {
         );
         if ($numstudentwhocanattempt > 0 && $numstudentattempted > 0) {
             $overviewdialog->add_item(
-                $this->stringmanager->get_string('averageattemptsperstudent', 'mod_quiz'),
+                get_string('averageattemptsperstudent', 'mod_quiz'),
                 round($numstudentattempted / $numstudentwhocanattempt)
             );
         }
-        // Add total entries.
+
         return new overviewitem(
-            name: $this->stringmanager->get_string('totalattempts', 'mod_quiz'),
+            name: get_string('totalattempts', 'mod_quiz'),
             value: $numattempts->total,
             content: $overviewdialog,
             textalign: text_align::CENTER,

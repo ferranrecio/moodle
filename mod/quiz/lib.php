@@ -1584,8 +1584,7 @@ function quiz_num_attempt_summary($quiz, $cm, $returnzero = false, $currentgroup
 }
 
 /**
- * Return a numerical summary of the number of attempts that have been made at a particular quiz,
- * Returns 0 if no attempts have been made yet.
+ * Return a numerical summary of the number of attempts that have been made at a particular quiz.
  *
  * @param stdClass $quiz
  * @param cm_info|stdClass $cm
@@ -1598,18 +1597,22 @@ function quiz_num_attempts(stdClass $quiz, cm_info|stdClass $cm, int $currentgro
     $numattempts->total = $DB->count_records('quiz_attempts', ['quiz' => $quiz->id, 'preview' => 0]);
     if ($numattempts->total) {
         if ($currentgroup) {
-            $numattempts->group = $DB->count_records_sql('SELECT COUNT(DISTINCT qa.id) FROM ' .
-                '{quiz_attempts} qa JOIN ' .
-                '{groups_members} gm ON qa.userid = gm.userid ' .
-                'WHERE quiz = ? AND preview = 0 AND groupid = ?',
-                [$quiz->id, $currentgroup]);
+            $numattempts->group = $DB->count_records_sql(
+                'SELECT COUNT(DISTINCT qa.id)
+                   FROM {quiz_attempts} qa
+                   JOIN {groups_members} gm ON qa.userid = gm.userid
+                  WHERE quiz = ? AND preview = 0 AND groupid = ?',
+                [$quiz->id, $currentgroup],
+            );
         } else if ($groups = groups_get_all_groups($cm->course, $USER->id, $cm->groupingid)) {
             [$usql, $params] = $DB->get_in_or_equal(array_keys($groups));
-            $numattempts->group = $DB->count_records_sql('SELECT COUNT(DISTINCT qa.id) FROM ' .
-                '{quiz_attempts} qa JOIN ' .
-                '{groups_members} gm ON qa.userid = gm.userid ' .
-                'WHERE quiz = ? AND preview = 0 AND ' .
-                "groupid $usql", array_merge([$quiz->id], $params));
+            $numattempts->group = $DB->count_records_sql(
+                'SELECT COUNT(DISTINCT qa.id)
+                   FROM {quiz_attempts} qa
+                   JOIN {groups_members} gm ON qa.userid = gm.userid
+                  WHERE quiz = ? AND preview = 0 AND groupid ' . $usql,
+                array_merge([$quiz->id], $params)
+            );
         }
     }
     return $numattempts;
@@ -1627,14 +1630,15 @@ function quiz_num_users_who_attempted(int $quizid, int $cmid): int {
     global $DB;
     $context = context_module::instance($cmid);
     $studentsjoins = get_enrolled_with_capabilities_join($context, '', ['mod/quiz:attempt', 'mod/quiz:reviewmyattempts']);
+
     $params = array_merge(['quiz' => $quizid, 'preview' => 0], $studentsjoins->params);
 
     return $DB->count_records_sql(
         "SELECT COUNT(DISTINCT u.id)
-            FROM {quiz_attempts} qa
-            LEFT JOIN {user} u ON qa.userid = u.id
-            $studentsjoins->joins
-            WHERE $studentsjoins->wheres AND qa.quiz = :quiz AND qa.preview = :preview",
+           FROM {quiz_attempts} qa
+           LEFT JOIN {user} u ON qa.userid = u.id
+                $studentsjoins->joins
+          WHERE $studentsjoins->wheres AND qa.quiz = :quiz AND qa.preview = :preview",
         $params,
     );
 }
@@ -1651,11 +1655,14 @@ function quiz_num_users_who_can_attempt(int $cmid): int {
     // Get the list of students who can attempt this quiz.
     $context = context_module::instance($cmid);
     $studentsjoins = get_enrolled_with_capabilities_join($context, '', ['mod/quiz:attempt', 'mod/quiz:reviewmyattempts']);
-    $sql = "SELECT COUNT(DISTINCT u.id)
-            FROM {user} u
-            $studentsjoins->joins
-            WHERE $studentsjoins->wheres";
-    return $DB->count_records_sql($sql, $studentsjoins->params);
+
+    return $DB->count_records_sql(
+        "SELECT COUNT(DISTINCT u.id)
+           FROM {user} u
+                $studentsjoins->joins
+          WHERE $studentsjoins->wheres",
+        $studentsjoins->params,
+    );
 }
 
 /**
