@@ -102,7 +102,7 @@ final class overview_test extends \advanced_testcase {
             $gradegrade->rawgrade = 77;
             $gradegrade->finalgrade = 77;
             $gradegrade->insert();
-            $expectedsubmissions = '77.00000';
+            $expectedsubmissions = '77.00';
         }
 
         $expectedassessments = '-';
@@ -118,7 +118,7 @@ final class overview_test extends \advanced_testcase {
             $gradegrade->rawgrade = 88;
             $gradegrade->finalgrade = 88;
             $gradegrade->insert();
-            $expectedassessments = '88.00000';
+            $expectedassessments = '88.00';
         }
 
         $currentuser = ($user == 'teacher') ? $teacher : $student;

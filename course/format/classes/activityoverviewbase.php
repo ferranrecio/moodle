@@ -231,7 +231,7 @@ abstract class activityoverviewbase {
 
             $result[] = new overviewitem(
                 name: $itemnames[$item->id],
-                value: $gradegrade->finalgrade,
+                value: grade_format_gradevalue($gradegrade->finalgrade, $item),
                 content: grade_format_gradevalue($gradegrade->finalgrade, $item),
             );
         }
