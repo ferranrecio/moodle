@@ -16,10 +16,12 @@
 
 namespace core_courseformat\output\local\overview;
 
+use core\output\externable;
 use core\output\named_templatable;
 use core\output\renderable;
 use core\output\renderer_base;
 use core\plugin_manager;
+use core_courseformat\external\overviewtable_exporter;
 use core_courseformat\local\overview\overviewitem;
 use core_courseformat\local\overview\overviewfactory;
 use cm_info;
@@ -32,7 +34,7 @@ use stdClass;
  * @copyright  2025 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class overviewtable implements renderable, named_templatable {
+class overviewtable implements renderable, named_templatable, externable {
     /** @var array $header the table headers */
     private array $headers = [];
 
@@ -140,6 +142,7 @@ class overviewtable implements renderable, named_templatable {
             }
             $result[] = [
                 'cmid' => $cm->id,
+                'cm' => $cm,
                 'overviews' => $this->load_overview_items_from_activity($output, $cm),
             ];
         }
@@ -252,6 +255,7 @@ class overviewtable implements renderable, named_templatable {
 
         $result = [];
         foreach ($row as $key => $item) {
+            $item->set_key($key);
             $result[$key] = $item;
         }
         return $result;
@@ -271,10 +275,68 @@ class overviewtable implements renderable, named_templatable {
                     'name' => $item->get_name(),
                     'key' => $key,
                     'textalign' => $item->get_text_align()->classes(),
+                    'align' => $item->get_text_align()->value,
                 ];
             }
             $this->columnhascontent[$key] = $this->columnhascontent[$key] || $item->get_value() !== null;
         }
+    }
+
+    #[\Override]
+    public function get_exporter(\core\context $context = null): overviewtable_exporter {
+        $context = $context ?? \core\context\course::instance($this->course->id);
+        return new overviewtable_exporter(
+            $this,
+            ['context' => $context],
+        );
+    }
+
+    #[\Override]
+    public static function get_read_structure(
+        int $required = VALUE_REQUIRED,
+        mixed $default = null
+    ): \core_external\external_single_structure {
+        return overviewtable_exporter::get_read_structure($required, $default);
+    }
+
+    #[\Override]
+    public static function read_properties_definition(): array {
+        return overviewtable_exporter::read_properties_definition();
+    }
+
+    public function export_for_external(renderer_base $output): stdClass {
+        $activities = $this->load_all_overviews_from_each_activity($output);
+        return (object) [
+            'headers' => $this->export_headers(),
+            'course' => $this->course,
+            'hasintegration' => overviewfactory::activity_has_overview_integration($this->modname),
+            'activities' => $this->export_activities_for_external($activities),
+        ];
+    }
+
+    /**
+     * Exports the activities for external use.
+     *
+     * @param array $activities An array of activities, each containing a 'cm' and 'overviews'.
+     * @return array An array of activities ready for external export.
+     */
+    private function export_activities_for_external(
+        array $activities,
+    ): array {
+        $result = [];
+        foreach ($activities as $activity) {
+            $columnitems = array_filter(
+                $activity['overviews'],
+                fn($key): bool => $this->columnhascontent[$key],
+                ARRAY_FILTER_USE_KEY,
+            );
+            $result[] = (object) [
+                'cm' => $activity['cm'],
+                'haserror' => false, // Error will be implemented in MDL-85852.
+                'items' => array_values($columnitems),
+            ];
+        }
+        return $result;
     }
 
     /**
