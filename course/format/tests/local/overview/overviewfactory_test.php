@@ -180,4 +180,56 @@ final class overviewfactory_test extends \advanced_testcase {
         $this->expectExceptionMessageMatches("/.* must extend core_courseformat\\\\activityoverviewbase.*/");
         overviewfactory::create($cm);
     }
+
+    /**
+     * Test activity_has_overview_integration for existing modules.
+     *
+     * @dataProvider activity_has_overview_integration_provider
+     * @param string $modname
+     * @param bool $expectempty
+     */
+    public function test_activity_has_overview_integration(
+        string $modname,
+        bool $expectempty,
+    ): void {
+        $result = overviewfactory::activity_has_overview_integration($modname);
+        $this->assertEquals($expectempty, $result);
+    }
+
+    /**
+     * Data provider for test_overview_integrations.
+     *
+     * @return array
+     */
+    public static function activity_has_overview_integration_provider(): array {
+        return [
+            'assign' => ['modname' => 'assign', 'expectempty' => true],
+            'bigbluebuttonbn' => ['modname' => 'bigbluebuttonbn', 'expectempty' => false],
+            'book' => ['modname' => 'book', 'expectempty' => false],
+            'choice' => ['modname' => 'choice', 'expectempty' => true],
+            'data' => ['modname' => 'data', 'expectempty' => true],
+            'feedback' => ['modname' => 'feedback', 'expectempty' => true],
+            'folder' => ['modname' => 'folder', 'expectempty' => false],
+            'forum' => ['modname' => 'forum', 'expectempty' => false],
+            'glossary' => ['modname' => 'glossary', 'expectempty' => true],
+            'h5pactivity' => ['modname' => 'h5pactivity', 'expectempty' => true],
+            'imscp' => ['modname' => 'imscp', 'expectempty' => false],
+            'label' => ['modname' => 'label', 'expectempty' => false],
+            'lesson' => ['modname' => 'lesson', 'expectempty' => true],
+            'lti' => ['modname' => 'lti', 'expectempty' => false],
+            'page' => ['modname' => 'page', 'expectempty' => false],
+            'qbank' => ['modname' => 'qbank', 'expectempty' => false],
+            'quiz' => ['modname' => 'quiz', 'expectempty' => false],
+            'resource' => ['modname' => 'resource', 'expectempty' => true],
+            'scorm' => ['modname' => 'scorm', 'expectempty' => false],
+            'url' => ['modname' => 'url', 'expectempty' => false],
+            'wiki' => ['modname' => 'wiki', 'expectempty' => false],
+            'workshop' => ['modname' => 'workshop', 'expectempty' => true],
+        ];
+    }
+
+    public function test_activity_has_overview_integration_non_existing(): void {
+        $result = overviewfactory::activity_has_overview_integration('fakemodulenonexisting');
+        $this->assertFalse($result);
+    }
 }
