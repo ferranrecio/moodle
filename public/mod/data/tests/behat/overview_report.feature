@@ -13,9 +13,9 @@ Feature: Testing overview integration in database activity
       | fullname | shortname | category | enablecompletion |
       | Course 1 | C1        | 0        | 1                |
     And the following "course enrolments" exist:
-      | user | course | role           |
-      | teacher1 | C1 | editingteacher |
-      | student1 | C1 | student        |
+      | user     | course | role           |
+      | teacher1 | C1     | editingteacher |
+      | student1 | C1     | student        |
     And the following "activity" exists:
       | course          | C1                   |
       | activity        | data                 |
@@ -131,3 +131,77 @@ Feature: Testing overview integration in database activity
     And I should see "Name" in the "data_overview_collapsible" "region"
     And I should see "Due date" in the "data_overview_collapsible" "region"
     And I should see "Actions" in the "data_overview_collapsible" "region"
+
+  @javascript
+  Scenario: Students and non-editing teachers can only see information related to their groups
+    Given the following "users" exist:
+      | username    | firstname   | lastname | email                   |
+      | nonediting1 | Non editing | Teacher  | nonediting1@example.com |
+    And the following "course enrolments" exist:
+      | user        | course | role           |
+      | nonediting1 | C1     | teacher        |
+    And the following "groups" exist:
+      | name    | course | idnumber |
+      | Group A | C1     | GA       |
+      | Group B | C1     | GB       |
+    And the following "group members" exist:
+      | user        | group |
+      | student1    | GA    |
+      | nonediting1 | GA    |
+    And the following "activity" exists:
+      | course          | C1                   |
+      | activity        | data                 |
+      | name            | Separate groups      |
+      | intro           | description          |
+      | idnumber        | separate             |
+      | approval        | 1                    |
+      | completion      | 1                    |
+      | comments        | 1                    |
+      | timeavailableto | ##1 Jan 2040 08:00## |
+      | groupmode       | 1                    |
+    And the following "mod_data > fields" exist:
+      | database | type | name             | description                  |
+      | separate | text | Title field      | Title field description      |
+      | separate | text | Short text field | Short text field description |
+    And the following "mod_data > templates" exist:
+      | database | name            |
+      | separate | singletemplate  |
+      | separate | listtemplate    |
+      | separate | addtemplate     |
+      | separate | asearchtemplate |
+      | separate | rsstemplate     |
+      | separate | singletemplate  |
+      | separate | listtemplate    |
+      | separate | addtemplate     |
+      | separate | asearchtemplate |
+      | separate | rsstemplate     |
+    And the following "mod_data > entries" exist:
+      | database | user     | Title field        | Short text field | approved | group |
+      | separate | student1 | Group A by student | Approved         | 1        | GA    |
+      | separate | admin    | Group A            | Approved         | 0        | GA    |
+      | separate | admin    | Group A approved   | Approved         | 1        | GA    |
+      | separate | admin    | Group B approved   | Approved         | 1        | GB    |
+      | separate | admin    | Group B            | Approved         | 0        | GB    |
+    # Let's add an entry for all participants to be sure everybody can view it.
+    And the following "mod_data > entries" exist:
+      | database | user     | Title field      | Short text field | approved |
+      | separate | admin    | All participants | Approved         | 1        |
+    # Add a comment to test the values.
+    When I am on the "Separate groups" "data activity" page logged in as student1
+    And I select "Single view" from the "jump" singleselect
+    And I click on "Comments (0)" "link"
+    And I set the following fields to these values:
+      | Comment        | Commenting the entry |
+    And I click on "Save comment" "link"
+    And I am on the "Course 1" "course > activities > data" page
+    Then the following should exist in the "Table listing all Database activities" table:
+      | Name            | Due date       | Total entries | My entries | Comments  |
+      | Separate groups | 1 January 2040 | 3             | 1          | 1         |
+    And I am on the "Course 1" "course > activities > data" page logged in as nonediting1
+    And the following should exist in the "Table listing all Database activities" table:
+      | Name            | Due date       | Entries | Comments | Actions     |
+      | Separate groups | 1 January 2040 | 4       | 1        | Approve (1) |
+    And I am on the "Course 1" "course > activities > data" page logged in as teacher1
+    And the following should exist in the "Table listing all Database activities" table:
+      | Name            | Due date       | Entries | Comments | Actions     |
+      | Separate groups | 1 January 2040 | 6       | 1        | Approve (2) |
