@@ -39,17 +39,19 @@ final class section_info_test extends \advanced_testcase {
         $this->setAdminUser();
 
         // Generate the course and pre-requisite module.
-        $course = $this->getDataGenerator()->create_course(
-                array('format' => 'topics',
-                    'numsections' => 3,
-                    'enablecompletion' => 1,
-                    'groupmode' => SEPARATEGROUPS,
-                    'forcegroupmode' => 0),
-                array('createsections' => true));
+        $course = $this->getDataGenerator()->create_course([
+            'format' => 'topics',
+            'numsections' => 3,
+            'enablecompletion' => 1,
+            'groupmode' => SEPARATEGROUPS,
+            'forcegroupmode' => 0,
+        ], ['createsections' => true]);
         $coursecontext = context_course::instance($course->id);
-        $prereqforum = $this->getDataGenerator()->create_module('forum',
-                array('course' => $course->id),
-                array('completion' => 1));
+        $prereqforum = $this->getDataGenerator()->create_module(
+            'forum',
+            ['course' => $course->id],
+            ['completion' => 1],
+        );
 
         // Add availability conditions.
         $availability = '{"op":"&","showc":[true,true,true],"c":[' .
@@ -58,17 +60,21 @@ final class section_info_test extends \advanced_testcase {
                 '{"type":"grade","id":666,"min":0.4},' .
                 '{"type":"profile","op":"contains","sf":"email","v":"test"}' .
                 ']}';
-        $DB->set_field('course_sections', 'availability', $availability,
-                array('course' => $course->id, 'section' => 2));
+        $DB->set_field(
+            'course_sections',
+            'availability',
+            $availability,
+            ['course' => $course->id, 'section' => 2],
+        );
         rebuild_course_cache($course->id, true);
-        $sectiondb = $DB->get_record('course_sections', array('course' => $course->id, 'section' => 2));
+        $sectiondb = $DB->get_record('course_sections', ['course' => $course->id, 'section' => 2]);
 
         // Create and enrol a student.
-        $studentrole = $DB->get_record('role', array('shortname' => 'student'), '*', MUST_EXIST);
+        $studentrole = $DB->get_record('role', ['shortname' => 'student'], '*', MUST_EXIST);
         $student = $this->getDataGenerator()->create_user();
         role_assign($studentrole->id, $student->id, $coursecontext);
         $enrolplugin = enrol_get_plugin('manual');
-        $enrolinstance = $DB->get_record('enrol', array('courseid' => $course->id, 'enrol' => 'manual'));
+        $enrolinstance = $DB->get_record('enrol', ['courseid' => $course->id, 'enrol' => 'manual']);
         $enrolplugin->enrol_user($enrolinstance, $student->id);
         $this->setUser($student);
 
@@ -108,7 +114,7 @@ final class section_info_test extends \advanced_testcase {
             [
                 'component' => 'test_component',
                 'itemid' => 1,
-            ]
+            ],
         );
 
         $modinfo = get_fast_modinfo($course->id);
@@ -144,12 +150,12 @@ final class section_info_test extends \advanced_testcase {
     /**
      * Test get_uservisible method when the section is delegated.
      *
-     * @dataProvider data_provider_get_uservisible_delegate
      * @param string $role The role to assign to the user.
      * @param bool $parentvisible The visibility of the parent section.
      * @param bool $delegatedvisible The visibility of the delegated section.
      * @param bool $expected The expected visibility of the delegated section.
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('data_provider_get_uservisible_delegate')]
     public function test_get_uservisible_delegate(
         string $role,
         bool $parentvisible,
@@ -245,11 +251,11 @@ final class section_info_test extends \advanced_testcase {
     /**
      * Test get_uservisible method when the section is delegated and depending on if the plugin is enabled.
      *
-     * @dataProvider provider_test_get_uservisible_delegate_enabled
      * @param string $role The role to assign to the user.
      * @param bool $enabled Whether the plugin is enabled.
      * @param bool $expected The expected visibility of the delegated section.
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_test_get_uservisible_delegate_enabled')]
     public function test_get_uservisible_delegate_enabled(
         string $role,
         bool $enabled,
@@ -313,13 +319,13 @@ final class section_info_test extends \advanced_testcase {
     /**
      * Test get_available method when the section is delegated.
      *
-     * @dataProvider data_provider_get_available_delegated
      * @param string $role The role to assign to the user.
      * @param bool $parentavailable The parent section is available.
      * @param bool $delegatedavailable The delegated section is available..
      * @param bool $expectedavailable The expected availability of the delegated section.
      * @param bool $expecteduservisible The expected uservisibility of the delegated section.
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('data_provider_get_available_delegated')]
     public function test_get_available_delegated(
         string $role,
         bool $parentavailable,
