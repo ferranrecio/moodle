@@ -23,14 +23,10 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace core;
+namespace core\strings;
 
-use core_string_manager_standard;
+use core\tests\strings\testable_core_string_manager;
 
-defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
-require_once($CFG->libdir.'/moodlelib.php');
 
 /**
  * Tests for the API of the string_manager.
@@ -42,20 +38,26 @@ require_once($CFG->libdir.'/moodlelib.php');
  * @copyright 2013 David Mudrak <david@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class string_manager_standard_test extends \advanced_testcase {
+final class standard_string_manager_test extends \advanced_testcase {
+    #[\Override()]
+    public static function setUpBeforeClass(): void {
+        global $CFG;
+        require_once($CFG->libdir . '/moodlelib.php');
+        require_once(__DIR__ . '/../classes/strings/testable_core_string_manager.php');
+        parent::setUpBeforeClass();
+    }
 
     public function test_string_manager_instance(): void {
         $this->resetAfterTest();
-
-        $otherroot = __DIR__.'/fixtures/langtest';
+        $otherroot = __DIR__ . '/fixtures/langtest';
         $stringman = testable_core_string_manager::instance($otherroot);
-        $this->assertInstanceOf('core_string_manager', $stringman);
+        $this->assertInstanceOf(\core\strings\standard_string_manager::class, $stringman);
     }
 
     public function test_get_language_dependencies(): void {
         $this->resetAfterTest();
 
-        $otherroot = __DIR__.'/fixtures/langtest';
+        $otherroot = __DIR__ . '/../fixtures/langtest';
         $stringman = testable_core_string_manager::instance($otherroot);
 
         // There is no parent language for 'en'.
@@ -104,7 +106,7 @@ final class string_manager_standard_test extends \advanced_testcase {
     public static function get_deprecated_strings_provider(): array {
         global $CFG;
 
-        $teststringman = testable_core_string_manager::instance($CFG->langotherroot, $CFG->langlocalroot, []);
+        $teststringman = testable_core_string_manager::instance($CFG->langotherroot, $CFG->langlocalroot);
         $allstrings = $teststringman->get_all_deprecated_strings();
         return array_map(fn ($string): array => [$string], $allstrings);
     }
@@ -115,7 +117,7 @@ final class string_manager_standard_test extends \advanced_testcase {
      * It will fail if the string in the wrong format or non-existing (mistyped) string was deprecated.
      *
      * @dataProvider get_deprecated_strings_provider
-     * @param   string      $string     The string to be tested
+     * @param string $string The string to be tested
      */
     public function test_validate_deprecated_strings_files($string): void {
         $stringman = get_string_manager();
@@ -162,7 +164,7 @@ final class string_manager_standard_test extends \advanced_testcase {
     }
 
     /**
-     * Test {@see core_string_manager_standard::get_list_of_countries()} under different conditions.
+     * Test get_list_of_countries() under different conditions.
      */
     public function test_get_list_of_countries(): void {
 
@@ -210,42 +212,5 @@ final class string_manager_standard_test extends \advanced_testcase {
         $this->assertArrayHasKey('CZ', $countries);
         $this->assertArrayHasKey('ES', $countries);
         $this->assertGreaterThan(4, count($countries));
-    }
-}
-
-/**
- * Helper class providing testable string_manager
- *
- * @copyright 2013 David Mudrak <david@moodle.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class testable_core_string_manager extends core_string_manager_standard {
-
-    /**
-     * Factory method
-     *
-     * @param string $otherroot full path to the location of installed upstream language packs
-     * @param string $localroot full path to the location of locally customized language packs, defaults to $otherroot
-     * @param bool $usecache use application permanent cache
-     * @param array $translist explicit list of visible translations
-     * @param string $menucache the location of a file that caches the list of available translations
-     * @return testable_core_string_manager
-     */
-    public static function instance($otherroot, $localroot = null, $usecache = false, array $translist = array(), $menucache = null) {
-        global $CFG;
-
-        if (is_null($localroot)) {
-            $localroot = $otherroot;
-        }
-
-        if (is_null($menucache)) {
-            $menucache = $CFG->cachedir.'/languages';
-        }
-
-        return new testable_core_string_manager($otherroot, $localroot, $usecache, $translist, $menucache);
-    }
-
-    public function get_all_deprecated_strings() {
-        return array_flip($this->load_deprecated_strings());
     }
 }

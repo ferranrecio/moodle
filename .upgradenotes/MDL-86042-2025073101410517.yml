@@ -1,0 +1,15 @@
+issueNumber: MDL-86042
+notes:
+  core:
+    - message: >-
+        All lang strings related classes has been moved to core\strings. This
+        include all string_manager implementations, and the lazy loading
+        lang_string. Also, a new core\strings class has been implemented and
+        could be used to inject the lang strings using DI.
+      type: improved
+    - message: >-
+        From now on, all implementations of core\strings\string_manager (before
+        known as core\string_manager) must have a construct with no params. The
+        old four params used in custom string_managers are considered deprecated
+        and will stop working in Moodle 6.0.
+      type: changed
