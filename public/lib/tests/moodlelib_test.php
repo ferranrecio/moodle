@@ -2120,7 +2120,7 @@ final class moodlelib_test extends \advanced_testcase {
         $leadingbackslash = (version_compare(PHP_VERSION, '8.2.0', '>=')) ? '\\' : '';
 
         $expected1 = <<<EOF
-{$leadingbackslash}core\lang_string::__set_state(array(
+{$leadingbackslash}core\strings\lang_string::__set_state(array(
    'component' => 'moodle',
    'a' => NULL,
    'string' => NULL,
@@ -4680,7 +4680,7 @@ EOT;
             ],
             'method_of_object' => [
                 [new lang_string('parentlanguage', 'core_langconfig'), 'my_foobar_method'],
-                'core\lang_string::my_foobar_method',
+                'core\strings\lang_string::my_foobar_method',
             ],
             'function_as_literal' => [
                 'my_foobar_callback',
