@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace core\tests;
+namespace core\tests\strings;
 
 /**
  * A string manager which supports mocking individual strings.
@@ -23,9 +23,9 @@ namespace core\tests;
  * @copyright  Andrew Lyons <andrew@nicols.co.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mocking_string_manager extends \core_string_manager_standard {
+class mocking_string_manager extends \core\strings\standard_string_manager {
     /** @var array<string, string> The list of strings */
-    private $strings = [];
+    private array $strings = [];
 
     #[\Override]
     public function get_string($identifier, $component = '', $a = null, $lang = null) {
@@ -36,7 +36,7 @@ class mocking_string_manager extends \core_string_manager_standard {
         return parent::get_string($identifier, $component, $a, $lang);
     }
 
-     /**
+    /**
       * Mock a string.
       *
       * @param string $identifier

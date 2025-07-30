@@ -185,9 +185,6 @@ require_once($CFG->libdir.'/classes/component.php');
 \core\component::register_autoloader();
 
 require_once($CFG->libdir.'/classes/text.php');
-require_once($CFG->libdir.'/classes/string_manager.php');
-require_once($CFG->libdir.'/classes/string_manager_install.php');
-require_once($CFG->libdir.'/classes/string_manager_standard.php');
 require_once($CFG->libdir.'/installlib.php');
 require_once($CFG->libdir.'/clilib.php');
 require_once($CFG->libdir.'/setuplib.php');

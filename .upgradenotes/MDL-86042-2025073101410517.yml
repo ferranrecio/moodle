@@ -1,0 +1,18 @@
+issueNumber: MDL-86042
+notes:
+  core:
+    - message: >-
+        All lang strings related classes has been moved to core\strings. This
+        include all string_manager implementations, and the lazy loading
+        lang_string. Also, a new core\strings class has been implemented and
+        could be used to inject the lang strings using DI.
+      type: improved
+    - message: >-
+        All implementations of core\strings\string_manager using four fixed
+        params for construct (before known as core\string_manager) are
+        considered legacy and will stop working in Moodle 6.0. Please,
+        migrate all custom string managers to hook handlers by overriding
+        the \core\strings\string_manager::class definition in the
+        \core\hook\di_configuration::class hook and provide a valid
+        class using dependency injection.
+      type: changed

@@ -34,7 +34,6 @@ $legacyclasses = [
 
     // Core API.
     \emoticon_manager::class => 'emoticon_manager.php',
-    \lang_string::class => 'lang_string.php',
     \moodle_url::class => 'url.php',
 
     // Exception API.
@@ -260,6 +259,13 @@ $legacyclasses = [
     \component_action::class => 'output/actions/component_action.php',
     \confirm_action::class => 'output/actions/confirm_action.php',
     \popup_action::class => 'output/actions/popup_action.php',
+
+    // String API.
+    \lang_string::class => 'strings/lang_string.php',
+    \core\lang_string::class => 'strings/lang_string.php',
+    \core_string_manager::class => 'strings/string_manager.php',
+    \core_string_manager_install::class => 'strings/installation_string_manager.php',
+    \core_string_manager_standard::class => 'strings/standard_string_manager.php',
 
     // Block Subsystem.
     \block_contents::class => [

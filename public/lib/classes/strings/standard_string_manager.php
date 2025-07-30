@@ -14,16 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Standard string manager.
- *
- * @package    core
- * @copyright  2010 Petr Skoda {@link http://skodak.org}
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+namespace core\strings;
 
-defined('MOODLE_INTERNAL') || die();
-
+use core_cache\cache;
+use core_cache\store as cache_store;
+use core_collator;
+use core\component;
+use core\strings\lang_config_helper;
+use Stringable;
 
 /**
  * Standard string_manager implementation
@@ -34,41 +32,59 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2010 Petr Skoda {@link http://skodak.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class core_string_manager_standard implements core_string_manager {
-    /** @var string location of all packs except 'en' */
-    protected $otherroot;
-    /** @var string location of all lang pack local modifications */
-    protected $localroot;
+class standard_string_manager implements string_manager {
     /** @var cache lang string cache - it will be optimised more later */
-    protected $cache;
+    protected ?cache $cache = null;
+
     /** @var int get_string() counter */
-    protected $countgetstring = 0;
-    /** @var array use disk cache */
-    protected $translist;
-    /** @var array language aliases to use in the language selector */
-    protected $transaliases = [];
+    protected int $countgetstring = 0;
+
+    /** @var array The list of available translations (langcode => langcode). It uses disk cache */
+    protected array $translist = [];
+
     /** @var cache stores list of available translations */
-    protected $menucache;
+    protected ?cache $menucache = null;
+
     /** @var array list of cached deprecated strings */
-    protected $cacheddeprecated;
+    protected ?array $cacheddeprecated = null;
+
+    /** @var string location of all packs except 'en' */
+    protected string $otherroot;
+
+    /** @var string location of all lang pack local modifications */
+    protected string $localroot;
+
+    /** @var array language aliases to use in the language selector */
+    protected array $transaliases = [];
+
+    /** @var lang_config_helper the language configuration helper */
+    protected lang_config_helper $langconfighelper;
 
     /**
      * Create new instance of string manager
-     *
-     * @param string $otherroot location of downloaded lang packs - usually $CFG->dataroot/lang
-     * @param string $localroot usually the same as $otherroot
-     * @param array $translist limit list of visible translations
-     * @param array $transaliases aliases to use for the languages in the language selector
      */
-    public function __construct($otherroot, $localroot, $translist, $transaliases = []) {
-        $this->otherroot    = $otherroot;
-        $this->localroot    = $localroot;
-        if ($translist) {
-            $this->translist = array_combine($translist, $translist);
-            $this->transaliases = $transaliases;
-        } else {
-            $this->translist = array();
+    public function __construct(
+        ?lang_config_helper $langconfighelper = null,
+    ) {
+
+        // For backwards compatibility, if no lang_config_helper is provided, get it from the DI container.
+        if ($langconfighelper === null) {
+            $langconfighelper = \core\di::get(lang_config_helper::class);
         }
+
+        [
+            'translations' => $translist,
+            'aliases' => $transaliases,
+        ] = $langconfighelper->get_translations();
+
+        // The translist is used for both get the list of available translations
+        // and check for their existence. We use array_combine to make it easier to check.
+        $this->translist = array_combine($translist, $translist);
+        $this->transaliases = $transaliases;
+
+        $this->otherroot = $langconfighelper->get_langpacks_path();
+        $this->localroot = $langconfighelper->get_local_langpacks_path();
+        $this->langconfighelper = $langconfighelper;
 
         if ($this->get_revision() > 0) {
             // We can use a proper cache, establish the cache using the 'String cache' definition.
@@ -76,12 +92,12 @@ class core_string_manager_standard implements core_string_manager {
             $this->menucache = cache::make('core', 'langmenu');
         } else {
             // We only want a cache for the length of the request, create a static cache.
-            $options = array(
+            $options = [
                 'simplekeys' => true,
-                'simpledata' => true
-            );
-            $this->cache = cache::make_from_params(cache_store::MODE_REQUEST, 'core', 'string', array(), $options);
-            $this->menucache = cache::make_from_params(cache_store::MODE_REQUEST, 'core', 'langmenu', array(), $options);
+                'simpledata' => true,
+            ];
+            $this->cache = cache::make_from_params(cache_store::MODE_REQUEST, 'core', 'string', [], $options);
+            $this->menucache = cache::make_from_params(cache_store::MODE_REQUEST, 'core', 'langmenu', [], $options);
         }
     }
 
@@ -96,23 +112,15 @@ class core_string_manager_standard implements core_string_manager {
      * @param string $lang the code of the language
      * @return array all explicit parent languages with the lang itself appended
      */
-    public function get_language_dependencies($lang) {
+    public function get_language_dependencies($lang): array {
         return $this->populate_parent_languages($lang);
     }
 
-    /**
-     * Load all strings for one component
-     *
-     * @param string $component The module the string is associated with
-     * @param string $lang
-     * @param bool $disablecache Do not use caches, force fetching the strings from sources
-     * @param bool $disablelocal Do not use customized strings in xx_local language packs
-     * @return array of all string for given component and lang
-     */
+    #[\Override]
     public function load_component_strings($component, $lang, $disablecache = false, $disablelocal = false) {
         global $CFG;
 
-        list($plugintype, $pluginname) = core_component::normalize_component($component);
+        [$plugintype, $pluginname] = component::normalize_component($component);
         if ($plugintype === 'core' and is_null($pluginname)) {
             $component = 'core';
         } else {
@@ -159,8 +167,9 @@ class core_string_manager_standard implements core_string_manager {
             }
 
         } else {
-            if (!$location = core_component::get_plugin_directory($plugintype, $pluginname) or !is_dir($location)) {
-                return array();
+            $location = component::get_plugin_directory($plugintype, $pluginname);
+            if (!$location || !is_dir($location)) {
+                return [];
             }
             if ($plugintype === 'mod') {
                 // Bloody mod hack.
@@ -168,11 +177,11 @@ class core_string_manager_standard implements core_string_manager {
             } else {
                 $file = $plugintype . '_' . $pluginname;
             }
-            $string = array();
+            $string = [];
             // First load English pack.
             if (!file_exists("$location/lang/en/$file.php")) {
                 // English pack does not exist, so do not try to load anything else.
-                return array();
+                return [];
             }
             include("$location/lang/en/$file.php");
             $enstring = $string;
@@ -233,8 +242,8 @@ class core_string_manager_standard implements core_string_manager {
         if (file_exists($filename)) {
             $content .= file_get_contents($filename);
         }
-        foreach (core_component::get_plugin_types() as $plugintype => $plugintypedir) {
-            foreach (core_component::get_plugin_list($plugintype) as $pluginname => $plugindir) {
+        foreach (component::get_plugin_types() as $plugintype => $plugintypedir) {
+            foreach (component::get_plugin_list($plugintype) as $pluginname => $plugindir) {
                 $filename = $plugindir.'/lang/en/deprecated.txt';
                 if (file_exists($filename)) {
                     $content .= "\n". file_get_contents($filename);
@@ -248,49 +257,22 @@ class core_string_manager_standard implements core_string_manager {
         return $this->cacheddeprecated;
     }
 
-    /**
-     * Has string been deprecated?
-     *
-     * Usually checked only inside get_string() to display debug warnings.
-     *
-     * @param string $identifier The identifier of the string to search for
-     * @param string $component The module the string is associated with
-     * @return bool true if deprecated
-     */
+    #[\Override]
     public function string_deprecated($identifier, $component) {
         $deprecated = $this->load_deprecated_strings();
-        list($plugintype, $pluginname) = core_component::normalize_component($component);
+        [$plugintype, $pluginname] = component::normalize_component($component);
         $normcomponent = $pluginname ? ($plugintype . '_' . $pluginname) : $plugintype;
         return isset($deprecated[$identifier . ',' . $normcomponent]);
     }
 
-    /**
-     * Does the string actually exist?
-     *
-     * get_string() is throwing debug warnings, sometimes we do not want them
-     * or we want to display better explanation of the problem.
-     * Note: Use with care!
-     *
-     * @param string $identifier The identifier of the string to search for
-     * @param string $component The module the string is associated with
-     * @return boot true if exists
-     */
+    #[\Override]
     public function string_exists($identifier, $component) {
         $lang = current_language();
         $string = $this->load_component_strings($component, $lang);
         return isset($string[$identifier]);
     }
 
-    /**
-     * Get String returns a requested string
-     *
-     * @param string $identifier The identifier of the string to search for
-     * @param string $component The module the string is associated with
-     * @param string|object|array $a An object, string or number that can be used
-     *      within translation strings
-     * @param string $lang moodle translation language, null means use current
-     * @return string The String !
-     */
+    #[\Override]
     public function get_string($identifier, $component = '', $a = null, $lang = null) {
         global $CFG;
 
@@ -343,13 +325,13 @@ class core_string_manager_standard implements core_string_manager {
             if (!isset($string[$identifier])) {
                 // The string is still missing - should be fixed by developer.
                 if ($CFG->debugdeveloper) {
-                    list($plugintype, $pluginname) = core_component::normalize_component($component);
+                    [$plugintype, $pluginname] = component::normalize_component($component);
                     if ($plugintype === 'core') {
                         $file = "lang/en/{$component}.php";
                     } else if ($plugintype == 'mod') {
                         $file = "mod/{$pluginname}/lang/en/{$pluginname}.php";
                     } else {
-                        $path = core_component::get_plugin_directory($plugintype, $pluginname);
+                        $path = component::get_plugin_directory($plugintype, $pluginname);
                         $file = "{$path}/lang/en/{$plugintype}_{$pluginname}.php";
                     }
                     debugging("Invalid get_string() identifier: '{$identifier}' or component '{$component}'. " .
@@ -390,7 +372,7 @@ class core_string_manager_standard implements core_string_manager {
         if ($CFG->debugdeveloper) {
             // Display a debugging message if sting exists but was deprecated.
             if ($this->string_deprecated($identifier, $component)) {
-                list($plugintype, $pluginname) = core_component::normalize_component($component);
+                [$plugintype, $pluginname] = component::normalize_component($component);
                 $normcomponent = $pluginname ? ($plugintype . '_' . $pluginname) : $plugintype;
                 debugging("String [{$identifier},{$normcomponent}] is deprecated. ".
                     'Either you should no longer be using that string, or the string has been incorrectly deprecated, in which case you should report this as a bug. '.
@@ -406,7 +388,7 @@ class core_string_manager_standard implements core_string_manager {
      *
      * @return array
      */
-    public function get_performance_summary() {
+    public function get_performance_summary(): array {
         return array(array(
             'langcountgetstring' => $this->countgetstring,
         ), array(
@@ -414,13 +396,7 @@ class core_string_manager_standard implements core_string_manager {
         ));
     }
 
-    /**
-     * Returns a localised list of all country names, sorted by localised name.
-     *
-     * @param bool $returnall return all or just enabled
-     * @param string $lang moodle translation language, null means use current
-     * @return array two-letter country code => translated name.
-     */
+    #[\Override]
     public function get_list_of_countries($returnall = false, $lang = null) {
         global $CFG;
 
@@ -431,12 +407,13 @@ class core_string_manager_standard implements core_string_manager {
         $countries = $this->load_component_strings('core_countries', $lang);
         core_collator::asort($countries);
 
-        if (!$returnall and !empty($CFG->allcountrycodes)) {
-            $enabled = explode(',', $CFG->allcountrycodes);
-            $return = array();
-            foreach ($enabled as $c) {
-                if (isset($countries[$c])) {
-                    $return[$c] = $countries[$c];
+        $countrycodes = $this->langconfighelper->get_country_codes();
+
+        if (!$returnall && !empty($countrycodes)) {
+            $return = [];
+            foreach ($countrycodes as $countrycode) {
+                if (isset($countries[$countrycode])) {
+                    $return[$countrycode] = $countries[$countrycode];
                 }
             }
 
@@ -448,16 +425,8 @@ class core_string_manager_standard implements core_string_manager {
         return $countries;
     }
 
-    /**
-     * Returns a localised list of languages, sorted by code keys.
-     *
-     * @param string $lang moodle translation language, null means use current
-     * @param string $standard language list standard
-     *    - iso6392: three-letter language code (ISO 639-2/T) => translated name
-     *    - iso6391: two-letter language code (ISO 639-1) => translated name
-     * @return array language code => translated name
-     */
-    public function get_list_of_languages($lang = null, $standard = 'iso6391') {
+    #[\Override]
+    public function get_list_of_languages(?string $lang = null, string $standard = 'iso6391') {
         if ($lang === null) {
             $lang = current_language();
         }
@@ -500,24 +469,13 @@ class core_string_manager_standard implements core_string_manager {
         return array();
     }
 
-    /**
-     * Checks if the translation exists for the language
-     *
-     * @param string $lang moodle translation language code
-     * @param bool $includeall include also disabled translations
-     * @return bool true if exists
-     */
+    #[\Override]
     public function translation_exists($lang, $includeall = true) {
         $translations = $this->get_list_of_translations($includeall);
         return isset($translations[$lang]);
     }
 
-    /**
-     * Returns localised list of installed translations
-     *
-     * @param bool $returnall return all or just enabled
-     * @return array moodle translation code => localised translation name
-     */
+    #[\Override]
     public function get_list_of_translations($returnall = false) {
         global $CFG;
 
@@ -601,13 +559,8 @@ class core_string_manager_standard implements core_string_manager {
         }
     }
 
-    /**
-     * Returns localised list of currencies.
-     *
-     * @param string $lang moodle translation language, null means use current
-     * @return array currency code => localised currency name
-     */
-    public function get_list_of_currencies($lang = null) {
+    #[\Override]
+    public function get_list_of_currencies($lang = null): array {
         if ($lang === null) {
             $lang = current_language();
         }
@@ -618,11 +571,8 @@ class core_string_manager_standard implements core_string_manager {
         return $currencies;
     }
 
-    /**
-     * Clears both in-memory and on-disk caches
-     * @param bool $phpunitreset true means called from our PHPUnit integration test reset
-     */
-    public function reset_caches($phpunitreset = false) {
+    #[\Override]
+    public function reset_caches($phpunitreset = false): void {
         // Clear the on-disk disk with aggregated string files.
         $this->cache->purge();
         $this->menucache->purge();
@@ -650,24 +600,18 @@ class core_string_manager_standard implements core_string_manager {
      * Returns cache key suffix, this enables us to store string + lang menu
      * caches in local caches on cluster nodes. We can not use prefix because
      * it would cause problems when creating subdirs in cache file store.
+     *
      * @return string
      */
-    protected function get_key_suffix() {
-        $rev = $this->get_revision();
-        if ($rev < 0) {
-            // Simple keys do not like minus char.
-            $rev = 0;
-        }
-
-        return $rev;
+    protected function get_key_suffix(): int {
+        // Simple keys do not like minus char.
+        return max($this->get_revision(), 0);
     }
 
-    /**
-     * Returns string revision counter, this is incremented after any string cache reset.
-     * @return int lang string revision counter, -1 if unknown
-     */
-    public function get_revision() {
+    #[\Override]
+    public function get_revision(): int {
         global $CFG;
+
         if (empty($CFG->langstringcache)) {
             return -1;
         }
@@ -686,8 +630,7 @@ class core_string_manager_standard implements core_string_manager {
      * @param array $stack list of parent languages already populated in previous recursive calls
      * @return array list of all parents of the given language with the $lang itself added as the last element
      */
-    protected function populate_parent_languages($lang, array $stack = array()) {
-
+    protected function populate_parent_languages($lang, array $stack = []): array {
         // English does not have a parent language.
         if ($lang === 'en') {
             return $stack;
@@ -702,15 +645,17 @@ class core_string_manager_standard implements core_string_manager {
         if (!file_exists("$this->otherroot/$lang/langconfig.php")) {
             return $stack;
         }
-        $string = array();
+
+        $string = [];
         include("$this->otherroot/$lang/langconfig.php");
 
         if (empty($string['parentlanguage']) or $string['parentlanguage'] === 'en') {
             return array_merge(array($lang), $stack);
-
         }
 
         $parentlang = $string['parentlanguage'];
         return $this->populate_parent_languages($parentlang, array_merge(array($lang), $stack));
     }
 }
+
+class_alias(standard_string_manager::class, \core_string_manager_standard::class);

@@ -1,0 +1,10 @@
+issueNumber: MDL-86042
+notes:
+  core:
+    - message: >-
+        The $CFG->early_install_lang configuration is now deprecated. If you
+        need to provide an alternative string_manager, you should override the
+        dependency injection (DI) class by implementing a callback on the
+        \core\hook\di_configuration hook. Look at
+        public/lib/classes/strings/hook_callbacks.php for an example.
+      type: deprecated

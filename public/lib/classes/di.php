@@ -119,9 +119,6 @@ class di {
                 return $DB;
             },
 
-            // The string manager.
-            \core_string_manager::class => fn() => get_string_manager(),
-
             // The Moodle Clock implementation, which itself is an extension of PSR-20.
             // Alias the PSR-20 clock interface to the Moodle clock. They are compatible.
             \core\clock::class => function () {

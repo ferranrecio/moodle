@@ -209,14 +209,11 @@ ini_set('include_path', $CFG->libdir.'/pear' . PATH_SEPARATOR . ini_get('include
 
 // Continue with lib loading.
 require_once($CFG->libdir.'/classes/text.php');
-require_once($CFG->libdir.'/classes/string_manager.php');
-require_once($CFG->libdir.'/classes/string_manager_install.php');
-require_once($CFG->libdir.'/classes/string_manager_standard.php');
 require_once($CFG->libdir.'/weblib.php');
 require_once($CFG->libdir.'/outputlib.php');
 require_once($CFG->libdir.'/dmllib.php');
 require_once($CFG->libdir.'/moodlelib.php');
-require_once($CFG->libdir .'/pagelib.php');
+require_once($CFG->libdir.'/pagelib.php');
 require_once($CFG->libdir.'/deprecatedlib.php');
 require_once($CFG->libdir.'/adminlib.php');
 require_once($CFG->libdir.'/environmentlib.php');

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace core;
+namespace core\strings;
 
 use core\exception\coding_exception;
 use stdClass;
@@ -278,3 +278,4 @@ class lang_string {
 // This file will be autoloaded by the legacyclasses autoload system.
 // In future all uses of this class will be corrected and the legacy references will be removed.
 class_alias(lang_string::class, \lang_string::class);
+class_alias(lang_string::class, \core\lang_string::class);
