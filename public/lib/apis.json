@@ -274,9 +274,9 @@
         "allowedlevel2": true,
         "allowedspread": true
     },
-    "string": {
+    "strings": {
         "component": "core",
-        "allowedlevel2": false,
+        "allowedlevel2": true,
         "allowedspread": false
     },
     "tag": {

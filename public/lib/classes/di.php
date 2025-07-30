@@ -120,7 +120,8 @@ class di {
             },
 
             // The string manager.
-            \core_string_manager::class => fn() => get_string_manager(),
+            \core_string_manager::class => \DI\get(\core\strings\string_manager::class),
+            \core\strings\string_manager::class => fn(): \core\strings\string_manager => \core\strings\string_manager_factory::create(),
 
             // The Moodle Clock implementation, which itself is an extension of PSR-20.
             // Alias the PSR-20 clock interface to the Moodle clock. They are compatible.
