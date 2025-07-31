@@ -24,6 +24,7 @@
  */
 
 use core\exception\moodle_exception;
+use core_course\course_request;
 
 /**
  * Class to store, cache, render and manage course category
