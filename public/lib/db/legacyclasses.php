@@ -322,4 +322,9 @@ $legacyclasses = [
         'core_filters',
         'form/local_settings_form.php',
     ],
+
+    \course_request::class => [
+        'core_course',
+        'course_request.php',
+    ],
 ];
