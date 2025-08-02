@@ -23,6 +23,8 @@
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
+use core_course\form\reject_request as reject_request_form;
+
 /**
  * Allow the administrator to look through a list of course requests and approve or reject them.
  *
