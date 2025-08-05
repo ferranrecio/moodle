@@ -39,13 +39,16 @@ final class section_info_test extends \advanced_testcase {
         $this->setAdminUser();
 
         // Generate the course and pre-requisite module.
-        $course = $this->getDataGenerator()->create_course([
-            'format' => 'topics',
-            'numsections' => 3,
-            'enablecompletion' => 1,
-            'groupmode' => SEPARATEGROUPS,
-            'forcegroupmode' => 0,
-        ], ['createsections' => true]);
+        $course = $this->getDataGenerator()->create_course(
+            [
+                'format' => 'topics',
+                'numsections' => 3,
+                'enablecompletion' => 1,
+                'groupmode' => SEPARATEGROUPS,
+                'forcegroupmode' => 0,
+            ],
+            ['createsections' => true],
+        );
         $coursecontext = context_course::instance($course->id);
         $prereqforum = $this->getDataGenerator()->create_module(
             'forum',
@@ -84,7 +87,7 @@ final class section_info_test extends \advanced_testcase {
 
         $this->assertEquals($sectiondb->id, $si->id);
         $this->assertEquals($sectiondb->course, $si->course);
-        $this->assertEquals($sectiondb->section, $si->section);
+        $this->assertEquals($sectiondb->section, $si->sectionnum);
         $this->assertEquals($sectiondb->name, $si->name);
         $this->assertEquals($sectiondb->visible, $si->visible);
         $this->assertEquals($sectiondb->summary, $si->summary);
@@ -173,7 +176,7 @@ final class section_info_test extends \advanced_testcase {
 
         formatactions::section($course)->update(
             $modinfo->get_section_info(1),
-            ['visible' => $parentvisible]
+            ['visible' => $parentvisible],
         );
 
         formatactions::cm($course)->set_visibility(
@@ -280,7 +283,7 @@ final class section_info_test extends \advanced_testcase {
         $this->setUser($user);
         $modinfo = get_fast_modinfo($course);
 
-        $delegatedsection = $modinfo->get_section_info($delegatedsection->section);
+        $delegatedsection = $modinfo->get_section_info($delegatedsection->sectionnum);
 
         // The get_uservisible is a magic getter.
         $this->assertEquals($expected, $delegatedsection->uservisible);
@@ -370,7 +373,7 @@ final class section_info_test extends \advanced_testcase {
         if (!$parentavailable) {
             formatactions::section($course)->update(
                 $modinfo->get_section_info(1),
-                ['availability' => $availability]
+                ['availability' => $availability],
             );
         }
 
@@ -473,7 +476,7 @@ final class section_info_test extends \advanced_testcase {
         rebuild_course_cache($course->id, true);
 
         $modinfo = get_fast_modinfo($course);
-        $delegatedsection = $modinfo->get_section_info($delegatedsection->section);
+        $delegatedsection = $modinfo->get_section_info($delegatedsection->sectionnum);
         $this->assertTrue($delegatedsection->is_orphan());
 
         // Check enabling the plugin restore the previous state.
@@ -481,7 +484,7 @@ final class section_info_test extends \advanced_testcase {
         rebuild_course_cache($course->id, true);
 
         $modinfo = get_fast_modinfo($course);
-        $delegatedsection = $modinfo->get_section_info($delegatedsection->section);
+        $delegatedsection = $modinfo->get_section_info($delegatedsection->sectionnum);
         $this->assertFalse($delegatedsection->is_orphan());
 
         // Force section limit in the course format instance.
@@ -498,7 +501,7 @@ final class section_info_test extends \advanced_testcase {
         $courseobject->numsections = 1;
         $property->setValue($format, $courseobject);
 
-        $delegatedsection = $modinfo->get_section_info($delegatedsection->section);
+        $delegatedsection = $modinfo->get_section_info($delegatedsection->sectionnum);
         $this->assertTrue($delegatedsection->is_orphan());
     }
 

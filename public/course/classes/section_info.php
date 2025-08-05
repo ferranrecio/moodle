@@ -243,10 +243,11 @@ class section_info implements IteratorAggregate {
         // Data that is always present.
         $this->_id = $data->id;
 
-        $defaults = self::$sectioncachedefaults +
-                ['conditionscompletion' => [],
-                    'conditionsgrade' => [],
-                    'conditionsfield' => []];
+        $defaults = self::$sectioncachedefaults + [
+            'conditionscompletion' => [],
+            'conditionsgrade' => [],
+            'conditionsfield' => [],
+        ];
 
         // Data that may use default values to save cache size.
         foreach ($defaults as $field => $value) {
@@ -292,9 +293,9 @@ class section_info implements IteratorAggregate {
             return isset($value);
         }
         if (
-            method_exists($this, 'get_' . $name) ||
-                property_exists($this, '_' . $name) ||
-                array_key_exists($name, self::$sectionformatoptions[$this->modinfo->get_course()->format])
+            method_exists($this, 'get_' . $name)
+            || property_exists($this, '_' . $name)
+            || array_key_exists($name, self::$sectionformatoptions[$this->modinfo->get_course()->format])
         ) {
             $value = $this->__get($name);
             return isset($value);
@@ -379,7 +380,7 @@ class section_info implements IteratorAggregate {
                 $this->_availableinfo,
                 true,
                 $userid,
-                $this->modinfo
+                $this->modinfo,
             );
         }
 
@@ -388,8 +389,10 @@ class section_info implements IteratorAggregate {
         }
         // Execute the hook from the course format that may override the available/availableinfo properties.
         $currentavailable = $this->_available;
-        course_get_format($this->modinfo->get_course())->
-            section_get_available_hook($this, $this->_available, $this->_availableinfo);
+
+        course_get_format($this->modinfo->get_course())
+            ->section_get_available_hook($this, $this->_available, $this->_availableinfo);
+
         if (!$currentavailable && $this->_available) {
             debugging('section_get_available_hook() can not make unavailable section available', DEBUG_DEVELOPER);
             $this->_available = $currentavailable;

@@ -167,7 +167,7 @@ use core\output\html_writer;
  * @property-read string $modplural Returns a localised human-readable name of the module type in plural form
  *      Calculated on request
  * @property-read string $content Content to display on main (view) page - calculated on request
- * @property-read url $url URL to link to for this module, or null if it doesn't have a view page - calculated on request
+ * @property-read url|null $url URL to link to for this module, or null if it doesn't have a view page - calculated on request
  * @property-read string $extraclasses Extra CSS classes to add to html output for this activity on main page
  *      Calculated on request
  * @property-read string $onclick Content of HTML on-click attribute already escaped - calculated on request
@@ -440,7 +440,7 @@ class cm_info implements IteratorAggregate {
     private $uservisibleoncoursepage;
 
     /**
-     * @var url
+     * @var url|null The activity URL, if any.
      */
     private $url;
 
@@ -935,14 +935,15 @@ class cm_info implements IteratorAggregate {
     public function get_grouping_label($textclasses = '') {
         $groupinglabel = '';
         if (
-            $this->effectivegroupmode != NOGROUPS && !empty($this->groupingid) &&
-                has_capability('moodle/course:managegroups', context_course::instance($this->course))
+            $this->effectivegroupmode != NOGROUPS
+            && !empty($this->groupingid)
+            && has_capability('moodle/course:managegroups', context_course::instance($this->course))
         ) {
             $groupings = groups_get_all_groupings($this->course);
             $groupinglabel = html_writer::tag(
                 'span',
                 '(' . format_string($groupings[$this->groupingid]->name) . ')',
-                ['class' => 'groupinglabel ' . $textclasses]
+                ['class' => 'groupinglabel ' . $textclasses],
             );
         }
         return $groupinglabel;
@@ -1297,8 +1298,10 @@ class cm_info implements IteratorAggregate {
      */
     private function check_not_view_only() {
         if ($this->state >= self::STATE_DYNAMIC) {
-            throw new coding_exception('Cannot set this data from _cm_info_view because it may ' .
-                    'affect other pages as well as view');
+            throw new coding_exception(
+                'Cannot set this data from _cm_info_view because it may ' .
+                'affect other pages as well as view'
+            );
         }
     }
 
@@ -1369,7 +1372,7 @@ class cm_info implements IteratorAggregate {
             $modviews[$this->modname] = !plugin_supports(
                 'mod',
                 $this->modname,
-                FEATURE_NO_VIEW_LINK
+                FEATURE_NO_VIEW_LINK,
             );
         }
         $this->url = $modviews[$this->modname]
@@ -1435,7 +1438,7 @@ class cm_info implements IteratorAggregate {
                 $this->availableinfo,
                 true,
                 $userid,
-                $this->modinfo
+                $this->modinfo,
             );
         } else {
             $this->available = true;
@@ -1552,16 +1555,18 @@ class cm_info implements IteratorAggregate {
         // If the user cannot access the activity set the uservisible flag to false.
         // Additional checks are required to determine whether the activity is entirely hidden or just greyed out.
         if (
-            (!$this->visible && !has_capability('moodle/course:viewhiddenactivities', $this->get_context(), $userid)) ||
-                (!$this->get_available() &&
-                !has_capability('moodle/course:ignoreavailabilityrestrictions', $this->get_context(), $userid))
+            !$this->visible && !has_capability('moodle/course:viewhiddenactivities', $this->get_context(), $userid)
+            || (
+                !$this->get_available()
+                && !has_capability('moodle/course:ignoreavailabilityrestrictions', $this->get_context(), $userid)
+            )
         ) {
             $this->uservisible = false;
         }
 
         // Check group membership.
         if ($this->is_user_access_restricted_by_capability()) {
-             $this->uservisible = false;
+            $this->uservisible = false;
             // Ensure activity is completely hidden from the user.
             $this->availableinfo = '';
         }
@@ -1583,7 +1588,7 @@ class cm_info implements IteratorAggregate {
     /**
      * Checks whether mod/...:view capability restricts the current user's access.
      *
-     * @return bool True if the user access is restricted.
+     * @return bool|null True if the user access is restricted.
      */
     public function is_user_access_restricted_by_capability() {
         $userid = $this->modinfo->get_user_id();

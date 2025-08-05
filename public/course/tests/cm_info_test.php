@@ -70,7 +70,7 @@ final class cm_info_test extends \advanced_testcase {
                 'idnumber' => 123,
                 'groupmode' => VISIBLEGROUPS,
                 'availability' => $availability,
-            ]
+            ],
         );
         rebuild_course_cache($course->id, true);
 
@@ -186,7 +186,7 @@ final class cm_info_test extends \advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course(
             ['format' => 'topics', 'numsections' => 3, 'enablecompletion' => 1],
-            ['createsections' => true]
+            ['createsections' => true],
         );
         $mods = [];
         $mods[0] = $this->getDataGenerator()->create_module('forum', ['course' => $course->id]);
