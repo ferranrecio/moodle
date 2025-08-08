@@ -293,6 +293,8 @@ class manager {
      * @return [] the filtered data comments array or null if there is no comment.
      */
     public function get_comments(?int $approved = null, array $groups = []): ?array {
+        global $CFG;
+        require_once($CFG->dirroot . '/comment/lib.php');
 
         $entries = $this->get_all_entries($groups);
         if (!is_null($approved)) {
