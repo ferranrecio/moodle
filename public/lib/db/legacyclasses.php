@@ -322,4 +322,12 @@ $legacyclasses = [
         'core_filters',
         'form/local_settings_form.php',
     ],
+    \comment::class => [
+        'core_comment',
+        'manager.php',
+    ],
+    \comment_exception::class => [
+        'core_comment',
+        'comment_exception.php',
+    ],
 ];
