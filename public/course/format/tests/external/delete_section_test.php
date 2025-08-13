@@ -28,20 +28,17 @@ use core_courseformat\stateupdates;
  * @copyright  2025 Laurent David <laurent.david@moodle.com>
  * @category   test
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @coversDefaultClass \core_courseformat\stateactions
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(stateactions::class)]
 final class delete_section_test extends \core_external\tests\externallib_testcase {
     /**
      * Test the webservice can execute the section_delete action.
      *
-     * @covers ::section_delete
-     * @dataProvider section_delete_provider
      * @param int $sectionum
      * @param string $format
      * @param int $expectedsectionum
-     *
-     * @throws \moodle_exception
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('section_delete_provider')]
     public function test_delete_section(int $sectionum, string $format, int $expectedsectionum): void {
         $this->resetAfterTest();
 

@@ -26,8 +26,8 @@ use stdClass;
  * @category   test
  * @copyright  2021 Sara Arjona (sara@moodle.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @coversDefaultClass \core_courseformat\external\update_course
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(update_course::class)]
 final class update_course_test extends \core_external\tests\externallib_testcase {
     #[\Override]
     public static function setUpBeforeClass(): void {
@@ -40,15 +40,13 @@ final class update_course_test extends \core_external\tests\externallib_testcase
     /**
      * Test the webservice can execute a core state action (cm_state).
      *
-     * @dataProvider execute_course_state_provider
-     * @covers ::execute
-     *
      * @param string $format the course format
      * @param string $action the state action name
      * @param array $expected the expected results
      * @param bool $expectexception if an exception should happen.
      * @param bool $assertdebug if an debug message should happen.
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('execute_course_state_provider')]
     public function test_execute_course_state(
         string $format,
         string $action,
@@ -56,7 +54,6 @@ final class update_course_test extends \core_external\tests\externallib_testcase
         bool $expectexception,
         bool $assertdebug
     ): void {
-
         $this->resetAfterTest();
 
         // Create a course with two activities.
@@ -171,9 +168,6 @@ final class update_course_test extends \core_external\tests\externallib_testcase
 
     /**
      * Test a wrong course id.
-     *
-     * @covers ::execute
-     *
      */
     public function test_execute_wrong_courseid(): void {
 
@@ -194,8 +188,6 @@ final class update_course_test extends \core_external\tests\externallib_testcase
 
     /**
      * Test target params are passed to the state actions.
-     *
-     * @covers ::execute
      */
     public function test_execute_target_params(): void {
 
