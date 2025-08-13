@@ -54,7 +54,7 @@ class request_course extends moodleform {
             'text',
             'fullname',
             get_string('fullnamecourse'),
-            ['maxlength' => \core_course\constants::FULLNAME_MAXIMUM_LENGTH, 'size' => 50]
+            ['maxlength' => \core_course\constants::FULLNAME_MAXIMUM_LENGTH, 'size' => 50],
         );
         $mform->addHelpButton('fullname', 'fullnamecourse');
         $mform->addRule('fullname', get_string('missingfullname'), 'required', null, 'client');
@@ -64,7 +64,7 @@ class request_course extends moodleform {
             'text',
             'shortname',
             get_string('shortnamecourse'),
-            ['maxlength' => \core_course\constants::SHORTNAME_MAXIMUM_LENGTH, 'size' => 20]
+            ['maxlength' => \core_course\constants::SHORTNAME_MAXIMUM_LENGTH, 'size' => 20],
         );
         $mform->addHelpButton('shortname', 'shortnamecourse');
         $mform->addRule('shortname', get_string('missingshortname'), 'required', null, 'client');
@@ -78,13 +78,24 @@ class request_course extends moodleform {
             $mform->addHelpButton('category', 'coursecategory');
         }
 
-        $mform->addElement('editor', 'summary_editor', get_string('summary'), null, course_request::summary_editor_options());
+        $mform->addElement(
+            'editor',
+            'summary_editor',
+            get_string('summary'),
+            null,
+            course_request::summary_editor_options(),
+        );
         $mform->addHelpButton('summary_editor', 'coursesummary');
         $mform->setType('summary_editor', PARAM_RAW);
 
         $mform->addElement('header', 'requestreason', get_string('courserequestreason'));
 
-        $mform->addElement('textarea', 'reason', get_string('courserequestsupport'), ['rows' => '15', 'cols' => '50']);
+        $mform->addElement(
+            'textarea',
+            'reason',
+            get_string('courserequestsupport'),
+            ['rows' => '15', 'cols' => '50'],
+        );
         $mform->addRule('reason', get_string('missingreqreason'), 'required', null, 'client');
         $mform->setType('reason', PARAM_TEXT);
 

@@ -135,18 +135,22 @@ if (empty($pending)) {
         $category = $course->get_category();
 
         // Fullname of the user who requested the course (with link to profile if current user can view it).
-        $requesterfullname = $OUTPUT->user_picture($course->get_requester(), [
-            'includefullname' => true,
-            'link' => user_can_view_profile($course->get_requester()),
-        ]);
+        $requesterfullname = $OUTPUT->user_picture(
+            $course->get_requester(),
+            [
+                'includefullname' => true,
+                'link' => user_can_view_profile($course->get_requester()),
+            ],
+        );
 
-        $row = [];
-        $row[] = $requesterfullname;
-        $row[] = format_string($course->shortname);
-        $row[] = format_string($course->fullname);
-        $row[] = format_text($course->summary, $course->summaryformat);
-        $row[] = $category->get_formatted_name();
-        $row[] = format_string($course->reason);
+        $row = [
+            $requesterfullname,
+            format_string($course->shortname),
+            format_string($course->fullname),
+            format_text($course->summary, $course->summaryformat),
+            $category->get_formatted_name(),
+            format_string($course->reason),
+        ];
 
         $controls = [
             $OUTPUT->single_button(

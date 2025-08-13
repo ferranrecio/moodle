@@ -271,11 +271,14 @@ class course_request {
      */
     public function get_category() {
         global $CFG;
-        if ($this->properties->category && ($category = core_course_category::get($this->properties->category, IGNORE_MISSING))) {
+        if (
+            $this->properties->category
+            && ($category = core_course_category::get($this->properties->category, IGNORE_MISSING))
+        ) {
             return $category;
         } else if (
-            $CFG->defaultrequestcategory &&
-                ($category = core_course_category::get($CFG->defaultrequestcategory, IGNORE_MISSING))
+            $CFG->defaultrequestcategory
+            && ($category = core_course_category::get($CFG->defaultrequestcategory, IGNORE_MISSING))
         ) {
             return $category;
         } else {
@@ -345,10 +348,11 @@ class course_request {
         }
 
         // Enrol the requester as teacher if necessary.
-        $tryinternal = !empty($CFG->creatornewroleid);
-        $tryinternal = $tryinternal && !is_viewing($context, $user, 'moodle/role:assign');
-        $tryinternal = $tryinternal && !is_enrolled($context, $user, 'moodle/role:assign');
-        if ($tryinternal) {
+        if (
+            !empty($CFG->creatornewroleid)
+            && !is_viewing($context, $user, 'moodle/role:assign')
+            && !is_enrolled($context, $user, 'moodle/role:assign')
+        ) {
             enrol_try_internal_enrol($course->id, $user->id, $CFG->creatornewroleid);
         }
 
@@ -364,12 +368,12 @@ class course_request {
         }
 
         $this->notify(
-            $user,
-            $USER,
-            'courserequestapproved',
-            get_string('courseapprovedsubject'),
-            get_string('courseapprovedemail2', 'moodle', $a),
-            $course->id,
+            touser: $user,
+            fromuser: $USER,
+            name: 'courserequestapproved',
+            subject: get_string('courseapprovedsubject'),
+            message: get_string('courseapprovedemail2', 'moodle', $a),
+            courseid: $course->id,
         );
 
         return $course->id;
@@ -387,11 +391,11 @@ class course_request {
         global $USER, $DB;
         $user = $DB->get_record('user', ['id' => $this->properties->requester], '*', MUST_EXIST);
         $this->notify(
-            $user,
-            $USER,
-            'courserequestrejected',
-            get_string('courserejectsubject'),
-            get_string('courserejectemail', 'moodle', $notice),
+            touser: $user,
+            fromuser: $USER,
+            name: 'courserequestrejected',
+            subject: get_string('courserejectsubject'),
+            message: get_string('courserejectemail', 'moodle', $notice),
         );
         $this->delete();
     }
@@ -447,8 +451,7 @@ class course_request {
 
         if ($context instanceof context_system) {
             $defaultcontext = context_coursecat::instance($CFG->defaultrequestcategory, IGNORE_MISSING);
-            return $defaultcontext &&
-                has_capability('moodle/course:request', $defaultcontext);
+            return $defaultcontext && has_capability('moodle/course:request', $defaultcontext);
         } else if ($context instanceof context_coursecat) {
             if (!$CFG->lockrequestcategory || $CFG->defaultrequestcategory == $context->instanceid) {
                 return has_capability('moodle/course:request', $context);
