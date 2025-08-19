@@ -401,28 +401,38 @@ final class overview_test extends \advanced_testcase {
      * @covers ::get_extra_submissions_overview
      * @covers ::get_extra_assessments_overview
      * @dataProvider data_provider_get_extra_submissions_overview
-     * @param string $user
+     * @param string $role
      * @param int $currentphase
+     * @param int $groupmode
      * @param bool $hasstudentactivity
      * @param bool $expectnull
+     * @param array $expected
      */
     public function test_get_extra_submissions_overview(
-        string $user,
+        string $role,
         int $currentphase,
+        int $groupmode,
         bool $hasstudentactivity,
         bool $expectnull,
+        array $expected = [],
     ): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 
         $course = $this->getDataGenerator()->create_course();
-        $teacher = $this->getDataGenerator()->create_and_enrol($course, 'teacher');
-        $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $student1 = $this->getDataGenerator()->create_and_enrol($course, 'student');
         $student2 = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $currentuser = $this->getDataGenerator()->create_and_enrol($course, $role);
+
+        if ($groupmode != NOGROUPS) {
+            $group1 = $this->getDataGenerator()->create_group(['courseid' => $course->id]);
+            $this->getDataGenerator()->create_group_member(['userid' => $currentuser->id, 'groupid' => $group1->id]);
+            $this->getDataGenerator()->create_group_member(['userid' => $student1->id, 'groupid' => $group1->id]);
+        }
 
         $activity = $this->getDataGenerator()->create_module(
             'workshop',
-            ['course' => $course->id],
+            ['course' => $course->id, 'groupmode' => $groupmode],
         );
         $cm = get_fast_modinfo($course)->get_cm($activity->cmid);
 
@@ -452,28 +462,37 @@ final class overview_test extends \advanced_testcase {
 
         if ($hasstudentactivity) {
             // Create some submissions.
-            $submissionid = $generator->create_submission(
+            $student1submissionid = $generator->create_submission(
                 $activity->id,
-                $student->id,
+                $student1->id,
                 ['title' => 'My custom title', 'grade' => 85.00000],
             );
-            $generator->create_submission(
+            $student2submissionid = $generator->create_submission(
                 $activity->id,
                 $student2->id,
                 ['title' => 'My custom title', 'grade' => 65.00000],
             );
-            // Assess one submission.
+            // Assess some submissions.
             $generator->create_assessment(
-                $submissionid,
-                $student->id,
-                ['weight' => 3, 'grade' => 95.00000],
+                $student1submissionid,
+                $currentuser->id,
+                ['weight' => 3, 'grade' => 45.00000],
+            );
+            $generator->create_assessment(
+                $student2submissionid,
+                $currentuser->id,
+                ['weight' => 3, 'grade' => 55.00000],
+            );
+            $generator->create_assessment(
+                $student2submissionid,
+                $currentuser->id,
+                ['weight' => 3, 'grade' => 65.00000],
             );
         }
 
         $manager = new \workshop($activity, $cm, $course, $cm->context);
         $manager->switch_phase($currentphase);
 
-        $currentuser = ($user == 'teacher') ? $teacher : $student;
         $this->setUser($currentuser);
 
         $overview = overviewfactory::create($cm);
@@ -494,12 +513,10 @@ final class overview_test extends \advanced_testcase {
         }
 
         $this->assertEquals(get_string('submissions', 'mod_workshop'), $itemsubmissions->get_name());
-        $expected = ($hasstudentactivity) ? 2 : 0;
-        $this->assertEquals($expected, $itemsubmissions->get_value());
+        $this->assertEquals($expected['submissions'], $itemsubmissions->get_value());
 
         $this->assertEquals(get_string('assessments', 'mod_workshop'), $itemassessment->get_name());
-        $expected = ($hasstudentactivity) ? 1 : 0;
-        $this->assertEquals($expected, $itemassessment->get_value());
+        $this->assertEquals($expected['assessments'], $itemassessment->get_value());
     }
 
     /**
@@ -510,123 +527,200 @@ final class overview_test extends \advanced_testcase {
     public static function data_provider_get_extra_submissions_overview(): array {
         return [
             'teacher setup phase without activity' => [
-                'user' => 'teacher',
+                'role' => 'editingteacher',
                 'currentphase' => \workshop::PHASE_SETUP,
+                'groupmode' => NOGROUPS,
                 'hasstudentactivity' => false,
                 'expectnull' => false,
+                'expected' => ['submissions' => 0, 'assessments' => 0],
             ],
             'student setup phase without activity' => [
-                'user' => 'student',
+                'role' => 'student',
                 'currentphase' => \workshop::PHASE_SETUP,
+                'groupmode' => NOGROUPS,
                 'hasstudentactivity' => false,
                 'expectnull' => true,
             ],
             'teacher submission phase without activity' => [
-                'user' => 'teacher',
+                'role' => 'editingteacher',
                 'currentphase' => \workshop::PHASE_SUBMISSION,
+                'groupmode' => NOGROUPS,
                 'hasstudentactivity' => false,
                 'expectnull' => false,
+                'expected' => ['submissions' => 0, 'assessments' => 0],
             ],
             'student submission phase without activity' => [
-                'user' => 'student',
+                'role' => 'student',
                 'currentphase' => \workshop::PHASE_SUBMISSION,
+                'groupmode' => NOGROUPS,
                 'hasstudentactivity' => false,
                 'expectnull' => true,
             ],
             'teacher assessment phase without activity' => [
-                'user' => 'teacher',
+                'role' => 'editingteacher',
                 'currentphase' => \workshop::PHASE_ASSESSMENT,
+                'groupmode' => NOGROUPS,
                 'hasstudentactivity' => false,
                 'expectnull' => false,
+                'expected' => ['submissions' => 0, 'assessments' => 0],
             ],
             'student assessment phase without activity' => [
-                'user' => 'student',
+                'role' => 'student',
                 'currentphase' => \workshop::PHASE_ASSESSMENT,
+                'groupmode' => NOGROUPS,
                 'hasstudentactivity' => false,
                 'expectnull' => true,
             ],
             'teacher evaluation phase without activity' => [
-                'user' => 'teacher',
+                'role' => 'editingteacher',
                 'currentphase' => \workshop::PHASE_EVALUATION,
+                'groupmode' => NOGROUPS,
                 'hasstudentactivity' => false,
                 'expectnull' => false,
+                'expected' => ['submissions' => 0, 'assessments' => 0],
             ],
             'student evaluation phase without activity' => [
-                'user' => 'student',
+                'role' => 'student',
                 'currentphase' => \workshop::PHASE_EVALUATION,
+                'groupmode' => NOGROUPS,
                 'hasstudentactivity' => false,
                 'expectnull' => true,
             ],
             'teacher closed phase without activity' => [
-                'user' => 'teacher',
+                'role' => 'editingteacher',
                 'currentphase' => \workshop::PHASE_CLOSED,
+                'groupmode' => NOGROUPS,
                 'hasstudentactivity' => false,
                 'expectnull' => false,
+                'expected' => ['submissions' => 0, 'assessments' => 0],
             ],
             'student closed phase without activity' => [
-                'user' => 'student',
+                'role' => 'student',
                 'currentphase' => \workshop::PHASE_CLOSED,
+                'groupmode' => NOGROUPS,
                 'hasstudentactivity' => false,
                 'expectnull' => true,
             ],
             // Tests with assessments.
             'teacher setup phase with activity' => [
-                'user' => 'teacher',
+                'role' => 'editingteacher',
                 'currentphase' => \workshop::PHASE_SETUP,
+                'groupmode' => NOGROUPS,
                 'hasstudentactivity' => true,
                 'expectnull' => false,
+                'expected' => ['submissions' => 2, 'assessments' => 3],
             ],
             'student setup phase with activity' => [
-                'user' => 'student',
+                'role' => 'student',
                 'currentphase' => \workshop::PHASE_SETUP,
+                'groupmode' => NOGROUPS,
                 'hasstudentactivity' => true,
                 'expectnull' => true,
             ],
             'teacher submission phase with activity' => [
-                'user' => 'teacher',
+                'role' => 'editingteacher',
                 'currentphase' => \workshop::PHASE_SUBMISSION,
+                'groupmode' => NOGROUPS,
                 'hasstudentactivity' => true,
                 'expectnull' => false,
+                'expected' => ['submissions' => 2, 'assessments' => 3],
             ],
             'student submission phase with activity' => [
-                'user' => 'student',
+                'role' => 'student',
                 'currentphase' => \workshop::PHASE_SUBMISSION,
+                'groupmode' => NOGROUPS,
                 'hasstudentactivity' => true,
                 'expectnull' => true,
             ],
             'teacher assessment phase with activity' => [
-                'user' => 'teacher',
+                'role' => 'editingteacher',
                 'currentphase' => \workshop::PHASE_ASSESSMENT,
+                'groupmode' => NOGROUPS,
                 'hasstudentactivity' => true,
                 'expectnull' => false,
+                'expected' => ['submissions' => 2, 'assessments' => 3],
             ],
             'student assessment phase with activity' => [
-                'user' => 'student',
+                'role' => 'student',
                 'currentphase' => \workshop::PHASE_ASSESSMENT,
+                'groupmode' => NOGROUPS,
                 'hasstudentactivity' => true,
                 'expectnull' => true,
             ],
             'teacher evaluation phase with activity' => [
-                'user' => 'teacher',
+                'role' => 'editingteacher',
                 'currentphase' => \workshop::PHASE_EVALUATION,
+                'groupmode' => NOGROUPS,
                 'hasstudentactivity' => true,
                 'expectnull' => false,
+                'expected' => ['submissions' => 2, 'assessments' => 3],
             ],
             'student evaluation phase with activity' => [
-                'user' => 'student',
+                'role' => 'student',
                 'currentphase' => \workshop::PHASE_EVALUATION,
+                'groupmode' => NOGROUPS,
                 'hasstudentactivity' => true,
                 'expectnull' => true,
             ],
             'teacher closed phase with activity' => [
-                'user' => 'teacher',
+                'role' => 'editingteacher',
                 'currentphase' => \workshop::PHASE_CLOSED,
+                'groupmode' => NOGROUPS,
                 'hasstudentactivity' => true,
                 'expectnull' => false,
+                'expected' => ['submissions' => 2, 'assessments' => 3],
             ],
             'student closed phase with activity' => [
-                'user' => 'student',
+                'role' => 'student',
                 'currentphase' => \workshop::PHASE_CLOSED,
+                'groupmode' => NOGROUPS,
+                'hasstudentactivity' => true,
+                'expectnull' => true,
+            ],
+            // Group mode tests.
+            'teacher closed phase with group activity (separate groups)' => [
+                'role' => 'editingteacher',
+                'currentphase' => \workshop::PHASE_CLOSED,
+                'groupmode' => SEPARATEGROUPS,
+                'hasstudentactivity' => true,
+                'expectnull' => false,
+                'expected' => ['submissions' => 2, 'assessments' => 3],
+            ],
+            'non-editing teacher closed phase with group activity (separate groups)' => [
+                'role' => 'teacher',
+                'currentphase' => \workshop::PHASE_CLOSED,
+                'groupmode' => SEPARATEGROUPS,
+                'hasstudentactivity' => true,
+                'expectnull' => false,
+                'expected' => ['submissions' => 1, 'assessments' => 1],
+            ],
+            'student closed phase with group activity (separate groups)' => [
+                'role' => 'student',
+                'currentphase' => \workshop::PHASE_CLOSED,
+                'groupmode' => SEPARATEGROUPS,
+                'hasstudentactivity' => true,
+                'expectnull' => true,
+            ],
+            'teacher closed phase with group activity (visible groups)' => [
+                'role' => 'editingteacher',
+                'currentphase' => \workshop::PHASE_CLOSED,
+                'groupmode' => VISIBLEGROUPS,
+                'hasstudentactivity' => true,
+                'expectnull' => false,
+                'expected' => ['submissions' => 2, 'assessments' => 3],
+            ],
+            'non-editing teacher closed phase with group activity (visible groups)' => [
+                'role' => 'teacher',
+                'currentphase' => \workshop::PHASE_CLOSED,
+                'groupmode' => VISIBLEGROUPS,
+                'hasstudentactivity' => true,
+                'expectnull' => false,
+                'expected' => ['submissions' => 2, 'assessments' => 3],
+            ],
+            'student closed phase with group activity (visible groups)' => [
+                'role' => 'student',
+                'currentphase' => \workshop::PHASE_CLOSED,
+                'groupmode' => VISIBLEGROUPS,
                 'hasstudentactivity' => true,
                 'expectnull' => true,
             ],

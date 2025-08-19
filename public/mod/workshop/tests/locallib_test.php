@@ -869,10 +869,10 @@ final class locallib_test extends \advanced_testcase {
     }
 
     /**
-     * Test count_submissions and count_assessments methods.
+     * Test count_all_submissions and count_all_assessments methods.
      *
-     * @covers \workshop::count_submissions
-     * @covers \workshop::count_assessments
+     * @covers \workshop::count_all_submissions
+     * @covers \workshop::count_all_assessments
      */
     public function test_count_submissions_count_assessments(): void {
         $this->resetAfterTest();
@@ -945,23 +945,61 @@ final class locallib_test extends \advanced_testcase {
 
         $manager = new workshop($activity, $cm, $course, $cm->context);
 
-        $this->assertEquals(4, $manager->count_submissions());
-        $this->assertEquals(4, $manager->count_submissions('all'));
-        $this->assertEquals(1, $manager->count_submissions($student1->id));
-        $this->assertEquals(1, $manager->count_submissions($student2->id));
+        $this->assertEquals(4, $manager->count_all_submissions());
+        $this->assertEquals(1, $manager->count_all_submissions(authorids: [$student1->id]));
+        $this->assertEquals(2, $manager->count_all_submissions(authorids: [$student1->id, $student2->id]));
 
-        $this->assertEquals(2, $manager->count_submissions('all', $group1->id));
-        $this->assertEquals(1, $manager->count_submissions('all', $group2->id));
-        $this->assertEquals(1, $manager->count_submissions($student1->id, $group1->id));
-        $this->assertEquals(0, $manager->count_submissions($student2->id, $group1->id));
+        $this->assertEquals(2, $manager->count_all_submissions(groupids: [$group1->id]));
+        $this->assertEquals(1, $manager->count_all_submissions(groupids: [$group2->id]));
+        $this->assertEquals(3, $manager->count_all_submissions(groupids: [$group1->id, $group2->id]));
+        $this->assertEquals(1, $manager->count_all_submissions(authorids: [$student1->id], groupids: [$group1->id]));
+        $this->assertEquals(0, $manager->count_all_submissions(authorids: [$student2->id], groupids: [$group1->id]));
 
-        $this->assertEquals(4, $manager->count_assessments());
-        $this->assertEquals(2, $manager->count_assessments(true));
+        $this->assertEquals(4, $manager->count_all_assessments());
+        $this->assertEquals(2, $manager->count_all_assessments(onlygraded: true));
 
-        $this->assertEquals(2, $manager->count_assessments(false, $group1->id));
-        $this->assertEquals(1, $manager->count_assessments(true, $group1->id));
+        $this->assertEquals(2, $manager->count_all_assessments(onlygraded: false, groupids: [$group1->id]));
+        $this->assertEquals(1, $manager->count_all_assessments(onlygraded: true, groupids: [$group1->id]));
 
-        $this->assertEquals(1, $manager->count_assessments(false, $group2->id));
-        $this->assertEquals(0, $manager->count_assessments(true, $group2->id));
+        $this->assertEquals(1, $manager->count_all_assessments(onlygraded: false, groupids: [$group2->id]));
+        $this->assertEquals(0, $manager->count_all_assessments(onlygraded: true, groupids: [$group2->id]));
+
+        $this->assertEquals(3, $manager->count_all_assessments(onlygraded: false, groupids: [$group1->id, $group2->id]));
+        $this->assertEquals(1, $manager->count_all_assessments(onlygraded: true, groupids: [$group1->id, $group2->id]));
+    }
+
+    /**
+     * Test count_all_participants method.
+     *
+     * @covers \workshop::count_all_participants
+     */
+    public function test_count_all_participants(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $course = $this->getDataGenerator()->create_course();
+        $group1 = $this->getDataGenerator()->create_group(['courseid' => $course->id]);
+        $group2 = $this->getDataGenerator()->create_group(['courseid' => $course->id]);
+        $student1 = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $student2 = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $student3 = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $student4 = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $guest = $this->getDataGenerator()->create_and_enrol($course, 'guest');
+
+        $this->getDataGenerator()->create_group_member(['userid' => $student1->id, 'groupid' => $group1->id]);
+        $this->getDataGenerator()->create_group_member(['userid' => $student3->id, 'groupid' => $group1->id]);
+        $this->getDataGenerator()->create_group_member(['userid' => $student2->id, 'groupid' => $group2->id]);
+
+        $activity = $this->getDataGenerator()->create_module(
+            'workshop',
+            ['course' => $course->id, 'groupmode' => SEPARATEGROUPS],
+        );
+        $cm = get_fast_modinfo($course)->get_cm($activity->cmid);
+        $manager = new workshop($activity, $cm, $course, $cm->context);
+
+        $this->assertEquals(4, $manager->count_all_participants());
+        $this->assertEquals(2, $manager->count_all_participants(groupids: [$group1->id]));
+        $this->assertEquals(1, $manager->count_all_participants(groupids: [$group2->id]));
+        $this->assertEquals(3, $manager->count_all_participants(groupids: [$group1->id, $group2->id]));
     }
 }
