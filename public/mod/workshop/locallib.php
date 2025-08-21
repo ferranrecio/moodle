@@ -827,11 +827,14 @@ class workshop {
                 $authorwhere
                 $groupwhere";
 
-        return $db->count_records_sql($sql, [
-            'workshopid' => $this->id,
-            ...$authorparams,
-            ...$groupparams,
-        ]);
+        return $db->count_records_sql(
+            $sql,
+            [
+                'workshopid' => $this->id,
+                ...$authorparams,
+                ...$groupparams,
+            ],
+        );
     }
 
     /**
@@ -896,10 +899,13 @@ class workshop {
                 $onlygradedwhere
                 $groupwhere";
 
-        return $db->count_records_sql($sql, [
-            'workshopid' => $this->id,
-            ...$groupparams,
-        ]);
+        return $db->count_records_sql(
+            $sql,
+            [
+                'workshopid' => $this->id,
+                ...$groupparams,
+            ],
+        );
     }
 
 

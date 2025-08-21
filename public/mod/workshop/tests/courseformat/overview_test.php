@@ -26,19 +26,18 @@ use core_courseformat\local\overview\overviewfactory;
 /**
  * Tests for Workshop overview integration.
  *
- * @covers \mod_workshop\course\overview
  * @package    mod_workshop
  * @category   test
  * @copyright  2025 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(overview::class)]
 final class overview_test extends \advanced_testcase {
 
     /**
      * Test get_grade_item_names method.
      *
      * @dataProvider data_provider_get_grade_item_names
-     * @covers ::get_grade_item_names
      * @param string $user
      * @param bool $expectempty
      * @param bool $hassubmission
@@ -169,7 +168,6 @@ final class overview_test extends \advanced_testcase {
     /**
      * Test get_extra_phase_overview method.
      *
-     * @covers ::get_extra_phase_overview
      * @dataProvider data_provider_get_extra_phase_overview
      * @param string $user
      * @param int $currentphase
@@ -257,7 +255,6 @@ final class overview_test extends \advanced_testcase {
     /**
      * Test get_extra_deadline_overview method.
      *
-     * @covers ::get_extra_deadline_overview
      * @dataProvider data_provider_get_extra_deadline_overview
      * @param string $user
      * @param int $currentphase
@@ -398,8 +395,6 @@ final class overview_test extends \advanced_testcase {
     /**
      * Test get_extra_submissions_overview and get_extra_assessments_overview methods.
      *
-     * @covers ::get_extra_submissions_overview
-     * @covers ::get_extra_assessments_overview
      * @dataProvider data_provider_get_extra_submissions_overview
      * @param string $role
      * @param int $currentphase
@@ -730,7 +725,6 @@ final class overview_test extends \advanced_testcase {
     /**
      * Test get_actions_overview.
      *
-     * @covers ::get_actions_overview
      * @dataProvider provider_test_get_actions_overview
      *
      * @param string $role
