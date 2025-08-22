@@ -37,12 +37,12 @@ final class overview_test extends \advanced_testcase {
     /**
      * Test get_grade_item_names method.
      *
-     * @dataProvider data_provider_get_grade_item_names
      * @param string $user
      * @param bool $expectempty
      * @param bool $hassubmission
      * @param bool $hasassesment
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('data_provider_get_grade_item_names')]
     public function test_get_grade_item_names(
         string $user,
         bool $expectempty,
@@ -168,10 +168,10 @@ final class overview_test extends \advanced_testcase {
     /**
      * Test get_extra_phase_overview method.
      *
-     * @dataProvider data_provider_get_extra_phase_overview
      * @param string $user
      * @param int $currentphase
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('data_provider_get_extra_phase_overview')]
     public function test_get_extra_phase_overview(string $user, int $currentphase): void {
         $this->resetAfterTest();
         $this->setAdminUser();
@@ -255,13 +255,13 @@ final class overview_test extends \advanced_testcase {
     /**
      * Test get_extra_deadline_overview method.
      *
-     * @dataProvider data_provider_get_extra_deadline_overview
      * @param string $user
      * @param int $currentphase
      * @param int $submissionend
      * @param int $assessmentend
      * @param int|null $expectedincrement null if the item should be null.
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('data_provider_get_extra_deadline_overview')]
     public function test_get_extra_deadline_overview(
         string $user,
         int $currentphase,
@@ -395,7 +395,6 @@ final class overview_test extends \advanced_testcase {
     /**
      * Test get_extra_submissions_overview and get_extra_assessments_overview methods.
      *
-     * @dataProvider data_provider_get_extra_submissions_overview
      * @param string $role
      * @param int $currentphase
      * @param int $groupmode
@@ -403,6 +402,7 @@ final class overview_test extends \advanced_testcase {
      * @param bool $expectnull
      * @param array $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('data_provider_get_extra_submissions_overview')]
     public function test_get_extra_submissions_overview(
         string $role,
         int $currentphase,
@@ -725,11 +725,10 @@ final class overview_test extends \advanced_testcase {
     /**
      * Test get_actions_overview.
      *
-     * @dataProvider provider_test_get_actions_overview
-     *
      * @param string $role
      * @param array|null $expected
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_test_get_actions_overview')]
     public function test_get_actions_overview(
         string $role,
         ?array $expected
