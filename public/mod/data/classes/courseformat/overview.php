@@ -87,7 +87,6 @@ class overview extends \core_courseformat\activityoverviewbase {
 
         $name = get_string('view', 'moodle');
         $toapprove = 0;
-        $alertlabel = get_string('numberofentriestoapprove', 'data');
         if ($this->manager->get_approval_requested()) {
             // Let's calculate how many entries need to be approved.
             $entries = $this->manager->filter_entries_by_approval($this->manager->get_all_entries(), 0);
@@ -96,6 +95,7 @@ class overview extends \core_courseformat\activityoverviewbase {
                 $name = get_string('approve', 'data');
             }
         }
+        $alertlabel = get_string('numberofentriestoapprove', 'data', $toapprove);
 
         $content = new overviewaction(
             url: new url('/mod/data/view.php', ['id' => $this->cm->id]),
