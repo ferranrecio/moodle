@@ -19,6 +19,7 @@ namespace mod_assign\courseformat;
 use assign;
 use cm_info;
 use core\url;
+use core\strings;
 use mod_assign\dates;
 use core_calendar\output\humandate;
 use core\output\local\properties\text_align;
@@ -43,6 +44,7 @@ class overview extends \core_courseformat\activityoverviewbase {
      */
     public function __construct(
         cm_info $cm,
+        private strings $strings,
     ) {
         global $CFG;
         require_once($CFG->dirroot . '/mod/assign/locallib.php');
@@ -60,7 +62,7 @@ class overview extends \core_courseformat\activityoverviewbase {
 
         if (empty($duedate)) {
             return new overviewitem(
-                name: get_string('duedate', 'assign'),
+                name: $this->strings->get('duedate', 'assign'),
                 value: null,
                 content: '-',
             );
@@ -69,7 +71,7 @@ class overview extends \core_courseformat\activityoverviewbase {
         $content = humandate::create_from_timestamp($duedate);
 
         return new overviewitem(
-            name: get_string('duedate', 'assign'),
+            name: $this->strings->get('duedate', 'assign'),
             value: $duedate,
             content: $content,
         );
@@ -81,8 +83,8 @@ class overview extends \core_courseformat\activityoverviewbase {
             return null;
         }
 
-        $alertlabel = get_string('numberofsubmissionsneedgrading', 'assign');
-        $name = get_string('view');
+        $alertlabel = $this->strings->get('numberofsubmissionsneedgrading', 'assign');
+        $name = $this->strings->get('view');
         $needgrading = 0;
 
         if (is_gradable(courseid: $this->course->id, itemtype: 'mod', itemmodule: 'assign', iteminstance: $this->cm->instance)) {
@@ -90,7 +92,7 @@ class overview extends \core_courseformat\activityoverviewbase {
                 array_keys($this->get_groups_for_filtering()),
             );
             if ($needgrading > 0) {
-                $name = get_string('gradeverb');
+                $name = $this->strings->get('gradeverb');
             }
         }
 
@@ -102,7 +104,7 @@ class overview extends \core_courseformat\activityoverviewbase {
         );
 
         return new overviewitem(
-            name: get_string('actions'),
+            name: $this->strings->get('actions'),
             value: $name,
             content: $content,
             textalign: text_align::CENTER,
@@ -146,9 +148,9 @@ class overview extends \core_courseformat\activityoverviewbase {
         }
 
         return new overviewitem(
-            name: get_string('submissions', 'assign'),
+            name: $this->strings->get('submissions', 'assign'),
             value: $submissions,
-            content: get_string(
+            content: $this->strings->get(
                 'count_of_total',
                 'core',
                 ['count' => $submissions, 'total' => $total]
@@ -179,13 +181,13 @@ class overview extends \core_courseformat\activityoverviewbase {
         }
 
         if (!empty($usersubmission->status)) {
-            $submittedstatus = get_string('submissionstatus_' . $usersubmission->status, 'assign');
+            $submittedstatus = $this->strings->get('submissionstatus_' . $usersubmission->status, 'assign');
         } else {
-            $submittedstatus = get_string('submissionstatus_', 'assign');
+            $submittedstatus = $this->strings->get('submissionstatus_', 'assign');
         }
 
         return new overviewitem(
-            name: get_string('submissionstatus', 'assign'),
+            name: $this->strings->get('submissionstatus', 'assign'),
             value: $submittedstatus,
             content: $submittedstatus,
         );
