@@ -56,4 +56,11 @@ class manager {
         $usergroups = groups_get_user_groups($course->id);
         return ($groupmode != SEPARATEGROUPS || !empty($usergroups['0']));
     }
+
+    public static function can_view_completion(\mod_feedback_completion $feedbackcompletion): bool {
+        return $feedbackcompletion->is_open()
+            && $feedbackcompletion->can_complete()
+            && $feedbackcompletion->can_submit()
+            && !empty($feedbackcompletion->get_items(true));
+    }
 }

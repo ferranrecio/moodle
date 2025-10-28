@@ -258,7 +258,7 @@ class mod_lesson_external extends external_api {
 
             // Check if the lesson does not have pages.
             if (!$lessonfirstpageid) {
-                $error = ["lessonnotready2" => null];
+                $error = ["lessonnotready" => null];
                 if (!$return) {
                     throw new moodle_exception(key($error), 'lesson');
                 }

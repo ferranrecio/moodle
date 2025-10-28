@@ -22,10 +22,12 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['addfiles'] = 'Add files';
 $string['bynameondate'] = 'by {$a->name} - {$a->date}';
 $string['contentheader'] = 'Content';
 $string['dnduploadmakefolder'] = 'Unzip files and create folder';
 $string['downloadfolder'] = 'Download folder';
+$string['emptyfolder'] = 'No content has been added to this folder yet.';
 $string['eventallfilesdownloaded'] = 'Zip archive of folder downloaded';
 $string['eventfolderupdated'] = 'Folder updated';
 $string['folder:addinstance'] = 'Add a new folder';

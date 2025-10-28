@@ -74,7 +74,7 @@ class forum_actionbar implements renderable, templatable {
      *
      * @return string HTML button
      */
-    private function get_new_discussion_topic_button(): string {
+    public function get_new_discussion_topic_button(): string {
         global $USER;
         $renderfactory = \mod_forum\local\container::get_renderer_factory();
         $discussionrenderer = $renderfactory->get_discussion_list_renderer($this->forum);
@@ -131,5 +131,13 @@ class forum_actionbar implements renderable, templatable {
             }
         }
         return $data;
+    }
+
+    public function get_add_discussion_item(): ?\core\output\action_link {
+        global $USER;
+        if ($this->forum->get_type() === 'single') {
+            return null;
+        }
+
     }
 }

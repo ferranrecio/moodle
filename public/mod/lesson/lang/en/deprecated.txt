@@ -3,3 +3,4 @@ groupoverridesdeleted,mod_lesson
 preview,mod_lesson
 previewlesson,mod_lesson
 viewreports2,mod_lesson
+lessonnotready2,mod_lesson

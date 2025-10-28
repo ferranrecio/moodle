@@ -43,7 +43,13 @@ class standard_action_bar extends base_action_bar {
      * @param int|null $courseid The course that the feedback is being accessed from. If null, courseid will be
      *                              set via the $cmid relationship
      */
+    #[\core\attribute\deprecated(
+        replacement: 'mod_feedback\output\view_action_bar',
+        since: '5.2',
+        mdl: 'MDL-XXXXX',
+    )]
     public function __construct(int $cmid, bool $viewcompletion, ?int $startpage = null, ?int $courseid = null) {
+        \core\deprecation::emit_deprecation(__FUNCTION__);
         parent::__construct($cmid);
         $this->startpage = $startpage;
         $this->viewcompletion = $viewcompletion;

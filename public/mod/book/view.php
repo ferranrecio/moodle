@@ -106,7 +106,12 @@ $PAGE->add_body_class('limitedwidth');
 if (!$chapterid) {
     $PAGE->set_url('/mod/book/view.php', array('id' => $id));
     echo $OUTPUT->header();
-    echo $OUTPUT->notification(get_string('nocontent', 'mod_book'), 'info', false);
+    $initialstate = new \core\output\initial_state_action_bar(
+        get_string('activitynotready', 'course'),
+        get_string('nocontent', 'mod_book'),
+        $OUTPUT->image_url('i/zero_state_noentries', 'core'),
+    );
+    echo $OUTPUT->render($initialstate);
 } else {
     $PAGE->set_url('/mod/book/view.php', ['id' => $id, 'chapterid' => $chapterid]);
     // The chapter doesnt exist or it is hidden for students.

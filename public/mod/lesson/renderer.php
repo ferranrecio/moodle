@@ -112,22 +112,34 @@ class mod_lesson_renderer extends plugin_renderer_base {
      */
     public function login_prompt(lesson $lesson, $failedattempt = false) {
         global $CFG;
-        $output  = $this->output->box_start('password-form');
-        $output .= $this->output->box_start('generalbox boxaligncenter');
-        $output .=  '<form id="password" method="post" action="'.$CFG->wwwroot.'/mod/lesson/view.php" autocomplete="off">';
-        $output .=  '<fieldset class="invisiblefieldset center">';
-        $output .=  '<input type="hidden" name="id" value="'. $this->page->cm->id .'" />';
-        $output .=  '<input type="hidden" name="sesskey" value="'.sesskey().'" />';
-        if ($failedattempt) {
-            $output .=  $this->output->notification(get_string('loginfail', 'lesson'));
-        }
-        $output .= get_string('passwordprotectedlesson', 'lesson', format_string($lesson->name)).'<br /><br />';
-        $output .= get_string('enterpassword', 'lesson')." <input type=\"password\" name=\"userpassword\" /><br /><br />";
-        $output .= "<div class='lessonbutton standardbutton submitbutton'><input type='submit' value='".get_string('continue', 'lesson')."' /></div>";
-        $output .= " <div class='lessonbutton standardbutton submitbutton'><input type='submit' name='backtocourse' value='".get_string('cancel', 'lesson')."' /></div>";
-        $output .=  '</fieldset></form>';
-        $output .=  $this->output->box_end();
-        $output .=  $this->output->box_end();
+        $output = '';
+        $initialstate = new \mod_lesson\output\initial_state_panel($lesson, \mod_lesson\output\initial_state_panel::PASSWORD);
+        $output .= $this->output->render($initialstate);
+        // $output .= $this->output->box_start('password-form');
+        // $output .= $this->output->box_start('generalbox boxaligncenter');
+        // $output .=  '<form id="password" method="post" action="'.$CFG->wwwroot.'/mod/lesson/view.php" autocomplete="off">';
+        // $output .=  '<fieldset class="invisiblefieldset center">';
+        // $output .=  '<input type="hidden" name="id" value="'. $this->page->cm->id .'" />';
+        // $output .=  '<input type="hidden" name="sesskey" value="'.sesskey().'" />';
+        // if ($failedattempt) {
+        //     $output .=  $this->output->notification(get_string('loginfail', 'lesson'));
+        // }
+        // $output .= get_string('enterpassword', 'lesson')." <input type=\"password\" name=\"userpassword\" /><br /><br />";
+        // $output .= "<div class='lessonbutton standardbutton submitbutton'><input type='submit' value='".get_string('continue', 'lesson')."' /></div>";
+        // $output .= " <div class='lessonbutton standardbutton submitbutton'><input type='submit' name='backtocourse' value='".get_string('cancel', 'lesson')."' /></div>";
+        // $output .=  '</fieldset></form>';
+        // $output .=  $this->output->box_end();
+        // $output .=  $this->output->box_end();
+
+        $output .= $this->output->render_from_template(
+            'mod_lesson/password_form',
+            [
+                'action' => (new moodle_url('/mod/lesson/view.php'))->out(false),
+                'cmid' => $this->page->cm->id,
+                'sesskey' => sesskey(),
+                'loginfailed' => !empty($failedattempt),
+            ],
+        );
         return $output;
     }
 
@@ -363,11 +375,21 @@ class mod_lesson_renderer extends plugin_renderer_base {
     }
 
     /**
-     * Return HTML to display add first page links
+     * Return HTML to display add first page links.
+     *
+     * @deprecated since Moodle 5.2.
+     * @todo remove this method in 5.2 (MDL-XXXXX)
      * @param lesson $lesson
      * @return string
      */
+    #[\core\attribute\deprecated(
+        replacement: '\mod_lesson\output\zero_state_action_bar',
+        since: '5.2',
+        mdl: 'MDL-XXXXX',
+    )]
     public function add_first_page_links(lesson $lesson) {
+        \core\deprecation::emit_deprecation([self::class, __FUNCTION__]);
+
         $prevpageid = 0;
 
         $headinglevel = $this->page->activityheader->get_heading_level(3);

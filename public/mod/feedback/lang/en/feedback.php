@@ -63,6 +63,7 @@ $string['count_of_nums'] = 'Count of numbers';
 $string['courseid'] = 'Course ID';
 $string['coursetemplates'] = 'Course templates';
 $string['creating_templates'] = 'Save these questions as a new template';
+$string['createactivity'] = 'Add questions to the feedback survey to start collecting responses from participants.';
 $string['delete_entry'] = 'Delete entry';
 $string['delete_item'] = 'Delete question';
 $string['delete_old_items'] = 'Override existing questions';
@@ -295,8 +296,9 @@ $string['textarea_width'] = 'Width';
 $string['textfield'] = 'Short text answer';
 $string['textfield_maxlength'] = 'Maximum characters accepted';
 $string['textfield_size'] = 'Textfield width';
+$string['thanks'] = 'Thank you for your feedback.';
 $string['there_are_no_settings_for_recaptcha'] = 'There are no settings for captcha';
-$string['this_feedback_is_already_submitted'] = 'You have already submitted this feedback.';
+$string['this_feedback_is_already_submitted'] = 'You have already submitted';
 $string['typemissing'] = 'Missing value "type"';
 $string['update_item'] = 'Save changes to question';
 $string['url_for_continue'] = 'Link to next activity';
@@ -305,6 +307,7 @@ $string['use_one_line_for_each_value'] = 'Use one line for each answer!';
 $string['use_this_template'] = 'Use template';
 $string['using_templates'] = 'Use a template';
 $string['vertical'] = 'Vertical';
+$string['welcome'] = 'Give your feedback';
 $string['whatfor'] = 'How would you like to apply the template?';
 
 // Deprecated since Moodle 4.5.

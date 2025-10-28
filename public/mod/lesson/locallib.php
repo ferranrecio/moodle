@@ -1561,6 +1561,7 @@ abstract class lesson_add_page_form_base extends moodleform {
  *
  * These properties are calculated
  * @property int $firstpageid Id of the first page of this lesson (prevpageid=0)
+ * @property stdClass|bool $firstpage The first page of this lesson (prevpageid=0)
  * @property int $lastpageid Id of the last page of this lesson (nextpageid=0)
  *
  * @copyright  2009 Sam Hemelryk

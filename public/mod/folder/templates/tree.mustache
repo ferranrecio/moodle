@@ -55,7 +55,12 @@
 {{#hassubdirs}}
     <ul role="group">
         {{#subdirs}}
-            <li role="treeitem" tabindex="-1" {{#hassubdirs}}aria-expanded="{{#showexpanded}}true{{/showexpanded}}{{^showexpanded}}false{{/showexpanded}}"{{/hassubdirs}}>
+            <li
+                role="treeitem"
+                tabindex="-1"
+                {{#hassubdirs}}
+                    aria-expanded="{{#showexpanded}}true{{/showexpanded}}{{^showexpanded}}false{{/showexpanded}}"
+                {{/hassubdirs}}>
                 {{>mod_folder/tree}}
             </li>
         {{/subdirs}}

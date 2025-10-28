@@ -324,7 +324,7 @@ final class external_test extends \core_external\tests\externallib_testcase {
         // Lesson withou pages.
         $lesson = new lesson($lesson2);
         $validation = testable_mod_lesson_external::validate_attempt($lesson, ['password' => ''], true);
-        $this->assertEquals('lessonnotready2', key($validation));
+        $this->assertEquals('lessonnotready', key($validation));
         $this->assertCount(1, $validation);
 
         // Test retakes.

@@ -1,0 +1,121 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_choice/display_options
+
+    Displays the options for a choice activity.
+
+    Example context (json):
+    {
+        "coursemoduleid": 123,
+        "infomessage": "You can see the results after answering.",
+        "isvertical": "true",
+        "multiple": true,
+        "viewurl": "https://yourmoodle.site/mod/choice/view.php?id=123",
+        "allowmultiple": "true",
+        "ispreviewonly": "true",
+        "limitanswers": "true",
+        "showavailable": "true",
+        "canchoose": "true",
+        "candelete": "true",
+        "options": [
+            {
+                "text": "Option 1",
+                "value": "1",
+                "disabled": false,
+                "checked": true,
+                "countanswers": 5,
+                "maxanswers": 10,
+                "optionnumber": 1
+            },
+            {
+                "text": "Option 2",
+                "value": "2",
+                "disabled": true,
+                "checked": false,
+                "countanswers": 3,
+                "maxanswers": 10,
+                "optionnumber": 2
+            }
+        ],
+        "sesskey": "abc123xyz"
+    }
+}}
+{{#infomessage}}
+<div class="alert alert-info" role="alert">
+    {{infomessage}}
+</div>
+{{/infomessage}}
+<form
+    method="POST"
+    action="{{viewurl}}"
+>
+    <ul
+        class="choices list-unstyled {{!
+            }}{{#isvertical}}vstack{{/isvertical}}{{!
+            }}{{^isvertical}}hstack{{/isvertical}}"
+    >
+        {{#options}}
+        <li class="option me-3">
+            <div class="form-check">
+                <input
+                    id="choice_{{optionnumber}}"
+                    class="form-check-input mx-1"
+                    type="{{#allowmultiple}}checkbox{{/allowmultiple}}{{^allowmultiple}}radio{{/allowmultiple}}"
+                    name="{{#allowmultiple}}answer[]{{/allowmultiple}}{{^allowmultiple}}answer{{/allowmultiple}}"
+                    value="{{value}}"
+                    {{#disabled}}disabled{{/disabled}}
+                    {{#checked}}checked{{/checked}}
+                >
+                <label class="form-check-label" for="choice_{{value}}">
+                    {{text}}
+                    {{#disabled}}
+                        {{#str}}full,choice{{/str}}
+                    {{/disabled}}
+                    {{#limitanswers}}
+                        {{#showavailable}}
+                            <br>
+                            {{#str}}responsesa,choice,{{countanswers}}{{/str}}
+                            <br>
+                            {{#str}}limita,choice,{{maxanswers}}{{/str}}
+                        {{/showavailable}}
+                    {{/limitanswers}}
+                </label>
+            </div>
+        </li>
+        {{/options}}
+    </ul>
+
+    <input type="hidden" name="sesskey" value="{{sesskey}}">
+    <input type="hidden" name="action" value="makechoice">
+    <input type="hidden" name="id" value="{{coursemoduleid}}">
+
+    {{^ispreviewonly}}
+        {{#canchoose}}
+            <input type="submit" value="{{#str}}savemychoice,choice{{/str}}" class="btn btn-primary">
+            {{#canremoveoptions}}
+            <a href="{{removeoptionsurl}}" class="ms-1">{{#str}}removemychoice,choice{{/str}}</a>
+            {{/canremoveoptions}}
+            {{#isfull}}
+            <label class="mt-3">{{#str}}choicefull,choice{{/str}}</label>
+            {{/isfull}}
+        {{/canchoose}}
+        {{^canchoose}}
+            <label>{{#str}}havetologin,choice{{/str}}</label>
+        {{/canchoose}}
+    {{/ispreviewonly}}
+</form>

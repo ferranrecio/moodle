@@ -1,4 +1,6 @@
 <?php
+
+use core_customfield\field;
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -945,19 +947,28 @@ function scorm_print_launch($user, $scorm, $action, $cm) {
         scorm_parse($scorm, false);
     }
 
-    $organization = optional_param('organization', '', PARAM_INT);
-
     if ($scorm->displaycoursestructure == 1) {
-        echo $OUTPUT->box_start('generalbox boxaligncenter toc', 'toc');
-        echo html_writer::div(get_string('contents', 'scorm'), 'structurehead');
+        echo $OUTPUT->container_start('toc card', 'toc');
+
+        echo $OUTPUT->container_start('card-header text-center');
+        echo html_writer::tag('h3', get_string('contents', 'scorm'), ['class' => 'h5 mb-0']);
+        echo $OUTPUT->container_end();
+
+        echo $OUTPUT->container_start('card-body');
     }
-    if (empty($organization)) {
-        $organization = $scorm->launch;
-    }
-    if ($orgs = $DB->get_records_select_menu('scorm_scoes', 'scorm = ? AND '.
-                                         $DB->sql_isempty('scorm_scoes', 'launch', false, true).' AND '.
-                                         $DB->sql_isempty('scorm_scoes', 'organization', false, false),
-                                         array($scorm->id), 'sortorder, id', 'id,title')) {
+
+    $organization = optional_param('organization', null, PARAM_INT) ?: $scorm->launch;
+
+    $orgs = $DB->get_records_select_menu(
+        table: 'scorm_scoes',
+        select: 'scorm = ? AND '
+            . $DB->sql_isempty('scorm_scoes', 'launch', false, true).' AND '
+            . $DB->sql_isempty('scorm_scoes', 'organization', false, false),
+        params:[$scorm->id],
+        sort: 'sortorder, id',
+        fields: 'id,title'
+    );
+    if ($orgs) {
         if (count($orgs) > 1) {
             $select = new single_select(new moodle_url($action), 'organization', $orgs, $organization, null);
             $select->label = get_string('organizations', 'scorm');
@@ -993,7 +1004,8 @@ function scorm_print_launch($user, $scorm, $action, $cm) {
     // Do we want the TOC to be displayed?
     if ($scorm->displaycoursestructure == 1) {
         echo $result->toc;
-        echo $OUTPUT->box_end();
+        echo $OUTPUT->container_end(); // Card body.
+        echo $OUTPUT->container_end(); // Toc.
     }
 
     // Is this the first attempt ?
@@ -1001,10 +1013,21 @@ function scorm_print_launch($user, $scorm, $action, $cm) {
 
     // Do not give the player launch FORM if the SCORM object is locked after the final attempt.
     if ($scorm->lastattemptlock == 0 || $result->attemptleft > 0) {
-            echo html_writer::start_div('scorm-center');
-            echo html_writer::start_tag('form', array('id' => 'scormviewform',
-                                                        'method' => 'post',
-                                                        'action' => $CFG->wwwroot.'/mod/scorm/player.php'));
+        echo html_writer::start_div('scorm-center');
+        echo html_writer::start_tag(
+            'form',
+            [
+                'id' => 'scormviewform',
+                'method' => 'post',
+                'action' => $CFG->wwwroot.'/mod/scorm/player.php',
+            ]
+        );
+
+        echo html_writer::start_tag(
+            'div',
+            ['class' => 'mt-5 mb-0 whitebutton hstack gap-2 justify-content-center'],
+        );
+
         if ($scorm->hidebrowse == 0) {
             echo html_writer::tag('button', get_string('browse', 'scorm'),
                     ['class' => 'btn btn-secondary me-1', 'name' => 'mode',
@@ -1028,6 +1051,9 @@ function scorm_print_launch($user, $scorm, $action, $cm) {
             echo html_writer::label(get_string('newattempt', 'scorm'), 'a', true, ['class' => 'ps-1']);
             echo html_writer::end_div();
         }
+
+        echo html_writer::end_tag('div');
+
         if (!empty($scorm->popup)) {
             echo html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'display', 'value' => 'popup'));
         }
@@ -1260,11 +1286,20 @@ function scorm_element_cmp($a, $b) {
 /**
  * Generate the user attempt status string
  *
+ * @deprecated since Moodle 5.2, use \mod_scorm\output\attempt_status instead.
+ * @todo remove in Moodle 6.0 (MDL-XXXXX)
  * @param object $user Current context user
  * @param object $scorm a moodle scrom object - mdl_scorm
  * @return string - Attempt status string
  */
+#[\core\attribute\deprecated(
+    replacement: '\mod_scorm\output\attempt_status',
+    since: '5.2',
+    mdl: 'MDL-XXXXX',
+)]
 function scorm_get_attempt_status($user, $scorm, $cm='') {
+    \core\deprecation::emit_deprecation(__FUNCTION__);
+
     global $DB, $PAGE, $OUTPUT;
 
     $attempts = scorm_get_attempt_count($user->id, $scorm, true);
@@ -1363,7 +1398,7 @@ function scorm_get_attempt_status($user, $scorm, $cm='') {
  * @param object $scorm a moodle scrom object - mdl_scorm
  * @param bool $returnobjects if true returns a object with attempts, if false returns count of attempts.
  * @param bool $ignoremissingcompletion - ignores attempts that haven't reported a grade/completion.
- * @return int - no. of attempts so far
+ * @return int|stdClass[] - no. of attempts so far, or array of attempt objects
  */
 function scorm_get_attempt_count($userid, $scorm, $returnobjects = false, $ignoremissingcompletion = false) {
     global $DB;

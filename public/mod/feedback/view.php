@@ -50,48 +50,28 @@ $PAGE->set_heading($course->fullname);
 $PAGE->add_body_class('limitedwidth');
 
 // Check whether the feedback is mapped to the given courseid.
-if (!has_capability('mod/feedback:edititems', $context) &&
-        !$feedbackcompletion->check_course_is_mapped()) {
+if (
+    !has_capability('mod/feedback:edititems', $context)
+    && !$feedbackcompletion->check_course_is_mapped()
+) {
     echo $OUTPUT->header();
     echo $OUTPUT->notification(get_string('cannotaccess', 'mod_feedback'));
     echo $OUTPUT->footer();
     exit;
 }
 
-$viewcompletion = $feedbackcompletion->is_open() && $feedbackcompletion->can_complete() && $feedbackcompletion->can_submit();
-$actionbar = new \mod_feedback\output\standard_action_bar(
-    $cm->id,
-    $viewcompletion,
-    $feedbackcompletion->get_resume_page(),
-    $courseid
-);
+$actionbar = new \mod_feedback\output\view_action_bar($cm, $feedbackcompletion);
 
-// Trigger module viewed event.
 $feedbackcompletion->trigger_module_viewed();
 
-/// Print the main part of the page
-///////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////
-
-$previewimg = $OUTPUT->pix_icon('t/preview', get_string('preview'));
-$previewlnk = new moodle_url('/mod/feedback/print.php', array('id' => $id));
-if ($courseid) {
-    $previewlnk->param('courseid', $courseid);
-}
-$preview = html_writer::link($previewlnk, $previewimg);
-
-$PAGE->activityheader->set_description("");
-
-// Print the page header.
 echo $OUTPUT->header();
 
-// Show description.
-echo $OUTPUT->box_start('generalbox feedback_description');
-$options = (object)array('noclean' => true);
-echo format_module_intro('feedback', $feedback, $cm->id);
-echo $renderer->main_action_bar($actionbar);
-echo $OUTPUT->box_end();
+echo $renderer->render($actionbar);
+
+if ($actionbar->end_page_after_rendering()) {
+    echo $OUTPUT->footer();
+    exit;
+}
 
 //show some infos to the feedback
 if (has_capability('mod/feedback:edititems', $context)) {
@@ -129,24 +109,6 @@ if (!$PAGE->has_secondary_navigation()) {
         echo '<p class="mdl-align">' . html_writer::link($mapurl, get_string('mapcourses', 'feedback')) . '</p>';
         echo $OUTPUT->box_end();
     }
-}
-
-if ($feedbackcompletion->can_complete()) {
-    echo $OUTPUT->box_start('generalbox boxaligncenter');
-    if (!$feedbackcompletion->is_open()) {
-        // Feedback is not yet open or is already closed.
-        echo $OUTPUT->notification(get_string('feedback_is_not_open', 'feedback'));
-        echo $OUTPUT->continue_button(course_get_url($courseid ?: $course->id));
-    } else if (!$feedbackcompletion->can_submit()) {
-        // Feedback was already submitted.
-        echo $OUTPUT->notification(
-            get_string('this_feedback_is_already_submitted', 'feedback'),
-            \core\output\notification::NOTIFY_INFO,
-            closebutton: false,
-        );
-        $OUTPUT->continue_button(course_get_url($courseid ?: $course->id));
-    }
-    echo $OUTPUT->box_end();
 }
 
 echo $OUTPUT->footer();

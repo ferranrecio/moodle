@@ -24,6 +24,9 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+use core_course\cm_info;
+use core\output\single_button;
+
 class mod_folder_renderer extends plugin_renderer_base {
 
     /**
@@ -47,6 +50,12 @@ class mod_folder_renderer extends plugin_renderer_base {
             return '';
         }
 
+        $foldertree = new folder_tree($folder, $cm);
+
+        if (empty($foldertree->dir['subdirs']) && empty($foldertree->dir['files'])) {
+            return $this->empty_folder_message($folder, $cm);
+        }
+
         $data = [];
         if (trim($folder->intro)) {
             if ($folder->display == FOLDER_DISPLAY_INLINE && $cm->showdescription) {
@@ -60,6 +69,7 @@ class mod_folder_renderer extends plugin_renderer_base {
         // is an "Edit settings" option in the action menu with the same functionality.
         $canmanagefolderfiles = has_capability('mod/folder:managefiles', $context);
         $canmanagecourseactivities = has_capability('moodle/course:manageactivities', $context);
+
         if ($canmanagefolderfiles && ($folder->display != FOLDER_DISPLAY_INLINE || !$canmanagecourseactivities)) {
             $editbutton = new single_button(new moodle_url('/mod/folder/edit.php', ['id' => $cm->id]),
                 get_string('edit'), 'post', single_button::BUTTON_PRIMARY);
@@ -71,13 +81,12 @@ class mod_folder_renderer extends plugin_renderer_base {
         $downloadable = folder_archive_available($folder, $cm);
         if ($downloadable) {
             $downloadbutton = new single_button(new moodle_url('/mod/folder/download_folder.php', ['id' => $cm->id]),
-                get_string('downloadfolder', 'folder'), 'get');
-            $downloadbutton->class = 'navitem ms-auto';
+                get_string('download'), 'get');
+            $downloadbutton->class = 'navitem ms-auto d-none d-md-inline-block';
             $data['download_button'] = $downloadbutton->export_for_template($this->output);
             $data['hasbuttons'] = true;
         }
 
-        $foldertree = new folder_tree($folder, $cm);
         if ($folder->display == FOLDER_DISPLAY_INLINE) {
             // Display module name as the name of the root directory.
             $foldertree->dir['dirname'] = $cm->get_formatted_name(array('escape' => false));
@@ -93,6 +102,36 @@ class mod_folder_renderer extends plugin_renderer_base {
         }
 
         return $this->render_from_template('mod_folder/folder', $data);
+    }
+
+    protected function empty_folder_message(stdClass $folder, cm_info $cm): string {
+        if ($folder->display == FOLDER_DISPLAY_INLINE) {
+            $data = [];
+            if ($cm->showdescription && !empty(trim($folder->intro))) {
+                $data['intro'] = format_module_intro('folder', $folder, $cm->id, false);
+            }
+            return $this->render_from_template('mod_folder/folder_empty', $data);
+        }
+
+        $initialstate = new \core\output\initial_state_action_bar(
+            get_string('activitynotready', 'course'),
+            get_string('emptyfolder', 'mod_folder'),
+            $this->image_url('i/zero_state_noentries', 'core'),
+        );
+
+        if (has_capability('mod/folder:managefiles', $cm->context)) {
+            $editurl = new moodle_url('/mod/folder/edit.php', ['id' => $cm->id]);
+            $initialstate->add_single_button(
+                new single_button(
+                    $editurl,
+                    get_string('addfiles', 'mod_folder'),
+                    'post',
+                    single_button::BUTTON_PRIMARY,
+                ),
+            );
+        }
+
+        return $this->render($initialstate);
     }
 
     /**

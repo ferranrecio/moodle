@@ -72,7 +72,7 @@ class manager {
     public static function create_from_instance(stdClass $instance): self {
         $cm = get_coursemodule_from_instance(self::MODULE, $instance->id);
         if (!$cm) {
-            throw new \moodle_exception('invalidcoursemodule', self::PLUGINNAME, '', null, 'Invalid course module');
+            throw new \moodle_exception('invalidcoursemodule', '', '', null, 'Invalid course module');
         }
         $cm = cm_info::create($cm);
         return new self($cm, $instance);
@@ -117,6 +117,15 @@ class manager {
      */
     public function get_coursemodule(): cm_info {
         return $this->cm;
+    }
+
+    /**
+     * Return the current course.
+     *
+     * @return stdClass the course record
+     */
+    public function get_course(): stdClass {
+        return $this->course;
     }
 
     /**
@@ -224,5 +233,19 @@ class manager {
         }
         $whatgrademethodarray = scorm_get_what_grade_array();
         return $whatgrademethodarray[$this->instance->whatgrade] ?? null;
+    }
+
+    public function is_active() {
+        $now = \core\di::get(\core\clock::class)->now();
+        $open = true;
+        $closed = false;
+        $timenow = time();
+        if (!empty($this->instance->timeopen) && $this->instance->timeopen >= $timenow) {
+            $open = false;
+        }
+        if (!empty($this->instance->timeclose) && $timenow > $this->instance->timeclose) {
+            $closed = true;
+        }
+        return $open && !$closed;
     }
 }

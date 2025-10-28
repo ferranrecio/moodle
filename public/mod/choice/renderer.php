@@ -25,7 +25,10 @@
 class mod_choice_renderer extends plugin_renderer_base {
 
     /**
-     * Returns HTML to display choices of option
+     * Returns HTML to display choices of option.
+     *
+     * @deprecated Since Moodle 5.2.
+     * @todo Remove this method in 6.0 (MDL-XXXXX)
      * @param object $options
      * @param int  $coursemoduleid
      * @param bool $vertical
@@ -408,4 +411,3 @@ class mod_choice_renderer extends plugin_renderer_base {
         return $this->output->render($chart);
     }
 }
-

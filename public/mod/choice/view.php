@@ -36,6 +36,8 @@ $strchoices = get_string('modulenameplural', 'choice');
 
 $context = context_module::instance($cm->id);
 
+$renderer = $PAGE->get_renderer('mod_choice');
+
 list($choiceavailable, $warnings) = choice_get_availability_status($choice);
 
 if ($action == 'delchoice' and confirm_sesskey() and is_enrolled($context, NULL, 'mod/choice:choose') and $choice->allowupdate
@@ -120,8 +122,23 @@ $groupmode = groups_get_activity_groupmode($cm);
 // Check if we want to include responses from inactive users.
 $onlyactive = $choice->includeinactive ? false : true;
 
-$allresponses = choice_get_response_data($choice, $cm, $groupmode, $onlyactive);   // Big function, approx 6 SQL calls per user.
+$timenow = \core\di::get(\core\clock::class)->now();
+$current = choice_get_my_response($choice);
 
+$initialstate = new \mod_choice\output\view_initial_state(
+    $choice,
+    $cm,
+    $current ?: null,
+);
+
+echo $renderer->render($initialstate);
+
+if ($initialstate->end_page_after_rendering()) {
+    echo $OUTPUT->footer();
+    exit;
+}
+
+$allresponses = choice_get_response_data($choice, $cm, $groupmode, $onlyactive);   // Big function, approx 6 SQL calls per user.
 
 if (has_capability('mod/choice:readresponses', $context) && !$PAGE->has_secondary_navigation()) {
     choice_show_reportlink($allresponses, $cm);
@@ -129,8 +146,6 @@ if (has_capability('mod/choice:readresponses', $context) && !$PAGE->has_secondar
 
 echo '<div class="clearer"></div>';
 
-$timenow = time();
-$current = choice_get_my_response($choice);
 //if user has already made a selection, and they are not allowed to update it or if choice is not open, show their selected answer.
 if (isloggedin() && (!empty($current)) &&
     (empty($choice->allowupdate) || ($timenow > $choice->timeclose)) ) {
@@ -155,45 +170,15 @@ if ((!empty($choice->timeopen)) && ($choice->timeopen > $timenow)) {
 }
 
 if ( (!$current or $choice->allowupdate) and $choiceopen and is_enrolled($context, NULL, 'mod/choice:choose')) {
-
-    // Show information on how the results will be published to students.
-    $publishinfo = null;
-    switch ($choice->showresults) {
-        case CHOICE_SHOWRESULTS_NOT:
-            $publishinfo = get_string('publishinfonever', 'choice');
-            break;
-
-        case CHOICE_SHOWRESULTS_AFTER_ANSWER:
-            if ($choice->publish == CHOICE_PUBLISH_ANONYMOUS) {
-                $publishinfo = get_string('publishinfoanonafter', 'choice');
-            } else {
-                $publishinfo = get_string('publishinfofullafter', 'choice');
-            }
-            break;
-
-        case CHOICE_SHOWRESULTS_AFTER_CLOSE:
-            if ($choice->publish == CHOICE_PUBLISH_ANONYMOUS) {
-                $publishinfo = get_string('publishinfoanonclose', 'choice');
-            } else {
-                $publishinfo = get_string('publishinfofullclose', 'choice');
-            }
-            break;
-
-        default:
-            // No need to inform the user in the case of CHOICE_SHOWRESULTS_ALWAYS since it's already obvious that the results are
-            // being published.
-            break;
-    }
-
-    // Show info if necessary.
-    if (!empty($publishinfo)) {
-        echo $OUTPUT->notification($publishinfo, 'info');
-    }
-
     // They haven't made their choice yet or updates allowed and choice is open.
     $options = choice_prepare_options($choice, $USER, $cm, $allresponses);
-    $renderer = $PAGE->get_renderer('mod_choice');
-    echo $renderer->display_options($options, $cm->id, $choice->display, $choice->allowmultiple);
+    // echo $renderer->display_options($options, $cm->id, $choice->display, $choice->allowmultiple);
+    $displayoptions = new \mod_choice\output\display_options(
+        $choice,
+        $cm,
+        $allresponses,
+    );
+    echo $OUTPUT->render($displayoptions);
     $choiceformshown = true;
 } else {
     $choiceformshown = false;
@@ -204,8 +189,10 @@ if (!$choiceformshown) {
 
     if (isguestuser()) {
         // Guest account
-        echo $OUTPUT->confirm(get_string('noguestchoose', 'choice').'<br /><br />'.get_string('liketologin'),
-                     get_login_url(), new moodle_url('/course/view.php', array('id'=>$course->id)));
+        echo $OUTPUT->confirm(
+            get_string('noguestchoose', 'choice').'<br /><br />'.get_string('liketologin'),
+            get_login_url(), new moodle_url('/course/view.php', array('id'=>$course->id))
+        );
     } else if (!is_enrolled($context)) {
         // Only people enrolled can make a choice
         $SESSION->wantsurl = qualified_me();

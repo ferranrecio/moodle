@@ -14,39 +14,37 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * This file is part of the SCORM module for Moodle.
+ *
+ * @copyright 2005 Martin Dougiamas  http://dougiamas.com
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package mod_scorm
+ */
+
+use mod_scorm\manager;
+use mod_scorm\output\initial_state_view;
+
 require_once("../../config.php");
 require_once($CFG->dirroot.'/mod/scorm/lib.php');
 require_once($CFG->dirroot.'/mod/scorm/locallib.php');
 require_once($CFG->dirroot.'/course/lib.php');
 
-$id = optional_param('id', '', PARAM_INT);       // Course Module ID, or
-$a = optional_param('a', '', PARAM_INT);         // scorm ID
+$id = optional_param('id', 0, PARAM_INT);       // Course Module ID, or
+$a = optional_param('a', 0, PARAM_INT);         // scorm ID
 $organization = optional_param('organization', '', PARAM_INT); // organization ID.
 $action = optional_param('action', '', PARAM_ALPHA);
 $preventskip = optional_param('preventskip', '', PARAM_INT); // Prevent Skip view, set by javascript redirects.
 
-if (!empty($id)) {
-    if (! $cm = get_coursemodule_from_id('scorm', $id, 0, true)) {
-        throw new \moodle_exception('invalidcoursemodule');
-    }
-    if (! $course = $DB->get_record("course", array("id" => $cm->course))) {
-        throw new \moodle_exception('coursemisconf');
-    }
-    if (! $scorm = $DB->get_record("scorm", array("id" => $cm->instance))) {
-        throw new \moodle_exception('invalidcoursemodule');
-    }
-} else if (!empty($a)) {
-    if (! $scorm = $DB->get_record("scorm", array("id" => $a))) {
-        throw new \moodle_exception('invalidcoursemodule');
-    }
-    if (! $course = $DB->get_record("course", array("id" => $scorm->course))) {
-        throw new \moodle_exception('coursemisconf');
-    }
-    if (! $cm = get_coursemodule_from_instance("scorm", $scorm->id, $course->id, true)) {
-        throw new \moodle_exception('invalidcoursemodule');
-    }
-} else {
-    throw new \moodle_exception('missingparameter');
+if ($id) {
+    list($course, $cm) = get_course_and_cm_from_cmid($id, manager::MODULE);
+    $manager = manager::create_from_coursemodule($cm);
+    $scorm = $manager->get_instance();
+} else { // We must have $d.
+    $scorm = $DB->get_record(manager::MODULE, ['id' => $d], '*', MUST_EXIST);
+    $manager = manager::create_from_instance($data);
+    $cm = $manager->get_coursemodule();
+    $course = $manager->get_course();
 }
 
 $url = new moodle_url('/mod/scorm/view.php', array('id' => $cm->id));
@@ -102,14 +100,20 @@ if (!empty($scorm->popup)) {
     } else {
         $courseurl = course_get_url($course, $cm->sectionnum)->out(false);
     }
-    $PAGE->requires->data_for_js('scormplayerdata', Array('launch' => $launch,
-                                                           'currentorg' => $orgidentifier,
-                                                           'sco' => $scoid,
-                                                           'scorm' => $scorm->id,
-                                                           'courseurl' => $courseurl,
-                                                           'cwidth' => $scorm->width,
-                                                           'cheight' => $scorm->height,
-                                                           'popupoptions' => $scorm->options), true);
+    $PAGE->requires->data_for_js(
+        'scormplayerdata',
+        [
+            'launch' => $launch,
+            'currentorg' => $orgidentifier,
+            'sco' => $scoid,
+            'scorm' => $scorm->id,
+            'courseurl' => $courseurl,
+            'cwidth' => $scorm->width,
+            'cheight' => $scorm->height,
+            'popupoptions' => $scorm->options,
+        ],
+        true
+    );
     $PAGE->requires->string_for_js('popupsblocked', 'scorm');
     $PAGE->requires->string_for_js('popuplaunched', 'scorm');
     $PAGE->requires->js('/mod/scorm/view.js', true);
@@ -129,18 +133,16 @@ $pagetitle = strip_tags($shortname.': '.format_string($scorm->name));
 scorm_view($scorm, $course, $cm, $contextmodule);
 
 if (empty($preventskip) && empty($launch) && (has_capability('mod/scorm:skipview', $contextmodule))) {
+    // The simple player will redirect automatically if needed.
     scorm_simple_play($scorm, $USER, $contextmodule, $cm->id);
 }
 
-// Print the page header.
-
 $PAGE->set_title($pagetitle);
 $PAGE->set_heading($course->fullname);
+$PAGE->add_body_class('limitedwidth');
 // Let the module handle the display.
 if (!empty($action) && $action == 'delete' && confirm_sesskey() && has_capability('mod/scorm:deleteownresponses', $contextmodule)) {
     $PAGE->activityheader->disable();
-} else {
-    $PAGE->activityheader->set_description('');
 }
 
 echo $OUTPUT->header();
@@ -158,13 +160,10 @@ if (!empty($action) && confirm_sesskey() && has_capability('mod/scorm:deleteownr
     }
 }
 
-// Print the main part of the page.
-$attemptstatus = '';
-if (empty($launch) && ($scorm->displayattemptstatus == SCORM_DISPLAY_ATTEMPTSTATUS_ALL ||
-         $scorm->displayattemptstatus == SCORM_DISPLAY_ATTEMPTSTATUS_ENTRY)) {
-    $attemptstatus = scorm_get_attempt_status($USER, $scorm, $cm);
+if (empty($launch)) {
+    $initialstate = new initial_state_view($manager);
+    echo $OUTPUT->render($initialstate);
 }
-echo $OUTPUT->box(format_module_intro('scorm', $scorm, $cm->id), '', 'intro');
 
 // Check if SCORM available. No need to display warnings because activity dates are displayed at the top of the page.
 list($available, $warnings) = scorm_get_availability_status($scorm);
@@ -172,8 +171,6 @@ list($available, $warnings) = scorm_get_availability_status($scorm);
 if ($available && empty($launch)) {
     scorm_print_launch($USER, $scorm, 'view.php?id='.$cm->id, $cm);
 }
-
-echo $OUTPUT->box($attemptstatus);
 
 if (!empty($forcejs)) {
     $message = $OUTPUT->box(get_string("forcejavascriptmessage", "scorm"), "forcejavascriptmessage");

@@ -1,0 +1,101 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template core/initial_state_action_bar
+
+    Template used to render an initial state tool bar with optional image, title,
+    intro text and action tools. This component is typically used in course activities
+    to show an initial state before any user action has taken place.
+
+    Example context (json):
+    {
+        "image": "example.png",
+        "title": "Sample Title",
+        "intro": "This is a description.",
+        "displayable": "<div>Custom HTML content</div>",
+        "tools": [
+            {
+                "type": "single_button",
+                "tool": {
+                    "id": "button1",
+                    "method": "get",
+                    "url": "#",
+                    "primary": true,
+                    "tooltip": "Tooltip for button 1",
+                    "label": "Button 1",
+                    "attributes": [
+                        {
+                            "name": "data-example",
+                            "value": "value1"
+                        }
+                    ]
+                }
+            },
+            {
+                "type": "action_menu",
+                "tool": {
+                    "id": "menu1",
+                    "items": [
+                        {
+                            "type": "action_link",
+                            "actionlink": {
+                                "url": "#",
+                                "label": "Menu Item 1"
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "hasinfo": true,
+        "hastools": true,
+        "disablepanel": false
+    }
+}}
+{{^disablepanel}}
+<div
+    class="text-xs-center my-4 text-center"
+    data-region="empty-message"
+>
+    {{#image}} <img src="{{image}}" alt="" style="height: 70px; width: 70px;"> {{/image}}
+    {{#title}} <h3 class="h5 mt-3 mb-0">{{{ title }}}</h3> {{/title}}
+    {{#intro}} <p class="mt-3 mb-0">{{{ intro }}}</p> {{/intro}}
+    {{#displayable}}<div class="mt-3 mb-0">{{{ displayable }}}</div>{{/displayable}}
+    {{#hastools}}
+    <div
+        id="action_bar"
+        class="mt-5 mb-0 whitebutton hstack gap-2 {{!
+            }} {{#hasinfo}} justify-content-center {{/hasinfo}}"
+    >
+        {{#tools}}
+            {{#action_menu}}
+                {{>core/action_menu}}
+            {{/action_menu}}
+            {{#single_button}}
+                {{>core/single_button}}
+            {{/single_button}}
+            {{#action_link}}
+                {{>core/action_link}}
+            {{/action_link}}
+            {{#htmltool}}
+                {{{ htmltool }}}
+            {{/htmltool}}
+        {{/tools}}
+    </div>
+    {{/hastools}}
+</div>
+{{/disablepanel}}

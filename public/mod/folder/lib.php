@@ -516,7 +516,7 @@ function folder_view($folder, $course, $cm, $context) {
 /**
  * Check if the folder can be zipped and downloaded.
  * @param stdClass $folder
- * @param context_module $cm
+ * @param \core_course\cm_info $cm
  * @return bool True if the folder can be zipped and downloaded.
  * @throws \dml_exception
  */

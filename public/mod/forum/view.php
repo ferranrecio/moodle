@@ -170,6 +170,22 @@ $activityheader->set_attrs($pageheader);
 echo $OUTPUT->header();
 
 $rendererfactory = mod_forum\local\container::get_renderer_factory();
+
+// $totaldiscussions = forum_count_discussions($cm->get_instance_record(), $cm, $course);
+// if ($totaldiscussions === 0) {
+
+//     $actionbar = new mod_forum\output\forum_actionbar($forum, $course, $groupid, $search);
+
+//     $zerostate = (new \core\output\zero_state_action_bar())
+//         ->set_title(get_string('welcome', 'mod_forum'))
+//         ->set_intro(get_string('nodiscussions', 'mod_forum'))
+//         ->set_image($OUTPUT->image_url('i/zero_state'))
+//         ->add_html_action($actionbar->get_new_discussion_topic_button());
+//     echo $OUTPUT->render($zerostate);
+//     echo $OUTPUT->footer();
+//     exit;
+// }
+
 // The elements for view action are rendered and added to the page.
 echo forum_activity_actionbar($forum, $groupid, $course, $search);
 

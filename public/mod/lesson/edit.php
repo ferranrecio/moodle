@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
 
+use mod_lesson\output\empty_lesson_action_bar;
+
 require_once('../../config.php');
 require_once($CFG->dirroot.'/mod/lesson/locallib.php');
 
@@ -30,7 +32,11 @@ $id = required_param('id', PARAM_INT);
 
 $cm = get_coursemodule_from_id('lesson', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-$lesson = new lesson($DB->get_record('lesson', array('id' => $cm->instance), '*', MUST_EXIST));
+$lesson = new lesson(
+    $DB->get_record('lesson', array('id' => $cm->instance), '*', MUST_EXIST),
+    $cm,
+    $course,
+);
 
 require_login($course, false, $cm);
 
@@ -54,32 +60,37 @@ if ($mode != get_user_preferences('lesson_view', 'collapsed') && $mode !== 'sing
     set_user_preference('lesson_view', $mode);
 }
 
-$lessonoutput = $PAGE->get_renderer('mod_lesson');
+/** @var mod_lesson_renderer $renderer */
+$renderer = $PAGE->get_renderer('mod_lesson');
 $PAGE->navbar->add(get_string('edit'));
-
-echo $lessonoutput->header($lesson, $cm, $mode, false, null, get_string('edit', 'lesson'));
-$actionarea = new \mod_lesson\output\edit_action_area($id, $url);
-echo $lessonoutput->render($actionarea);
 
 if (!$lesson->has_pages()) {
     // There are no pages; give teacher some options
     require_capability('mod/lesson:edit', $context);
-    echo $lessonoutput->add_first_page_links($lesson);
-} else {
-    switch ($mode) {
-        case 'collapsed':
-            echo $lessonoutput->display_edit_collapsed($lesson, $lesson->firstpageid);
-            break;
-        case 'single':
-            $pageid =  required_param('pageid', PARAM_INT);
-            $PAGE->url->param('pageid', $pageid);
-            $singlepage = $lesson->load_page($pageid);
-            echo $lessonoutput->display_edit_full($lesson, $singlepage->id, $singlepage->prevpageid, true);
-            break;
-        case 'full':
-            echo $lessonoutput->display_edit_full($lesson, $lesson->firstpageid, 0);
-            break;
-    }
+    echo $OUTPUT->header();
+    $zerostate = new empty_lesson_action_bar($lesson);
+    echo $renderer->render($zerostate);
+    echo $renderer->footer();
+    exit;
 }
 
-echo $lessonoutput->footer();
+echo $renderer->header($lesson, $cm, $mode, false, null, get_string('edit', 'lesson'));
+$actionarea = new \mod_lesson\output\edit_action_area($id, $url);
+echo $renderer->render($actionarea);
+
+switch ($mode) {
+    case 'collapsed':
+        echo $renderer->display_edit_collapsed($lesson, $lesson->firstpageid);
+        break;
+    case 'single':
+        $pageid =  required_param('pageid', PARAM_INT);
+        $PAGE->url->param('pageid', $pageid);
+        $singlepage = $lesson->load_page($pageid);
+        echo $renderer->display_edit_full($lesson, $singlepage->id, $singlepage->prevpageid, true);
+        break;
+    case 'full':
+        echo $renderer->display_edit_full($lesson, $lesson->firstpageid, 0);
+        break;
+}
+
+echo $renderer->footer();

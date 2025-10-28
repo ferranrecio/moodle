@@ -794,6 +794,7 @@ $string['nousersmatch'] = 'No user(s) found for given criteria';
 $string['showmoreusers'] = 'Show more users';
 $string['viewconversation'] = 'View discussion';
 $string['viewgrades'] = 'View grades';
+$string['welcome'] = 'Welcome to this forum';
 
 // Deprecated since Moodle 4.5.
 $string['privacy:request:delete:discussion:name'] = 'Delete at the request of the author';
