@@ -38577,8 +38577,17 @@ body {
   bottom: calc(max(80px, 1rem * 3) * -1);
   transition: bottom 0.5s;
   z-index: 1020;
-  box-shadow: 0 0 1rem rgba(0, 0, 0, 0.15);
   font-size: calc(1rem * 1.10);
+}
+.stickyfooter::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0.5rem;
+  box-shadow: 0 -0.5rem 1rem rgba(0, 0, 0, 0.15);
+  pointer-events: none;
 }
 .stickyfooter .sticky-footer-content {
   overflow: hidden;
@@ -38617,6 +38626,14 @@ body {
 }
 .stickyfooter [data-groupname=buttonar] {
   width: 100%;
+}
+
+#page.show-drawer-left .stickyfooter {
+  left: 285px;
+}
+
+#page.show-drawer-right .stickyfooter {
+  right: 315px;
 }
 
 .hasstickyfooter .stickyfooter {
@@ -39421,7 +39438,6 @@ body.tox-fullscreen .tox.tox-tinymce-aux {
   .hasstickyfooter .drawer-left,
   .hasstickyfooter .drawer-right {
     top: 50px;
-    height: calc(100vh - 50px - max(80px, 1rem * 3));
   }
   #page.drawers {
     position: relative;
