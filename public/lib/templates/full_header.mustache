@@ -28,7 +28,6 @@
         "courseheader": "course_header_html",
         "welcomemessage": "welcomemessage",
         "headeractions": [ "header_action_html"],
-        "completionactions":  [ "manual_completion_button_html"]
     }
 }}
 <header id="page-header" class="header-maxwidth d-print-none" data-for="page-heading">
@@ -61,11 +60,6 @@
                 {{#headeractions}}
                 <div class="header-action ms-2">{{{.}}}</div>
                 {{/headeractions}}
-                {{#completionactions}}
-                    <div class="manual-completion" data-region="manual-completion">
-                        {{{.}}}
-                    </div>
-                {{/completionactions}}
             </div>
         </div>
     </div>

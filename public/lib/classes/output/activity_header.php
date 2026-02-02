@@ -203,9 +203,7 @@ class activity_header implements renderable, templatable {
                 && !empty($data['uservisible'])
                 && !empty($data['showmanualcompletion'])
             ) {
-                $this->page->add_header_action(
-                    $output->render_from_template('core_course/completion_manual', $data)
-                );
+                $this->add_completion_to_page_header($output, $data);
             }
 
             $activityinfo = $output->render_from_template('core_course/activity_info', $data);
@@ -230,6 +228,32 @@ class activity_header implements renderable, templatable {
             'completion' => $activityinfo,
             'additional_items' => $additionalitems,
         ], $activitycompletiondata);
+    }
+
+    /**
+     * Adds the manual completion component to the page header actions.
+     *
+     * @param renderer_base $output
+     * @param array $data the template data for the completion component
+     * @return bool if the completion was added
+     */
+    private function add_completion_to_page_header(renderer_base $output, array $data): bool {
+        // Some themes may not use completion in the header, so we check first.
+        $showcompletion = $this->page?->layout_options['completioninheader'] ?? true;
+        if (!$showcompletion) {
+            return false;
+        }
+
+        $this->page->add_header_action(
+            $output->render_from_template('core_course/completion_manual', $data)
+        );
+        // Also init the heading component to manage feature like manual completion button display.
+        $this->page->requires->js_call_amd(
+            'core_courseformat/local/content/activity_header',
+            'init',
+            ["[data-for='page-heading']"],
+        );
+        return true;
     }
 
     /**
