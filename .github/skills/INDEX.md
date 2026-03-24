@@ -28,6 +28,10 @@ This directory contains custom Copilot skills for this repository.
   - Path: `.github/skills/moodle-plugin-webservice/SKILL.md`
   - Purpose: Create and refactor Moodle plugin web services using `db/services.php`, `external_api`, and exporter-backed response schemas.
 
+- **Moodle Persistent Classes**
+  - Path: `.github/skills/moodle-persistent-classes/SKILL.md`
+  - Purpose: Create and use Moodle `core\persistent` classes for DB-backed models, including property definitions, validation, lifecycle hooks, and usage patterns in services/APIs.
+
 - **Moodle Routing Subsystem**
   - Path: `.github/skills/moodle-routing-subsystem/SKILL.md`
   - Purpose: Implement and refactor Moodle routes (controller/api/shim), including parameter schemas, response patterns, shortlinks, and route testing.
@@ -57,6 +61,8 @@ This directory contains custom Copilot skills for this repository.
 - Use **Moodle Plugin Common Files** when creating a new plugin structure or validating that a plugin includes the required and recommended standard files.
 
 - Use **Moodle Plugin Webservice** when creating or reviewing plugin external functions in `classes/external`, registering them in `db/services.php`, or reusing exporters to define web service response structures.
+
+- Use **Moodle Persistent Classes** when creating/refactoring DB-backed models in `classes/` that should extend `\core\persistent`, or when moving CRUD/validation patterns from raw `$DB` calls into persistent-based models.
 
 - Use **Moodle Routing Subsystem** when creating or migrating routes with `#[route(...)]`, defining typed path/query/header parameters, adding legacy shim redirects, implementing shortlink handlers, or writing `\route_testcase` coverage.
 
