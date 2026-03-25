@@ -44,6 +44,42 @@ Use this skill when creating a new activity module in `mod/` or when refactoring
      - `<modname>_update_instance($data, $mform = null): bool`
      - `<modname>_delete_instance($id): bool`
    - Implement `<modname>_supports($feature)` and declare relevant features including `FEATURE_MOD_PURPOSE`.
+   - Add important optional callbacks depending on module behaviour:
+     - File API (if plugin serves files):
+       - `<modname>_get_file_areas($course, $cm, $context)`
+       - `<modname>_get_file_info(...)`
+       - `<modname>_pluginfile(...)`
+     - Course module display/visibility (if custom course page behaviour is needed):
+       - `<modname>_get_coursemodule_info($coursemodule)`
+       - `mod_<modname>_cm_info_dynamic(cm_info $cm)`
+       - `<modname>_cm_info_view(cm_info $cm)`
+       - `<modname>_extend_navigation(...)`
+       - `<modname>_extend_settings_navigation(...)`
+     - Grading/rating (if plugin is assessable):
+       - `<modname>_get_user_grades(...)`
+       - `<modname>_update_grades(...)`
+       - `<modname>_grade_item_update(...)`
+       - `<modname>_grade_item_delete(...)`
+       - `<modname>_rating_permissions(...)`
+       - `<modname>_rating_validate(...)`
+     - Completion and tracking (if completion uses custom rules or side effects):
+       - `mod_<modname>_get_completion_active_rule_descriptions($cm)`
+       - Any plugin-specific helper to update completion state after writes.
+     - Calendar integration (if open/close/due events exist):
+       - `<modname>_refresh_events(...)`
+       - `mod_<modname>_core_calendar_provide_event_action(...)`
+       - `mod_<modname>_core_calendar_get_valid_event_timestart_range(...)`
+       - `mod_<modname>_core_calendar_event_timestart_updated(...)`
+       - `mod_<modname>_core_calendar_get_event_action_string(...)`
+     - Course reset and housekeeping (if user data must be purgeable):
+       - `<modname>_reset_course_form_definition(&$mform)`
+       - `<modname>_reset_course_form_defaults($course)`
+       - `<modname>_reset_userdata($data)`
+       - `<modname>_reset_gradebook($courseid, $type='')`
+     - Activity/report integration (only if relevant):
+       - `<modname>_user_outline(...)`
+       - `<modname>_user_complete(...)`
+       - `<modname>_check_updates_since(cm_info $cm, $from, $filter = array())`
 
 5. `mod_form.php`
    - Define class `mod_<modname>_mod_form` for add/edit instance form.
