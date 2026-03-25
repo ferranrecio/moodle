@@ -18,16 +18,16 @@ The Peer Review Assignment activity stores instructor-defined phases, student su
 
 **Acceptance criteria**
 
-- [ ] `id` INT, Primary Key, auto-increment
-- [ ] `course` INT, Foreign Key, NOT NULL — references `course.id`
-- [ ] `name` VARCHAR, NOT NULL — activity display name
-- [ ] `intro` TEXT, default NULL — activity description
-- [ ] `introformat` INT, default 0 — intro text format
-- [ ] `blindreview` INT (BOOLEAN), default 0 — whether peer reviews are anonymous
-- [ ] `groupsubmissions` INT (BOOLEAN), default 0 — whether submissions are group-based
-- [ ] `groupingid` INT, default NULL — references `group_groupings.id` if the teacher wants to use a specific grouping for group submissions
-- [ ] `timecreated` DATETIME, NOT NULL — set automatically on record creation
-- [ ] `timemodified` DATETIME, NOT NULL — updated automatically on every modification
+- [x] `id` INT, Primary Key, auto-increment
+- [x] `course` INT, Foreign Key, NOT NULL — references `course.id`
+- [x] `name` VARCHAR, NOT NULL — activity display name
+- [x] `intro` TEXT, default NULL — activity description
+- [x] `introformat` INT, default 0 — intro text format
+- [x] `blindreview` INT (BOOLEAN), default 0 — whether peer reviews are anonymous
+- [x] `groupsubmissions` INT (BOOLEAN), default 0 — whether submissions are group-based
+- [x] `groupingid` INT, default NULL — references `group_groupings.id` if the teacher wants to use a specific grouping for group submissions
+- [x] `timecreated` DATETIME, NOT NULL — set automatically on record creation
+- [x] `timemodified` DATETIME, NOT NULL — updated automatically on every modification
 
 ---
 
@@ -39,25 +39,25 @@ The Peer Review Assignment activity stores instructor-defined phases, student su
 
 **Acceptance criteria**
 
-- [ ] `id` INT, Primary Key, auto-increment
-- [ ] `peerassignid` INT, Foreign Key, NOT NULL — references `peerassign.id`
-- [ ] `phasetype` INT, NOT NULL — phase type: 0=sample, 1=validation, 2=submission, 3=peer_review, 4=teacher_eval
-- [ ] `sequencenumber` INT, NOT NULL — phase order (1-based)
-- [ ] `title` VARCHAR, NOT NULL — phase display name
-- [ ] `description` TEXT, default NULL — detailed instructions for phase
-- [ ] `required` INT (BOOLEAN), default 1 — whether this phase must be completed
-- [ ] `unlockmethod` VARCHAR, default 'manual' — 'manual' or 'date'
-- [ ] `unlockdate` DATETIME, default NULL — phase unlock date if unlockmethod='date'
-- [ ] `allowfiles` INT (BOOLEAN), default 1 — whether file uploads are allowed
-- [ ] `filetypes` VARCHAR, default NULL — comma-separated allowed file extensions
-- [ ] `maxfilesize` INT, default 0 — max file size in bytes (0 = unlimited)
-- [ ] `extras` TEXT, default NULL — JSON serialized additional settings (e.g. number of reviewers for peer review phase)
-- [ ] `startdate` DATETIME, default NULL — when the phase becomes active
-- [ ] `enddate` DATETIME, default NULL — when the phase closes
-- [ ] `cutoffdate` DATETIME, default NULL — last date for submissions (can differ from enddate which may allow late grading)
-- [ ] `visible` INT (BOOLEAN), default 1 — whether the phase is visible to students
-- [ ] `timecreated` DATETIME, NOT NULL
-- [ ] `timemodified` DATETIME, NOT NULL
+- [x] `id` INT, Primary Key, auto-increment
+- [x] `peerassignid` INT, Foreign Key, NOT NULL — references `peerassign.id`
+- [x] `phasetype` INT, NOT NULL — phase type: 0=sample, 1=validation, 2=submission, 3=peer_review, 4=teacher_eval
+- [x] `sequencenumber` INT, NOT NULL — phase order (1-based)
+- [x] `title` VARCHAR, NOT NULL — phase display name
+- [x] `description` TEXT, default NULL — detailed instructions for phase
+- [x] `required` INT (BOOLEAN), default 1 — whether this phase must be completed
+- [x] `unlockmethod` VARCHAR, default 'manual' — 'manual' or 'date'
+- [x] `unlockdate` DATETIME, default NULL — phase unlock date if unlockmethod='date'
+- [x] `allowfiles` INT (BOOLEAN), default 1 — whether file uploads are allowed
+- [x] `filetypes` VARCHAR, default NULL — comma-separated allowed file extensions
+- [x] `maxfilesize` INT, default 0 — max file size in bytes (0 = unlimited)
+- [x] `extras` TEXT, default NULL — JSON serialized additional settings (e.g. number of reviewers for peer review phase)
+- [x] `startdate` DATETIME, default NULL — when the phase becomes active
+- [x] `enddate` DATETIME, default NULL — when the phase closes
+- [x] `cutoffdate` DATETIME, default NULL — last date for submissions (can differ from enddate which may allow late grading)
+- [x] `visible` INT (BOOLEAN), default 1 — whether the phase is visible to students
+- [x] `timecreated` DATETIME, NOT NULL
+- [x] `timemodified` DATETIME, NOT NULL
 
 ---
 
@@ -69,16 +69,16 @@ The Peer Review Assignment activity stores instructor-defined phases, student su
 
 **Acceptance criteria**
 
-- [ ] `id` INT, Primary Key, auto-increment
-- [ ] `phaseid` INT, Foreign Key, NOT NULL — references `peerassign_phases.id`
-- [ ] `userid` INT, Foreign Key, NOT NULL — student who submitted
-- [ ] `groupid` INT, default NULL — if group submissions are enabled, references `groups.id`
-- [ ] `attemptnum` INT, default 0 — attempt number (0-based)
-- [ ] `timecreated` DATETIME, NOT NULL — submission timestamp
-- [ ] `timemodified` DATETIME, NOT NULL — last modification
-- [ ] `plugindata` TEXT, default NULL — JSON serialized submission content/metadata
-- [ ] `status` VARCHAR, default 'submitted' — e.g. 'draft', 'submitted', 'reopened'
-- [ ] One submission record per (phaseid, userid, attemptnum) combination
+- [x] `id` INT, Primary Key, auto-increment
+- [x] `phaseid` INT, Foreign Key, NOT NULL — references `peerassign_phases.id`
+- [x] `userid` INT, Foreign Key, NOT NULL — student who submitted
+- [x] `groupid` INT, default NULL — if group submissions are enabled, references `groups.id`
+- [x] `attemptnum` INT, default 0 — attempt number (0-based)
+- [x] `timecreated` DATETIME, NOT NULL — submission timestamp
+- [x] `timemodified` DATETIME, NOT NULL — last modification
+- [x] `plugindata` TEXT, default NULL — JSON serialized submission content/metadata
+- [x] `status` VARCHAR, default 'submitted' — e.g. 'draft', 'submitted', 'reopened'
+- [x] One submission record per (phaseid, userid, attemptnum) combination
 
 ---
 
@@ -90,12 +90,12 @@ The Peer Review Assignment activity stores instructor-defined phases, student su
 
 **Acceptance criteria**
 
-- [ ] Files are stored in `mod_peerassign` component context
-- [ ] Filearea is `submission` for submission files
+- [x] Files are stored in `mod_peerassign` component context
+- [x] Filearea is `submission` for submission files
 - [ ] Itemid is the `peerassign_submissions.id` of the associated submission record
-- [ ] Filearea is `reviewattachment` for peer review attachments
+- [x] Filearea is `reviewattachment` for peer review attachments
 - [ ] Itemid is the `peerassign_peer_reviews.id` of the associated peer review record
-- [ ] Filearea is `sampledescription` for sample & description phase materials
+- [x] Filearea is `sampledescription` for sample & description phase materials
 - [ ] Itemid is the `peerassign_phases.id` of the associated phase record
 - [ ] File records use standard Moodle `files` table
 
@@ -109,16 +109,16 @@ The Peer Review Assignment activity stores instructor-defined phases, student su
 
 **Acceptance criteria**
 
-- [ ] `id` INT, Primary Key, auto-increment
-- [ ] `phaseid` INT, Foreign Key, NOT NULL — references `peerassign_phases.id`
-- [ ] `submissionid` INT, Foreign Key, NOT NULL — references `peerassign_submissions.id`
-- [ ] `revieweruserid` INT, Foreign Key, NOT NULL — the peer reviewer
-- [ ] `groupid` INT, default NULL — if group submissions are enabled, references `groups.id`
-- [ ] `feedback` TEXT, default NULL — review comments
-- [ ] `feedbackformat` INT, default 0 — Moodle text format
-- [ ] `grade` DECIMAL(5,2), default NULL — peer-assigned numeric grade
-- [ ] `timecreated` DATETIME, NOT NULL — when review was submitted
-- [ ] `timemodified` DATETIME, NOT NULL
+- [x] `id` INT, Primary Key, auto-increment
+- [x] `phaseid` INT, Foreign Key, NOT NULL — references `peerassign_phases.id`
+- [x] `submissionid` INT, Foreign Key, NOT NULL — references `peerassign_submissions.id`
+- [x] `revieweruserid` INT, Foreign Key, NOT NULL — the peer reviewer
+- [x] `groupid` INT, default NULL — if group submissions are enabled, references `groups.id`
+- [x] `feedback` TEXT, default NULL — review comments
+- [x] `feedbackformat` INT, default 0 — Moodle text format
+- [x] `grade` DECIMAL(5,2), default NULL — peer-assigned numeric grade
+- [x] `timecreated` DATETIME, NOT NULL — when review was submitted
+- [x] `timemodified` DATETIME, NOT NULL
 
 ---
 
@@ -130,20 +130,20 @@ The Peer Review Assignment activity stores instructor-defined phases, student su
 
 **Acceptance criteria**
 
-- [ ] `id` INT, Primary Key, auto-increment
-- [ ] `peerassignid` INT, Foreign Key, NOT NULL — references `peerassign.id`
-- [ ] `userid` INT, Foreign Key, NOT NULL — the student being graded
-- [ ] `attemptnum` INT, default 0 — which submission attempt this grade applies to
-- [ ] `peergrademethod` VARCHAR, default 'average' — how to aggregate peer grades ('average', 'median', 'highest')
-- [ ] `aggregatedpeergrade` DECIMAL(5,2), default NULL — computed peer grade
-- [ ] `teachergrade` DECIMAL(5,2), default NULL — instructor-assigned grade
-- [ ] `teacherfeedback` TEXT, default NULL — instructor comments
-- [ ] `teacherfeedbackformat` INT, default 0 — Moodle text format
-- [ ] `teacherid` INT, Foreign Key, default NULL — reference to grading teacher
-- [ ] `gradingvisible` INT (BOOLEAN), default 0 — teacher controls when grades are released to student
-- [ ] `timecreated` DATETIME, NOT NULL
-- [ ] `timemodified` DATETIME, NOT NULL
-- [ ] One record per (peerassignid, userid, attemptnum)
+- [x] `id` INT, Primary Key, auto-increment
+- [x] `peerassignid` INT, Foreign Key, NOT NULL — references `peerassign.id`
+- [x] `userid` INT, Foreign Key, NOT NULL — the student being graded
+- [x] `attemptnum` INT, default 0 — which submission attempt this grade applies to
+- [x] `peergrademethod` VARCHAR, default 'average' — how to aggregate peer grades ('average', 'median', 'highest')
+- [x] `aggregatedpeergrade` DECIMAL(5,2), default NULL — computed peer grade
+- [x] `teachergrade` DECIMAL(5,2), default NULL — instructor-assigned grade
+- [x] `teacherfeedback` TEXT, default NULL — instructor comments
+- [x] `teacherfeedbackformat` INT, default 0 — Moodle text format
+- [x] `teacherid` INT, Foreign Key, default NULL — reference to grading teacher
+- [x] `gradingvisible` INT (BOOLEAN), default 0 — teacher controls when grades are released to student
+- [x] `timecreated` DATETIME, NOT NULL
+- [x] `timemodified` DATETIME, NOT NULL
+- [x] One record per (peerassignid, userid, attemptnum)
 
 ---
 
@@ -155,14 +155,14 @@ The Peer Review Assignment activity stores instructor-defined phases, student su
 
 **Acceptance criteria**
 
-- [ ] `id` INT, Primary Key, auto-increment
-- [ ] `phaseid` INT, Foreign Key, NOT NULL — references `peerassign_phases.id`
-- [ ] `userid` INT, Foreign Key, NOT NULL — student
-- [ ] `completed` INT (BOOLEAN), default 0 — phase completion status
-- [ ] `timecompleted` DATETIME, default NULL — when phase was completed
-- [ ] `timecreated` DATETIME, NOT NULL
-- [ ] `timemodified` DATETIME, NOT NULL
-- [ ] One record per (phaseid, userid) combination
+- [x] `id` INT, Primary Key, auto-increment
+- [x] `phaseid` INT, Foreign Key, NOT NULL — references `peerassign_phases.id`
+- [x] `userid` INT, Foreign Key, NOT NULL — student
+- [x] `completed` INT (BOOLEAN), default 0 — phase completion status
+- [x] `timecompleted` DATETIME, default NULL — when phase was completed
+- [x] `timecreated` DATETIME, NOT NULL
+- [x] `timemodified` DATETIME, NOT NULL
+- [x] One record per (phaseid, userid) combination
 
 ## Edge cases
 

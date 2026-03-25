@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/peerassign/db" VERSION="20250101" COMMENT="XMLDB file for Moodle mod/peerassign"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="peerassign" COMMENT="Peer Review Assignment activity instances">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Foreign Key to course.id"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" COMMENT="Activity display name"/>
+        <FIELD NAME="intro" TYPE="text" NOTNULL="false" COMMENT="Activity description"/>
+        <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="false" DEFAULT="0" COMMENT="Intro text format"/>
+        <FIELD NAME="blindreview" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" COMMENT="Boolean: whether peer reviews are anonymous"/>
+        <FIELD NAME="groupsubmissions" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" COMMENT="Boolean: whether submissions are group-based"/>
+        <FIELD NAME="groupingid" TYPE="int" LENGTH="10" NOTNULL="false" COMMENT="Foreign Key to group_groupings.id"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Timestamp of record creation"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Timestamp of last modification"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="course" TYPE="foreign" FIELDS="course" REFTABLE="course" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="course_idx" UNIQUE="false" FIELDS="course"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="peerassign_phases" COMMENT="Progressive activity workflow stages">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="peerassignid" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Foreign Key to peerassign.id"/>
+        <FIELD NAME="phasetype" TYPE="int" LENGTH="4" NOTNULL="true" COMMENT="Phase type: 0=sample, 1=validation, 2=submission, 3=peer_review, 4=teacher_eval"/>
+        <FIELD NAME="sequencenumber" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Phase order (1-based)"/>
+        <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="true" COMMENT="Phase display name"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" COMMENT="Detailed instructions"/>
+        <FIELD NAME="required" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="1" COMMENT="Boolean: whether this phase must be completed"/>
+        <FIELD NAME="unlockmethod" TYPE="char" LENGTH="50" NOTNULL="false" DEFAULT="manual" COMMENT="'manual' or 'date'"/>
+        <FIELD NAME="unlockdate" TYPE="int" LENGTH="10" NOTNULL="false" COMMENT="Phase unlock date if unlockmethod='date'"/>
+        <FIELD NAME="allowfiles" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="1" COMMENT="Boolean: whether file uploads are allowed"/>
+        <FIELD NAME="filetypes" TYPE="char" LENGTH="255" NOTNULL="false" COMMENT="Comma-separated allowed file extensions"/>
+        <FIELD NAME="maxfilesize" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" COMMENT="Max file size in bytes (0=unlimited)"/>
+        <FIELD NAME="extras" TYPE="text" NOTNULL="false" COMMENT="JSON serialized additional settings"/>
+        <FIELD NAME="startdate" TYPE="int" LENGTH="10" NOTNULL="false" COMMENT="When the phase becomes active"/>
+        <FIELD NAME="enddate" TYPE="int" LENGTH="10" NOTNULL="false" COMMENT="When the phase closes"/>
+        <FIELD NAME="cutoffdate" TYPE="int" LENGTH="10" NOTNULL="false" COMMENT="Last date for submissions"/>
+        <FIELD NAME="visible" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="1" COMMENT="Boolean: whether phase is visible to students"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="peerassignid" TYPE="foreign" FIELDS="peerassignid" REFTABLE="peerassign" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="peerassignid_seq_idx" UNIQUE="false" FIELDS="peerassignid, sequencenumber"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="peerassign_submissions" COMMENT="Student work submissions">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="phaseid" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Foreign Key to peerassign_phases.id"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Student who submitted"/>
+        <FIELD NAME="groupid" TYPE="int" LENGTH="10" NOTNULL="false" COMMENT="Group ID if group submissions enabled"/>
+        <FIELD NAME="attemptnum" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" COMMENT="Attempt number (0-based)"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="plugindata" TYPE="text" NOTNULL="false" COMMENT="JSON serialized submission content/metadata"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="50" NOTNULL="false" DEFAULT="submitted" COMMENT="e.g. 'draft', 'submitted', 'reopened'"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="phaseid" TYPE="foreign" FIELDS="phaseid" REFTABLE="peerassign_phases" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="phaseid_userid_attemptnum_idx" UNIQUE="true" FIELDS="phaseid, userid, attemptnum"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="peerassign_peer_reviews" COMMENT="Peer feedback data">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="phaseid" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Foreign Key to peerassign_phases.id"/>
+        <FIELD NAME="submissionid" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Foreign Key to peerassign_submissions.id"/>
+        <FIELD NAME="revieweruserid" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="The peer reviewer"/>
+        <FIELD NAME="groupid" TYPE="int" LENGTH="10" NOTNULL="false" COMMENT="If group submissions enabled"/>
+        <FIELD NAME="feedback" TYPE="text" NOTNULL="false" COMMENT="Review comments"/>
+        <FIELD NAME="feedbackformat" TYPE="int" LENGTH="4" NOTNULL="false" DEFAULT="0" COMMENT="Moodle text format"/>
+        <FIELD NAME="grade" TYPE="number" LENGTH="5" DECIMALS="2" NOTNULL="false" COMMENT="Peer-assigned numeric grade"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="phaseid" TYPE="foreign" FIELDS="phaseid" REFTABLE="peerassign_phases" REFFIELDS="id"/>
+        <KEY NAME="submissionid" TYPE="foreign" FIELDS="submissionid" REFTABLE="peerassign_submissions" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="phaseid_submissionid_idx" UNIQUE="false" FIELDS="phaseid, submissionid"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="peerassign_grades" COMMENT="Peer and teacher grades">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="peerassignid" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Foreign Key to peerassign.id"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Student being graded"/>
+        <FIELD NAME="attemptnum" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" COMMENT="Submission attempt this grade applies to"/>
+        <FIELD NAME="peergrademethod" TYPE="char" LENGTH="50" NOTNULL="false" DEFAULT="average" COMMENT="How to aggregate peer grades"/>
+        <FIELD NAME="aggregatedpeergrade" TYPE="number" LENGTH="5" DECIMALS="2" NOTNULL="false" COMMENT="Computed peer grade"/>
+        <FIELD NAME="teachergrade" TYPE="number" LENGTH="5" DECIMALS="2" NOTNULL="false" COMMENT="Instructor-assigned grade"/>
+        <FIELD NAME="teacherfeedback" TYPE="text" NOTNULL="false" COMMENT="Instructor comments"/>
+        <FIELD NAME="teacherfeedbackformat" TYPE="int" LENGTH="4" NOTNULL="false" DEFAULT="0" COMMENT="Moodle text format"/>
+        <FIELD NAME="teacherid" TYPE="int" LENGTH="10" NOTNULL="false" COMMENT="Reference to grading teacher"/>
+        <FIELD NAME="gradingvisible" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" COMMENT="Boolean: teacher controls when grades are released"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="peerassignid" TYPE="foreign" FIELDS="peerassignid" REFTABLE="peerassign" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="peerassignid_userid_attemptnum_idx" UNIQUE="true" FIELDS="peerassignid, userid, attemptnum"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="peerassign_phase_completion" COMMENT="Phase completion tracking">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="phaseid" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Foreign Key to peerassign_phases.id"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Student"/>
+        <FIELD NAME="completed" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" COMMENT="Boolean: phase completion status"/>
+        <FIELD NAME="timecompleted" TYPE="int" LENGTH="10" NOTNULL="false" COMMENT="When phase was completed"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="phaseid" TYPE="foreign" FIELDS="phaseid" REFTABLE="peerassign_phases" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="phaseid_userid_idx" UNIQUE="true" FIELDS="phaseid, userid"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

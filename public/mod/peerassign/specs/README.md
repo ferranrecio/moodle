@@ -10,6 +10,7 @@ This folder contains plain-markdown behavior specs for the **Peer Review Assignm
 | `webservices/` | The Moodle web service methods |
 | `businessrules/` | The business rules governing the plugin's behavior |
 | `ui/` | The user interface components and interactions |
+| `architecture/` | The overall architecture and design decisions |
 
 ## Spec file structure
 
@@ -49,9 +50,9 @@ Links to source documentation and ADRs.
 3. Edge cases are equally binding — they must be implemented and tested.
 4. If a behavior conflicts with the source docs, the source docs take precedence; update the spec and note the discrepancy.
 5. All implemented behaviours must provide PHPUnit tests or Behat tests that verify the acceptance criteria.
-6. Mark acceptance criteria as `[x]` when the behavior is implemented and verified.
+6. Edit the original spec files to mark acceptance criteria as `[x]` when the behavior is implemented and verified.
 7. If an implementation adds something that will benefit from a copilot skill, create the new skill immediately.
-8. Every time you implement something, include a summary in the `vibelog` folder.
+8. Every time you implement something, include a summary in the `vibelog` folder. Do not edit any existing file in this folder.
 
 ## Spec file index
 
@@ -63,6 +64,8 @@ Links to source documentation and ADRs.
 | `businessrules/create-activity.spec.md` | Business rules for creating `peerassign` activity instances | — |
 | `businessrules/update-activity.spec.md` | Business rules specific to updating existing activity instances | — |
 | `businessrules/delete-activity.spec.md` | Business rules specific to deleting activity instances | — |
+| `architecture/classes.spec.md` | The baseline class architecture and responsibilities | — |
+| `architecture/capabilities.spec.md` | The baseline capability model and permission helper expectations | — |
 
 ## The `vibelog` folder
 

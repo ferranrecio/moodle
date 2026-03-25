@@ -21,12 +21,12 @@ The webservice name is `mod_peerassign_create_phase`.
 
 **Acceptance criteria**
 
-- [ ] Required input fields are: `peerassignid`, `phasetype`, `sequencenumber`, `title`, `customdata`
-- [ ] `customdata` is accepted as `PARAM_RAW` in `execute_parameters`
-- [ ] `customdata` is JSON-encoded phase-specific settings and is validated before persistence
+- [x] Required input fields are: `peerassignid`, `phasetype`, `sequencenumber`, `title`, `customdata`
+- [x] `customdata` is accepted as `PARAM_RAW` in `execute_parameters`
+- [x] `customdata` is JSON-encoded phase-specific settings and is validated before persistence
 - [ ] `customdata` is persisted into `peerassign_phases.extras` as normalized JSON
-- [ ] `timecreated` and `timemodified` are set on insert
-- [ ] Response contains at minimum: `status`, `phaseid`, `peerassignid`, `message`
+- [x] `timecreated` and `timemodified` are set on insert
+- [x] Response contains at minimum: `status`, `phaseid`, `peerassignid`, `message`
 
 ---
 
@@ -38,10 +38,10 @@ The webservice name is `mod_peerassign_create_phase`.
 
 **Acceptance criteria**
 
-- [ ] Optional fields accepted: `description`, `required`, `unlockmethod`, `unlockdate`, `allowfiles`, `filetypes`, `maxfilesize`
-- [ ] Missing optional fields default to schema defaults
-- [ ] `unlockmethod` only accepts supported values (`manual`, `date`)
-- [ ] `unlockdate` is required when `unlockmethod = date`
+- [x] Optional fields accepted: `description`, `required`, `unlockmethod`, `unlockdate`, `allowfiles`, `filetypes`, `maxfilesize`
+- [x] Missing optional fields default to schema defaults
+- [x] `unlockmethod` only accepts supported values (`manual`, `date`)
+- [x] `unlockdate` is required when `unlockmethod = date`
 - [ ] `maxfilesize` is validated as non-negative integer
 
 ---
@@ -54,10 +54,10 @@ The webservice name is `mod_peerassign_create_phase`.
 
 **Acceptance criteria**
 
-- [ ] The activity context is loaded from `peerassignid`
-- [ ] `self::validate_context($context)` is called
-- [ ] Caller must have module management capability for the target activity context
-- [ ] If capability fails, no DB write occurs and an exception is returned
+- [x] The activity context is loaded from `peerassignid`
+- [x] `self::validate_context($context)` is called
+- [x] Caller must have module management capability for the target activity context
+- [x] If capability fails, no DB write occurs and an exception is returned
 
 ---
 
@@ -100,12 +100,12 @@ The webservice name is `mod_peerassign_create_phase`.
 
 **Acceptance criteria**
 
-- [ ] Missing required parameter raises invalid parameter exception
-- [ ] Non-JSON `customdata` raises invalid parameter exception
+- [x] Missing required parameter raises invalid parameter exception
+- [x] Non-JSON `customdata` raises invalid parameter exception
 - [ ] JSON Schema validation failures for `customdata` return a specific documented webservice error code
 - [ ] Invalid `phasetype` raises invalid parameter exception
-- [ ] Invalid `peerassignid` raises not-found style exception
-- [ ] Errors use Moodle exception flow and are consumable by WS clients
+- [x] Invalid `peerassignid` raises not-found style exception
+- [x] Errors use Moodle exception flow and are consumable by WS clients
 
 ---
 
@@ -131,9 +131,9 @@ The webservice name is `mod_peerassign_create_phase`.
 
 **Acceptance criteria**
 
-- [ ] `mod_peerassign_create_phase` is declared in `db/services.php`
-- [ ] Class and method target the external function implementation
-- [ ] Function is marked with appropriate access restrictions for authenticated users
+- [x] `mod_peerassign_create_phase` is declared in `db/services.php`
+- [x] Class and method target the external function implementation
+- [x] Function is marked with appropriate access restrictions for authenticated users
 - [ ] Function description documents that `customdata` is a JSON-encoded payload accepted via `PARAM_RAW`
 
 ## Edge cases

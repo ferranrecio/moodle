@@ -18,9 +18,9 @@ Over time, teachers can update activity settings (for example, group submissions
 
 **Acceptance criteria**
 
-- [ ] Update supports editable fields at minimum: `name`, `intro`, `introformat`, `blindreview`, `groupsubmissions`, `groupingid`
-- [ ] `id` and `course` identify the target activity and are not reassigned to a different course by update flow
-- [ ] `timemodified` is updated on successful save
+- [x] Update supports editable fields at minimum: `name`, `intro`, `introformat`, `blindreview`, `groupsubmissions`, `groupingid`
+- [x] `id` and `course` identify the target activity and are not reassigned to a different course by update flow
+- [x] `timemodified` is updated on successful save
 - [ ] Unchanged fields preserve their previous values
 
 ---
@@ -33,10 +33,10 @@ Over time, teachers can update activity settings (for example, group submissions
 
 **Acceptance criteria**
 
-- [ ] Boolean-like fields (`blindreview`, `groupsubmissions`) are normalized to `0` or `1`
-- [ ] `groupingid` validation (exists, same course) is enforced when provided
-- [ ] Invalid values are rejected with clear validation errors
-- [ ] On validation failure, no partial update is persisted
+- [x] Boolean-like fields (`blindreview`, `groupsubmissions`) are normalized to `0` or `1`
+- [x] `groupingid` validation (exists, same course) is enforced when provided
+- [x] Invalid values are rejected with clear validation errors
+- [x] On validation failure, no partial update is persisted
 
 ---
 
@@ -48,9 +48,9 @@ Over time, teachers can update activity settings (for example, group submissions
 
 **Acceptance criteria**
 
-- [ ] `groupsubmissions` can transition from `0` to `1`
-- [ ] If `groupingid` is provided, it must pass grouping validation rules
-- [ ] If no `groupingid` is provided, configuration remains valid with `groupingid = NULL`
+- [x] `groupsubmissions` can transition from `0` to `1`
+- [x] If `groupingid` is provided, it must pass grouping validation rules
+- [x] If no `groupingid` is provided, configuration remains valid with `groupingid = NULL`
 - [ ] Downstream ownership/assignment logic can resolve to group-based behavior after update
 
 ---
