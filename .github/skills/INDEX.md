@@ -37,7 +37,7 @@ This directory contains custom Copilot skills for this repository.
   - Purpose: Implement and refactor Moodle routes (controller/api/shim), including parameter schemas, response patterns, shortlinks, and route testing.
 
 - **Moodle Output Rendering**
-  - Path: `.github/skills/output-rendering/SKILL.md`
+  - Path: `.github/skills/moodle-output-rendering/SKILL.md`
   - Purpose: Apply Moodle output architecture best practices across entry points, output classes, renderers, templates, and JS initialization.
 
 - **Rubrics in Moodle Activity**

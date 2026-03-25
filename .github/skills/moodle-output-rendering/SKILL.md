@@ -1,3 +1,8 @@
+---
+name: moodle-output-rendering
+description: Apply Moodle output rendering best practices across entry points, output classes, renderers, and Mustache templates to keep UI code maintainable, themeable, and architecturally correct.
+---
+
 # Good practices using Moodle Output Rendering
 
 This guide defines good practices for Moodle UI development. In Moodle, bad examples outnumber good ones; follow these rules to ensure code is maintainable, themeable, and architecturally sound, while addressing common misconceptions and "bad practices" found in Moodle core.
