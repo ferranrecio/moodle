@@ -5,7 +5,7 @@ This folder contains plain-markdown behavior specs for the **Peer Review Assignm
 ## What these specs cover
 
 | Folder | Component |
-|---|---|
+| --- | --- |
 | `database/` | MVP database schema |
 | `webservices/` | The Moodle web service methods |
 | `businessrules/` | The business rules governing the plugin's behavior |
@@ -32,7 +32,7 @@ Domain context required to understand the behaviors.
 **When** an action occurs
 **Then** the expected outcome
 
-**Acceptance criteria**
+Acceptance criteria:
 - [ ] Specific, testable requirement
 - [ ] ...
 
@@ -57,7 +57,7 @@ Links to source documentation and ADRs.
 ## Spec file index
 
 | Spec file | Description | Key ADRs |
-|---|---|---|
+| --- | --- | --- |
 | `introduction.md` | The plugin introduction | — |
 | `database/schema.spec.md` | All tables with fields, types, constraints, and relations | — |
 | `webservices/create-phase.spec.md` | Webservice contract to create a new phase with `param_raw` JSON settings | — |
@@ -66,6 +66,8 @@ Links to source documentation and ADRs.
 | `businessrules/delete-activity.spec.md` | Business rules specific to deleting activity instances | — |
 | `architecture/classes.spec.md` | The baseline class architecture and responsibilities | — |
 | `architecture/capabilities.spec.md` | The baseline capability model and permission helper expectations | — |
+| `architecture/testing.spec.md` | The testing architecture, generator patterns, and coverage requirements | — |
+| `ui/activity-icons.spec.md` | Design specifications for the activity icon (monologo.svg) | — |
 
 ## The `vibelog` folder
 

@@ -38,3 +38,5 @@ Using the rules explained in the README.md form the specs, apply the rules about
 ### Review notes
 
 - The methods were created but I need to refine the implementation a bit, nothing relevant.
+- Missing PHPUnit tests for the static creators. I added them to the specs.
+- The `get_course()` method was added to the manager class to return the course record, which is a common need in views and other places. This was not explicitly in the spec but seemed like a useful addition to avoid redundant calls to `get_course()`.

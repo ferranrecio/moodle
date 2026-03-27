@@ -16,7 +16,7 @@ Over time, teachers can update activity settings (for example, group submissions
 **When** a teacher edits the activity settings and saves
 **Then** editable fields are updated in `peerassign`
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] Update supports editable fields at minimum: `name`, `intro`, `introformat`, `blindreview`, `groupsubmissions`, `groupingid`
 - [x] `id` and `course` identify the target activity and are not reassigned to a different course by update flow
@@ -31,7 +31,7 @@ Over time, teachers can update activity settings (for example, group submissions
 **When** shared settings are modified
 **Then** validation and normalization are consistent with create logic
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] Boolean-like fields (`blindreview`, `groupsubmissions`) are normalized to `0` or `1`
 - [x] `groupingid` validation (exists, same course) is enforced when provided
@@ -46,7 +46,7 @@ Over time, teachers can update activity settings (for example, group submissions
 **When** a teacher enables `groupsubmissions`
 **Then** the updated configuration remains internally consistent
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] `groupsubmissions` can transition from `0` to `1`
 - [x] If `groupingid` is provided, it must pass grouping validation rules
@@ -61,7 +61,7 @@ Over time, teachers can update activity settings (for example, group submissions
 **When** a teacher attempts to set `groupsubmissions` from `1` to `0`
 **Then** data integrity is preserved through deterministic behavior
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [ ] Implementation chooses and documents one behavior: block change with a clear error, or allow change with explicit migration rules
 - [ ] Existing submissions, peer reviews, and grades are not left in ambiguous ownership state
@@ -76,7 +76,7 @@ Over time, teachers can update activity settings (for example, group submissions
 **When** the target activity does not exist or the identifier is malformed
 **Then** the operation fails safely with clear errors
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [ ] Non-existent activity `id` returns a not-found style error
 - [ ] Malformed identifier types are rejected during parameter validation

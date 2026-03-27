@@ -18,7 +18,7 @@ Capability checks are centralized in `mod_peerassign\permissions` using helper m
 **When** runtime access control is needed in hooks, external functions, and UI/file flows
 **Then** capabilities are checked through `mod_peerassign\permissions` helper methods and capability requirements remain aligned with the defined keys.
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] `db/access.php` defines all module capabilities: `addinstance`, `view`, `manage`, `submit`, `review`, `grade`, `addphase` under the `mod/peerassign:*` namespace
 - [x] `permissions::can_view_files()` checks `mod/peerassign:view` for file visibility

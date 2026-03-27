@@ -16,7 +16,7 @@ Teachers create a Peer Review Assignment from the Moodle activity chooser and co
 **When** they create a Peer Review Assignment with only required fields
 **Then** a valid `peerassign` activity instance is created
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] Required create inputs include at minimum: `course`, `name`
 - [x] A new record is inserted in `peerassign`
@@ -35,7 +35,7 @@ Teachers create a Peer Review Assignment from the Moodle activity chooser and co
 **When** the teacher provides description content
 **Then** description fields are persisted correctly
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] `intro` is optional and may be NULL
 - [x] `introformat` is persisted when provided
@@ -50,12 +50,11 @@ Teachers create a Peer Review Assignment from the Moodle activity chooser and co
 **When** they set the anonymous/blind review option
 **Then** the blind review preference is stored and used by later display logic
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] `blindreview` is accepted as a boolean-like value
 - [x] If omitted, `blindreview` defaults to `0`
 - [x] If provided, `blindreview` is normalized to integer `0` or `1`
-- [ ] The setting affects reviewer identity visibility in UI behavior, not persistence of reviewer IDs
 
 ---
 
@@ -65,7 +64,7 @@ Teachers create a Peer Review Assignment from the Moodle activity chooser and co
 **When** the activity is saved
 **Then** it is configured for individual submissions
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] `groupsubmissions` defaults to `0`
 - [ ] `groupingid` defaults to `NULL`
@@ -79,7 +78,7 @@ Teachers create a Peer Review Assignment from the Moodle activity chooser and co
 **When** they enable group submissions while creating the activity
 **Then** the activity is persisted with group-based submission mode
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] `groupsubmissions` accepts a boolean-like value and is normalized to `0`/`1`
 - [x] When enabled, `groupsubmissions` is stored as `1`
@@ -93,7 +92,7 @@ Teachers create a Peer Review Assignment from the Moodle activity chooser and co
 **When** the teacher optionally selects a grouping
 **Then** grouping constraints are persisted and validated
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] `groupingid` is optional and may be NULL even when `groupsubmissions = 1`
 - [x] If provided, `groupingid` must reference an existing `groupings.id`
@@ -108,7 +107,7 @@ Teachers create a Peer Review Assignment from the Moodle activity chooser and co
 **When** a non-null `groupingid` is provided
 **Then** behavior is deterministic and documented
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] Implementation chooses one behavior and documents it: either reject non-null `groupingid`, or persist as NULL
 - [x] No inconsistent state is stored where individual submissions depend on grouping constraints
@@ -122,7 +121,7 @@ Teachers create a Peer Review Assignment from the Moodle activity chooser and co
 **When** a teacher creates or updates an activity and enables group submissions
 **Then** the grouping selection option is not shown in the UI
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] During create/update, the UI checks for existing groupings in the course
 - [x] If no groupings exist, the grouping selection field is hidden or disabled
@@ -136,7 +135,7 @@ Teachers create a Peer Review Assignment from the Moodle activity chooser and co
 **When** initial plugin setup completes
 **Then** the activity has a deterministic starting state for phase authoring
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] The initial Sample & Description phase is automatically created when the activity is created
 - [x] No additional phases beyond the initial Sample & Description phase are auto-created
@@ -152,7 +151,7 @@ Teachers create a Peer Review Assignment from the Moodle activity chooser and co
 **When** create validation runs
 **Then** permission checks occur before any plugin record is written
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [ ] User must have capability to add module instances in the target course/module context
 - [ ] If capability validation fails, no `peerassign` record is created
@@ -166,7 +165,7 @@ Teachers create a Peer Review Assignment from the Moodle activity chooser and co
 **When** one step fails
 **Then** no partial activity state remains
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] On any exception, plugin-specific inserted data is rolled back
 - [ ] No orphan plugin record remains if course module creation fails

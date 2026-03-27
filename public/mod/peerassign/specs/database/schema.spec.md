@@ -16,7 +16,7 @@ The Peer Review Assignment activity stores instructor-defined phases, student su
 **When** the database is provisioned
 **Then** a `peerassign` table exists with all mandatory fields
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] `id` INT, Primary Key, auto-increment
 - [x] `course` INT, Foreign Key, NOT NULL — references `course.id`
@@ -37,7 +37,7 @@ The Peer Review Assignment activity stores instructor-defined phases, student su
 **When** the database is provisioned
 **Then** a `peerassign_phases` table exists with all required fields
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] `id` INT, Primary Key, auto-increment
 - [x] `peerassignid` INT, Foreign Key, NOT NULL — references `peerassign.id`
@@ -67,7 +67,7 @@ The Peer Review Assignment activity stores instructor-defined phases, student su
 **When** the database is provisioned
 **Then** a `peerassign_submissions` table exists with all required fields
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] `id` INT, Primary Key, auto-increment
 - [x] `phaseid` INT, Foreign Key, NOT NULL — references `peerassign_phases.id`
@@ -88,7 +88,7 @@ The Peer Review Assignment activity stores instructor-defined phases, student su
 **When** files are uploaded
 **Then** files are stored in Moodle's file API with appropriate context
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] Files are stored in `mod_peerassign` component context
 - [x] Filearea is `submission` for submission files
@@ -107,7 +107,7 @@ The Peer Review Assignment activity stores instructor-defined phases, student su
 **When** the database is provisioned
 **Then** a `peerassign_peer_reviews` table exists with all required fields
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] `id` INT, Primary Key, auto-increment
 - [x] `phaseid` INT, Foreign Key, NOT NULL — references `peerassign_phases.id`
@@ -128,7 +128,7 @@ The Peer Review Assignment activity stores instructor-defined phases, student su
 **When** the database is provisioned
 **Then** a `peerassign_grades` table exists with all required fields
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] `id` INT, Primary Key, auto-increment
 - [x] `peerassignid` INT, Foreign Key, NOT NULL — references `peerassign.id`
@@ -153,7 +153,7 @@ The Peer Review Assignment activity stores instructor-defined phases, student su
 **When** the database is provisioned
 **Then** a `peerassign_phase_completion` table exists
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] `id` INT, Primary Key, auto-increment
 - [x] `phaseid` INT, Foreign Key, NOT NULL — references `peerassign_phases.id`
@@ -187,13 +187,13 @@ The Peer Review Assignment activity stores instructor-defined phases, student su
 **When** persistence classes are implemented
 **Then** each class maps to the correct table with matching field types and relationships
 
-**Acceptance criteria**
+Acceptance criteria:
 
-- [ ] `mod_peerassign\persistence\peerassign` class maps to `peerassign` table
-- [ ] `mod_peerassign\persistence\phase` class maps to `peerassign_phases` table
-- [ ] `mod_peerassign\persistence\submission` class maps to `peerassign_submissions` table
-- [ ] `mod_peerassign\persistence\peer_review` class maps to `peerassign_peer_reviews` table
-- [ ] `mod_peerassign\persistence\grade` class maps to `peerassign_grades` table
-- [ ] `mod_peerassign\persistence\phase_completion` class maps to `peerassign_phase_completion` table
-- [ ] All field types in persistence classes match the corresponding database schema field types
-- [ ] Foreign key relationships are represented in persistence classes (e.g., `phase` has a reference to `peerassignid`, `submission` has a reference to `phaseid`, etc.)
+- [x] `mod_peerassign\local\models\peerassign` class maps to `peerassign` table
+- [x] `mod_peerassign\local\models\phase` class maps to `peerassign_phases` table
+- [x] `mod_peerassign\local\models\submission` class maps to `peerassign_submissions` table
+- [x] `mod_peerassign\local\models\peer_review` class maps to `peerassign_peer_reviews` table
+- [x] `mod_peerassign\local\models\grade` class maps to `peerassign_grades` table
+- [x] `mod_peerassign\local\models\phase_completion` class maps to `peerassign_phase_completion` table
+- [x] All field types in persistence classes match the corresponding database schema field types
+- [x] Foreign key relationships are represented in persistence classes (e.g., `phase` has a reference to `peerassignid`, `submission` has a reference to `phaseid`, etc.)

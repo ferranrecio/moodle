@@ -30,10 +30,10 @@ use mod_peerassign\permissions;
 
 // Course module id.
 $id = required_param('id', PARAM_INT);
-$cm = get_coursemodule_from_id('subsection', $id, 0, false, MUST_EXIST);
+$cm = get_coursemodule_from_id(manager::MODULE, $id, 0, false, MUST_EXIST);
 $manager = manager::create_from_coursemodule($cm);
 
-$course = $cm->course;
+$course = $manager->get_course();
 $context = $manager->get_context();
 $moduleinstance = $manager->get_instance();
 

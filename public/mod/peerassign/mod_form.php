@@ -49,7 +49,7 @@ class mod_peerassign_mod_form extends moodleform_mod {
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
         // Adding the standard "name" field.
-        $mform->addElement('text', 'name', get_string('activityname', 'core'), ['size' => '64']);
+        $mform->addElement('text', 'name', get_string('activityname', manager::PLUGINNAME), ['size' => '64']);
         if (!empty($this->_customdata['grade'])) {
             $mform->setType('name', PARAM_TEXT);
         } else {
@@ -57,7 +57,6 @@ class mod_peerassign_mod_form extends moodleform_mod {
         }
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
-        $mform->addHelpButton('name', 'activityname', 'core');
 
         // Adding the standard "intro" and "introformat" fields.
         $this->standard_intro_elements();

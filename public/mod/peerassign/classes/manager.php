@@ -30,6 +30,12 @@ use cm_info;
 use context_module;
 use moodle_page;
 use stdClass;
+use mod_peerassign\local\models\grade as grade_model;
+use mod_peerassign\local\models\peer_review as peer_review_model;
+use mod_peerassign\local\models\peerassign as peerassign_model;
+use mod_peerassign\local\models\phase as phase_model;
+use mod_peerassign\local\models\phase_completion as phase_completion_model;
+use mod_peerassign\local\models\submission as submission_model;
 use mod_peerassign\output\renderer;
 
 /**
@@ -59,6 +65,9 @@ class manager {
     /** @var cm_info course_modules record. */
     private $cm;
 
+    /** @var \stdClass course object */
+    private $course;
+
     /**
      * Class constructor.
      *
@@ -73,6 +82,7 @@ class manager {
         $this->context = context_module::instance($cm->id);
         $this->instance->cmidnumber = $cm->idnumber;
         $this->path = $CFG->dirroot . '/mod/' . self::MODULE;
+        $this->course = get_course($cm->course);
     }
 
     /**
@@ -94,10 +104,8 @@ class manager {
      * @return manager
      */
     public static function create_from_coursemodule($cm): self {
-        global $DB;
-
         $cm = cm_info::create($cm);
-        $instance = $DB->get_record(self::MODULE, ['id' => $cm->instance], '*', MUST_EXIST);
+        $instance = peerassign_model::get_record(['id' => $cm->instance], MUST_EXIST)->to_record();
         return new self($cm, $instance);
     }
 
@@ -112,8 +120,6 @@ class manager {
      * @return manager
      */
     public static function create_from_data_record(stdClass $record): self {
-        global $DB;
-
         if (!empty($record->peerassignid)) {
             $instanceid = (int)$record->peerassignid;
         } else if (!empty($record->id)) {
@@ -122,7 +128,7 @@ class manager {
             throw new \coding_exception('Missing peerassign instance identifier in data record.');
         }
 
-        $instance = $DB->get_record(self::MODULE, ['id' => $instanceid], '*', MUST_EXIST);
+        $instance = peerassign_model::get_record(['id' => $instanceid], MUST_EXIST)->to_record();
         $cm = get_coursemodule_from_instance(self::MODULE, $instance->id);
         $cm = cm_info::create($cm);
         return new self($cm, $instance);
@@ -153,6 +159,15 @@ class manager {
      */
     public function get_coursemodule(): cm_info {
         return $this->cm;
+    }
+
+    /**
+     * Return the current course.
+     *
+     * @return stdClass the course record
+     */
+    public function get_course(): stdClass {
+        return $this->course;
     }
 
     /**
@@ -199,31 +214,27 @@ class manager {
      * @throws \Exception
      */
     public static function create_initial_sample_phase($peerassignid) {
-        global $DB;
+        $phase = new phase_model(0, (object) [
+            'peerassignid' => (int)$peerassignid,
+            'phasetype' => 0,
+            'sequencenumber' => 1,
+            'title' => get_string('sampledescriptionphase', self::PLUGINNAME),
+            'description' => null,
+            'required' => 1,
+            'unlockmethod' => 'manual',
+            'unlockdate' => null,
+            'allowfiles' => 1,
+            'filetypes' => null,
+            'maxfilesize' => 0,
+            'extras' => null,
+            'startdate' => null,
+            'enddate' => null,
+            'cutoffdate' => null,
+            'visible' => 1,
+        ]);
+        $phase->create();
 
-        $phase = new \stdClass();
-        $phase->peerassignid = $peerassignid;
-        $phase->phasetype = 0; // 0 = sample
-        $phase->sequencenumber = 1;
-        $phase->title = get_string('sampledescriptionphase', self::PLUGINNAME);
-        $phase->description = null;
-        $phase->required = 1;
-        $phase->unlockmethod = 'manual';
-        $phase->unlockdate = null;
-        $phase->allowfiles = 1;
-        $phase->filetypes = null;
-        $phase->maxfilesize = 0;
-        $phase->extras = null;
-        $phase->startdate = null;
-        $phase->enddate = null;
-        $phase->cutoffdate = null;
-        $phase->visible = 1;
-        $phase->timecreated = time();
-        $phase->timemodified = $phase->timecreated;
-
-        $phaseid = $DB->insert_record('peerassign_phases', $phase);
-
-        return $phaseid;
+        return (int)$phase->get('id');
     }
 
     /**
@@ -233,33 +244,37 @@ class manager {
      * @throws \Exception
      */
     public static function delete_activity_cascade($peerassignid) {
-        global $DB;
+        $cm = get_coursemodule_from_instance(self::MODULE, (int)$peerassignid, 0, false, IGNORE_MISSING);
+        $context = $cm ? \context_module::instance($cm->id, IGNORE_MISSING) : null;
 
-        $context = \context_module::instance_by_id($peerassignid);
-        if (!$context) {
-            // If context can't be found, still try to delete the data.
-            $context = null;
+        $phases = phase_model::get_records(['peerassignid' => (int)$peerassignid]);
+        foreach ($phases as $phase) {
+            $phaseid = (int)$phase->get('id');
+
+            $phasecompletions = phase_completion_model::get_records(['phaseid' => $phaseid]);
+            foreach ($phasecompletions as $phasecompletion) {
+                $phasecompletion->delete();
+            }
+
+            $peerreviews = peer_review_model::get_records(['phaseid' => $phaseid]);
+            foreach ($peerreviews as $peerreview) {
+                $peerreview->delete();
+            }
+
+            $submissions = submission_model::get_records(['phaseid' => $phaseid]);
+            foreach ($submissions as $submission) {
+                $submission->delete();
+            }
         }
 
-        // Delete all related data in reverse dependency order.
-        $DB->delete_records('peerassign_phase_completion', ['phaseid' => $DB->sql_in(
-            'SELECT id FROM {peerassign_phases} WHERE peerassignid = ?',
-            [$peerassignid]
-        )]);
+        $grades = grade_model::get_records(['peerassignid' => (int)$peerassignid]);
+        foreach ($grades as $grade) {
+            $grade->delete();
+        }
 
-        $DB->delete_records('peerassign_grades', ['peerassignid' => $peerassignid]);
-
-        $DB->delete_records('peerassign_peer_reviews', ['phaseid' => $DB->sql_in(
-            'SELECT id FROM {peerassign_phases} WHERE peerassignid = ?',
-            [$peerassignid]
-        )]);
-
-        $DB->delete_records('peerassign_submissions', ['phaseid' => $DB->sql_in(
-            'SELECT id FROM {peerassign_phases} WHERE peerassignid = ?',
-            [$peerassignid]
-        )]);
-
-        $DB->delete_records('peerassign_phases', ['peerassignid' => $peerassignid]);
+        foreach ($phases as $phase) {
+            $phase->delete();
+        }
 
         // Clean up file areas if context exists.
         if ($context) {

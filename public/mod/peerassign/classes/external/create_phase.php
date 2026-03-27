@@ -32,6 +32,8 @@ use external_value;
 use external_single_structure;
 use external_multiple_structure;
 use external_warnings;
+use mod_peerassign\local\models\peerassign as peerassign_model;
+use mod_peerassign\local\models\phase as phase_model;
 use mod_peerassign\manager;
 use mod_peerassign\permissions;
 
@@ -156,7 +158,7 @@ class create_phase extends external_api {
         $filetypes = '',
         $maxfilesize = 0
     ) {
-        global $DB, $USER;
+        global $USER;
 
         // Validate parameters.
         $params = self::validate_parameters(self::execute_parameters(), [
@@ -175,7 +177,7 @@ class create_phase extends external_api {
         ]);
 
         // Get the activity.
-        $peerassign = $DB->get_record(manager::MODULE, ['id' => $params['peerassignid']], '*', MUST_EXIST);
+        peerassign_model::get_record(['id' => $params['peerassignid']], MUST_EXIST);
 
         // Get the course module and context.
         $cm = get_coursemodule_from_instance(manager::MODULE, $params['peerassignid']);
@@ -210,24 +212,23 @@ class create_phase extends external_api {
         }
 
         // Create the phase record.
-        $phase = new \stdClass();
-        $phase->peerassignid = $params['peerassignid'];
-        $phase->phasetype = $params['phasetype'];
-        $phase->sequencenumber = $params['sequencenumber'];
-        $phase->title = $params['title'];
-        $phase->description = !empty($params['description']) ? $params['description'] : null;
-        $phase->required = $params['required'];
-        $phase->unlockmethod = $params['unlockmethod'];
-        $phase->unlockdate = $params['unlockdate'] > 0 ? $params['unlockdate'] : null;
-        $phase->allowfiles = $params['allowfiles'];
-        $phase->filetypes = !empty($params['filetypes']) ? $params['filetypes'] : null;
-        $phase->maxfilesize = $params['maxfilesize'];
-        $phase->extras = $params['customdata'];
-        $phase->visible = 1;
-        $phase->timecreated = time();
-        $phase->timemodified = $phase->timecreated;
-
-        $phaseid = $DB->insert_record('peerassign_phases', $phase);
+        $phase = new phase_model(0, (object) [
+            'peerassignid' => $params['peerassignid'],
+            'phasetype' => $params['phasetype'],
+            'sequencenumber' => $params['sequencenumber'],
+            'title' => $params['title'],
+            'description' => !empty($params['description']) ? $params['description'] : null,
+            'required' => $params['required'],
+            'unlockmethod' => $params['unlockmethod'],
+            'unlockdate' => $params['unlockdate'] > 0 ? $params['unlockdate'] : null,
+            'allowfiles' => $params['allowfiles'],
+            'filetypes' => !empty($params['filetypes']) ? $params['filetypes'] : null,
+            'maxfilesize' => $params['maxfilesize'],
+            'extras' => $params['customdata'],
+            'visible' => 1,
+        ]);
+        $phase->create();
+        $phaseid = (int)$phase->get('id');
 
         return [
             'status' => 'success',

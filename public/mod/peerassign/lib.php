@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 use mod_peerassign\manager;
+use mod_peerassign\local\models\peerassign as peerassign_model;
 use mod_peerassign\permissions;
 
 /**
@@ -36,20 +37,16 @@ use mod_peerassign\permissions;
  * @throws moodle_exception
  */
 function peerassign_add_instance($data, $mform = null) {
-    global $DB;
-
-    $data->timecreated = time();
-    $data->timemodified = $data->timecreated;
-
-    // Insert the main activity record.
-    $id = $DB->insert_record(manager::MODULE, $data);
+    $instance = new peerassign_model(0, $data);
+    $instance->create();
+    $id = (int)$instance->get('id');
 
     try {
         // Create the initial Sample & Description phase.
         manager::create_initial_sample_phase($id);
     } catch (Exception $e) {
         // If phase creation fails, delete the created activity record and re-throw the exception.
-        $DB->delete_records(manager::MODULE, ['id' => $id]);
+        $instance->delete();
         throw $e;
     }
 
@@ -65,14 +62,15 @@ function peerassign_add_instance($data, $mform = null) {
  * @throws moodle_exception
  */
 function peerassign_update_instance($data, $mform = null) {
-    global $DB;
+    $instance = new peerassign_model((int)$data->instance);
+    $instance->from_record((object)array_merge(
+        (array)$instance->to_record(),
+        (array)$data,
+        ['id' => (int)$data->instance]
+    ));
+    $instance->update();
 
-    $data->timemodified = time();
-    $data->id = $data->instance;
-
-    // Update validation rules can be applied here.
-    // For now, simply update the record.
-    return $DB->update_record(manager::MODULE, $data);
+    return true;
 }
 
 /**
@@ -83,19 +81,18 @@ function peerassign_update_instance($data, $mform = null) {
  * @throws moodle_exception
  */
 function peerassign_delete_instance($id) {
-    global $DB;
-
-    // Get the activity instance.
-    $peerassign = $DB->get_record(manager::MODULE, ['id' => $id]);
-    if (!$peerassign) {
+    $instance = peerassign_model::get_record(['id' => (int)$id]);
+    if (!$instance) {
         return false;
     }
 
     try {
         manager::delete_activity_cascade($id);
+        $instance->delete();
     } catch (Exception $e) {
         // Log the error but allow deletion to proceed.
         debugging('Error during cascade deletion: ' . $e->getMessage(), DEBUG_DEVELOPER);
+        return false;
     }
 
     return true;

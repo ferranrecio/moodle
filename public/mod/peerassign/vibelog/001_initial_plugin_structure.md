@@ -194,3 +194,4 @@ tests/activity_creation_test.php           - Sample PHPUnit test
 - It creates an unnecessary `render_activity_view` function in the renderer. Because outputs are templatables there is no need to have a specific method. I removed the method manually.
 - The `manager` and `permisions` classes are created in the `mod_peerassign/classes/local/` folder, but they should be in `mod_peerassign/classes/` to follow the standard Moodle structure. I decided to create a new `architecture` specs folder for this kind of details so it can be implemented later.
 - It creates a `QUICKSTART.md` file for no particular reason. I keep it for now.
+- Missing lang string for `pluginadministration` and `pluginname`. I added it manually.

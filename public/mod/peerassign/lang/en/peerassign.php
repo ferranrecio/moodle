@@ -23,6 +23,7 @@
  */
 
 $string['activitydescription'] = 'Activity description';
+$string['activityname'] = 'Peer Review Assignment';
 $string['activityuiplaceholder'] = 'Activity interface will be implemented here.';
 $string['blindreview_help'] = 'If enabled, peer reviewers will not see the names of the students they are reviewing.';
 $string['blindreview'] = 'Blind review';
@@ -44,6 +45,7 @@ $string['peerassign:review'] = 'Review and provide feedback on other students\' 
 $string['peerassign:submit'] = 'Submit work for a Peer Review Assignment';
 $string['peerassign:view'] = 'View a Peer Review Assignment';
 $string['peerassignfieldset'] = 'Custom example fieldset';
+$string['pluginadministration'] = 'Peer Review Assignment administration';
 $string['pluginname'] = 'Peer Review Assignment';
 $string['reviewattachments'] = 'Review Attachments';
 $string['sampledescription'] = 'Sample Description';

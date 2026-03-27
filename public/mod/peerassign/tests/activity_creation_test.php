@@ -27,6 +27,7 @@ namespace mod_peerassign\tests;
 defined('MOODLE_INTERNAL') || die();
 
 use mod_peerassign\manager;
+use mod_peerassign\local\models\peerassign as peerassign_model;
 
 /**
  * Test case for activity creation.
@@ -68,8 +69,6 @@ class activity_creation_test extends \advanced_testcase {
      * Test manager static creator methods.
      */
     public function test_manager_static_creators(): void {
-        global $DB;
-
         $this->resetAfterTest();
 
         $course = $this->getDataGenerator()->create_course();
@@ -78,7 +77,7 @@ class activity_creation_test extends \advanced_testcase {
             'name' => 'Creator methods test',
         ]);
 
-        $instance = $DB->get_record(manager::MODULE, ['id' => $module->id], '*', MUST_EXIST);
+        $instance = peerassign_model::get_record(['id' => $module->id], MUST_EXIST)->to_record();
         $cm = get_coursemodule_from_instance(manager::MODULE, $module->id, $course->id, false, MUST_EXIST);
 
         $managerfrominstance = \mod_peerassign\manager::create_from_instance($instance);

@@ -23,10 +23,13 @@ This architecture should remain simple while the plugin grows.
 **When** activity lifecycle events occur (create, delete, view, etc.)
 **Then** `mod_peerassign\\manager` has all the necessary methods.
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] `manager` class has all the static creators like other modules `create_from_instance`, `create_from_coursemodule`, and `create_from_data_record`. For example: `public/mod/data/classes/manager.php`, `public/mod/subsection/classes/manager.php`, or `public/mod/h5pactivity/classes/local/manager.php`
 - [x] Entry points/hooks call `manager` methods instead of duplicating lifecycle SQL
+- [X] The `manager` class has several static methods to create an instance of the manager class, similar to `public/mod/data/classes/manager.php`, `public/mod/subsection/classes/manager.php`.
+- [X] The `manager` class has a $course attribute that is set in the constructor and a `get_course()` method to return it, to avoid having to call `get_course()` separately in the view and other places.
+- [x] There's a PHPUnit test that covers the manager static creators to ensure they work as expected, and any other public methods on the manager class.
 
 ---
 
@@ -36,7 +39,7 @@ This architecture should remain simple while the plugin grows.
 **When** permission checks are required
 **Then** `mod_peerassign\permissions` provides reusable capability helper methods
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] Capability helper methods exist for view/manage/submit/review/grade use-cases
 - [x] `peerassign_pluginfile()` calls `permissions::can_view_files()` before serving files
@@ -50,11 +53,11 @@ This architecture should remain simple while the plugin grows.
 **When** performing CRUD operations on the plugin's data
 **Then** there are persistent classes that represent each table and handle database interactions
 
-**Acceptance criteria**
+Acceptance criteria:
 
-- [ ] All persistent classes should be located in `mod_peerassign\local\models` namespace to follow Moodle's standard structure for models
-- [ ] There is a persistent class for each of the plugin's tables (e.g., `phase`, `submission`, `peer_review`, `grade`, etc.)
-- [ ] These classes use Moodle's persistent patterns and provide methods extending `public/lib/classes/persistent.php`
+- [x] All persistent classes should be located in `mod_peerassign\local\models` namespace to follow Moodle's standard structure for models
+- [x] There is a persistent class for each of the plugin's tables (e.g., `phase`, `submission`, `peer_review`, `grade`, etc.)
+- [x] These classes use Moodle's persistent patterns and provide methods extending `public/lib/classes/persistent.php`
 
 ### Scenario: output classes first construct param should be a manager instance
 
@@ -62,6 +65,11 @@ This architecture should remain simple while the plugin grows.
 **When** constructing output classes for rendering
 **Then** the first parameter should be a `manager` instance to provide necessary context and data
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] All output classes in `mod_peerassign\output` namespace have constructors that accept a `mod_peerassign\manager` instance as the first parameter
+
+## References
+
+- `public/mod/peerassign/specs/README.md` — spec file structure and guidelines
+- `public/mod/peerassign/specs/architecture/testing.spec.md` — testing architecture and generator patterns

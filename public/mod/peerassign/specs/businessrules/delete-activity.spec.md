@@ -16,7 +16,7 @@ At end-of-life, teachers can delete the activity from the course. DELETE logic m
 **When** a teacher deletes the activity using Moodle module deletion flow
 **Then** plugin data is removed consistently
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [ ] Deletion uses Moodle standard module deletion integration for the plugin
 - [ ] The `peerassign` record is deleted
@@ -31,7 +31,7 @@ At end-of-life, teachers can delete the activity from the course. DELETE logic m
 **When** delete validation runs
 **Then** permission checks are enforced before destructive actions
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [ ] User must have capability to delete/manage module instances in target context
 - [ ] If capability validation fails, no data is deleted
@@ -45,7 +45,7 @@ At end-of-life, teachers can delete the activity from the course. DELETE logic m
 **When** any delete step fails
 **Then** failure handling prevents silent partial cleanup
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [ ] Delete path uses transactional/rollback-safe behavior where supported
 - [ ] Failures are logged and surfaced according to Moodle error-handling conventions
@@ -60,7 +60,7 @@ At end-of-life, teachers can delete the activity from the course. DELETE logic m
 **When** the target activity does not exist or the identifier is malformed
 **Then** the operation fails safely with clear errors
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [ ] Non-existent activity `id` returns a not-found style error
 - [ ] Malformed identifier types are rejected during parameter validation

@@ -19,7 +19,7 @@ The webservice name is `mod_peerassign_create_phase`.
 **When** `mod_peerassign_create_phase` is called with required parameters
 **Then** a new record is created in `peerassign_phases`
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] Required input fields are: `peerassignid`, `phasetype`, `sequencenumber`, `title`, `customdata`
 - [x] `customdata` is accepted as `PARAM_RAW` in `execute_parameters`
@@ -36,7 +36,7 @@ The webservice name is `mod_peerassign_create_phase`.
 **When** optional fields are provided
 **Then** optional values are persisted to matching `peerassign_phases` fields
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] Optional fields accepted: `description`, `required`, `unlockmethod`, `unlockdate`, `allowfiles`, `filetypes`, `maxfilesize`
 - [x] Missing optional fields default to schema defaults
@@ -52,7 +52,7 @@ The webservice name is `mod_peerassign_create_phase`.
 **When** the function executes
 **Then** Moodle context and capability checks run before any write occurs
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] The activity context is loaded from `peerassignid`
 - [x] `self::validate_context($context)` is called
@@ -67,7 +67,7 @@ The webservice name is `mod_peerassign_create_phase`.
 **When** `sequencenumber` conflicts with an existing phase
 **Then** sequencing remains deterministic and consistent
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [ ] `sequencenumber` must be >= 1
 - [ ] Duplicate sequence positions are resolved by shifting subsequent phases OR the request is rejected with a clear error (implementation must choose one behavior and document it)
@@ -81,7 +81,7 @@ The webservice name is `mod_peerassign_create_phase`.
 **When** phase-type-specific rules are evaluated
 **Then** invalid payloads are rejected and valid payloads are accepted
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [ ] `customdata` must be a valid JSON object (not array/scalar)
 - [ ] `customdata` is validated against a JSON Schema provided by the selected phase type validator
@@ -98,7 +98,7 @@ The webservice name is `mod_peerassign_create_phase`.
 **When** validation fails
 **Then** the function returns a clear error and no partial write
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] Missing required parameter raises invalid parameter exception
 - [x] Non-JSON `customdata` raises invalid parameter exception
@@ -115,7 +115,7 @@ The webservice name is `mod_peerassign_create_phase`.
 **When** any step fails during write
 **Then** no partial phase data remains in the database
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [ ] DB writes execute inside a delegated transaction
 - [ ] On exception, transaction is rolled back
@@ -129,7 +129,7 @@ The webservice name is `mod_peerassign_create_phase`.
 **When** webservice metadata is registered
 **Then** the function is discoverable for service configuration
 
-**Acceptance criteria**
+Acceptance criteria:
 
 - [x] `mod_peerassign_create_phase` is declared in `db/services.php`
 - [x] Class and method target the external function implementation
