@@ -72,6 +72,7 @@ Links to source documentation and ADRs.
 ## Workflow: Implementing a Spec
 
 ### Step 1: Read the spec
+- Always open the main spec README: `public/mod/peerassign/specs/README.md`
 - Open the relevant spec file (e.g., `specs/architecture/capabilities.spec.md`)
 - Understand the **Purpose** and **Background**
 - Review all **Behaviors**, **Scenarios**, and Acceptance criteria:
