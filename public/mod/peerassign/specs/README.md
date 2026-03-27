@@ -67,6 +67,7 @@ Links to source documentation and ADRs.
 | `architecture/classes.spec.md` | The baseline class architecture and responsibilities | — |
 | `architecture/capabilities.spec.md` | The baseline capability model and permission helper expectations | — |
 | `architecture/testing.spec.md` | The testing architecture, generator patterns, and coverage requirements | — |
+| `architecture/antipatterns.spec.md` | Prohibited coding patterns collected from peer-review feedback | — |
 | `ui/activity-icons.spec.md` | Design specifications for the activity icon (monologo.svg) | — |
 
 ## The `vibelog` folder
