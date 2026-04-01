@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/course/moodleform_mod.php');
+require_once($CFG->dirroot . '/course/moodleform_mod.php');
 
 use mod_peerassign\manager;
 
@@ -36,7 +36,6 @@ use mod_peerassign\manager;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_peerassign_mod_form extends moodleform_mod {
-
     /**
      * Define the form structure.
      */

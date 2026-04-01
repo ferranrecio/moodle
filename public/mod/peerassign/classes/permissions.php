@@ -24,8 +24,6 @@
 
 namespace mod_peerassign;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Permissions class for capability checks.
  *
@@ -34,7 +32,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class permissions {
-
     /**
      * Check if the current user can add a new activity instance.
      *

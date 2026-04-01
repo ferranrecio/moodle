@@ -24,8 +24,6 @@
 
 namespace mod_peerassign\output;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Renderer for mod_peerassign outputs.
  *

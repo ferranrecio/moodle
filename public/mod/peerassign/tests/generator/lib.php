@@ -25,7 +25,6 @@ use mod_peerassign\manager;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_peerassign_generator extends testing_module_generator {
-
     /** @var int Counter for generated phases. */
     protected int $phasecount = 0;
 

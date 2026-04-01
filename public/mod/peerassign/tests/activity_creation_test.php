@@ -24,8 +24,6 @@
 
 namespace mod_peerassign\tests;
 
-defined('MOODLE_INTERNAL') || die();
-
 use mod_peerassign\manager;
 use mod_peerassign\local\models\peerassign as peerassign_model;
 
@@ -36,8 +34,8 @@ use mod_peerassign\local\models\peerassign as peerassign_model;
  * @copyright 2025 Your Organization
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class activity_creation_test extends \advanced_testcase {
-
+#[\PHPUnit\Framework\Attributes\CoversClass(manager::class)]
+final class activity_creation_test extends \advanced_testcase {
     /**
      * Test that an activity can be created.
      */

@@ -27,8 +27,7 @@ use mod_peerassign\manager;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(\mod_peerassign_generator::class)]
-class generator_test extends \advanced_testcase {
-
+final class generator_test extends \advanced_testcase {
     /**
      * Test that create_instance returns a valid record with expected defaults.
      */

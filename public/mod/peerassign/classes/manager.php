@@ -24,8 +24,6 @@
 
 namespace mod_peerassign;
 
-defined('MOODLE_INTERNAL') || die();
-
 use cm_info;
 use context_module;
 use moodle_page;
@@ -46,7 +44,6 @@ use mod_peerassign\output\renderer;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class manager {
-
     /** Module name. */
     const MODULE = 'peerassign';
 

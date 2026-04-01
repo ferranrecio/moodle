@@ -24,8 +24,6 @@
 
 namespace mod_peerassign\local\models;
 
-defined('MOODLE_INTERNAL') || die();
-
 use core\persistent;
 use mod_peerassign\manager;
 
@@ -37,7 +35,6 @@ use mod_peerassign\manager;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class submission extends persistent {
-
     /** @var string The table name. */
     const TABLE = manager::MODULE . '_submissions';
 

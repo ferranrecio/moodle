@@ -22,8 +22,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 use mod_peerassign\manager;
 use mod_peerassign\local\models\peerassign as peerassign_model;
 use mod_peerassign\permissions;
@@ -150,7 +148,6 @@ function peerassign_get_file_areas($course, $cm, $context) {
  * @return bool False if file not found
  */
 function peerassign_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []) {
-    global $DB, $USER;
 
     if ($context->contextlevel != CONTEXT_MODULE) {
         return false;

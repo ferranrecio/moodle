@@ -24,8 +24,6 @@
 
 namespace mod_peerassign\output;
 
-defined('MOODLE_INTERNAL') || die();
-
 use renderable;
 use renderer_base;
 use stdClass;

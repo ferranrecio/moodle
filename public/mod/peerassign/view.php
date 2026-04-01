@@ -22,7 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require(__DIR__.'/../../config.php');
+require(__DIR__ . '/../../config.php');
 
 use mod_peerassign\output\activity_view;
 use mod_peerassign\manager;
@@ -37,14 +37,14 @@ $course = $manager->get_course();
 $context = $manager->get_context();
 $moduleinstance = $manager->get_instance();
 
+require_login($course, true, $cm);
+
 permissions::require_view_activity($manager);
 
 $PAGE->set_url('/mod/peerassign/view.php', ['id' => $id]);
 $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($context);
-
-$manager = manager::create_from_coursemodule($cm);
 
 $renderer = $manager->get_renderer();
 

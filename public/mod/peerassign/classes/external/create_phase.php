@@ -47,7 +47,6 @@ require_once($CFG->libdir . '/externallib.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class create_phase extends external_api {
-
     /**
      * Execute parameters definition.
      *
@@ -158,8 +157,6 @@ class create_phase extends external_api {
         $filetypes = '',
         $maxfilesize = 0
     ) {
-        global $USER;
-
         // Validate parameters.
         $params = self::validate_parameters(self::execute_parameters(), [
             'peerassignid' => $peerassignid,
@@ -195,7 +192,7 @@ class create_phase extends external_api {
         }
 
         // Validate unlockmethod.
-        if (!in_array($params['unlockmethod'], ['manual', 'date'])) {
+        if (!in_array($params['unlockmethod'], ['manual', 'date'], true)) {
             throw new \invalid_parameter_exception('Invalid unlock method');
         }
 

@@ -34,8 +34,7 @@ use mod_peerassign\local\models\phase_completion as phase_completion_model;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(manager::class)]
-class manager_test extends \advanced_testcase {
-
+final class manager_test extends \advanced_testcase {
     /**
      * Helper to create a course and peerassign activity.
      *
@@ -135,21 +134,21 @@ class manager_test extends \advanced_testcase {
         $instance = peerassign_model::get_record(['id' => $module->id], MUST_EXIST)->to_record();
         $cm = get_coursemodule_from_instance(manager::MODULE, $module->id, $course->id, false, MUST_EXIST);
 
-        $fromInstance = manager::create_from_instance($instance);
-        $fromCm = manager::create_from_coursemodule($cm);
-        $fromRecord = manager::create_from_data_record((object) ['peerassignid' => $module->id]);
+        $frominstance = manager::create_from_instance($instance);
+        $fromcm = manager::create_from_coursemodule($cm);
+        $fromrecord = manager::create_from_data_record((object) ['peerassignid' => $module->id]);
 
         // All three should reference the same activity instance.
-        $this->assertEquals($fromInstance->get_instance()->id, $fromCm->get_instance()->id);
-        $this->assertEquals($fromCm->get_instance()->id, $fromRecord->get_instance()->id);
+        $this->assertEquals($frominstance->get_instance()->id, $fromcm->get_instance()->id);
+        $this->assertEquals($fromcm->get_instance()->id, $fromrecord->get_instance()->id);
 
         // All three should reference the same course module.
-        $this->assertEquals($fromInstance->get_coursemodule()->id, $fromCm->get_coursemodule()->id);
-        $this->assertEquals($fromCm->get_coursemodule()->id, $fromRecord->get_coursemodule()->id);
+        $this->assertEquals($frominstance->get_coursemodule()->id, $fromcm->get_coursemodule()->id);
+        $this->assertEquals($fromcm->get_coursemodule()->id, $fromrecord->get_coursemodule()->id);
 
         // All three should reference the same context.
-        $this->assertEquals($fromInstance->get_context()->id, $fromCm->get_context()->id);
-        $this->assertEquals($fromCm->get_context()->id, $fromRecord->get_context()->id);
+        $this->assertEquals($frominstance->get_context()->id, $fromcm->get_context()->id);
+        $this->assertEquals($fromcm->get_context()->id, $fromrecord->get_context()->id);
     }
 
     /**
@@ -178,9 +177,9 @@ class manager_test extends \advanced_testcase {
         $instance = peerassign_model::get_record(['id' => $module->id], MUST_EXIST)->to_record();
         $manager = manager::create_from_instance($instance);
 
-        $managerCourse = $manager->get_course();
-        $this->assertInstanceOf(\stdClass::class, $managerCourse);
-        $this->assertEquals($course->id, $managerCourse->id);
+        $managercourse = $manager->get_course();
+        $this->assertInstanceOf(\stdClass::class, $managercourse);
+        $this->assertEquals($course->id, $managercourse->id);
     }
 
     /**
@@ -207,11 +206,11 @@ class manager_test extends \advanced_testcase {
 
         [$course, $module] = $this->create_activity();
 
-        $phaseId = manager::create_initial_sample_phase($module->id);
+        $phaseid = manager::create_initial_sample_phase($module->id);
 
-        $this->assertGreaterThan(0, $phaseId);
+        $this->assertGreaterThan(0, $phaseid);
 
-        $phase = phase_model::get_record(['id' => $phaseId]);
+        $phase = phase_model::get_record(['id' => $phaseid]);
         $this->assertNotFalse($phase);
         $this->assertEquals($module->id, $phase->get('peerassignid'));
         $this->assertEquals(0, $phase->get('phasetype'));
@@ -251,8 +250,7 @@ class manager_test extends \advanced_testcase {
             'revieweruserid' => $reviewer->id,
         ]);
 
-        // Create grade.
-        $grade = $generator->create_grade(['peerassignid' => $module->id, 'userid' => $student->id]);
+        $generator->create_grade(['peerassignid' => $module->id, 'userid' => $student->id]);
 
         // Create phase completion.
         $completion = new phase_completion_model(0, (object) [
@@ -261,6 +259,9 @@ class manager_test extends \advanced_testcase {
             'status' => 'complete',
         ]);
         $completion->create();
+
+        // Review variable must be used to avoid phpmd warnings.
+        $this->assertNotEmpty($review->id);
 
         // Verify records exist before deletion.
         $this->assertNotEmpty(phase_model::get_records(['peerassignid' => $module->id]));
