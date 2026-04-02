@@ -12,6 +12,8 @@ Teachers create a Peer Review Assignment from the Moodle activity chooser and co
 
 ### Scenario: Teacher creates an activity with minimum required fields
 
+**Why** Teachers must be able to quickly create a new Peer Review Assignment with just a name and course context. Sensible defaults allow immediate setup without overwhelming configuration options, and auto-creation of the initial Sample & Description phase provides a predictable starting state.
+
 **Given** a teacher with permission to add activities in a course
 **When** they create a Peer Review Assignment with only required fields
 **Then** a valid `peerassign` activity instance is created
@@ -31,6 +33,8 @@ Acceptance criteria:
 
 ### Scenario: Optional activity description fields are accepted
 
+**Why** Teachers need to provide context and instructions for the activity. Rich-text descriptions help students understand goals and expectations before engaging with the assignment workflow.
+
 **Given** a valid activity creation request
 **When** the teacher provides description content
 **Then** description fields are persisted correctly
@@ -46,6 +50,8 @@ Acceptance criteria:
 
 ### Scenario: Blind review setting is configured at creation time
 
+**Why** Anonymity in peer review can reduce bias and improve feedback quality. Teachers must be able to decide upfront whether reviewer identities remain hidden throughout the activity lifecycle.
+
 **Given** a teacher creates a Peer Review Assignment
 **When** they set the anonymous/blind review option
 **Then** the blind review preference is stored and used by later display logic
@@ -59,6 +65,8 @@ Acceptance criteria:
 ---
 
 ### Scenario: Activity is created for individual submissions by default
+
+**Why** Individual submissions are the most common case and should be the default. Group submissions require additional complexity around group membership and ownership, so they should be opt-in rather than forcing everyone to configure grouping constraints.
 
 **Given** a teacher creates a Peer Review Assignment without enabling group submissions
 **When** the activity is saved
@@ -74,6 +82,8 @@ Acceptance criteria:
 
 ### Scenario: Group submissions can be enabled during creation
 
+**Why** Some courses use collaborative group work. Enabling group submissions allows teams to submit collectively and receive group-level feedback, reducing administrative overhead compared to managing individual submissions.
+
 **Given** a teacher wants students to submit as groups
 **When** they enable group submissions while creating the activity
 **Then** the activity is persisted with group-based submission mode
@@ -87,6 +97,8 @@ Acceptance criteria:
 ---
 
 ### Scenario: Grouping is optional when group submissions are enabled
+
+**Why** Teachers may enable group submissions using the course groups. Alternatively, they may lock submissions to a specific grouping (e.g., project teams) when users are in more than one group.
 
 **Given** group submissions are enabled and the course has groupings defined
 **When** the teacher optionally selects a grouping
@@ -103,6 +115,8 @@ Acceptance criteria:
 
 ### Scenario: Grouping value is ignored or rejected when group submissions are disabled
 
+**Why** If individual submissions are enabled, grouping constraints make no sense and could confuse downstream logic. The system must enforce consistency by either rejecting the conflicting inputs or automatically clearing the grouping value.
+
 **Given** group submissions are disabled and the course has groupings defined
 **When** a non-null `groupingid` is provided
 **Then** behavior is deterministic and documented
@@ -117,6 +131,8 @@ Acceptance criteria:
 
 ### Scenario: Grouping option is not present if the course has no groupings
 
+**Why** If no groupings exist in the course, offering a grouping selector creates confusion and false expectations. The UI should adapt dynamically to show only relevant options based on course configuration.
+
 **Given** a course has no groupings defined
 **When** a teacher creates or updates an activity and enables group submissions
 **Then** the grouping selection option is not shown in the UI
@@ -130,6 +146,8 @@ Acceptance criteria:
 ---
 
 ### Scenario: Activity creation initializes a predictable initial state workflow
+
+**Why** Every activity must start in a properly initialized state. Auto-creating the Sample & Description phase provides a predictable starting point and ensures teachers can immediately begin configuring the workflow without manual boilerplate setup.
 
 **Given** a new activity instance is created
 **When** initial plugin setup completes
@@ -147,6 +165,8 @@ Acceptance criteria:
 
 ### Scenario: Capability and course-module context are validated before create write
 
+**Why** Only authorized users should create activities. Checking capabilities before writing prevents unauthorized activity creation and ensures audit trail consistency.
+
 **Given** a user attempts to create a Peer Review Assignment
 **When** create validation runs
 **Then** permission checks occur before any plugin record is written
@@ -160,6 +180,8 @@ Acceptance criteria:
 ---
 
 ### Scenario: Create operation is atomic
+
+**Why** Creating an activity involves multiple steps: inserting the plugin record and creating the course module. Partial completion (e.g., activity record created but no course module) would leave the system in an inconsistent state where the activity is unusable.
 
 **Given** activity creation involves multiple persistence steps
 **When** one step fails

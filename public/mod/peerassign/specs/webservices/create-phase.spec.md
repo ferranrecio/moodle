@@ -14,6 +14,8 @@ The webservice name is `mod_peerassign_create_phase`.
 
 ### Scenario: Webservice creates a phase with required fields and phase-specific JSON
 
+**Why** Teachers need to programmatically add phases to activities via a structured API. The webservice must accept phase-specific configuration (via customdata) to support varied phase types (sample, submission, peer review, etc.) with different settings while ensuring data persists correctly.
+
 **Given** an authenticated user with permission to manage a peerassign activity
 **And** a valid `peerassignid` exists
 **When** `mod_peerassign_create_phase` is called with required parameters
@@ -32,6 +34,8 @@ Acceptance criteria:
 
 ### Scenario: Webservice accepts optional generic phase fields
 
+**Why** Phases have common optional properties (description, unlock behavior, file settings) that apply across all phase types. The API must support partial requests where callers omit optional fields, with sensible defaults applied automatically.
+
 **Given** a valid create request
 **When** optional fields are provided
 **Then** optional values are persisted to matching `peerassign_phases` fields
@@ -48,6 +52,8 @@ Acceptance criteria:
 
 ### Scenario: Webservice validates context and capability before create
 
+**Why** Moodle webservices must enforce role-based access control. Only teachers with explicit permission to manage the activity should be able to create phases. This prevents unauthorized users from modifying activity workflows.
+
 **Given** a request for `mod_peerassign_create_phase`
 **When** the function executes
 **Then** Moodle context and capability checks run before any write occurs
@@ -63,6 +69,8 @@ Acceptance criteria:
 
 ### Scenario: Webservice validates and normalizes phase sequence
 
+**Why** Phase order drives the student workflow. Duplicate sequence numbers would create ambiguity in phase progression. The system must ensure each phase has a deterministic, unique position, either by rejecting conflicts or automatically reordering.
+
 **Given** a valid request for phase creation
 **When** `sequencenumber` conflicts with an existing phase
 **Then** sequencing remains deterministic and consistent
@@ -76,6 +84,8 @@ Acceptance criteria:
 ---
 
 ### Scenario: Webservice enforces `customdata` rules by phase type
+
+**Why** Different phase types require different settings (e.g., peer_review needs reviewer count, validation needs checklists). JSON Schema validation ensures only valid phase-specific configurations are persisted, preventing data corruption and runtime errors.
 
 **Given** a create request with `phasetype` and `customdata`
 **When** phase-type-specific rules are evaluated
@@ -94,6 +104,8 @@ Acceptance criteria:
 
 ### Scenario: Webservice rejects malformed input with Moodle-standard errors
 
+**Why** Consistent error reporting helps API clients diagnose problems quickly. Moodle-standard exceptions ensure errors are properly logged and consumable by web service clients and mobile apps.
+
 **Given** invalid request data
 **When** validation fails
 **Then** the function returns a clear error and no partial write
@@ -111,6 +123,8 @@ Acceptance criteria:
 
 ### Scenario: Webservice write is atomic
 
+**Why** Multi-step database operations (normalization, validation, insert) must all succeed or all fail together. Partial writes would leave the database in an inconsistent state where a phase record exists without proper normalization.
+
 **Given** a create request that requires normalization and insert
 **When** any step fails during write
 **Then** no partial phase data remains in the database
@@ -124,6 +138,8 @@ Acceptance criteria:
 ---
 
 ### Scenario: Webservice definition is exposed in db/services.php
+
+**Why** Moodle's webservice discovery system reads `db/services.php` to register available functions, assign access restrictions, and document parameters. Without this registration, the function is not discoverable to administrators or clients.
 
 **Given** the plugin provides a callable external function
 **When** webservice metadata is registered

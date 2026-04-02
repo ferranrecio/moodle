@@ -12,6 +12,8 @@ Moodle activity modules provide a `testing_module_generator` subclass at `tests/
 
 ### Scenario: Generator class exists and follows core conventions
 
+**Why** Test generators reduce boilerplate and ensure consistent test setup across PHPUnit and Behat. A standard generator interface makes tests maintainable and allows developers to quickly set up realistic scenarios without duplicating database logic.
+
 **Given** a developer needs to write tests for any peerassign feature
 **When** they look for a data generator
 **Then** `mod_peerassign_generator` is available at `tests/generator/lib.php` and follows the standard Moodle generator contract
@@ -26,6 +28,8 @@ Acceptance criteria:
 ---
 
 ### Scenario: Generator provides helpers for core domain objects
+
+**Why** Domain-specific helper methods (create_phase, create_submission) make test intent clear and reduce test code complexity. Each helper encapsulates default values and relationships, so tests focus on behavior rather than setup.
 
 **Given** tests need to set up phases, submissions, peer reviews, and grades
 **When** using the generator
@@ -42,20 +46,9 @@ Acceptance criteria:
 
 ---
 
-### Scenario: Generator resets state between tests
-
-**Given** multiple tests run in sequence using the generator
-**When** the test framework resets state
-**Then** generator internal counters are cleared
-
-Acceptance criteria:
-
-- [x] `reset()` method exists and calls `parent::reset()`
-- [x] Any internal counters (instance count, phase count, etc.) are zeroed on reset
-
----
-
 ### Scenario: Generator has its own unit test coverage
+
+**Why** The generator is foundational infrastructure used by other tests. Testing the generator itself ensures it creates correct, consistent data structures, preventing cascading test failures caused by broken generator logic.
 
 **Given** the generator is a foundational test utility
 **When** verifying it works correctly
@@ -72,6 +65,8 @@ Acceptance criteria:
 ---
 
 ### Scenario: PHPUnit 12 compatibility
+
+**Why** Using modern PHPUnit features (PHP attributes, ::class syntax) keeps the codebase future-proof and allows CI to enforce contemporary testing practices. Avoiding deprecated features prevents test runtime warnings and preparation for future PHPUnit major versions.
 
 **Given** the generator is used in PHPUnit tests
 **When** running tests with PHPUnit 12

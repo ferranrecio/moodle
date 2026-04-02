@@ -12,6 +12,8 @@ At end-of-life, teachers can delete the activity from the course. DELETE logic m
 
 ### Scenario: Teacher deletes an activity from the course
 
+**Why** When an activity is no longer needed, teachers must be able to remove it cleanly from the course. All related data (phases, submissions, reviews, files) must be removed to prevent orphaned records and storage waste.
+
 **Given** an existing Peer Review Assignment activity
 **When** a teacher deletes the activity using Moodle module deletion flow
 **Then** plugin data is removed consistently
@@ -27,6 +29,8 @@ Acceptance criteria:
 
 ### Scenario: Delete enforces capability and context checks before removal
 
+**Why** Deletion is destructive and irreversible. Checking permissions before proceeding prevents accidental or malicious data loss and ensures only authorized users can remove activities.
+
 **Given** a user attempts to delete a Peer Review Assignment
 **When** delete validation runs
 **Then** permission checks are enforced before destructive actions
@@ -40,6 +44,8 @@ Acceptance criteria:
 ---
 
 ### Scenario: Delete operation is atomic and leaves no orphan plugin data
+
+**Why** Deletion may involve removing records from multiple tables and file storage. Partial deletion leaves orphaned data that wastes storage and confuses future operations. Atomic deletion ensures all-or-nothing semantics.
 
 **Given** activity deletion may involve multiple table and file operations
 **When** any delete step fails
@@ -55,6 +61,8 @@ Acceptance criteria:
 ---
 
 ### Scenario: Delete rejects invalid or missing target activity identifiers
+
+**Why** Attempting to delete a non-existent activity is a sign of client error (e.g., race condition, malformed request). Failing fast with a clear error prevents silent failures and helps surface bugs in deletion workflows.
 
 **Given** a delete request is made
 **When** the target activity does not exist or the identifier is malformed

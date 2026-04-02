@@ -54,6 +54,9 @@ Domain context required to understand the behaviors.
 ## Behaviors
 
 ### Scenario: <descriptive name>
+
+**Why**: Explanation of why this scenario is important and what it ensures.
+
 **Given** a precondition
 **When** an action occurs
 **Then** the expected outcome

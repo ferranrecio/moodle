@@ -12,6 +12,8 @@ Over time, teachers can update activity settings (for example, group submissions
 
 ### Scenario: Teacher updates editable activity fields
 
+**Why** Teachers may need to adjust activity settings after creation (name, description, blind review preference) as course objectives evolve. A clear list of editable fields prevents accidental changes to critical settings like course membership.
+
 **Given** an existing Peer Review Assignment activity
 **When** a teacher edits the activity settings and saves
 **Then** editable fields are updated in `peerassign`
@@ -26,6 +28,8 @@ Acceptance criteria:
 ---
 
 ### Scenario: Update applies the same validation rules as create for shared fields
+
+**Why** Consistency across create and update prevents surprising behavior where a value accepted during creation is rejected during update, or vice versa. Unified validation logic reduces bugs and improves user experience.
 
 **Given** an update request for an existing activity
 **When** shared settings are modified
@@ -42,6 +46,8 @@ Acceptance criteria:
 
 ### Scenario: Enabling group submissions on update is allowed only with consistent constraints
 
+**Why** Teachers may initially create an activity for individual submissions and later decide to enable group submissions. This transition must be seamless but constrained to prevent downstream ownership confusion.
+
 **Given** an activity currently configured for individual submissions
 **When** a teacher enables `groupsubmissions`
 **Then** the updated configuration remains internally consistent
@@ -57,6 +63,8 @@ Acceptance criteria:
 
 ### Scenario: Disabling group submissions on update handles existing group-linked data safely
 
+**Why** If an activity already has submissions or reviews under group ownership, simply switching to individual mode would create ambiguity (which group member "owns" the submission?). The system must either block the change with remediation guidance or implement safe data migration rules.
+
 **Given** an activity with existing group-mode submissions or reviews
 **When** a teacher attempts to set `groupsubmissions` from `1` to `0`
 **Then** data integrity is preserved through deterministic behavior
@@ -71,6 +79,8 @@ Acceptance criteria:
 ---
 
 ### Scenario: Update rejects invalid or missing target activity identifiers
+
+**Why** Before modifying any data, the system must confirm the target activity exists and is accessible. Checking this upfront prevents wasted processing and provides clear error messages to users.
 
 **Given** an update request is made
 **When** the target activity does not exist or the identifier is malformed

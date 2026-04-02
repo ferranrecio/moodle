@@ -12,6 +12,8 @@ During the initial implementation rounds, several recurring mistakes were caught
 
 ### Scenario: No hardcoded plugin or module name strings
 
+**Why** Hardcoded strings scatter the plugin name across the codebase and make refactoring or rebranding difficult. Centralizing the plugin name in manager constants ensures consistency and allows single-point updates.
+
 **Given** the manager class exposes `manager::MODULE` (`'peerassign'`) and `manager::PLUGINNAME` (`'mod_peerassign'`)
 **When** any PHP file in the plugin references the plugin name
 **Then** it must use the constants, not literal strings
@@ -32,6 +34,8 @@ grep -rn "'mod_peerassign'" public/mod/peerassign/ --include='*.php' | grep -v '
 
 ### Scenario: No html_writer in entry points or output classes
 
+**Why** The html_writer is an old library that should not be used in modern Moodle development. Using Mustache templates separates presentation from business logic, follows Moodle's established patterns.
+
 **Given** the plugin uses `output` classes implementing `renderable` and `templatable`
 **When** building UI for any entry point
 **Then** all markup is produced via Mustache templates, never `html_writer`
@@ -47,6 +51,8 @@ Rules to follow:
 
 ### Scenario: No custom render methods for templatable output classes
 
+**Why** Custom `render_*` methods create duplicate logic pathways that are error-prone and hard to maintain. The `templatable` contract is sufficient.
+
 **Given** output classes implement `\templatable` or `\named_templatable` and are rendered via `$OUTPUT->render()`
 **When** the renderer is defined
 **Then** it must not contain `render_<classname>` methods that duplicate the templatable contract
@@ -58,6 +64,8 @@ Rules to follow:
 ---
 
 ### Scenario: Output classes use constructor promotion, not old-style properties
+
+**Why** Constructor parameter promotion (PHP 8.0+) eliminates boilerplate and reduces lines of code. Since Moodle 5.2 requires PHP 8.3, promotion is expected and improves readability while avoiding manual property assignment errors.
 
 **Given** PHP 8.3+ is the minimum version
 **When** defining output class attributes
@@ -71,6 +79,8 @@ Rules to follow:
 ---
 
 ### Scenario: Required language strings are always present
+
+**Why** Moodle requires certain language strings to render the activity in the activity manager and module listing. Missing strings cause broken UI elements.
 
 **Given** Moodle requires specific lang strings for every activity module
 **When** the plugin is installed

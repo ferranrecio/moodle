@@ -14,6 +14,8 @@ Capability checks are centralized in `mod_peerassign\permissions` using helper m
 
 ### Scenario: all activity capabilities are defined and enforced through permissions helpers
 
+**Why** Centralized capability enforcement via helper methods prevents accidental privilege escalation and makes it easy to audit access control logic.
+
 **Given** the activity capability definitions in `db/access.php`
 **When** runtime access control is needed in hooks, external functions, and UI/file flows
 **Then** capabilities are checked through `mod_peerassign\permissions` helper methods and capability requirements remain aligned with the defined keys.

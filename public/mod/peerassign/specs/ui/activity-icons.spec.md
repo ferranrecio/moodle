@@ -50,6 +50,8 @@ Acceptance criteria:
 
 ### Scenario: Icon file is accessible and properly located
 
+**Why** Moodle's icon system relies on file location and SVG validity to display activity icons in course overviews and pickers. Proper SVG structure ensures the icon renders consistently across all browsers and themes without errors.
+
 **Given** the Peer Review Assignment plugin is installed
 **When** Moodle loads activity icons
 **Then** the monologo.svg file is found and rendered correctly

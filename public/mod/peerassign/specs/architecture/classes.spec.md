@@ -19,6 +19,8 @@ This architecture should remain simple while the plugin grows.
 
 ### Scenario: Manager class owns activity lifecycle helpers
 
+**Why** A dedicated manager class centralizes lifecycle operations (create, load, delete) and prevents scattered, duplicated business logic across multiple entry points. This follows patterns established in mod_data, mod_subsection, and other Moodle activities.
+
 **Given** plugin-level needs to instantiate a manager class
 **When** activity lifecycle events occur (create, delete, view, etc.)
 **Then** `mod_peerassign\\manager` has all the necessary methods.
@@ -35,6 +37,8 @@ Acceptance criteria:
 
 ### Scenario: Permissions class centralizes capability checks
 
+**Why** Scattering capability checks across the codebase makes it easy to miss security checks or apply them inconsistently. A single permissions helper class ensures every access point applies the same rules, making the system auditable and maintainable.
+
 **Given** multiple entry points need role/capability decisions
 **When** permission checks are required
 **Then** `mod_peerassign\permissions` provides reusable capability helper methods
@@ -49,6 +53,8 @@ Acceptance criteria:
 
 ### Scenario: persistent classes must exists per each table
 
+**Why** Persistent classes provide a standardized ORM layer that handles database interactions consistently. Using Moodle's persistent base class ensures validation, timestamps, and transaction safety are applied uniformly across all data models.
+
 **Given** the need to interact with the database tables
 **When** performing CRUD operations on the plugin's data
 **Then** there are persistent classes that represent each table and handle database interactions
@@ -60,6 +66,8 @@ Acceptance criteria:
 - [x] These classes use Moodle's persistent patterns and provide methods extending `public/lib/classes/persistent.php`
 
 ### Scenario: output classes first construct param should be a manager instance
+
+**Why** Passing a manager instance to output classes decouples template rendering from direct database access, improves testability, and makes data dependencies explicit. Output classes focus on presentation while the manager handles business logic.
 
 **Given** the need to render UI components that depend on activity state
 **When** constructing output classes for rendering

@@ -12,6 +12,8 @@ The Peer Review Assignment activity stores instructor-defined phases, student su
 
 ### Scenario: Activity instance table is created with all required fields
 
+**Why** The peerassign table is the core entity representing each Peer Review Assignment activity. It stores fundamental configuration (name, description, blind review setting, group submission mode) needed to initialize activity workflows and render the activity listing.
+
 **Given** the plugin is installed
 **When** the database is provisioned
 **Then** a `peerassign` table exists with all mandatory fields
@@ -32,6 +34,8 @@ Acceptance criteria:
 ---
 
 ### Scenario: Phases table stores progressive activity workflow stages
+
+**Why** Phases define the sequential workflow of the activity (Sample & Description, Submission, Peer Review, etc.). Each phase has distinct rules and visibility. A dedicated table with sequencing and unlock logic enables progressive workflows and prevents students from skipping ahead.
 
 **Given** the plugin is installed
 **When** the database is provisioned
@@ -63,6 +67,8 @@ Acceptance criteria:
 
 ### Scenario: Submissions table records student work submissions
 
+**Why** Submissions track what students have submitted and when. The table links students to phases and allows multiple attempts. Data like status and content are essential for display, grading, and peer assignment workflows.
+
 **Given** a student submits work
 **When** the database is provisioned
 **Then** a `peerassign_submissions` table exists with all required fields
@@ -84,6 +90,8 @@ Acceptance criteria:
 
 ### Scenario: Submission files are stored in Moodle file storage
 
+**Why** Moodle's file API provides flexible storage backend support (local filesystem, cloud storage).
+
 **Given** a student attaches files to a submission
 **When** files are uploaded
 **Then** files are stored in Moodle's file API with appropriate context
@@ -102,6 +110,8 @@ Acceptance criteria:
 ---
 
 ### Scenario: Peer reviews table records peer feedback
+
+**Why** Peer reviews capture feedback from student reviewers. Each review is tied to a specific submission and reviewer, allowing tracking of who reviewed whom and aggregation of feedback for grading and display.
 
 **Given** a peer reviewer submits feedback
 **When** the database is provisioned
@@ -123,6 +133,8 @@ Acceptance criteria:
 ---
 
 ### Scenario: Grades table records both peer and teacher grades
+
+**Why** The grades table aggregates final scores from peer reviewers and instructors. Separate aggregated and teacher grades allow comparison and override logic. Tracking gradesource and visibility control enables flexible grading workflows.
 
 **Given** grades are assigned
 **When** the database is provisioned
@@ -148,6 +160,8 @@ Acceptance criteria:
 ---
 
 ### Scenario: Phase completion tracking records student progress
+
+**Why** Tracking phase completion separately from submissions and grades allows activities where phases have no grading (e.g., Sample & Description). This supports progress reporting and unlock logic that doesn't depend on grades.
 
 **Given** a student completes a phase
 **When** the database is provisioned
@@ -182,6 +196,8 @@ Acceptance criteria:
 - Moodle Workshop activity module (`mod_workshop`) — reference for peer review patterns
 
 ### Scenario: persistence classes map to tables with correct field types and relations
+
+**Why** Persistent classes provide an ORM layer that ensures type safety, validation, and relationship handling. Correct mapping between PHP classes and database tables prevents runtime errors and makes the data model self-documenting.
 
 **Given** the database schema is defined
 **When** persistence classes are implemented
