@@ -66,13 +66,22 @@ Links to source documentation and ADRs.
 | `webservices/create-phase.spec.md` | Webservice contract to create a new phase with `param_raw` JSON settings | — |
 | `businessrules/create-activity.spec.md` | Business rules for creating `peerassign` activity instances | — |
 | `businessrules/phase-management.spec.md` | Business rules for teacher-managed phase creation and deletion, including initial-phase protection | — |
+| `businessrules/phase-general.spec.md` | General behavior and invariants that apply to all phase types | — |
+| `businessrules/phase-sample.spec.md` | Business rules specific to Sample & Description phases | — |
+| `businessrules/phase-validation.spec.md` | Business rules specific to Validation phases | — |
+| `businessrules/phase-submission.spec.md` | Business rules specific to Submission phases | — |
+| `businessrules/phase-peer-review.spec.md` | Business rules specific to Peer Review phases | — |
+| `businessrules/phase-teacher-eval.spec.md` | Business rules specific to Teacher Evaluation phases | — |
 | `businessrules/update-activity.spec.md` | Business rules specific to updating existing activity instances | — |
 | `businessrules/delete-activity.spec.md` | Business rules specific to deleting activity instances | — |
 | `architecture/classes.spec.md` | The baseline class architecture and responsibilities | — |
+| `architecture/phases.spec.md` | Phase class hierarchy, phase manage outputs, and template contracts | — |
 | `architecture/capabilities.spec.md` | The baseline capability model and permission helper expectations | — |
 | `architecture/testing.spec.md` | The testing architecture, generator patterns, and coverage requirements | — |
 | `architecture/antipatterns.spec.md` | Prohibited coding patterns collected from peer-review feedback | — |
 | `ui/activity-icons.spec.md` | Design specifications for the activity icon (monologo.svg) | — |
+| `ui/phase-manager.spec.md` | UI contract for rendering and managing phase cards on activity view | — |
+
 
 ## The `vibelog` folder
 
