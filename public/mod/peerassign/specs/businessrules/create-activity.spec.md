@@ -157,6 +157,8 @@ Acceptance criteria:
 
 - [x] The initial Sample & Description phase is automatically created when the activity is created
 - [x] No additional phases beyond the initial Sample & Description phase are auto-created
+- [ ] Teachers can add additional phases after creation, including extra non-initial Sample & Description phases
+- [ ] Teachers cannot delete the initial Sample & Description phase once created
 - [ ] The setup UI can add further phases immediately after activity creation
 - [x] The auto-created Sample & Description phase is deterministic and documented
 - [ ] Initial state does not expose student-facing phase actions before teacher configuration is complete

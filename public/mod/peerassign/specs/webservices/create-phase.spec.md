@@ -29,6 +29,7 @@ Acceptance criteria:
 - [ ] `customdata` is persisted into `peerassign_phases.extras` as normalized JSON
 - [x] `timecreated` and `timemodified` are set on insert
 - [x] Response contains at minimum: `status`, `phaseid`, `peerassignid`, `message`
+- [ ] `phasetype = sample` is valid for creating additional non-initial Sample & Description phases
 
 ---
 
@@ -99,6 +100,23 @@ Acceptance criteria:
 - [ ] For `peer_review` phase, reviewer-related settings in `customdata` are validated (e.g., reviewer count > 0)
 - [ ] For `validation` phase, condition/checklist-related settings in `customdata` are validated
 - [ ] For `sample` phase, media/instruction settings in `customdata` are validated
+
+---
+
+### Scenario: Webservice distinguishes initial sample protection from teacher-created sample phases
+
+**Why** Activities always include one protected initial Sample & Description phase, but teachers may add more sample phases later. The create API must support these additions without changing deletion protections for the initial phase.
+
+**Given** an activity already has its auto-created initial Sample & Description phase
+**When** `mod_peerassign_create_phase` is called with `phasetype = sample`
+**Then** an additional non-initial sample phase is created successfully
+
+Acceptance criteria:
+
+- [ ] Create requests for additional sample phases are accepted when capability and validation pass
+- [ ] Newly created sample phases are flagged as non-initial phases in persisted state
+- [ ] The create API does not alter protections applied to the auto-created initial sample phase
+- [ ] PHPunit tests verify that extra sample phases can be created in the activity and that the initial sample phase remains protected against deletion
 
 ---
 

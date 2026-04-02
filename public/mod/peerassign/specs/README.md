@@ -65,6 +65,7 @@ Links to source documentation and ADRs.
 | `database/schema.spec.md` | All tables with fields, types, constraints, and relations | — |
 | `webservices/create-phase.spec.md` | Webservice contract to create a new phase with `param_raw` JSON settings | — |
 | `businessrules/create-activity.spec.md` | Business rules for creating `peerassign` activity instances | — |
+| `businessrules/phase-management.spec.md` | Business rules for teacher-managed phase creation and deletion, including initial-phase protection | — |
 | `businessrules/update-activity.spec.md` | Business rules specific to updating existing activity instances | — |
 | `businessrules/delete-activity.spec.md` | Business rules specific to deleting activity instances | — |
 | `architecture/classes.spec.md` | The baseline class architecture and responsibilities | — |
