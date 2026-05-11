@@ -45,7 +45,8 @@
          },
         "newdiscussionbtn": "<a class='btn btn-primary'>Add discussion topic</a>",
         "subscribetoforum": "http://localhost/moodle/mod/forum/subscribe.php?id=7&sesskey=abcd&returnurl=http//localhost/moodle/mod/forum/view.php?id=4",
-        "unsubscribefromforum": "http://localhost/moodle/mod/forum/subscribe.php?id=7&sesskey=abcd&returnurl=http//localhost/moodle/mod/forum/view.php?id=4"
+        "unsubscribefromforum": "http://localhost/moodle/mod/forum/subscribe.php?id=7&sesskey=abcd&returnurl=http//localhost/moodle/mod/forum/view.php?id=4",
+        "subscriptiontoggler": "sample HTML"
     }
 }}
 
@@ -65,5 +66,9 @@
                 <a class="btn btn-secondary" href="{{ unsubscribefromforum }}">{{#str}}unsubscribe, mod_forum {{/str}}</a>
             {{/unsubscribefromforum}}
         </div>
+    </div>
+    <div class="d-flex gap-2">
+        <div>Subscribed</div>
+        {{{subscriptiontoggler}}}
     </div>
 </div>

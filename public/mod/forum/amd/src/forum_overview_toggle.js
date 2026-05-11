@@ -21,7 +21,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+import ForumEvents from 'mod_forum/forum_events';
 import Notification from 'core/notification';
+import {publish} from 'core/pubsub';
 import {getString} from 'core/str';
 import {add as addToast} from 'core/toast';
 import Repository from 'mod_forum/repository';
@@ -36,7 +38,7 @@ function registerEventListeners(toggleElement) {
             subscriptionToggleClickHandler(toggleElement);
         }
         if (toggleElement.dataset.type === 'forum-track-toggle') {
-            trackToggleClickHanldler(toggleElement);
+            trackToggleClickHandler(toggleElement);
         }
     });
 }
@@ -70,6 +72,17 @@ async function subscriptionToggleClickHandler(toggleElement) {
             forumName,
         );
         addToast(feedbackMessage, {visuallyHidden: true});
+
+        publish(
+            ForumEvents.ALL_SUBSCRIPTION_TOGGLED,
+                {
+                forumId: forumId,
+                subscriptionState: newTargetState,
+            },
+        );
+
+        // Here you can include a toast, for me. And another for the user ;-).
+
     } catch (error) {
         Notification.exception(error);
     }
@@ -81,7 +94,7 @@ async function subscriptionToggleClickHandler(toggleElement) {
  * @param {HTMLElement} toggleElement The toggle element that was clicked
  * @return {Promise<void>}
  */
-async function trackToggleClickHanldler(toggleElement) {
+async function trackToggleClickHandler(toggleElement) {
     const forumId = toggleElement.dataset.forumid;
     const forumName = toggleElement.dataset.forumname;
     const newState = toggleElement.dataset.targetstate;
@@ -120,7 +133,8 @@ async function trackToggleClickHanldler(toggleElement) {
 async function updateSwitchState(toggleElement, newTargetState, stringKey) {
     toggleElement.dataset.targetstate = newTargetState ? 0 : 1;
     const string = await getString(stringKey, 'mod_forum');
-    const label = toggleElement.closest('td').querySelector(`label[for="${toggleElement.id}"] span`);
+    const container = toggleElement.closest('td') || document;
+    let label = container.querySelector(`label[for="${toggleElement.id}"] span`);
     label.textContent = string;
 }
 

@@ -116,8 +116,15 @@ class forum_actionbar implements renderable, templatable {
         $cansubscribe = $activeenrolled && !($this->forum->get_subscription_mode() === FORUM_FORCESUBSCRIBE) &&
             (!($this->forum->get_subscription_mode() === FORUM_DISALLOWSUBSCRIBE) || $canmanage);
         if ($cansubscribe) {
-            $returnurl =
-                (new moodle_url('/mod/forum/view.php', ['id' => $this->forum->get_course_module_record()->id]))->out(false);
+            $modinfo = get_fast_modinfo($this->course);
+            $cm = $modinfo->get_instance_of('forum', $forumobject->id);
+            /** @var \mod_forum\courseformat\overview $overview */
+            $overview = \core_courseformat\local\overview\overviewfactory::create($cm);
+            $data['subscriptiontoggler'] = $overview->get_extra_subscribed_overview()->get_content();
+
+            $returnurl = (
+                new moodle_url('/mod/forum/view.php', ['id' => $this->forum->get_course_module_record()->id])
+            )->out(false);
             if (!\mod_forum\subscriptions::is_subscribed($USER->id, $forumobject, null, $this->forum->get_course_module_record())) {
                 $data['subscribetoforum'] = (new moodle_url(
                     '/mod/forum/subscribe.php',

@@ -244,7 +244,7 @@ class overview extends \core_courseformat\activityoverviewbase {
      *
      * @return overviewitem The overview item.
      */
-    private function get_extra_subscribed_overview(): overviewitem {
+    public function get_extra_subscribed_overview(): overviewitem {
 
         $disabled = false;
         $subscribed = false;

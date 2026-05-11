@@ -58,6 +58,27 @@ define([
             }
         });
 
+        PubSub.subscribe(ForumEvents.ALL_SUBSCRIPTION_TOGGLED, function(data) {
+            var subscribed = data.subscriptionState;
+            window.console.log('Subs to ALL_SUBSCRIPTION_TOGGLED with subscriptionState ' + subscribed);
+            var discussionListItems = root.find(Selectors.discussion.item + '[data-discussionid]');
+            discussionListItems.each(function() {
+                // Change subscription classes.
+                var discussionListItem = $(this);
+                var subscribedLabel = discussionListItem.find(Selectors.discussion.subscribedLabel);
+                if (subscribed) {
+                    discussionListItem.addClass('subscribed');
+                    subscribedLabel.removeAttr('hidden');
+                } else {
+                    discussionListItem.removeClass('subscribed');
+                    subscribedLabel.attr('hidden', true);
+                }
+                // Update switch.
+                var toggleElement = discussionListItem.find(Selectors.discussion.subscriptionToggle);
+                toggleElement.prop('checked', subscribed);
+            });
+        });
+
         root.on('click', Selectors.post.inpageCancelButton, function(e) {
             // Tell formchangechecker to reset the form state.
             FormChangeChecker.resetFormDirtyState(e.currentTarget);
