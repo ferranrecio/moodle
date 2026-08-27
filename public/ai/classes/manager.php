@@ -141,9 +141,13 @@ class manager {
             $providers[$action] = [];
             foreach ($instances as $instance) {
                 // Check the plugin is enabled and the provider is configured before making the action available.
-                if ($enabledonly && (!$instance->enabled
-                        || !$this->is_action_enabled($instance->provider, $action, $instance->id))
-                        || $enabledonly && !$instance->is_provider_configured()) {
+                if ($enabledonly
+                    && (
+                        !$instance->enabled
+                        || !$this->is_action_enabled($instance->provider, $action, $instance->id)
+                    )
+                    || $enabledonly && !$instance->is_provider_configured()
+                ) {
                     continue;
                 }
                 if (in_array($action, $instance->get_action_list())) {
@@ -326,22 +330,30 @@ class manager {
 
             // Update the enabled state of the action.
             $actionconfig = $provider->actionconfig;
-            $actionconfig[$actionclass]['enabled'] = (bool)$enabled;
+            $actionconfig[$actionclass]['enabled'] = (bool) $enabled;
 
             return $this->update_provider_instance(
                 provider: $provider,
-                actionconfig: $actionconfig)->actionconfig[$actionclass]['enabled'];
+                actionconfig: $actionconfig,
+            )->actionconfig[$actionclass]['enabled'];
 
         } else {
             // Handle placement actions.
             // Only set value if there is no config setting or if the value is different from the previous one.
-            if ($oldvalue !== (bool)$enabled) {
-                set_config($actionbasename, $enabled, $plugin);
-                add_to_config_log('disabled', !$oldvalue, !$enabled, $plugin);
-                \core_plugin_manager::reset_caches();
-                return true;
+            if ($oldvalue === (bool) $enabled) {
+                return false;
             }
-            return false;
+
+            $enabledactions = get_config($plugin, 'enabledactions');
+            $enabledactions = $enabledactions ? (array) json_decode($enabledactions, true) : [];
+            $oldjson = json_encode($enabledactions);
+            $enabledactions[$actionbasename] = (int) $enabled;
+            $newjson = json_encode($enabledactions);
+            set_config('enabledactions', $newjson, $plugin);
+            add_to_config_log('enabledactions', $oldjson, $newjson, $plugin);
+            \core_plugin_manager::reset_caches();
+
+            return true;
         }
     }
 
@@ -386,12 +398,17 @@ class manager {
             return $this->is_provider_action_enabled($plugin, $actionclass, $instanceid);
         } else {
             // Handle placement actions.
-            $value = get_config($plugin, $actionclass::get_basename());
-            // If not exist in DB, set it to true (enabled).
-            if ($value === false) {
+            $enabledactions = get_config($plugin, 'enabledactions');
+            // If no enabledactions config exists, default to enabled.
+            if ($enabledactions === false) {
                 return true;
             }
-            return (bool) $value;
+            $enabledactions = json_decode($enabledactions, true);
+            $basename = $actionclass::get_basename();
+            if (!array_key_exists($basename, $enabledactions)) {
+                return true;
+            }
+            return (bool) $enabledactions[$basename];
         }
     }
 

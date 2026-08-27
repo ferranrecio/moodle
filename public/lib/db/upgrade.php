@@ -2178,5 +2178,42 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2026080700.01);
     }
 
+    if ($oldversion < 2026081800.01) {
+        // Migrate AI placement action configs from individual config_plugins entries
+        // to a consolidated JSON 'enabledactions' entry per placement plugin.
+        $placements = $DB->get_records_select(
+            'config_plugins',
+            $DB->sql_like('plugin', ':plugin'),
+            ['plugin' => 'aiplacement_%'],
+        );
+
+        // Group config entries by plugin.
+        $pluginconfigs = [];
+        foreach ($placements as $record) {
+            $pluginconfigs[$record->plugin][$record->name] = $record->value;
+        }
+
+        // Known action basenames that may be stored as individual config entries.
+        $actionbasenames = ['explain_text', 'generate_image', 'generate_text', 'summarise_text'];
+
+        foreach ($pluginconfigs as $plugin => $configs) {
+            $enabledactions = [];
+            $hasactions = false;
+            foreach ($actionbasenames as $basename) {
+                if (array_key_exists($basename, $configs)) {
+                    $enabledactions[$basename] = (int) $configs[$basename];
+                    $hasactions = true;
+                    unset_config($basename, $plugin);
+                }
+            }
+            if ($hasactions && !array_key_exists('enabledactions', $configs)) {
+                set_config('enabledactions', json_encode($enabledactions), $plugin);
+            }
+        }
+
+        // Main savepoint reached.
+        upgrade_main_savepoint(true, 2026081800.01);
+    }
+
     return true;
 }
