@@ -221,7 +221,7 @@ final class manager_test extends \advanced_testcase {
         $record->provider = 'dummy';
         $record->enabled = 1;
         $record->config = json_encode($config);
-        $record->actionconfig = json_encode(['generate_text' => 1]);
+        $record->actionconfig = json_encode([generate_text::class => 1]);
         $record->id = $DB->insert_record('ai_providers', $record);
 
         $manager = \core\di::get(\core_ai\manager::class);
@@ -244,14 +244,14 @@ final class manager_test extends \advanced_testcase {
         $record1->provider = 'dummy';
         $record1->enabled = 1;
         $record1->config = json_encode($config);
-        $record1->actionconfig = json_encode(['generate_text' => 1]);
+        $record1->actionconfig = json_encode([generate_text::class => 1]);
 
         $record2 = new \stdClass();
         $record2->name = 'dummy2';
         $record2->provider = 'dummy';
         $record2->enabled = 1;
         $record2->config = json_encode($config);
-        $record2->actionconfig = json_encode(['generate_text' => 1]);
+        $record2->actionconfig = json_encode([generate_text::class => 1]);
 
         $DB->insert_records('ai_providers', [
                 $record1,
@@ -518,10 +518,11 @@ final class manager_test extends \advanced_testcase {
 
         // Disable the generate text action for the Open AI provider.
         $setresult = $manager->set_action_state(
-                plugin: $provider1->provider,
-                actionbasename: generate_text::class::get_basename(),
-                enabled: 0,
-                instanceid: $provider1->id);
+            plugin: $provider1->provider,
+            actionclass: generate_text::class,
+            enabled: 0,
+            instanceid: $provider1->id
+        );
         // Assert that the action was disabled.
         $this->assertFalse($setresult);
 
@@ -535,7 +536,7 @@ final class manager_test extends \advanced_testcase {
         // Re-enable the generate text action for the Openai provider.
         $manager->set_action_state(
             plugin: $provider1->provider,
-            actionbasename: generate_text::class::get_basename(),
+            actionclass: generate_text::class,
             enabled: 1,
             instanceid: $provider1->id,
         );
@@ -796,7 +797,7 @@ final class manager_test extends \advanced_testcase {
 
         // Check the record was written to the DB with expected values.
         $record = $DB->get_record('ai_action_register', ['id' => $storeresult], '*', MUST_EXIST);
-        $this->assertEquals($action->get_basename(), $record->actionname);
+        $this->assertEquals($action::class, $record->actionname);
         $this->assertEquals($userid, $record->userid);
         $this->assertEquals($contextid, $record->contextid);
         $this->assertEquals($provider->get_name(), $record->provider);
@@ -959,7 +960,7 @@ final class manager_test extends \advanced_testcase {
         ]);
 
         $registerid = $DB->insert_record('ai_action_register', (object) [
-            'actionname' => 'generate_text',
+            'actionname' => generate_text::class,
             'actionid' => $childid,
             'success' => 1,
             'userid' => 1,
@@ -968,6 +969,8 @@ final class manager_test extends \advanced_testcase {
             'timecreated' => time(),
             'timecompleted' => time(),
             'model' => 'gpt-test',
+            'prompttokens' => 12,
+            'completiontokens' => 34,
             'courseid' => -1,
             'prompttokens' => 12,
             'completiontokens' => 34,
@@ -975,10 +978,11 @@ final class manager_test extends \advanced_testcase {
 
         $detail = manager::get_action_detail($registerid);
 
-        $this->assertEquals('generate_text', $detail->actionname);
+        $this->assertEquals(generate_text::class, $detail->actionname);
         $this->assertEquals('This is a test prompt', $detail->typedata->prompt);
         $this->assertEquals('This is the generated content', $detail->typedata->generatedcontent);
         $this->assertEquals(12, $detail->prompttokens);
+        $this->assertEquals(34, $detail->completiontokens);
     }
 
     /**
@@ -1055,7 +1059,7 @@ final class manager_test extends \advanced_testcase {
         // Disable the action.
         $manager->set_action_state(
             plugin: $provider->provider,
-            actionbasename: $action::get_basename(),
+            actionclass: $action,
             enabled: 0,
             instanceid: $provider->id
         );
@@ -1067,6 +1071,18 @@ final class manager_test extends \advanced_testcase {
             instanceid: $provider->id
         );
         $this->assertFalse($result);
+    }
+
+    /**
+     * Test malformed placement action configuration defaults to enabled.
+     */
+    public function test_is_action_enabled_with_malformed_placement_config(): void {
+        $this->resetAfterTest();
+        set_config('enabledactions', '{', 'aiplacement_editor');
+
+        $manager = \core\di::get(manager::class);
+
+        $this->assertTrue($manager->is_action_enabled('aiplacement_editor', generate_image::class));
     }
 
     /**
@@ -1087,10 +1103,11 @@ final class manager_test extends \advanced_testcase {
 
         // Disable the action.
         $setresult = $manager->set_action_state(
-                plugin: $provider->provider,
-                actionbasename: $action::get_basename(),
-                enabled: 0,
-                instanceid: $provider->id);
+            plugin: $provider->provider,
+            actionclass: $action,
+            enabled: 0,
+            instanceid: $provider->id
+        );
 
         // Should now be disabled.
         $this->assertFalse($setresult);
@@ -1104,10 +1121,11 @@ final class manager_test extends \advanced_testcase {
         // Enable the action.
         $manager = \core\di::get(manager::class);
         $result = $manager->set_action_state(
-                plugin: $provider->provider,
-                actionbasename: generate_text::class::get_basename(),
-                enabled: 1,
-                instanceid: $provider->id);
+            plugin: $provider->provider,
+            actionclass: generate_text::class,
+            enabled: 1,
+            instanceid: $provider->id
+        );
         $this->assertTrue($result);
     }
 
@@ -1138,10 +1156,11 @@ final class manager_test extends \advanced_testcase {
 
         // Disable the action.
         $manager->set_action_state(
-                plugin: $provider->provider,
-                actionbasename: $action::get_basename(),
-                enabled: 0,
-                instanceid: $provider->id);
+            plugin: $provider->provider,
+            actionclass: $action,
+            enabled: 0,
+            instanceid: $provider->id
+        );
 
         // Should now be unavailable.
         $result = $manager->is_action_available($action);
@@ -1229,6 +1248,37 @@ final class manager_test extends \advanced_testcase {
     }
 
     /**
+     * Test action form field names are stable and namespace-specific.
+     */
+    public function test_get_action_form_field_name(): void {
+        $coreaction = generate_text::class;
+        $customaction = 'local_example\\aiactions\\generate_text';
+
+        $corefield = manager::get_action_form_field_name($coreaction);
+
+        $this->assertSame($corefield, manager::get_action_form_field_name($coreaction));
+        $this->assertSame($corefield, manager::get_action_form_field_name("\\{$coreaction}"));
+        $this->assertNotSame($corefield, manager::get_action_form_field_name($customaction));
+        $this->assertSame('action-core_ai--aiactions--generate_text', $corefield);
+    }
+
+    /**
+     * Test stored action choices can be read independently of module-wide enablement.
+     */
+    public function test_get_enabled_actions_from_json(): void {
+        $settings = json_encode([
+            generate_text::class => 1,
+            explain_text::class => 1,
+            generate_image::class => 0,
+        ]);
+
+        $this->assertSame(
+            [generate_text::class, explain_text::class],
+            manager::get_enabled_actions_from_json($settings),
+        );
+    }
+
+    /**
      * Test is_action_enabled_in_context method.
      *
      * @return void
@@ -1245,7 +1295,7 @@ final class manager_test extends \advanced_testcase {
         // Create forum module and enabled only the generate text action.
         $module = $generator->create_module('forum', [
             'course' => $course->id,
-            'enabledaiactions' => json_encode(['generate_text' => 1]),
+            'enabledaiactions' => json_encode([generate_text::class => 1]),
         ]);
 
         // Set the page context to the module context.
@@ -1272,21 +1322,26 @@ final class manager_test extends \advanced_testcase {
     public static function ai_actions_provider(): array {
         return [
             'actioncombo1' => [
-                json_encode(['generate_text' => 1, 'generate_image' => 1]),
+                json_encode([generate_text::class => 1, generate_image::class => 1]),
                 [
                     generate_text::class,
                     generate_image::class,
                 ],
             ],
             'actioncombo2' => [
-                json_encode(['summarise_text' => 1, 'explain_text' => 1]),
+                json_encode([summarise_text::class => 1, explain_text::class => 1]),
                 [
                     summarise_text::class,
                     explain_text::class,
                 ],
             ],
             'actioncombo3' => [
-                json_encode(['summarise_text' => 1, 'explain_text' => 0, 'generate_text' => 1, 'generate_image' => 1]),
+                json_encode([
+                    summarise_text::class => 1,
+                    explain_text::class => 0,
+                    generate_text::class => 1,
+                    generate_image::class => 1,
+                ]),
                 [
                     summarise_text::class,
                     generate_text::class,
@@ -1294,7 +1349,12 @@ final class manager_test extends \advanced_testcase {
                 ],
             ],
             'actioncombo4' => [
-                json_encode(['summarise_text' => 0, 'explain_text' => 1, 'generate_text' => 0, 'generate_image' => 0]),
+                json_encode([
+                    summarise_text::class => 0,
+                    explain_text::class => 1,
+                    generate_text::class => 0,
+                    generate_image::class => 0,
+                ]),
                 [
                     explain_text::class,
                 ],
