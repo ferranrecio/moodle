@@ -16,12 +16,6 @@
 
 namespace tool_generator\local\testscenario;
 
-use behat_data_generators;
-use Behat\Gherkin\Parser;
-use Behat\Gherkin\Lexer;
-use Behat\Gherkin\Keywords\ArrayKeywords;
-use Behat\Gherkin\Node\StepNode;
-
 /**
  * Tests for steprunner class.
  *
@@ -39,48 +33,19 @@ final class steprunner_test extends \advanced_testcase {
     }
 
     /**
-     * Get a step node from a string.
+     * Get a step runner from a string.
      * @param string $step the step string.
-     * @return StepNode the step node.
+     * @return steprunner the step runner.
      */
-    private function get_step(string $step): StepNode {
+    private function get_step_runner(string $step): steprunner {
         $content = 'Feature: Test feature
             Scenario: Test scenario
             ' . $step . '
         ';
 
-        $method = new \ReflectionMethod(runner::class, 'get_parser');
-        $parser = $method->invoke(new runner());
-
-        $feature = $parser->parse($content);
-        $scenario = $feature->getScenarios()[0];
-        $steps = $scenario->getSteps();
-        return $steps[0];
-    }
-
-    /**
-     * Get the list of valid behat steps for the tests.
-     * @return array the valid steps details.
-     */
-    private function get_valid_steps(): array {
-        $generator = new behat_data_generators();
-        return [
-            '/^the following "(?P<element_string>(?:[^"]|\\")*)" exist:$/' => (object) [
-                'name' => 'the_following_entities_exist',
-                'given' => '/^the following "(?P<element_string>(?:[^"]|\\")*)" exist:$/',
-                'generator' => $generator,
-            ],
-            ':count :entitytype exist with the following data:' => (object) [
-                'name' => 'the_following_repeated_entities_exist',
-                'given' => ':count :entitytype exist with the following data:',
-                'generator' => $generator,
-            ],
-            'the following :entitytype exists:' => (object) [
-                'name' => 'the_following_entity_exists',
-                'given' => 'the following :entitytype exists:',
-                'generator' => $generator,
-            ],
-        ];
+        $runner = new runner();
+        $runner->init();
+        return $runner->parse_feature($content)->get_all_steps()[0];
     }
 
     /**
@@ -91,9 +56,7 @@ final class steprunner_test extends \advanced_testcase {
      * @dataProvider execute_steps_provider
      */
     public function test_is_valid(string $step, bool $expected): void {
-        $validsteps = $this->get_valid_steps();
-        $step = $this->get_step($step);
-        $steprunner = new steprunner(null, $validsteps, $step);
+        $steprunner = $this->get_step_runner($step);
         $this->assertEquals($expected, $steprunner->is_valid());
     }
 
@@ -111,10 +74,7 @@ final class steprunner_test extends \advanced_testcase {
 
         $this->resetAfterTest();
 
-        $validsteps = $this->get_valid_steps();
-
-        $step = $this->get_step($step);
-        $steprunner = new steprunner(null, $validsteps, $step);
+        $steprunner = $this->get_step_runner($step);
 
         $this->assertFalse($steprunner->is_executed());
 
@@ -177,13 +137,11 @@ final class steprunner_test extends \advanced_testcase {
 
         $this->resetAfterTest();
 
-        $validsteps = $this->get_valid_steps();
-
-        $step = $this->get_step('Given the following "course" exists:
+        $step = 'Given the following "course" exists:
             | fullname         | Course test |
             | shortname        | C1          |
-            | category         | 0           |');
-        $steprunner = new steprunner(null, $validsteps, $step);
+            | category         | 0           |';
+        $steprunner = $this->get_step_runner($step);
 
         $this->assertFalse($steprunner->is_executed());
 
@@ -200,7 +158,7 @@ final class steprunner_test extends \advanced_testcase {
         );
 
         // Execute the same course creation.
-        $steprunner = new steprunner(null, $validsteps, $step);
+        $steprunner = $this->get_step_runner($step);
         $this->assertFalse($steprunner->is_executed());
         $result = $steprunner->execute();
         $this->assertFalse($result);
@@ -214,14 +172,11 @@ final class steprunner_test extends \advanced_testcase {
      * @covers ::get_arguments_string
      */
     public function test_get_step_content(): void {
-        $step = $this->get_step('Given the following "course" exists:
+        $steprunner = $this->get_step_runner('Given the following "course" exists:
         | fullname    | Course test |
         | shortname   | C1          |
         | category    | 0           |
         | numsections | 3           |');
-
-        $validsteps = $this->get_valid_steps();
-        $steprunner = new steprunner(null, $validsteps, $step);
 
         $this->assertEquals(
             'the following "course" exists:',

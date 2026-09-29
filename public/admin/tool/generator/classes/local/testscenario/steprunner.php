@@ -16,8 +16,10 @@
 
 namespace tool_generator\local\testscenario;
 
-use behat_base;
+use Behat\Behat\Definition\Call\DefinitionCall;
+use Behat\Gherkin\Node\FeatureNode;
 use Behat\Gherkin\Node\StepNode;
+use Behat\Gherkin\Node\TableNode;
 
 /**
  * Class to validate and process a scenario step.
@@ -27,20 +29,14 @@ use Behat\Gherkin\Node\StepNode;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class steprunner {
-    /** @var behat_base|null the behat step class instance. */
-    private ?behat_base $generator = null;
+    /** @var behat_runtime the restricted Behat runtime. */
+    private behat_runtime $runtime;
 
-    /** @var array the valid steps indexed by given expression tag. */
-    private array $validsteps;
+    /** @var DefinitionCall|null the matched Behat call. */
+    private ?DefinitionCall $call = null;
 
     /** @var StepNode the step node to process. */
     private StepNode $stepnode;
-
-    /** @var string|null the generator method to call. */
-    private ?string $method = null;
-
-    /** @var array the parameters to pass to the generator method. */
-    private array $params = [];
 
     /** @var bool if the step is valid. */
     private bool $isvalid = false;
@@ -53,70 +49,19 @@ class steprunner {
 
     /**
      * Constructor.
-     * @param behat_base|null $unused This does nothing, do not use it.
-     * @param array $validsteps the valid steps indexed by given expression tag.
+     * @param behat_runtime $runtime the restricted Behat runtime
+     * @param FeatureNode $feature the feature containing the step
      * @param StepNode $stepnode the step node to process.
      */
-    public function __construct($unused, array $validsteps, StepNode $stepnode) {
-        if ($unused !== null) {
-            debugging('Deprecated argument passed to ' . __FUNCTION__, DEBUG_DEVELOPER);
-        }
-        $this->validsteps = $validsteps;
+    public function __construct(behat_runtime $runtime, FeatureNode $feature, StepNode $stepnode) {
+        $this->runtime = $runtime;
         $this->stepnode = $stepnode;
-        $this->init();
-    }
-
-    /**
-     * Init the step runner.
-     *
-     * This method will check if the step is valid and all the needed information
-     * in case it is executed.
-     */
-    private function init() {
-        $matches = [];
-        $linetext = $this->stepnode->getText();
-        foreach ($this->validsteps as $method) {
-            if (!$this->match_given($method->given, $linetext, $matches)) {
-                continue;
-            }
-            $this->method = $method->name;
-            $this->params = $this->build_method_params($method->name, $matches, $method->generator);
-            $this->generator = $method->generator;
+        $this->call = $runtime->create_call($feature, $stepnode);
+        if ($this->call !== null) {
             $this->isvalid = true;
-            return;
+        } else {
+            $this->error = get_string('testscenario_invalidstep', 'tool_generator');
         }
-        $this->error = get_string('testscenario_invalidstep', 'tool_generator');
-    }
-
-    /**
-     * Build the method parameters.
-     * @param string $methodname the method name.
-     * @param array $matches the matches.
-     * @param behat_base $generator the method class.
-     * @return array the method parameters.
-     */
-    private function build_method_params(string $methodname, array $matches, behat_base $generator) {
-        $method = new \ReflectionMethod($generator, $methodname);
-        $params = [];
-        foreach ($method->getParameters() as $param) {
-            $paramname = $param->getName();
-            if (isset($matches[$paramname])) {
-                $params[] = $matches[$paramname];
-                unset($matches[$paramname]);
-            } else if (isset($matches["{$paramname}_string"])) {
-                // If the param uses a regular expression with a name.
-                $params[] = $matches["{$paramname}_string"];
-                unset($matches["{$paramname}_string"]);
-            } else if (count($matches) > 0) {
-                // If the param is not present means the regular expressions does not use
-                // proper names. So we will try to find the param by position.
-                $params[] = array_pop($matches);
-            } else {
-                // No more params to match.
-                break;
-            }
-        }
-        return array_merge($params, $this->stepnode->getArguments());
     }
 
     /**
@@ -158,47 +103,11 @@ class steprunner {
     public function get_arguments_string(): string {
         $result = '';
         foreach ($this->stepnode->getArguments() as $argument) {
-            $result .= $argument->getTableAsString();
+            if ($argument instanceof TableNode) {
+                $result .= $argument->getTableAsString();
+            }
         }
         return $result;
-    }
-
-    /**
-     * Match a given expression with a text.
-     * @param string $pattern the given expression.
-     * @param string $text the text to match.
-     * @param array $matches the matches.
-     * @return bool if the step matched the generator given expression.
-     */
-    private function match_given(string $pattern, $text, array &$matches) {
-        $internalmatcher = [];
-        if (substr($pattern, 0, 1) === '/') {
-            // Pattern is a regular expression.
-            $result = preg_match($pattern, $text, $matches);
-            foreach ($matches as $key => $value) {
-                if (is_int($key)) {
-                    unset($matches[$key]);
-                }
-            }
-            return $result;
-        }
-
-        // Patter is a string with parameters.
-        $elementmatches = [];
-        preg_match_all('/:([^ ]+)/', $pattern, $elementmatches, PREG_SET_ORDER, 0);
-
-        $pattern = preg_replace('/:([^ ]+)/', '(?P<$1>"[^"]+"|[^" ]+)', $pattern);
-        $pattern = '/^' . $pattern . '$/';
-        $result = preg_match($pattern, $text, $internalmatcher);
-        if (!$result) {
-            return false;
-        }
-        foreach ($elementmatches as $elementmatch) {
-            // Remove any possible " at the beggining and end of $internalmatcher[$elementmatch[1]].
-            $paramvalue = preg_replace('/^"(.*)"$/', '$1', $internalmatcher[$elementmatch[1]]);
-            $matches[$elementmatch[1]] = $paramvalue;
-        }
-        return true;
     }
 
     /**
@@ -210,13 +119,9 @@ class steprunner {
             return false;
         }
         $this->executed = true;
-        try {
-            call_user_func_array(
-                [$this->generator, $this->method],
-                $this->params
-            );
-        } catch (\moodle_exception $exception) {
-            $this->error = $exception->getMessage();
+        $result = $this->runtime->execute($this->call);
+        if ($result->hasException()) {
+            $this->error = $result->getException()->getMessage();
             $this->isvalid = false;
             return false;
         }

@@ -18,7 +18,6 @@ namespace tool_generator\local\testscenario;
 
 use behat_admin;
 use behat_data_generators;
-use behat_base;
 use behat_course;
 use behat_general;
 use behat_user;
@@ -27,9 +26,7 @@ use Behat\Gherkin\Parser;
 use Behat\Gherkin\Lexer;
 use Behat\Gherkin\Keywords\ArrayKeywords;
 use Behat\Gherkin\Node\OutlineNode;
-use ReflectionClass;
 use ReflectionMethod;
-use stdClass;
 
 /**
  * Class to process a scenario generator file.
@@ -40,10 +37,10 @@ use stdClass;
  */
 class runner {
 
-    /** @var behat_data_generators the behat data generator instance. */
-    private behat_data_generators $generator;
+    /** @var behat_runtime the restricted Behat runtime. */
+    private behat_runtime $runtime;
 
-    /** @var array of valid steps indexed by given expression tag. */
+    /** @var array information about the valid steps. */
     private array $validsteps;
 
     /**
@@ -53,7 +50,6 @@ class runner {
         $this->include_composer_libraries();
         $this->include_behat_libraries();
         $this->load_generator();
-        $this->load_cleanup();
     }
 
     /**
@@ -91,6 +87,7 @@ class runner {
         require_once("{$CFG->dirroot}/course/lib.php");
         require_once("{$CFG->dirroot}/course/tests/behat/behat_course.php");
         require_once("{$CFG->dirroot}/lib/tests/behat/behat_general.php");
+        require_once("{$CFG->dirroot}/lib/tests/behat/behat_transformations.php");
         require_once("{$CFG->dirroot}/user/tests/behat/behat_user.php");
         return true;
     }
@@ -99,47 +96,50 @@ class runner {
      * Load all generators.
      */
     private function load_generator() {
-        $this->generator = new behat_data_generators();
-        $this->validsteps = $this->scan_generator($this->generator);
-
-        // Add some extra steps from other classes.
-        $extrasteps = [
-            [behat_admin::class, 'the_following_config_values_are_set_as_admin'],
-            [behat_general::class, 'i_enable_plugin'],
-            [behat_general::class, 'i_disable_plugin'],
+        $allowedmethods = [
+            behat_data_generators::class => null,
+            behat_admin::class => ['the_following_config_values_are_set_as_admin'],
+            behat_general::class => ['i_enable_plugin', 'i_disable_plugin'],
+            behat_course::class => ['the_course_is_deleted'],
+            behat_user::class => ['the_user_is_deleted'],
         ];
-        foreach ($extrasteps as $callable) {
-            $classname = $callable[0];
-            $method = $callable[1];
-            $extra = $this->scan_method(
-                new ReflectionMethod($classname, $method),
-                new $classname(),
-            );
-            if ($extra) {
-                $this->validsteps[$extra->given] = $extra;
-            }
-        }
+        $contexts = [
+            new behat_data_generators(),
+            new behat_admin(),
+            new behat_general(),
+            new behat_course(),
+            new behat_user(),
+            new \behat_transformations(),
+        ];
+        $this->runtime = new behat_runtime($contexts, $allowedmethods);
+        $this->validsteps = $this->build_valid_steps();
     }
 
     /**
-     * Load all cleanup steps.
+     * Build the step information used by the web interface.
+     *
+     * @return array
      */
-    private function load_cleanup() {
-        $extra = $this->scan_method(
-            new ReflectionMethod(behat_course::class, 'the_course_is_deleted'),
-            new behat_course(),
-        );
-        if ($extra) {
-            $this->validsteps[$extra->given] = $extra;
+    private function build_valid_steps(): array {
+        $steps = [];
+        foreach ($this->runtime->get_definitions() as $definition) {
+            $method = $definition->getReflection();
+            if (!$method instanceof ReflectionMethod) {
+                continue;
+            }
+            $step = (object) [
+                'given' => $definition->getPattern(),
+                'name' => $method->getName(),
+                'generator' => null,
+                'example' => null,
+            ];
+            $reference = $method->getDeclaringClass()->getName() . '::' . $method->getName();
+            if ($attribute = attribute_helper::instance($reference, \core\attribute\example::class)) {
+                $step->example = (string) $attribute->example;
+            }
+            $steps[] = $step;
         }
-
-        $extra = $this->scan_method(
-            new ReflectionMethod(behat_user::class, 'the_user_is_deleted'),
-            new behat_user(),
-        );
-        if ($extra) {
-            $this->validsteps[$extra->given] = $extra;
-        }
+        return $steps;
     }
 
     /**
@@ -147,69 +147,7 @@ class runner {
      * @return array the valid steps.
      */
     public function get_valid_steps(): array {
-        return array_values($this->validsteps);
-    }
-
-    /**
-     * Scan a generator to get all valid steps.
-     * @param behat_data_generators $generator the generator to scan.
-     * @return array the valid steps.
-     */
-    private function scan_generator(behat_data_generators $generator): array {
-        $result = [];
-        $class = new ReflectionClass($generator);
-        $methods = $class->getMethods(ReflectionMethod::IS_PUBLIC);
-        foreach ($methods as $method) {
-            $scan = $this->scan_method($method, $generator);
-            if ($scan) {
-                $result[$scan->given] = $scan;
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * Scan a method to get the given expression tag.
-     * @param ReflectionMethod $method the method to scan.
-     * @param behat_base $behatclass the behat class instance to use.
-     * @return stdClass|null the method data (given, name, class).
-     */
-    private function scan_method(ReflectionMethod $method, behat_base $behatclass): ?stdClass {
-        $given = $this->get_method_given($method);
-        if (!$given) {
-            return null;
-        }
-        $result = (object)[
-            'given' => $given,
-            'name' => $method->getName(),
-            'generator' => $behatclass,
-            'example' => null,
-        ];
-        $reference = $method->getDeclaringClass()->getName() . '::' . $method->getName();
-        if ($attribute = attribute_helper::instance($reference, \core\attribute\example::class)) {
-            $result->example = (string) $attribute->example;
-        }
-        return $result;
-    }
-
-    /**
-     * Get the given expression tag of a method.
-     *
-     * @param ReflectionMethod $method the method to get the given expression tag.
-     * @return string|null the given expression tag or null if not found.
-     */
-    private function get_method_given(ReflectionMethod $method): ?string {
-        $doccomment = $method->getDocComment();
-        $doccomment = str_replace("\r\n", "\n", $doccomment);
-        $doccomment = str_replace("\r", "\n", $doccomment);
-        $doccomment = explode("\n", $doccomment);
-        foreach ($doccomment as $line) {
-            $matches = [];
-            if (preg_match('/.*\@(given|when|then)\s+(.+)$/i', $line, $matches)) {
-                return $matches[2];
-            }
-        }
-        return null;
+        return $this->validsteps;
     }
 
     /**
@@ -250,13 +188,13 @@ class runner {
                     continue;
                 }
                 if ($scenario->getNodeType() == 'Outline') {
-                    $this->parse_scenario_outline($scenario, $result);
+                    $this->parse_scenario_outline($feature, $scenario, $result);
                     continue;
                 }
                 $result->add_scenario($scenario->getNodeType(), $scenario->getTitle());
                 $steps = $scenario->getSteps();
                 foreach ($steps as $step) {
-                    $result->add_step(new steprunner(null, $this->validsteps, $step));
+                    $result->add_step(new steprunner($this->runtime, $feature, $step));
                 }
             }
         }
@@ -274,16 +212,21 @@ class runner {
 
     /**
      * Parse a scenario outline.
-     * @param OutlineNode $scenario the scenario outline to parse.
+        * @param \Behat\Gherkin\Node\FeatureNode $feature the parsed feature.
+        * @param OutlineNode $scenario the scenario outline to parse.
      * @param parsedfeature $result the parsed feature to add the scenario.
      */
-    private function parse_scenario_outline(OutlineNode $scenario, parsedfeature $result) {
+    private function parse_scenario_outline(
+        \Behat\Gherkin\Node\FeatureNode $feature,
+        OutlineNode $scenario,
+        parsedfeature $result,
+    ) {
         $count = 1;
         foreach ($scenario->getExamples() as $example) {
             $result->add_scenario($example->getNodeType(), $example->getOutlineTitle() . " ($count)");
             $steps = $example->getSteps();
             foreach ($steps as $step) {
-                $result->add_step(new steprunner(null, $this->validsteps, $step));
+                $result->add_step(new steprunner($this->runtime, $feature, $step));
             }
             $count++;
         }
