@@ -18,18 +18,17 @@ namespace tool_generator\local\testscenario;
 
 use behat_admin;
 use behat_data_generators;
-use behat_base;
 use behat_course;
 use behat_general;
+use behat_transformations;
 use behat_user;
 use core\attribute_helper;
 use Behat\Gherkin\Parser;
 use Behat\Gherkin\Lexer;
-use Behat\Gherkin\Keywords\ArrayKeywords;
+use Behat\Gherkin\Keywords\CachedArrayKeywords;
+use Behat\Gherkin\Node\FeatureNode;
 use Behat\Gherkin\Node\OutlineNode;
-use ReflectionClass;
 use ReflectionMethod;
-use stdClass;
 
 /**
  * Class to process a scenario generator file.
@@ -39,33 +38,49 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class runner {
+    /** @var behat_runtime the restricted Behat runtime. */
+    private behat_runtime $runtime;
 
-    /** @var behat_data_generators the behat data generator instance. */
-    private behat_data_generators $generator;
-
-    /** @var array of valid steps indexed by given expression tag. */
+    /** @var array information about the valid steps. */
     private array $validsteps;
 
     /**
-     * Initi all composer, behat libraries and load the valid steps.
+     * Init all composer, behat libraries and load the valid steps.
      */
     public function init() {
-        $this->include_composer_libraries();
+        $this->require_composer_libraries();
         $this->include_behat_libraries();
         $this->load_generator();
-        $this->load_cleanup();
     }
 
     /**
-     * Include composer autload.
+     * Require composer autoload, or throw an exception if it is missing.
+     *
+     * @return bool
+     * @deprecated since Moodle 5.3
+     * @todo       Final deprecation in Moodle 6.3 (MDL-XXXX)
      */
-    public function include_composer_libraries() {
+    #[\core\attribute\deprecated(
+        replacement: '\tool_generator\local\testscenario\runner::init()',
+        since: '5.3',
+        mdl: 'MDL-82661',
+        reason: 'Composer libraries are loaded by init()',
+    )]
+    public function include_composer_libraries(): bool {
+        \core\deprecation::emit_deprecation([self::class, __FUNCTION__]);
+        $this->require_composer_libraries();
+        return true;
+    }
+
+    /**
+     * Require composer autoload, or throw an exception if it is missing.
+     */
+    private function require_composer_libraries() {
         global $CFG;
         if (!file_exists($CFG->dirroot . '/../vendor/autoload.php')) {
             throw new \moodle_exception('Missing composer.');
         }
         require_once($CFG->dirroot . '/../vendor/autoload.php');
-        return true;
     }
 
     /**
@@ -82,15 +97,12 @@ class runner {
             define('BEHAT_TEST', 1);
         }
 
-        // Behat utilities.
-        require_once($CFG->libdir . '/behat/classes/util.php');
-        require_once($CFG->libdir . '/behat/classes/behat_command.php');
-        require_once($CFG->libdir . '/behat/behat_base.php');
         require_once("{$CFG->libdir}/tests/behat/behat_data_generators.php");
         require_once("{$CFG->dirroot}/admin/tests/behat/behat_admin.php");
         require_once("{$CFG->dirroot}/course/lib.php");
         require_once("{$CFG->dirroot}/course/tests/behat/behat_course.php");
-        require_once("{$CFG->dirroot}/lib/tests/behat/behat_general.php");
+        require_once("{$CFG->libdir}/tests/behat/behat_general.php");
+        require_once("{$CFG->libdir}/tests/behat/behat_transformations.php");
         require_once("{$CFG->dirroot}/user/tests/behat/behat_user.php");
         return true;
     }
@@ -99,117 +111,65 @@ class runner {
      * Load all generators.
      */
     private function load_generator() {
-        $this->generator = new behat_data_generators();
-        $this->validsteps = $this->scan_generator($this->generator);
-
-        // Add some extra steps from other classes.
-        $extrasteps = [
-            [behat_admin::class, 'the_following_config_values_are_set_as_admin'],
-            [behat_general::class, 'i_enable_plugin'],
-            [behat_general::class, 'i_disable_plugin'],
+        $allowedmethods = [
+            behat_data_generators::class => null,
+            behat_admin::class => ['the_following_config_values_are_set_as_admin'],
+            behat_general::class => ['i_enable_plugin', 'i_disable_plugin'],
+            behat_course::class => ['the_course_is_deleted'],
+            behat_user::class => ['the_user_is_deleted'],
         ];
-        foreach ($extrasteps as $callable) {
-            $classname = $callable[0];
-            $method = $callable[1];
-            $extra = $this->scan_method(
-                new ReflectionMethod($classname, $method),
-                new $classname(),
-            );
-            if ($extra) {
-                $this->validsteps[$extra->given] = $extra;
-            }
-        }
+        $contexts = [
+            new behat_data_generators(),
+            new behat_admin(),
+            new behat_general(),
+            new behat_course(),
+            new behat_user(),
+            new behat_transformations(),
+        ];
+        $this->runtime = new behat_runtime($contexts, $allowedmethods);
+        $this->validsteps = $this->build_valid_steps($contexts);
     }
 
     /**
-     * Load all cleanup steps.
+     * Build the step information used by the web interface.
+     *
+     * The name and generator fields are only kept for the deprecated steprunner.
+     *
+     * @param \behat_base[] $contexts the context instances used by the runtime.
+     * @return \stdClass[] list of {given: string, name: string, generator: \behat_base, example: ?string}
      */
-    private function load_cleanup() {
-        $extra = $this->scan_method(
-            new ReflectionMethod(behat_course::class, 'the_course_is_deleted'),
-            new behat_course(),
-        );
-        if ($extra) {
-            $this->validsteps[$extra->given] = $extra;
+    private function build_valid_steps(array $contexts): array {
+        $instances = [];
+        foreach ($contexts as $context) {
+            $instances[$context::class] = $context;
         }
-
-        $extra = $this->scan_method(
-            new ReflectionMethod(behat_user::class, 'the_user_is_deleted'),
-            new behat_user(),
-        );
-        if ($extra) {
-            $this->validsteps[$extra->given] = $extra;
+        $steps = [];
+        foreach ($this->runtime->get_definitions() as $definition) {
+            $method = $definition->getReflection();
+            if (!$method instanceof ReflectionMethod) {
+                continue;
+            }
+            $step = (object) [
+                'given' => $definition->getPattern(),
+                'name' => $method->getName(),
+                'generator' => $instances[$definition->getCallable()[0]],
+                'example' => null,
+            ];
+            $reference = $method->getDeclaringClass()->getName() . '::' . $method->getName();
+            if ($attribute = attribute_helper::instance($reference, \core\attribute\example::class)) {
+                $step->example = (string) $attribute->example;
+            }
+            $steps[] = $step;
         }
+        return $steps;
     }
 
     /**
      * Get all valid steps.
-     * @return array the valid steps.
+     * @return \stdClass[] list of {given: string, name: string, generator: \behat_base, example: ?string}
      */
     public function get_valid_steps(): array {
-        return array_values($this->validsteps);
-    }
-
-    /**
-     * Scan a generator to get all valid steps.
-     * @param behat_data_generators $generator the generator to scan.
-     * @return array the valid steps.
-     */
-    private function scan_generator(behat_data_generators $generator): array {
-        $result = [];
-        $class = new ReflectionClass($generator);
-        $methods = $class->getMethods(ReflectionMethod::IS_PUBLIC);
-        foreach ($methods as $method) {
-            $scan = $this->scan_method($method, $generator);
-            if ($scan) {
-                $result[$scan->given] = $scan;
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * Scan a method to get the given expression tag.
-     * @param ReflectionMethod $method the method to scan.
-     * @param behat_base $behatclass the behat class instance to use.
-     * @return stdClass|null the method data (given, name, class).
-     */
-    private function scan_method(ReflectionMethod $method, behat_base $behatclass): ?stdClass {
-        $given = $this->get_method_given($method);
-        if (!$given) {
-            return null;
-        }
-        $result = (object)[
-            'given' => $given,
-            'name' => $method->getName(),
-            'generator' => $behatclass,
-            'example' => null,
-        ];
-        $reference = $method->getDeclaringClass()->getName() . '::' . $method->getName();
-        if ($attribute = attribute_helper::instance($reference, \core\attribute\example::class)) {
-            $result->example = (string) $attribute->example;
-        }
-        return $result;
-    }
-
-    /**
-     * Get the given expression tag of a method.
-     *
-     * @param ReflectionMethod $method the method to get the given expression tag.
-     * @return string|null the given expression tag or null if not found.
-     */
-    private function get_method_given(ReflectionMethod $method): ?string {
-        $doccomment = $method->getDocComment();
-        $doccomment = str_replace("\r\n", "\n", $doccomment);
-        $doccomment = str_replace("\r", "\n", $doccomment);
-        $doccomment = explode("\n", $doccomment);
-        foreach ($doccomment as $line) {
-            $matches = [];
-            if (preg_match('/.*\@(given|when|then)\s+(.+)$/i', $line, $matches)) {
-                return $matches[2];
-            }
-        }
-        return null;
+        return $this->validsteps;
     }
 
     /**
@@ -250,13 +210,13 @@ class runner {
                     continue;
                 }
                 if ($scenario->getNodeType() == 'Outline') {
-                    $this->parse_scenario_outline($scenario, $result);
+                    $this->parse_scenario_outline($feature, $scenario, $result);
                     continue;
                 }
                 $result->add_scenario($scenario->getNodeType(), $scenario->getTitle());
                 $steps = $scenario->getSteps();
                 foreach ($steps as $step) {
-                    $result->add_step(new steprunner(null, $this->validsteps, $step));
+                    $result->add_step(new scenario_step($this->runtime, $feature, $step));
                 }
             }
         }
@@ -274,16 +234,21 @@ class runner {
 
     /**
      * Parse a scenario outline.
+     * @param FeatureNode $feature the parsed feature.
      * @param OutlineNode $scenario the scenario outline to parse.
      * @param parsedfeature $result the parsed feature to add the scenario.
      */
-    private function parse_scenario_outline(OutlineNode $scenario, parsedfeature $result) {
+    private function parse_scenario_outline(
+        FeatureNode $feature,
+        OutlineNode $scenario,
+        parsedfeature $result,
+    ) {
         $count = 1;
         foreach ($scenario->getExamples() as $example) {
             $result->add_scenario($example->getNodeType(), $example->getOutlineTitle() . " ($count)");
             $steps = $example->getSteps();
             foreach ($steps as $step) {
-                $result->add_step(new steprunner(null, $this->validsteps, $step));
+                $result->add_step(new scenario_step($this->runtime, $feature, $step));
             }
             $count++;
         }
@@ -294,23 +259,7 @@ class runner {
      * @return Parser
      */
     private function get_parser(): Parser {
-        $keywords = new ArrayKeywords([
-            'en' => [
-                'feature' => 'Feature',
-                'background' => 'Background',
-                'scenario' => 'Scenario',
-                'scenario_outline' => 'Scenario Outline|Scenario Template',
-                'examples' => 'Examples|Scenarios',
-                'given' => 'Given',
-                'when' => 'When',
-                'then' => 'Then',
-                'and' => 'And',
-                'but' => 'But',
-            ],
-        ]);
-        $lexer = new Lexer($keywords);
-        $parser = new Parser($lexer);
-        return $parser;
+        return new Parser(new Lexer(CachedArrayKeywords::withDefaultKeywords()));
     }
 
     /**

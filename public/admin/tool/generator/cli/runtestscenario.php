@@ -128,6 +128,10 @@ if (!file_exists($featurefile)) {
 // Switch to admin user account.
 \core\session\manager::set_user(get_admin());
 
+// Some generators render output (e.g. AI provider forms), so run with the output ready like the web version.
+$PAGE->set_context(\core\context\system::instance());
+$PAGE->initialise_theme_and_output();
+
 $runner = new tool_generator\local\testscenario\runner();
 
 try {

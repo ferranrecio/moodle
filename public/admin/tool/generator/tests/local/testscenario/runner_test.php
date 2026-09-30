@@ -25,6 +25,15 @@ namespace tool_generator\local\testscenario;
  * @coversDefaultClass \tool_generator\local\testscenario\runner
  */
 final class runner_test extends \advanced_testcase {
+    /**
+     * Test the deprecated include_composer_libraries method.
+     * @covers ::include_composer_libraries
+     */
+    public function test_include_composer_libraries(): void {
+        $runner = new runner();
+        $this->assertTrue($runner->include_composer_libraries());
+        $this->assertDebuggingCalled();
+    }
 
     /**
      * Test for parse_feature.
@@ -75,6 +84,36 @@ final class runner_test extends \advanced_testcase {
             6,
             $DB->count_records('role_assignments', ['contextid' => $context->id])
         );
+    }
+
+    /**
+     * Test standard Behat transformations are applied to generator tables.
+     *
+     * @covers ::parse_feature
+     * @covers ::execute
+     */
+    public function test_parse_and_execute_relative_date(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $runner = new runner();
+        $runner->init();
+        $feature = $runner->parse_feature('Feature: Relative dates
+            Scenario: Create a course starting tomorrow
+                Given the following "course" exists:
+                    | fullname  | Relative date course |
+                    | shortname | relative-date       |
+                    | category  | 0                   |
+                    | startdate | ##tomorrow##        |
+        ');
+
+        $this->assertTrue($feature->is_valid());
+        $this->assertTrue($runner->execute($feature));
+
+        $course = $DB->get_record('course', ['shortname' => 'relative-date'], '*', MUST_EXIST);
+        $this->assertEquals(strtotime('tomorrow'), $course->startdate);
     }
 
     /**

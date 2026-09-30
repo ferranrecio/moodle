@@ -1,0 +1,19 @@
+issueNumber: MDL-82661
+notes:
+  tool_generator:
+    - message: >-
+        The `tool_generator\local\testscenario\steprunner` class has been
+        deprecated. Use `tool_generator\local\testscenario\scenario_step`
+        instead, which uses the Behat runtime to match and execute steps.
+      type: deprecated
+    - message: >-
+        Passing a `tool_generator\local\testscenario\steprunner` instance to
+        `tool_generator\local\testscenario\parsedfeature::add_step()` has been
+        deprecated. Pass a `tool_generator\local\testscenario\scenario_step`
+        instead.
+      type: deprecated
+    - message: >-
+        The `tool_generator\local\testscenario\runner::include_composer_libraries()`
+        method has been deprecated. Composer libraries are loaded by
+        `tool_generator\local\testscenario\runner::init()`.
+      type: deprecated

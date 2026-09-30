@@ -174,6 +174,23 @@ final class parsedfeature_test extends \advanced_testcase {
     }
 
     /**
+     * Test that adding a steprunner is deprecated.
+     * @covers ::add_step
+     */
+    public function test_add_step_steprunner_deprecated(): void {
+        $step = new steprunner(null, [], new \Behat\Gherkin\Node\StepNode('Given', 'I am in a course', [], 1));
+        $this->assertDebuggingCalled();
+
+        $parsedfeature = new parsedfeature();
+        $parsedfeature->add_step($step);
+        $this->assertDebuggingCalled(
+            'Passing a steprunner to ' . parsedfeature::class . '::add_step is deprecated. Use '
+                . scenario_step::class . ' instead.',
+        );
+        $this->assertCount(1, $parsedfeature->get_all_steps());
+    }
+
+    /**
      * Test for ading errors into scenarios.
      * @covers ::add_error
      * @covers ::add_scenario

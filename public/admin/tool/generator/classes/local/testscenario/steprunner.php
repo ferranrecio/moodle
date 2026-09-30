@@ -25,7 +25,14 @@ use Behat\Gherkin\Node\StepNode;
  * @package    tool_generator
  * @copyright  2023 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @deprecated since Moodle 5.3
+ * @todo       Final deprecation in Moodle 6.3 (MDL-XXXX)
  */
+#[\core\attribute\deprecated(
+    replacement: scenario_step::class,
+    since: '5.3',
+    mdl: 'MDL-82661',
+)]
 class steprunner {
     /** @var behat_base|null the behat step class instance. */
     private ?behat_base $generator = null;
@@ -58,6 +65,7 @@ class steprunner {
      * @param StepNode $stepnode the step node to process.
      */
     public function __construct($unused, array $validsteps, StepNode $stepnode) {
+        \core\deprecation::emit_deprecation(self::class);
         if ($unused !== null) {
             debugging('Deprecated argument passed to ' . __FUNCTION__, DEBUG_DEVELOPER);
         }
