@@ -16,21 +16,18 @@
 
 namespace tool_generator\local\testscenario;
 
-use behat_data_generators;
-use Behat\Gherkin\Parser;
-use Behat\Gherkin\Lexer;
-use Behat\Gherkin\Keywords\ArrayKeywords;
-use Behat\Gherkin\Node\StepNode;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
- * Tests for steprunner class.
+ * Tests for scenario_step class.
  *
  * @package tool_generator
- * @copyright 2023 Ferran Recio <ferran@moodel.com>
+ * @copyright 2026 Ferran Recio <ferran@moodle.com>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @coversDefaultClass \tool_generator\local\testscenario\steprunner
  */
-final class steprunner_test extends \advanced_testcase {
+#[CoversClass(scenario_step::class)]
+final class scenario_step_test extends \advanced_testcase {
     public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
         // Call the init method to include all behat libraries and attributes.
@@ -39,84 +36,45 @@ final class steprunner_test extends \advanced_testcase {
     }
 
     /**
-     * Get a step node from a string.
+     * Get a scenario step from a string.
      * @param string $step the step string.
-     * @return StepNode the step node.
+     * @return scenario_step the scenario step.
      */
-    private function get_step(string $step): StepNode {
+    private function get_step_runner(string $step): scenario_step {
         $content = 'Feature: Test feature
             Scenario: Test scenario
             ' . $step . '
         ';
 
-        $method = new \ReflectionMethod(runner::class, 'get_parser');
-        $parser = $method->invoke(new runner());
-
-        $feature = $parser->parse($content);
-        $scenario = $feature->getScenarios()[0];
-        $steps = $scenario->getSteps();
-        return $steps[0];
-    }
-
-    /**
-     * Get the list of valid behat steps for the tests.
-     * @return array the valid steps details.
-     */
-    private function get_valid_steps(): array {
-        $generator = new behat_data_generators();
-        return [
-            '/^the following "(?P<element_string>(?:[^"]|\\")*)" exist:$/' => (object) [
-                'name' => 'the_following_entities_exist',
-                'given' => '/^the following "(?P<element_string>(?:[^"]|\\")*)" exist:$/',
-                'generator' => $generator,
-            ],
-            ':count :entitytype exist with the following data:' => (object) [
-                'name' => 'the_following_repeated_entities_exist',
-                'given' => ':count :entitytype exist with the following data:',
-                'generator' => $generator,
-            ],
-            'the following :entitytype exists:' => (object) [
-                'name' => 'the_following_entity_exists',
-                'given' => 'the following :entitytype exists:',
-                'generator' => $generator,
-            ],
-        ];
+        $runner = new runner();
+        $runner->init();
+        return $runner->parse_feature($content)->get_all_steps()[0];
     }
 
     /**
      * Test for parse_feature.
-     * @covers ::is_valid
      * @param string $step the step to validate.
      * @param bool $expected if the step is expected to be valid.
-     * @dataProvider execute_steps_provider
      */
+    #[DataProvider('execute_steps_provider')]
     public function test_is_valid(string $step, bool $expected): void {
-        $validsteps = $this->get_valid_steps();
-        $step = $this->get_step($step);
-        $steprunner = new steprunner(null, $validsteps, $step);
-        $this->assertDebuggingCalled();
+        $steprunner = $this->get_step_runner($step);
         $this->assertEquals($expected, $steprunner->is_valid());
     }
 
     /**
      * Test for execute step.
      *
-     * @covers ::is_executed
-     * @covers ::execute
      * @param string $step the step to execute.
      * @param bool $expected if the step is expected to be executed.
-     * @dataProvider execute_steps_provider
      */
+    #[DataProvider('execute_steps_provider')]
     public function test_execute(string $step, bool $expected): void {
         global $DB;
 
         $this->resetAfterTest();
 
-        $validsteps = $this->get_valid_steps();
-
-        $step = $this->get_step($step);
-        $steprunner = new steprunner(null, $validsteps, $step);
-        $this->assertDebuggingCalled();
+        $steprunner = $this->get_step_runner($step);
 
         $this->assertFalse($steprunner->is_executed());
 
@@ -170,23 +128,17 @@ final class steprunner_test extends \advanced_testcase {
 
     /**
      * Test for execute step.
-     * @covers ::is_executed
-     * @covers ::execute
-     * @covers ::get_error
      */
     public function test_execute_duplicated(): void {
         global $DB;
 
         $this->resetAfterTest();
 
-        $validsteps = $this->get_valid_steps();
-
-        $step = $this->get_step('Given the following "course" exists:
+        $step = 'Given the following "course" exists:
             | fullname         | Course test |
             | shortname        | C1          |
-            | category         | 0           |');
-        $steprunner = new steprunner(null, $validsteps, $step);
-        $this->assertDebuggingCalled();
+            | category         | 0           |';
+        $steprunner = $this->get_step_runner($step);
 
         $this->assertFalse($steprunner->is_executed());
 
@@ -203,8 +155,7 @@ final class steprunner_test extends \advanced_testcase {
         );
 
         // Execute the same course creation.
-        $steprunner = new steprunner(null, $validsteps, $step);
-        $this->assertDebuggingCalled();
+        $steprunner = $this->get_step_runner($step);
         $this->assertFalse($steprunner->is_executed());
         $result = $steprunner->execute();
         $this->assertFalse($result);
@@ -214,19 +165,13 @@ final class steprunner_test extends \advanced_testcase {
 
     /**
      * Test for parse_feature.
-     * @covers ::get_text
-     * @covers ::get_arguments_string
      */
     public function test_get_step_content(): void {
-        $step = $this->get_step('Given the following "course" exists:
+        $steprunner = $this->get_step_runner('Given the following "course" exists:
         | fullname    | Course test |
         | shortname   | C1          |
         | category    | 0           |
         | numsections | 3           |');
-
-        $validsteps = $this->get_valid_steps();
-        $steprunner = new steprunner(null, $validsteps, $step);
-        $this->assertDebuggingCalled();
 
         $this->assertEquals(
             'the following "course" exists:',

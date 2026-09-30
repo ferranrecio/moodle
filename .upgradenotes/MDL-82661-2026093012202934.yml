@@ -1,0 +1,8 @@
+issueNumber: MDL-82661
+notes:
+  tool_generator:
+    - message: >-
+        The `tool_generator\local\testscenario\steprunner` class has been
+        deprecated. Use `tool_generator\local\testscenario\scenario_step`
+        instead, which uses the Behat runtime to match and execute steps.
+      type: deprecated

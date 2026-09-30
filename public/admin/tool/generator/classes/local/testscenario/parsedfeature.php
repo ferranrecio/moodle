@@ -34,7 +34,7 @@ class parsedfeature {
 
     /** @var stdClass[] the list of scenarios with all the steps.
      *
-     * scenarionum => {type: string, title: string, steps: steprunner[]}.
+     * scenarionum => {type: string, title: string, steps: scenario_step[]}.
      */
     private array $scenarios = [];
 
@@ -62,9 +62,9 @@ class parsedfeature {
 
     /**
      * Add a line to the current scenario.
-     * @param steprunner $step the step to add.
+     * @param scenario_step|steprunner $step the step to add.
      */
-    public function add_step(steprunner $step) {
+    public function add_step(scenario_step|steprunner $step) {
         if (empty($this->scenarios)) {
             $this->add_scenario('scenario', null);
         }
@@ -101,7 +101,7 @@ class parsedfeature {
 
     /**
      * Get the list of scenarios.
-     * @return stdClass[] array of scenarionum => {type: string, title: string, steps: steprunner[]}
+     * @return stdClass[] array of scenarionum => {type: string, title: string, steps: scenario_step[]}
      */
     public function get_scenarios(): array {
         return $this->scenarios;
@@ -109,7 +109,7 @@ class parsedfeature {
 
     /**
      * Get all the steps form all scenarios.
-     * @return steprunner[]
+     * @return scenario_step[]
      */
     public function get_all_steps(): array {
         $result = [];
