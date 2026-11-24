@@ -113,8 +113,6 @@ final class modlib_test extends \advanced_testcase {
 
     /**
      * Test module defaults read the namespace-specific AI action form field.
-     *
-     * @covers ::set_moduleinfo_defaults
      */
     public function test_set_moduleinfo_defaults_with_action_form_field(): void {
         global $PAGE;

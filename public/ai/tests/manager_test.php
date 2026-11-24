@@ -969,8 +969,6 @@ final class manager_test extends \advanced_testcase {
             'timecreated' => time(),
             'timecompleted' => time(),
             'model' => 'gpt-test',
-            'prompttokens' => 12,
-            'completiontokens' => 34,
             'courseid' => -1,
             'prompttokens' => 12,
             'completiontokens' => 34,

@@ -18,6 +18,10 @@ namespace core_ai\reportbuilder\local\entities;
 
 use core\di;
 use core_ai\aiactions\base as action_base;
+use core_ai\aiactions\explain_text;
+use core_ai\aiactions\generate_image;
+use core_ai\aiactions\generate_text;
+use core_ai\aiactions\summarise_text;
 use core_ai\manager;
 use core\component;
 use core_reportbuilder\local\entities\base;
@@ -179,10 +183,10 @@ class ai_action_register extends base {
             "{$mainalias}.actionname",
         ))
             ->set_options([
-                \core_ai\aiactions\explain_text::class => new lang_string('action_explain_text', 'core_ai'),
-                \core_ai\aiactions\generate_image::class => new lang_string('action_generate_image', 'core_ai'),
-                \core_ai\aiactions\generate_text::class => new lang_string('action_generate_text', 'core_ai'),
-                \core_ai\aiactions\summarise_text::class => new lang_string('action_summarise_text', 'core_ai'),
+                explain_text::class => new lang_string('action_explain_text', 'core_ai'),
+                generate_image::class => new lang_string('action_generate_image', 'core_ai'),
+                generate_text::class => new lang_string('action_generate_text', 'core_ai'),
+                summarise_text::class => new lang_string('action_summarise_text', 'core_ai'),
             ]);
 
         // Provider filter.

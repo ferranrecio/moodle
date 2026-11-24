@@ -16,15 +16,17 @@
 
 declare(strict_types=1);
 
-namespace aiplacement_editor\aiactions;
+namespace aiplacement_editor\tests\aiactions;
 
 use core_ai\aiactions\base;
 use core_ai\aiactions\responses\response_base;
 
 /**
- * Test action used to verify language component discovery.
+ * Test action owned by a plugin, used to verify that actions resolve strings against their own component.
  *
- * @package   core_ai
+ * Used by {@see \core_ai\aiactions\base_test}.
+ *
+ * @package   aiplacement_editor
  * @copyright 2026 Tasio Bertomeu Gomez <tasio.bertomeu@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

@@ -2488,33 +2488,12 @@ function xmldb_main_upgrade($oldversion) {
             string $classname,
             ?string $provider = null,
         ) use ($DB): void {
-            $params = [
-                'legacyactionname' => $basename,
-                'newactionname' => $classname,
-            ];
-            $providersql = '';
-            if ($provider !== null) {
-                $providersql = ' AND legacy.provider = :provider';
-                $params['provider'] = $provider;
-            }
-
-            // Remove duplicate legacy register rows left by an interrupted migration.
-            $sql = "SELECT legacy.id
-                      FROM {ai_action_register} legacy
-                      JOIN {ai_action_register} current
-                        ON current.actionname = :newactionname
-                       AND current.actionid = legacy.actionid
-                     WHERE legacy.actionname = :legacyactionname{$providersql}";
-            $duplicateids = $DB->get_fieldset_sql($sql, $params);
-            foreach (array_chunk($duplicateids, 1000) as $idchunk) {
-                $DB->delete_records_list('ai_action_register', 'id', $idchunk);
-            }
-
             $select = 'actionname = :legacyactionname';
+            $params = ['legacyactionname' => $basename];
             if ($provider !== null) {
                 $select .= ' AND provider = :provider';
+                $params['provider'] = $provider;
             }
-            unset($params['newactionname']);
             $DB->set_field_select('ai_action_register', 'actionname', $classname, $select, $params);
         };
 

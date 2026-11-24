@@ -31,6 +31,7 @@ use restore_controller;
 #[\PHPUnit\Framework\Attributes\CoversMethod(\restore_section_structure_step::class, 'process_section')]
 #[\PHPUnit\Framework\Attributes\CoversMethod(\restore_root_task::class, 'define_settings')]
 #[\PHPUnit\Framework\Attributes\CoversMethod(\restore_load_included_files::class, 'process_file')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\restore_module_structure_step::class, 'process_module')]
 final class restore_stepslib_test extends \advanced_testcase {
     /**
      * Setup to include all libraries.
@@ -151,8 +152,6 @@ final class restore_stepslib_test extends \advanced_testcase {
 
     /**
      * Test legacy AI action basenames are normalized when restoring a course module.
-     *
-     * @covers \restore_module_structure_step::process_module
      */
     public function test_restore_module_normalizes_legacy_ai_actions(): void {
         global $DB;
