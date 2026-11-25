@@ -16,11 +16,13 @@
 
 namespace core_ai;
 
+use aiplacement_editor\tests\aiactions\custom_action;
 use core_ai\aiactions\generate_image;
 use core_ai\aiactions\generate_text;
 use core_ai\aiactions\summarise_text;
 use core_ai\aiactions\explain_text;
 use core_ai\aiactions\responses\response_generate_image;
+use core_ai\aiactions\responses\response_generic;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -52,6 +54,7 @@ final class manager_test extends \advanced_testcase {
             public static function get_action_list(): array {
                 return [];
             }
+
         };
 
         $context = \context_system::instance();
@@ -96,6 +99,28 @@ final class manager_test extends \advanced_testcase {
             summarise_text::class,
             explain_text::class,
         ], $actions);
+    }
+
+    /**
+     * Test setting the enabled state of a custom action.
+     */
+    public function test_set_action_state_for_custom_action(): void {
+        $this->resetAfterTest();
+        set_config('enabledactions', json_encode([custom_action::class => 0]), 'aiplacement_editor');
+        $manager = \core\di::get(manager::class);
+
+        $this->assertTrue($manager->set_action_state('aiplacement_editor', custom_action::class, 1));
+        $this->assertTrue($manager->is_action_enabled('aiplacement_editor', custom_action::class));
+    }
+
+    /**
+     * Test setting the enabled state with an invalid class.
+     */
+    public function test_set_action_state_rejects_non_action_class(): void {
+        $manager = \core\di::get(manager::class);
+
+        $this->expectException(\coding_exception::class);
+        $manager->set_action_state('aiplacement_editor', \stdClass::class, 1);
     }
 
     /**
@@ -591,6 +616,20 @@ final class manager_test extends \advanced_testcase {
         // Success should be false as there are no enabled providers.
         $result = $managermock->process_action($action);
         $this->assertFalse($result->get_success());
+    }
+
+    /**
+     * Test process_action returns a generic failure response for a custom action with no provider.
+     */
+    public function test_process_action_custom_action_without_provider(): void {
+        $this->resetAfterTest();
+        $action = new custom_action(contextid: \context_system::instance()->id);
+
+        $result = \core\di::get(manager::class)->process_action($action);
+
+        $this->assertInstanceOf(response_generic::class, $result);
+        $this->assertFalse($result->get_success());
+        $this->assertSame(custom_action::class, $result->get_actionname());
     }
 
     /**

@@ -213,6 +213,16 @@ class manager {
         }
 
         // Response if there are no providers available.
+        if (!class_exists($responseclassname)) {
+            return new responses\response_generic(
+                success: false,
+                actionname: $actionname,
+                errorcode: -1,
+                error: get_string('error:noproviders', 'core_ai'),
+                errormessage: get_string('error:defaultmessage', 'core_ai'),
+            );
+        }
+
         return new $responseclassname(
             success: false,
             errorcode: -1,

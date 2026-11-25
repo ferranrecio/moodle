@@ -80,22 +80,20 @@ final class base_test extends \advanced_testcase {
     /**
      * Data provider for {@see test_action_strings_resolve_against_language_component}.
      *
-     * @return array
+     * @return \Generator
      */
-    public static function action_strings_provider(): array {
-        return [
-            'core action' => [
-                'actionclass' => aiactions\generate_text::class,
-                'component' => 'core_ai',
-                'stringid' => 'action_generate_text',
-                'hasinstruction' => true,
-            ],
-            'plugin action' => [
-                'actionclass' => custom_action::class,
-                'component' => 'aiplacement_editor',
-                'stringid' => 'action_custom_action',
-                'hasinstruction' => false,
-            ],
+    public static function action_strings_provider(): \Generator {
+        yield 'core action' => [
+            'actionclass' => aiactions\generate_text::class,
+            'component' => 'core_ai',
+            'stringid' => 'action_generate_text',
+            'hasinstruction' => true,
+        ];
+        yield 'plugin action' => [
+            'actionclass' => custom_action::class,
+            'component' => 'aiplacement_editor',
+            'stringid' => 'action_custom_action',
+            'hasinstruction' => false,
         ];
     }
 
